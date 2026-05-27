@@ -110,7 +110,8 @@ router.post("/v1/inbox/threads/:threadId/reply", requireTenant, async (req, res,
       to,
       subject: subject ?? thread.subject ?? "Re: conversation",
       text: body,
-      metadata: { actorUserId: actorId(req), actorLabel: actorLabel(req) },
+      jobId: thread.jobId ?? null,
+      metadata: { actorUserId: actorId(req), actorLabel: actorLabel(req), threadId: thread.id },
     });
 
     res.json({ ok: true });

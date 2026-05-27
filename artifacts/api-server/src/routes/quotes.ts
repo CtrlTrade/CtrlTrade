@@ -237,6 +237,26 @@ router.post("/v1/quotes/:quoteId/send", requireTenant, async (req, res): Promise
     .set({ status: "sent", sentAt: now })
     .where(eq(quotesTable.id, ctx.q.id))
     .returning();
+  if (ctx.customer.email) {
+    try {
+      const { dispatchNotification } = await import("../lib/notifications");
+      const { getAppBaseUrl } = await import("../lib/email");
+      await dispatchNotification({
+        tenantId,
+        eventKind: "quote.sent",
+        vars: {
+          customerName: ctx.customer.name,
+          tenantName: req.auth!.tenant!.name,
+          quoteNumber: updated.number,
+          quoteUrl: `${getAppBaseUrl()}/portal/${req.auth!.tenant!.slug}`,
+        },
+        to: { email: ctx.customer.email, name: ctx.customer.name, customerId: ctx.customer.id },
+        metadata: { quoteId: updated.id },
+      });
+    } catch (err) {
+      req.log.warn({ err, quoteId: updated.id }, "Quote send email failed");
+    }
+  }
   await logAudit({
     tenantId,
     actorUserId: req.auth!.user.id,
@@ -264,6 +284,24 @@ router.post("/v1/quotes/:quoteId/accept", requireTenant, async (req, res): Promi
     .set({ status: "accepted", acceptedAt: now })
     .where(eq(quotesTable.id, ctx.q.id))
     .returning();
+  if (ctx.customer.email) {
+    try {
+      const { dispatchNotification } = await import("../lib/notifications");
+      await dispatchNotification({
+        tenantId,
+        eventKind: "quote.accepted",
+        vars: {
+          customerName: ctx.customer.name,
+          tenantName: req.auth!.tenant!.name,
+          quoteNumber: updated.number,
+        },
+        to: { email: ctx.customer.email, name: ctx.customer.name, customerId: ctx.customer.id },
+        metadata: { quoteId: updated.id },
+      });
+    } catch (err) {
+      req.log.warn({ err, quoteId: updated.id }, "Quote accepted email failed");
+    }
+  }
   await logAudit({
     tenantId,
     actorUserId: req.auth!.user.id,

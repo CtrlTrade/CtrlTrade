@@ -180,6 +180,23 @@ router.post("/v1/auth/signup", async (req, res): Promise<void> => {
     return;
   }
 
+  try {
+    const { dispatchNotification } = await import("../lib/notifications");
+    const { getAppBaseUrl } = await import("../lib/email");
+    await dispatchNotification({
+      tenantId: result.tenant.id,
+      eventKind: "auth.signup_welcome",
+      vars: {
+        name: result.user.name,
+        tenantName: result.tenant.name,
+        appUrl: `${getAppBaseUrl()}/app`,
+      },
+      to: { email: result.user.email, name: result.user.name },
+    });
+  } catch (err) {
+    req.log.error({ err }, "Signup welcome email failed");
+  }
+
   await logAudit({
     tenantId: result.tenant.id,
     actorUserId: result.user.id,
