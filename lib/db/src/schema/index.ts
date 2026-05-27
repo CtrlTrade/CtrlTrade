@@ -492,6 +492,8 @@ export const jobsTable = pgTable(
     assignedUserId: uuid("assigned_user_id").references(() => usersTable.id, { onDelete: "set null" }),
     assignedVehicleId: uuid("assigned_vehicle_id"),
     valuePence: integer("value_pence").notNull().default(0),
+    parentContractId: uuid("parent_contract_id"),
+    recurrenceIndex: integer("recurrence_index"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
@@ -500,9 +502,42 @@ export const jobsTable = pgTable(
     statusIdx: index("jobs_status_idx").on(t.status),
     scheduleIdx: index("jobs_schedule_idx").on(t.tenantId, t.scheduledStart),
     assignedIdx: index("jobs_assigned_idx").on(t.assignedUserId),
+    contractIdx: index("jobs_contract_idx").on(t.parentContractId),
     uniqNum: unique("jobs_tenant_number_uniq").on(t.tenantId, t.number),
   }),
 );
+
+// ---- Maintenance Contracts -------------------------------------------------
+export const maintenanceContractsTable = pgTable(
+  "maintenance_contracts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").notNull().references(() => customersTable.id, { onDelete: "restrict" }),
+    title: text("title").notNull(),
+    frequency: varchar("frequency", { length: 24 }).notNull(), // weekly|fortnightly|monthly|quarterly|annually
+    startDate: timestamp("start_date", { withTimezone: true }).notNull(),
+    endDate: timestamp("end_date", { withTimezone: true }),
+    occurrences: integer("occurrences"),
+    nextDueAt: timestamp("next_due_at", { withTimezone: true }),
+    status: varchar("status", { length: 24 }).notNull().default("active"), // active|paused|cancelled|completed
+    pricePence: integer("price_pence").notNull().default(0),
+    notes: text("notes"),
+    addressLine1: text("address_line_1"),
+    city: text("city"),
+    postcode: text("postcode"),
+    jobsGenerated: integer("jobs_generated").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("contracts_tenant_idx").on(t.tenantId),
+    customerIdx: index("contracts_customer_idx").on(t.tenantId, t.customerId),
+    nextDueIdx: index("contracts_next_due_idx").on(t.status, t.nextDueAt),
+  }),
+);
+
+export type MaintenanceContract = typeof maintenanceContractsTable.$inferSelect;
 
 // ---- Fleet -----------------------------------------------------------------
 export const vehiclesTable = pgTable(

@@ -19,7 +19,8 @@ export type JobKind =
   | "voice_dispatch"
   | "notification_retry"
   | "notification_digest_daily"
-  | "notification_digest_weekly";
+  | "notification_digest_weekly"
+  | "contract_job_generation";
 
 export const ALL_JOB_KINDS: JobKind[] = [
   "send_email",
@@ -37,6 +38,7 @@ export const ALL_JOB_KINDS: JobKind[] = [
   "notification_retry",
   "notification_digest_daily",
   "notification_digest_weekly",
+  "contract_job_generation",
 ];
 
 let _boss: PgBoss | null = null;

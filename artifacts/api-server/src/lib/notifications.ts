@@ -43,6 +43,7 @@ export const NOTIFICATION_EVENTS: NotificationEvent[] = [
   { kind: "inbox.new_message", defaultChannels: ["email"], description: "New inbound customer message", category: "inbox" },
   { kind: "inbox.reply", defaultChannels: ["email"], description: "Operator reply on a thread", category: "inbox" },
   { kind: "inbox.compose", defaultChannels: ["email"], description: "Operator-initiated message to a customer", category: "inbox" },
+  { kind: "contract.expiry_warning", defaultChannels: ["email"], description: "Maintenance contract expiring in 7 days", category: "contract" },
 ];
 
 export const CHANNELS: Channel[] = ["email", "sms", "whatsapp"];

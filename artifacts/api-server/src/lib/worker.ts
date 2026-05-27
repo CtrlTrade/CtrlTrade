@@ -6,6 +6,7 @@ import { sendEmail } from "./email";
 import { sendSmsViaTwilio, sendWhatsAppViaTwilio } from "./twilio";
 import { processDeliveryRetries, processDigests } from "./notifications";
 import { reconcileFromStripeSubscription } from "./stripeReconcile";
+import { runContractJobGenerationOnce, runContractExpiryWarnings, generateNextJobForContract } from "./contractGeneration";
 import { db, tenantsTable } from "@workspace/db";
 import { inArray } from "drizzle-orm";
 
@@ -112,6 +113,20 @@ const handlers: Record<JobKind, Handler> = {
       await recordUsage(p.tenantId, "voice_minute", minutes, { to: p.to });
     }
   },
+  contract_job_generation: async (p) => {
+    // If a specific contractId is supplied, generate just that one. Otherwise run
+    // the full daily sweep.
+    if (p?.contractId) {
+      const result = await generateNextJobForContract(p.contractId);
+      logger.info({ contractId: p.contractId, result }, "contract_job_generation: single trigger");
+    } else {
+      const result = await runContractJobGenerationOnce();
+      const warnings = await runContractExpiryWarnings();
+      if (result.generated > 0 || warnings.sent > 0) {
+        logger.info({ ...result, warningsSent: warnings.sent }, "contract_job_generation sweep complete");
+      }
+    }
+  },
 };
 
 /** Register all job handlers on pg-boss. Called by the worker entrypoint. */
@@ -158,5 +173,7 @@ export async function registerSchedules(): Promise<void> {
   await boss.schedule("notification_digest_weekly", "0 8 * * 1", {}, { tz: "UTC" } as any);
   // Nightly integration reconciliation (pulls invoice payment status from Xero).
   await boss.schedule("integration_sync", "30 3 * * *", { kind: "nightly_reconcile" }, { tz: "UTC" } as any);
-  logger.info("Worker schedules registered (hourly expiry+rollup, daily summary+dunning+integrations, 5-min notify retry, daily+weekly digests)");
+  // Daily contract job generation + expiry warnings at 06:00 UTC.
+  await boss.schedule("contract_job_generation", "0 6 * * *", {}, { tz: "UTC" } as any);
+  logger.info("Worker schedules registered (hourly expiry+rollup, daily summary+dunning+integrations+contracts, 5-min notify retry, daily+weekly digests)");
 }
