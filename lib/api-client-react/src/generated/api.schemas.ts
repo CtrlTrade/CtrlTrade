@@ -749,6 +749,100 @@ export interface InvoiceSummary {
   createdAt: string;
 }
 
+export interface InvoiceItemsReplaceInput {
+  items: InvoiceItemInput[];
+}
+
+export interface InvoiceMarkPaidInput {
+  /** @minimum 1 */
+  amountPence?: number;
+  note?: string;
+  receivedAt?: string;
+}
+
+export interface DepositInvoiceInput {
+  /**
+     * @minimum 1
+     * @maximum 100
+     */
+  depositPct: number;
+}
+
+export interface InvoiceTemplateItemInput {
+  /** @minLength 1 */
+  description: string;
+  /** @minimum 1 */
+  quantity: number;
+  /** @minimum 0 */
+  unitPricePence: number;
+}
+
+export type InvoiceTemplateInputFrequency = typeof InvoiceTemplateInputFrequency[keyof typeof InvoiceTemplateInputFrequency];
+
+
+export const InvoiceTemplateInputFrequency = {
+  weekly: 'weekly',
+  monthly: 'monthly',
+  quarterly: 'quarterly',
+  yearly: 'yearly',
+} as const;
+
+export interface InvoiceTemplateInput {
+  customerId: string;
+  /** @minLength 1 */
+  title: string;
+  notes?: string;
+  frequency: InvoiceTemplateInputFrequency;
+  nextRunAt: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  vatRatePct?: number;
+  items: InvoiceTemplateItemInput[];
+}
+
+export type UpdateInvoiceTemplateInputFrequency = typeof UpdateInvoiceTemplateInputFrequency[keyof typeof UpdateInvoiceTemplateInputFrequency];
+
+
+export const UpdateInvoiceTemplateInputFrequency = {
+  weekly: 'weekly',
+  monthly: 'monthly',
+  quarterly: 'quarterly',
+  yearly: 'yearly',
+} as const;
+
+export interface UpdateInvoiceTemplateInput {
+  /** @minLength 1 */
+  title?: string;
+  /** @nullable */
+  notes?: string | null;
+  frequency?: UpdateInvoiceTemplateInputFrequency;
+  nextRunAt?: string;
+  active?: boolean;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  vatRatePct?: number;
+  items?: InvoiceTemplateItemInput[];
+}
+
+export interface InvoiceTemplate {
+  id: string;
+  customerId: string;
+  customerName: string;
+  title: string;
+  /** @nullable */
+  notes?: string | null;
+  frequency: string;
+  nextRunAt: string;
+  active: boolean;
+  vatRatePct: number;
+  items: InvoiceTemplateItemInput[];
+  createdAt: string;
+}
+
 export interface Invoice {
   id: string;
   number: string;
@@ -782,6 +876,7 @@ export interface Invoice {
   voidedAt?: string | null;
   /** @nullable */
   paymentLinkUrl?: string | null;
+  isDeposit?: boolean;
   items: InvoiceItem[];
   payments: InvoicePayment[];
   createdAt: string;

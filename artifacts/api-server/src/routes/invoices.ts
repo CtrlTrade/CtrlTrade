@@ -21,6 +21,9 @@ import {
   SendInvoiceResponse,
   VoidInvoiceResponse,
   GetAgedDebtorsResponse,
+  ReplaceInvoiceItemsBody,
+  MarkInvoicePaidBody,
+  GenerateDepositInvoiceFromQuoteBody,
 } from "@workspace/api-zod";
 import { requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
@@ -44,12 +47,17 @@ function computeTotals(items: { quantity: number; unitPricePence: number }[], va
   return { subtotalPence, taxPence, totalPence: subtotalPence + taxPence };
 }
 
+function deriveStatus(i: Invoice): string {
+  if (i.status === "sent" && i.dueAt && i.dueAt.getTime() < Date.now()) return "overdue";
+  return i.status;
+}
+
 function serializeSummary(i: Invoice, customerName: string) {
   return {
     id: i.id,
     number: i.number,
     title: i.title,
-    status: i.status,
+    status: deriveStatus(i),
     customerId: i.customerId,
     customerName,
     totalPence: i.totalPence,
@@ -75,7 +83,7 @@ function serializeInvoice(
     id: i.id,
     number: i.number,
     title: i.title,
-    status: i.status,
+    status: deriveStatus(i),
     customerId: i.customerId,
     customerName: customer.name,
     customerEmail: customer.email,
@@ -94,6 +102,7 @@ function serializeInvoice(
     paidAt: i.paidAt?.toISOString() ?? null,
     voidedAt: i.voidedAt?.toISOString() ?? null,
     paymentLinkUrl: i.stripePaymentLinkUrl,
+    isDeposit: i.isDeposit,
     items: items.map((it) => ({
       id: it.id,
       description: it.description,
@@ -202,8 +211,10 @@ router.get("/v1/invoices", requireTenant, async (req, res): Promise<void> => {
   const tenantId = req.auth!.tenant!.id;
   const statusQ = req.query.status;
   const status = typeof statusQ === "string" ? statusQ : undefined;
-  const whereClause = status
-    ? and(eq(invoicesTable.tenantId, tenantId), eq(invoicesTable.status, status))
+  // "overdue" is derived (sent + dueAt < now); filter sent and then post-filter.
+  const dbStatus = status === "overdue" ? "sent" : status;
+  const whereClause = dbStatus
+    ? and(eq(invoicesTable.tenantId, tenantId), eq(invoicesTable.status, dbStatus))
     : eq(invoicesTable.tenantId, tenantId);
   const rows = await db
     .select({ i: invoicesTable, customerName: customersTable.name })
@@ -211,7 +222,10 @@ router.get("/v1/invoices", requireTenant, async (req, res): Promise<void> => {
     .innerJoin(customersTable, eq(customersTable.id, invoicesTable.customerId))
     .where(whereClause)
     .orderBy(desc(invoicesTable.createdAt));
-  res.json(ListInvoicesResponse.parse(rows.map((r) => serializeSummary(r.i, r.customerName))));
+  let summaries = rows.map((r) => serializeSummary(r.i, r.customerName));
+  if (status === "overdue") summaries = summaries.filter((s) => s.status === "overdue");
+  else if (status === "sent") summaries = summaries.filter((s) => s.status === "sent");
+  res.json(ListInvoicesResponse.parse(summaries));
 });
 
 router.get("/v1/invoices/aged-debtors", requireTenant, async (req, res): Promise<void> => {
@@ -490,6 +504,175 @@ router.post("/v1/invoices/:invoiceId/void", requireTenant, async (req, res): Pro
   );
 });
 
+router.put("/v1/invoices/:invoiceId/items", requireTenant, async (req, res): Promise<void> => {
+  const parsed = ReplaceInvoiceItemsBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  const tenantId = req.auth!.tenant!.id;
+  const ctx = await loadInvoiceCtx(tenantId, req.params.invoiceId as string);
+  if (!ctx) {
+    res.status(404).json({ error: "Invoice not found" });
+    return;
+  }
+  if (ctx.inv.status !== "draft") {
+    res.status(409).json({ error: "Only draft invoices can be edited" });
+    return;
+  }
+  const totals = computeTotals(parsed.data.items, ctx.inv.vatRatePct);
+  await db.transaction(async (tx) => {
+    await tx.delete(invoiceItemsTable).where(eq(invoiceItemsTable.invoiceId, ctx.inv.id));
+    if (parsed.data.items.length > 0) {
+      await tx.insert(invoiceItemsTable).values(
+        parsed.data.items.map((it, idx) => ({
+          invoiceId: ctx.inv.id,
+          description: it.description,
+          quantity: it.quantity,
+          unitPricePence: it.unitPricePence,
+          sortOrder: idx,
+        })),
+      );
+    }
+    await tx
+      .update(invoicesTable)
+      .set({
+        subtotalPence: totals.subtotalPence,
+        taxPence: totals.taxPence,
+        totalPence: totals.totalPence,
+        stripePaymentLinkId: null,
+        stripePaymentLinkUrl: null,
+      })
+      .where(eq(invoicesTable.id, ctx.inv.id));
+  });
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: req.auth!.user.email,
+    kind: "invoice.items.updated",
+    message: `Invoice ${ctx.inv.number} line items updated`,
+  });
+  const updated = (await loadInvoiceCtx(tenantId, ctx.inv.id))!;
+  res.json(
+    GetInvoiceResponse.parse(
+      serializeInvoice(updated.inv, updated.customer, updated.items, updated.payments, updated.jobNumber),
+    ),
+  );
+});
+
+router.post("/v1/invoices/:invoiceId/mark-paid", requireTenant, async (req, res): Promise<void> => {
+  const parsed = MarkInvoicePaidBody.safeParse(req.body ?? {});
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  const tenantId = req.auth!.tenant!.id;
+  const ctx = await loadInvoiceCtx(tenantId, req.params.invoiceId as string);
+  if (!ctx) {
+    res.status(404).json({ error: "Invoice not found" });
+    return;
+  }
+  if (ctx.inv.status === "void") {
+    res.status(409).json({ error: "Cannot mark a void invoice as paid" });
+    return;
+  }
+  if (ctx.inv.status === "paid") {
+    res.status(409).json({ error: "Invoice already paid" });
+    return;
+  }
+  const receivedAt = parsed.data.receivedAt ? new Date(parsed.data.receivedAt as unknown as string) : new Date();
+  // Lock the invoice row and recompute paid sum inside the transaction so
+  // concurrent mark-paid calls cannot over-record cash beyond the invoice
+  // total (financial-correctness invariant).
+  let amount = 0;
+  try {
+    await db.transaction(async (tx) => {
+      const lockRes = await tx.execute<{ id: string; total_pence: number; status: string }>(
+        sql`SELECT id, total_pence, status FROM invoices WHERE id = ${ctx.inv.id} FOR UPDATE`,
+      );
+      const locked = lockRes.rows[0];
+      if (!locked) throw new Error("Invoice disappeared");
+      if (locked.status === "paid") throw new Error("ALREADY_PAID");
+      if (locked.status === "void") throw new Error("VOID");
+      const sumRes = await tx.execute<{ s: number | null }>(
+        sql`SELECT COALESCE(SUM(amount_pence), 0)::int AS s FROM payments WHERE invoice_id = ${ctx.inv.id} AND status = 'succeeded'`,
+      );
+      const alreadyPaid = Number(sumRes.rows[0]?.s ?? 0);
+      const remaining = Math.max(0, locked.total_pence - alreadyPaid);
+      const requested = parsed.data.amountPence ?? remaining;
+      amount = Math.min(requested, remaining);
+      if (amount <= 0) throw new Error("NOTHING_TO_PAY");
+      await tx.insert(paymentsTable).values({
+        tenantId,
+        invoiceId: ctx.inv.id,
+        amountPence: amount,
+        currency: ctx.inv.currency,
+        provider: "manual",
+        status: "succeeded",
+        receivedAt,
+      });
+      if (alreadyPaid + amount >= locked.total_pence) {
+        await tx
+          .update(invoicesTable)
+          .set({ status: "paid", paidAt: receivedAt })
+          .where(eq(invoicesTable.id, ctx.inv.id));
+      }
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg === "ALREADY_PAID") { res.status(409).json({ error: "Invoice already paid" }); return; }
+    if (msg === "VOID") { res.status(409).json({ error: "Cannot mark a void invoice as paid" }); return; }
+    if (msg === "NOTHING_TO_PAY") { res.status(400).json({ error: "Nothing to mark paid" }); return; }
+    throw err;
+  }
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: req.auth!.user.email,
+    kind: "invoice.payment.manual",
+    message: `Invoice ${ctx.inv.number} manual payment recorded`,
+    metadata: { amountPence: amount, note: parsed.data.note ?? null },
+  });
+  // Receipt email
+  await sendPaymentReceipt(ctx.inv.id, amount).catch((err) =>
+    logger.warn({ err, invoiceId: ctx.inv.id }, "Receipt email failed"),
+  );
+  const updated = (await loadInvoiceCtx(tenantId, ctx.inv.id))!;
+  res.json(
+    GetInvoiceResponse.parse(
+      serializeInvoice(updated.inv, updated.customer, updated.items, updated.payments, updated.jobNumber),
+    ),
+  );
+});
+
+async function sendPaymentReceipt(invoiceId: string, amountPence: number): Promise<void> {
+  const [inv] = await db.select().from(invoicesTable).where(eq(invoicesTable.id, invoiceId));
+  if (!inv) return;
+  const [customer] = await db
+    .select()
+    .from(customersTable)
+    .where(and(eq(customersTable.tenantId, inv.tenantId), eq(customersTable.id, inv.customerId)));
+  if (!customer?.email) return;
+  const totalGbp = (amountPence / 100).toFixed(2);
+  const fullyPaid = inv.status === "paid";
+  const lines = [
+    `Hi ${customer.name},`,
+    ``,
+    `We've received your payment of £${totalGbp} for invoice ${inv.number}.`,
+    fullyPaid ? `This invoice is now fully paid. Thank you!` : `Thank you — your invoice balance has been updated.`,
+    ``,
+    `Reference: ${inv.number}`,
+  ];
+  await sendEmail({
+    tenantId: inv.tenantId,
+    template: "invoice.payment.receipt",
+    to: [{ email: customer.email, name: customer.name }],
+    subject: `Payment received — invoice ${inv.number}`,
+    text: lines.join("\n"),
+    metadata: { invoiceId: inv.id, amountPence },
+  });
+}
+
 router.post("/v1/jobs/:jobId/invoice", requireTenant, async (req, res): Promise<void> => {
   const tenantId = req.auth!.tenant!.id;
   const tenant = req.auth!.tenant!;
@@ -611,6 +794,89 @@ router.post("/v1/quotes/:quoteId/invoice", requireTenant, async (req, res): Prom
   );
 });
 
+router.post("/v1/quotes/:quoteId/deposit-invoice", requireTenant, async (req, res): Promise<void> => {
+  const parsed = GenerateDepositInvoiceFromQuoteBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  const tenantId = req.auth!.tenant!.id;
+  const tenant = req.auth!.tenant!;
+  const [quote] = await db
+    .select()
+    .from(quotesTable)
+    .where(and(eq(quotesTable.tenantId, tenantId), eq(quotesTable.id, req.params.quoteId as string)));
+  if (!quote) {
+    res.status(404).json({ error: "Quote not found" });
+    return;
+  }
+  if (quote.status !== "accepted" && quote.status !== "converted" && quote.status !== "sent") {
+    res.status(409).json({ error: "Quote must be sent, accepted, or converted to invoice a deposit" });
+    return;
+  }
+  const qItems = await db
+    .select()
+    .from(quoteLineItemsTable)
+    .where(eq(quoteLineItemsTable.quoteId, quote.id));
+  const quoteSubtotal = qItems.reduce((s, it) => s + it.quantity * it.unitPricePence, 0);
+  if (quoteSubtotal <= 0) {
+    res.status(400).json({ error: "Quote has no value" });
+    return;
+  }
+  const depositPence = Math.round((quoteSubtotal * parsed.data.depositPct) / 100);
+  const vatRatePct = tenant.vatRatePct ?? 20;
+  const number = await nextInvoiceNumber(tenantId);
+  const totals = computeTotals(
+    [{ quantity: 1, unitPricePence: depositPence }],
+    vatRatePct,
+  );
+  const inv = await db.transaction(async (tx) => {
+    const [row] = await tx
+      .insert(invoicesTable)
+      .values({
+        tenantId,
+        customerId: quote.customerId,
+        quoteId: quote.id,
+        number,
+        title: `Deposit (${parsed.data.depositPct}%) for ${quote.title}`,
+        status: "draft",
+        notes: quote.notes,
+        isDeposit: true,
+        vatRatePct,
+        subtotalPence: totals.subtotalPence,
+        taxPence: totals.taxPence,
+        totalPence: totals.totalPence,
+        dueAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      })
+      .returning();
+    await tx.insert(invoiceItemsTable).values({
+      invoiceId: row.id,
+      description: `Deposit (${parsed.data.depositPct}%) for ${quote.title}`,
+      quantity: 1,
+      unitPricePence: depositPence,
+      sortOrder: 0,
+    });
+    return row;
+  });
+  // Also persist depositPct on the quote so future runs are idempotent at the UI layer
+  await db
+    .update(quotesTable)
+    .set({ depositPct: parsed.data.depositPct })
+    .where(eq(quotesTable.id, quote.id));
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: req.auth!.user.email,
+    kind: "invoice.deposit.created",
+    message: `Deposit invoice ${inv.number} (${parsed.data.depositPct}%) generated from quote ${quote.number}`,
+    metadata: { quoteId: quote.id, invoiceId: inv.id, depositPct: parsed.data.depositPct },
+  });
+  const ctx = (await loadInvoiceCtx(tenantId, inv.id))!;
+  res.status(201).json(
+    serializeInvoice(ctx.inv, ctx.customer, ctx.items, ctx.payments, ctx.jobNumber),
+  );
+});
+
 // Used by webhook handler to credit a payment + mark invoice paid.
 export async function recordInvoicePayment(opts: {
   invoiceId: string;
@@ -635,16 +901,28 @@ export async function recordInvoicePayment(opts: {
       .where(eq(paymentsTable.stripeCheckoutSessionId, opts.stripeCheckoutSessionId));
     if (dup) return;
   }
-  await db.insert(paymentsTable).values({
-    tenantId: inv.tenantId,
-    invoiceId: inv.id,
-    amountPence: opts.amountPence,
-    currency: opts.currency,
-    provider: "stripe",
-    stripeCheckoutSessionId: opts.stripeCheckoutSessionId ?? null,
-    stripePaymentIntentId: opts.stripePaymentIntentId ?? null,
-    status: "succeeded",
-  });
+  try {
+    await db.insert(paymentsTable).values({
+      tenantId: inv.tenantId,
+      invoiceId: inv.id,
+      amountPence: opts.amountPence,
+      currency: opts.currency,
+      provider: "stripe",
+      stripeCheckoutSessionId: opts.stripeCheckoutSessionId ?? null,
+      stripePaymentIntentId: opts.stripePaymentIntentId ?? null,
+      status: "succeeded",
+    });
+  } catch (err) {
+    // Idempotent: a concurrent webhook delivery may have raced us and the
+    // partial unique index on stripe_checkout_session_id rejected our insert.
+    const code = (err as { code?: string } | null)?.code;
+    if (opts.stripeCheckoutSessionId && code === "23505") {
+      logger.info({ invoiceId: inv.id, checkoutSessionId: opts.stripeCheckoutSessionId },
+        "recordInvoicePayment: duplicate webhook delivery suppressed");
+      return;
+    }
+    throw err;
+  }
   const totalPaid = await db
     .select({ s: sql<number>`coalesce(sum(amount_pence), 0)::int` })
     .from(paymentsTable)
@@ -663,6 +941,9 @@ export async function recordInvoicePayment(opts: {
       metadata: { amountPence: paid, checkoutSessionId: opts.stripeCheckoutSessionId },
     });
   }
+  await sendPaymentReceipt(inv.id, opts.amountPence).catch((err) =>
+    logger.warn({ err, invoiceId: inv.id }, "Receipt email failed"),
+  );
 }
 
 export default router;

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import {
   useListInvoices,
@@ -5,8 +6,10 @@ import {
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Repeat } from "lucide-react";
 
 function formatGBP(pence: number) {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(pence / 100);
@@ -20,14 +23,29 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "outline" | "dest
   void: "outline",
 };
 
+const FILTERS = [
+  { value: "", label: "All" },
+  { value: "draft", label: "Draft" },
+  { value: "sent", label: "Sent" },
+  { value: "overdue", label: "Overdue" },
+  { value: "paid", label: "Paid" },
+  { value: "void", label: "Void" },
+];
+
 export function AppInvoices() {
-  const { data, isLoading } = useListInvoices();
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const { data, isLoading } = useListInvoices(statusFilter ? { status: statusFilter } : undefined);
   const { data: debtors } = useGetAgedDebtors();
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold uppercase tracking-tighter">Invoices</h1>
+        <Link href="/invoice-templates">
+          <Button variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="link-invoice-templates">
+            <Repeat className="h-4 w-4 mr-2" /> Recurring templates
+          </Button>
+        </Link>
       </div>
 
       {debtors && (
@@ -72,12 +90,30 @@ export function AppInvoices() {
       )}
 
       <Card className="rounded-none border-border shadow-sm">
-        <CardHeader><CardTitle className="uppercase tracking-tight">All invoices</CardTitle></CardHeader>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle className="uppercase tracking-tight">All invoices</CardTitle>
+            <div className="flex gap-1">
+              {FILTERS.map((f) => (
+                <Button
+                  key={f.value}
+                  variant={statusFilter === f.value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter(f.value)}
+                  className="rounded-none uppercase tracking-wider text-xs font-bold"
+                  data-testid={`filter-invoice-${f.value || "all"}`}
+                >
+                  {f.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardHeader>
         <CardContent>
           {isLoading ? (
             <Skeleton className="h-32" />
           ) : !data || data.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No invoices yet. Generate one from a completed job or accepted quote.</p>
+            <p className="text-muted-foreground text-sm">No invoices match the current filter.</p>
           ) : (
             <Table>
               <TableHeader><TableRow>

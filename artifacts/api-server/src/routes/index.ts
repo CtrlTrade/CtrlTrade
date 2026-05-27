@@ -16,6 +16,7 @@ import teamRouter from "./team";
 import dashboardRouter from "./dashboard";
 import posRouter from "./pos";
 import invoicesRouter from "./invoices";
+import invoiceTemplatesRouter from "./invoiceTemplates";
 
 const router: IRouter = Router();
 
@@ -43,5 +44,6 @@ router.use(teamRouter);
 router.use(dashboardRouter);
 router.use(posRouter);
 router.use(invoicesRouter);
+router.use(invoiceTemplatesRouter);
 
 export default router;

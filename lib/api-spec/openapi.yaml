@@ -927,6 +927,117 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Invoice" }
 
+  /v1/invoices/{invoiceId}/items:
+    parameters:
+      - in: path
+        name: invoiceId
+        required: true
+        schema: { type: string }
+    put:
+      operationId: replaceInvoiceItems
+      tags: [invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InvoiceItemsReplaceInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+
+  /v1/invoices/{invoiceId}/mark-paid:
+    parameters:
+      - in: path
+        name: invoiceId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: markInvoicePaid
+      tags: [invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InvoiceMarkPaidInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+
+  /v1/invoice-templates:
+    get:
+      operationId: listInvoiceTemplates
+      tags: [invoices]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/InvoiceTemplate" }
+    post:
+      operationId: createInvoiceTemplate
+      tags: [invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InvoiceTemplateInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InvoiceTemplate" }
+
+  /v1/invoice-templates/{templateId}:
+    parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateInvoiceTemplate
+      tags: [invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateInvoiceTemplateInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InvoiceTemplate" }
+    delete:
+      operationId: deleteInvoiceTemplate
+      tags: [invoices]
+      responses:
+        "204": { description: No Content }
+
+  /v1/invoice-templates/{templateId}/run:
+    parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: runInvoiceTemplate
+      tags: [invoices]
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+
   /v1/jobs/{jobId}/invoice:
     parameters:
       - in: path
@@ -952,6 +1063,27 @@ paths:
     post:
       operationId: generateInvoiceFromQuote
       tags: [invoices]
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+
+  /v1/quotes/{quoteId}/deposit-invoice:
+    parameters:
+      - in: path
+        name: quoteId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: generateDepositInvoiceFromQuote
+      tags: [invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DepositInvoiceInput" }
       responses:
         "201":
           description: Created
@@ -1953,6 +2085,80 @@ components:
         paidAt: { type: ["string", "null"], format: date-time }
         createdAt: { type: string, format: date-time }
 
+    InvoiceItemsReplaceInput:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/InvoiceItemInput" }
+
+    InvoiceMarkPaidInput:
+      type: object
+      properties:
+        amountPence: { type: integer, minimum: 1 }
+        note: { type: string }
+        receivedAt: { type: string, format: date-time }
+
+    DepositInvoiceInput:
+      type: object
+      required: [depositPct]
+      properties:
+        depositPct: { type: integer, minimum: 1, maximum: 100 }
+
+    InvoiceTemplateItemInput:
+      type: object
+      required: [description, quantity, unitPricePence]
+      properties:
+        description: { type: string, minLength: 1 }
+        quantity: { type: integer, minimum: 1 }
+        unitPricePence: { type: integer, minimum: 0 }
+
+    InvoiceTemplateInput:
+      type: object
+      required: [customerId, title, frequency, nextRunAt, items]
+      properties:
+        customerId: { type: string }
+        title: { type: string, minLength: 1 }
+        notes: { type: string }
+        frequency: { type: string, enum: [weekly, monthly, quarterly, yearly] }
+        nextRunAt: { type: string, format: date-time }
+        vatRatePct: { type: integer, minimum: 0, maximum: 100 }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/InvoiceTemplateItemInput" }
+
+    UpdateInvoiceTemplateInput:
+      type: object
+      properties:
+        title: { type: string, minLength: 1 }
+        notes: { type: ["string", "null"] }
+        frequency: { type: string, enum: [weekly, monthly, quarterly, yearly] }
+        nextRunAt: { type: string, format: date-time }
+        active: { type: boolean }
+        vatRatePct: { type: integer, minimum: 0, maximum: 100 }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/InvoiceTemplateItemInput" }
+
+    InvoiceTemplate:
+      type: object
+      required: [id, customerId, customerName, title, frequency, nextRunAt, active, vatRatePct, items, createdAt]
+      properties:
+        id: { type: string }
+        customerId: { type: string }
+        customerName: { type: string }
+        title: { type: string }
+        notes: { type: ["string", "null"] }
+        frequency: { type: string }
+        nextRunAt: { type: string, format: date-time }
+        active: { type: boolean }
+        vatRatePct: { type: integer }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/InvoiceTemplateItemInput" }
+        createdAt: { type: string, format: date-time }
+
     Invoice:
       type: object
       required: [id, number, title, status, customerId, customerName, subtotalPence, taxPence, totalPence, vatRatePct, currency, items, payments, createdAt]
@@ -1979,6 +2185,7 @@ components:
         paidAt: { type: ["string", "null"], format: date-time }
         voidedAt: { type: ["string", "null"], format: date-time }
         paymentLinkUrl: { type: ["string", "null"] }
+        isDeposit: { type: boolean }
         items:
           type: array
           items: { $ref: "#/components/schemas/InvoiceItem" }

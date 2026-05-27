@@ -41,6 +41,7 @@ export interface Invoice {
   voidedAt?: Date | null;
   /** @nullable */
   paymentLinkUrl?: string | null;
+  isDeposit?: boolean;
   items: InvoiceItem[];
   payments: InvoicePayment[];
   createdAt: Date;

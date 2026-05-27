@@ -5,6 +5,7 @@ import {
   useAcceptQuote,
   useConvertQuoteToJob,
   useGenerateInvoiceFromQuote,
+  useGenerateDepositInvoiceFromQuote,
   getGetQuoteQueryKey,
   getListQuotesQueryKey,
   getListJobsQueryKey,
@@ -16,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Send, Check, ArrowRightCircle, Receipt } from "lucide-react";
+import { ArrowLeft, Send, Check, ArrowRightCircle, Receipt, Percent } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 function formatGBP(pence: number) {
@@ -54,7 +55,28 @@ export function AppQuoteDetail() {
       onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
     },
   });
+  const depositInvoice = useGenerateDepositInvoiceFromQuote({
+    mutation: {
+      onSuccess: (inv) => {
+        qc.invalidateQueries({ queryKey: getListInvoicesQueryKey() });
+        toast({ title: `Deposit invoice ${inv.number} created` });
+        setLocation(`/invoices/${inv.id}`);
+      },
+      onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
+    },
+  });
   const canInvoice = data?.status === "accepted" || data?.status === "converted";
+  const canDeposit = data?.status === "sent" || data?.status === "accepted" || data?.status === "converted";
+  const requestDeposit = () => {
+    const raw = window.prompt("Deposit percentage (1-100):", "25");
+    if (!raw) return;
+    const pct = parseInt(raw, 10);
+    if (Number.isNaN(pct) || pct < 1 || pct > 100) {
+      toast({ title: "Invalid percentage", variant: "destructive" });
+      return;
+    }
+    depositInvoice.mutate({ quoteId: id, data: { depositPct: pct } });
+  };
 
   if (isLoading) return <Skeleton className="h-96" />;
   if (!data) return <p>Quote not found.</p>;
@@ -88,6 +110,12 @@ export function AppQuoteDetail() {
           className="rounded-none uppercase tracking-wider font-bold" data-testid="button-convert-quote">
           <ArrowRightCircle className="h-4 w-4 mr-2" /> Convert to job
         </Button>
+        {canDeposit && (
+          <Button onClick={requestDeposit} disabled={depositInvoice.isPending}
+            variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-deposit-invoice">
+            <Percent className="h-4 w-4 mr-2" /> Deposit invoice
+          </Button>
+        )}
         {canInvoice && (
           <Button onClick={() => generateInvoice.mutate({ quoteId: id })}
             disabled={generateInvoice.isPending}

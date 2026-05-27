@@ -9,6 +9,7 @@ import {
   uuid,
   index,
   unique,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -39,6 +40,7 @@ export const tenantsTable = pgTable(
     brandColor: varchar("brand_color", { length: 16 }),
     logoUrl: text("logo_url"),
     vatRatePct: integer("vat_rate_pct").notNull().default(20),
+    invoiceNumberSeq: integer("invoice_number_seq").notNull().default(0),
     stripeCustomerId: text("stripe_customer_id"),
     stripeSubscriptionId: text("stripe_subscription_id"),
     trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
@@ -214,6 +216,7 @@ export const quotesTable = pgTable(
     status: varchar("status", { length: 24 }).notNull().default("draft"), // draft|sent|accepted|declined|converted
     currency: varchar("currency", { length: 8 }).notNull().default("gbp"),
     notes: text("notes"),
+    depositPct: integer("deposit_pct").notNull().default(0),
     sentAt: timestamp("sent_at", { withTimezone: true }),
     acceptedAt: timestamp("accepted_at", { withTimezone: true }),
     convertedJobId: uuid("converted_job_id"),
@@ -385,6 +388,7 @@ export const invoicesTable = pgTable(
     taxPence: integer("tax_pence").notNull().default(0),
     totalPence: integer("total_pence").notNull().default(0),
     vatRatePct: integer("vat_rate_pct").notNull().default(20),
+    isDeposit: boolean("is_deposit").notNull().default(false),
     notes: text("notes"),
     dueAt: timestamp("due_at", { withTimezone: true }),
     sentAt: timestamp("sent_at", { withTimezone: true }),
@@ -434,6 +438,12 @@ export const paymentsTable = pgTable(
   (t) => ({
     tenantIdx: index("payments_tenant_idx").on(t.tenantId),
     invoiceIdx: index("payments_invoice_idx").on(t.invoiceId),
+    // Partial unique index — prevents duplicate Stripe webhook deliveries
+    // creating two payment rows for the same checkout session. Enforced in DB
+    // because the JS dedupe check in recordInvoicePayment is racy.
+    stripeSessionUnique: uniqueIndex("payments_stripe_checkout_session_unique")
+      .on(t.stripeCheckoutSessionId)
+      .where(sql`${t.stripeCheckoutSessionId} IS NOT NULL`),
   }),
 );
 
@@ -455,3 +465,28 @@ export type PosSale = typeof posSalesTable.$inferSelect;
 export type Invoice = typeof invoicesTable.$inferSelect;
 export type InvoiceItem = typeof invoiceItemsTable.$inferSelect;
 export type Payment = typeof paymentsTable.$inferSelect;
+
+export const invoiceTemplatesTable = pgTable(
+  "invoice_templates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").notNull().references(() => customersTable.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    notes: text("notes"),
+    frequency: varchar("frequency", { length: 16 }).notNull(), // weekly|monthly|quarterly|yearly
+    nextRunAt: timestamp("next_run_at", { withTimezone: true }).notNull(),
+    active: boolean("active").notNull().default(true),
+    vatRatePct: integer("vat_rate_pct").notNull().default(20),
+    items: jsonb("items").notNull().$type<Array<{ description: string; quantity: number; unitPricePence: number }>>(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("invoice_templates_tenant_idx").on(t.tenantId),
+    nextIdx: index("invoice_templates_next_idx").on(t.nextRunAt),
+  }),
+);
+
+export type InvoiceTemplate = typeof invoiceTemplatesTable.$inferSelect;
+

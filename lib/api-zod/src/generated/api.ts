@@ -1321,6 +1321,7 @@ export const GetInvoiceResponse = zod.object({
   "paidAt": zod.coerce.date().nullish(),
   "voidedAt": zod.coerce.date().nullish(),
   "paymentLinkUrl": zod.string().nullish(),
+  "isDeposit": zod.boolean().optional(),
   "items": zod.array(zod.object({
   "id": zod.string(),
   "description": zod.string(),
@@ -1367,6 +1368,7 @@ export const SendInvoiceResponse = zod.object({
   "paidAt": zod.coerce.date().nullish(),
   "voidedAt": zod.coerce.date().nullish(),
   "paymentLinkUrl": zod.string().nullish(),
+  "isDeposit": zod.boolean().optional(),
   "items": zod.array(zod.object({
   "id": zod.string(),
   "description": zod.string(),
@@ -1413,6 +1415,7 @@ export const VoidInvoiceResponse = zod.object({
   "paidAt": zod.coerce.date().nullish(),
   "voidedAt": zod.coerce.date().nullish(),
   "paymentLinkUrl": zod.string().nullish(),
+  "isDeposit": zod.boolean().optional(),
   "items": zod.array(zod.object({
   "id": zod.string(),
   "description": zod.string(),
@@ -1432,6 +1435,237 @@ export const VoidInvoiceResponse = zod.object({
 })
 
 
+export const ReplaceInvoiceItemsParams = zod.object({
+  "invoiceId": zod.coerce.string()
+})
+
+
+
+export const replaceInvoiceItemsBodyItemsItemUnitPricePenceMin = 0;
+
+
+
+export const ReplaceInvoiceItemsBody = zod.object({
+  "items": zod.array(zod.object({
+  "description": zod.string().min(1),
+  "quantity": zod.number().min(1),
+  "unitPricePence": zod.number().min(replaceInvoiceItemsBodyItemsItemUnitPricePenceMin)
+}))
+})
+
+export const ReplaceInvoiceItemsResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "jobId": zod.string().nullish(),
+  "jobNumber": zod.string().nullish(),
+  "quoteId": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "subtotalPence": zod.number(),
+  "taxPence": zod.number(),
+  "totalPence": zod.number(),
+  "amountPaidPence": zod.number().optional(),
+  "vatRatePct": zod.number(),
+  "currency": zod.string(),
+  "dueAt": zod.coerce.date().nullish(),
+  "sentAt": zod.coerce.date().nullish(),
+  "paidAt": zod.coerce.date().nullish(),
+  "voidedAt": zod.coerce.date().nullish(),
+  "paymentLinkUrl": zod.string().nullish(),
+  "isDeposit": zod.boolean().optional(),
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number(),
+  "sortOrder": zod.number()
+})),
+  "payments": zod.array(zod.object({
+  "id": zod.string(),
+  "amountPence": zod.number(),
+  "currency": zod.string(),
+  "provider": zod.string(),
+  "status": zod.string(),
+  "receivedAt": zod.coerce.date()
+})),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const MarkInvoicePaidParams = zod.object({
+  "invoiceId": zod.coerce.string()
+})
+
+
+
+
+export const MarkInvoicePaidBody = zod.object({
+  "amountPence": zod.number().min(1).optional(),
+  "note": zod.string().optional(),
+  "receivedAt": zod.coerce.date().optional()
+})
+
+export const MarkInvoicePaidResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "jobId": zod.string().nullish(),
+  "jobNumber": zod.string().nullish(),
+  "quoteId": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "subtotalPence": zod.number(),
+  "taxPence": zod.number(),
+  "totalPence": zod.number(),
+  "amountPaidPence": zod.number().optional(),
+  "vatRatePct": zod.number(),
+  "currency": zod.string(),
+  "dueAt": zod.coerce.date().nullish(),
+  "sentAt": zod.coerce.date().nullish(),
+  "paidAt": zod.coerce.date().nullish(),
+  "voidedAt": zod.coerce.date().nullish(),
+  "paymentLinkUrl": zod.string().nullish(),
+  "isDeposit": zod.boolean().optional(),
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number(),
+  "sortOrder": zod.number()
+})),
+  "payments": zod.array(zod.object({
+  "id": zod.string(),
+  "amountPence": zod.number(),
+  "currency": zod.string(),
+  "provider": zod.string(),
+  "status": zod.string(),
+  "receivedAt": zod.coerce.date()
+})),
+  "createdAt": zod.coerce.date()
+})
+
+
+
+
+export const listInvoiceTemplatesResponseItemsItemUnitPricePenceMin = 0;
+
+
+
+export const ListInvoiceTemplatesResponseItem = zod.object({
+  "id": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "title": zod.string(),
+  "notes": zod.string().nullish(),
+  "frequency": zod.string(),
+  "nextRunAt": zod.coerce.date(),
+  "active": zod.boolean(),
+  "vatRatePct": zod.number(),
+  "items": zod.array(zod.object({
+  "description": zod.string().min(1),
+  "quantity": zod.number().min(1),
+  "unitPricePence": zod.number().min(listInvoiceTemplatesResponseItemsItemUnitPricePenceMin)
+})),
+  "createdAt": zod.coerce.date()
+})
+export const ListInvoiceTemplatesResponse = zod.array(ListInvoiceTemplatesResponseItem)
+
+
+
+export const createInvoiceTemplateBodyVatRatePctMin = 0;
+export const createInvoiceTemplateBodyVatRatePctMax = 100;
+
+
+
+export const createInvoiceTemplateBodyItemsItemUnitPricePenceMin = 0;
+
+
+
+export const CreateInvoiceTemplateBody = zod.object({
+  "customerId": zod.string(),
+  "title": zod.string().min(1),
+  "notes": zod.string().optional(),
+  "frequency": zod.enum(['weekly', 'monthly', 'quarterly', 'yearly']),
+  "nextRunAt": zod.coerce.date(),
+  "vatRatePct": zod.number().min(createInvoiceTemplateBodyVatRatePctMin).max(createInvoiceTemplateBodyVatRatePctMax).optional(),
+  "items": zod.array(zod.object({
+  "description": zod.string().min(1),
+  "quantity": zod.number().min(1),
+  "unitPricePence": zod.number().min(createInvoiceTemplateBodyItemsItemUnitPricePenceMin)
+}))
+})
+
+
+export const UpdateInvoiceTemplateParams = zod.object({
+  "templateId": zod.coerce.string()
+})
+
+
+export const updateInvoiceTemplateBodyVatRatePctMin = 0;
+export const updateInvoiceTemplateBodyVatRatePctMax = 100;
+
+
+
+export const updateInvoiceTemplateBodyItemsItemUnitPricePenceMin = 0;
+
+
+
+export const UpdateInvoiceTemplateBody = zod.object({
+  "title": zod.string().min(1).optional(),
+  "notes": zod.string().nullish(),
+  "frequency": zod.enum(['weekly', 'monthly', 'quarterly', 'yearly']).optional(),
+  "nextRunAt": zod.coerce.date().optional(),
+  "active": zod.boolean().optional(),
+  "vatRatePct": zod.number().min(updateInvoiceTemplateBodyVatRatePctMin).max(updateInvoiceTemplateBodyVatRatePctMax).optional(),
+  "items": zod.array(zod.object({
+  "description": zod.string().min(1),
+  "quantity": zod.number().min(1),
+  "unitPricePence": zod.number().min(updateInvoiceTemplateBodyItemsItemUnitPricePenceMin)
+})).optional()
+})
+
+
+
+export const updateInvoiceTemplateResponseItemsItemUnitPricePenceMin = 0;
+
+
+
+export const UpdateInvoiceTemplateResponse = zod.object({
+  "id": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "title": zod.string(),
+  "notes": zod.string().nullish(),
+  "frequency": zod.string(),
+  "nextRunAt": zod.coerce.date(),
+  "active": zod.boolean(),
+  "vatRatePct": zod.number(),
+  "items": zod.array(zod.object({
+  "description": zod.string().min(1),
+  "quantity": zod.number().min(1),
+  "unitPricePence": zod.number().min(updateInvoiceTemplateResponseItemsItemUnitPricePenceMin)
+})),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const DeleteInvoiceTemplateParams = zod.object({
+  "templateId": zod.coerce.string()
+})
+
+
+export const RunInvoiceTemplateParams = zod.object({
+  "templateId": zod.coerce.string()
+})
+
+
 export const GenerateInvoiceFromJobParams = zod.object({
   "jobId": zod.coerce.string()
 })
@@ -1439,6 +1673,19 @@ export const GenerateInvoiceFromJobParams = zod.object({
 
 export const GenerateInvoiceFromQuoteParams = zod.object({
   "quoteId": zod.coerce.string()
+})
+
+
+export const GenerateDepositInvoiceFromQuoteParams = zod.object({
+  "quoteId": zod.coerce.string()
+})
+
+export const generateDepositInvoiceFromQuoteBodyDepositPctMax = 100;
+
+
+
+export const GenerateDepositInvoiceFromQuoteBody = zod.object({
+  "depositPct": zod.number().min(1).max(generateDepositInvoiceFromQuoteBodyDepositPctMax)
 })
 
 
