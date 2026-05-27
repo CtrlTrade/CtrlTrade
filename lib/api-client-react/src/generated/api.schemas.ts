@@ -105,6 +105,7 @@ export interface Tenant {
   brandColor?: string | null;
   /** @nullable */
   logoUrl?: string | null;
+  leadCaptureAllowedOrigins?: string[];
   tradeCategorySlugs?: string[];
 }
 
@@ -122,6 +123,7 @@ export interface TenantUpdate {
   postcode?: string;
   brandColor?: string;
   logoUrl?: string;
+  leadCaptureAllowedOrigins?: string[];
   tradeCategorySlugs?: string[];
 }
 
@@ -977,6 +979,19 @@ export interface LeadActivity {
   actorLabel?: string | null;
 }
 
+export interface LeadFile {
+  id: string;
+  name: string;
+  url: string;
+  /** @nullable */
+  mimeType?: string | null;
+  /** @nullable */
+  sizeBytes?: number | null;
+  /** @nullable */
+  uploadedByLabel?: string | null;
+  createdAt: string;
+}
+
 export type Lead = LeadSummary & ({
   /** @nullable */
   message?: string | null;
@@ -986,6 +1001,7 @@ export type Lead = LeadSummary & ({
   firstContactedAt?: string | null;
   notes: LeadNote[];
   activities: LeadActivity[];
+  files: LeadFile[];
 });
 
 export interface LeadInput {
@@ -1116,6 +1132,16 @@ export interface PublicLeadInput {
   title?: string;
   message?: string;
   sourceDetail?: string;
+}
+
+export interface LeadFileInput {
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  url: string;
+  mimeType?: string;
+  /** @minimum 0 */
+  sizeBytes?: number;
 }
 
 export interface PublicLeadResult {

@@ -27,5 +27,6 @@ export interface Tenant {
   brandColor?: string | null;
   /** @nullable */
   logoUrl?: string | null;
+  leadCaptureAllowedOrigins?: string[];
   tradeCategorySlugs?: string[];
 }

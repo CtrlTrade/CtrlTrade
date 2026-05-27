@@ -25,6 +25,7 @@ export function AppSettings() {
     postcode: "",
     brandColor: "",
     logoUrl: "",
+    leadCaptureAllowedOrigins: "",
     tradeCategorySlugs: [] as string[]
   });
 
@@ -40,6 +41,7 @@ export function AppSettings() {
         postcode: tenant.postcode || "",
         brandColor: tenant.brandColor || "",
         logoUrl: tenant.logoUrl || "",
+        leadCaptureAllowedOrigins: (tenant.leadCaptureAllowedOrigins ?? []).join("\n"),
         tradeCategorySlugs: tenant.tradeCategorySlugs || []
       });
     }
@@ -51,7 +53,15 @@ export function AppSettings() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateTenant.mutate({ data: formData }, {
+    const { leadCaptureAllowedOrigins, ...rest } = formData;
+    const payload = {
+      ...rest,
+      leadCaptureAllowedOrigins: leadCaptureAllowedOrigins
+        .split(/\r?\n|,/)
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0),
+    };
+    updateTenant.mutate({ data: payload }, {
       onSuccess: () => {
         toast({ title: "Settings updated", description: "Tenant profile has been saved." });
       },
@@ -156,6 +166,26 @@ export function AppSettings() {
           </Button>
         </div>
       </form>
+
+      <Card className="rounded-none border-border shadow-sm">
+        <CardHeader>
+          <CardTitle className="uppercase tracking-tight">Lead Capture — Allowed Domains</CardTitle>
+          <CardDescription>
+            One domain per line (e.g. <code>example.com</code>, <code>www.example.com</code>). Subdomains are included automatically. Leave empty to accept submissions from any origin (server-to-server and form posts without an Origin header are always accepted).
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            rows={4}
+            value={formData.leadCaptureAllowedOrigins}
+            onChange={(e) => setFormData({ ...formData, leadCaptureAllowedOrigins: e.target.value })}
+            placeholder={"example.com\nstaging.example.com"}
+            className="rounded-none font-mono text-xs"
+            data-testid="textarea-allowed-origins"
+          />
+          <p className="text-xs text-muted-foreground mt-2">Use the Save Settings button above to apply changes.</p>
+        </CardContent>
+      </Card>
 
       <LeadCaptureSnippetCard />
     </div>

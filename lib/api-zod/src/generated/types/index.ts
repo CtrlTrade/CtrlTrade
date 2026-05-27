@@ -53,6 +53,8 @@ export * from './leadActivityInputKind';
 export * from './leadConvertInput';
 export * from './leadConvertResult';
 export * from './leadEmbedSnippet';
+export * from './leadFile';
+export * from './leadFileInput';
 export * from './leadInput';
 export * from './leadLoseInput';
 export * from './leadNote';

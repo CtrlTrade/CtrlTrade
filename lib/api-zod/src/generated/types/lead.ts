@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { LeadActivity } from './leadActivity';
+import type { LeadFile } from './leadFile';
 import type { LeadNote } from './leadNote';
 import type { LeadSummary } from './leadSummary';
 
@@ -18,4 +19,5 @@ export type Lead = LeadSummary & ({
   firstContactedAt?: Date | null;
   notes: LeadNote[];
   activities: LeadActivity[];
+  files: LeadFile[];
 });

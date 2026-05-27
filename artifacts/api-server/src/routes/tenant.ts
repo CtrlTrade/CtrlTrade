@@ -38,6 +38,11 @@ router.patch("/v1/tenant", requireTenant, async (req, res): Promise<void> => {
   for (const k of ["name", "country", "phone", "addressLine1", "city", "postcode", "brandColor", "logoUrl"] as const) {
     if (parsed.data[k] !== undefined) updates[k] = parsed.data[k];
   }
+  if (parsed.data.leadCaptureAllowedOrigins !== undefined) {
+    updates.leadCaptureAllowedOrigins = parsed.data.leadCaptureAllowedOrigins
+      .map((o) => o.trim())
+      .filter((o) => o.length > 0);
+  }
   if (Object.keys(updates).length > 0) {
     await db.update(tenantsTable).set(updates).where(eq(tenantsTable.id, tenantId));
   }

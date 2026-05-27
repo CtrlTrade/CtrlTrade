@@ -39,6 +39,7 @@ export const tenantsTable = pgTable(
     companyNumber: text("company_number"),
     brandColor: varchar("brand_color", { length: 16 }),
     logoUrl: text("logo_url"),
+    leadCaptureAllowedOrigins: text("lead_capture_allowed_origins").array().notNull().default(sql`'{}'::text[]`),
     vatRatePct: integer("vat_rate_pct").notNull().default(20),
     invoiceNumberSeq: integer("invoice_number_seq").notNull().default(0),
     stripeCustomerId: text("stripe_customer_id"),
@@ -163,8 +164,13 @@ export const featureFlagsTable = pgTable("feature_flags", {
 export const notificationDeliveriesTable = pgTable("notification_deliveries", {
   id: uuid("id").primaryKey().defaultRandom(),
   tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").references(() => usersTable.id, { onDelete: "set null" }),
   channel: varchar("channel", { length: 32 }).notNull(),
   template: varchar("template", { length: 64 }).notNull(),
+  subjectKind: varchar("subject_kind", { length: 32 }),
+  subjectId: uuid("subject_id"),
+  scheduledAt: timestamp("scheduled_at", { withTimezone: true }),
+  subject: text("subject"),
   payload: jsonb("payload"),
   status: varchar("status", { length: 32 }).notNull().default("queued"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -560,6 +566,26 @@ export const leadActivitiesTable = pgTable(
   }),
 );
 
+export const leadFilesTable = pgTable(
+  "lead_files",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    leadId: uuid("lead_id").notNull().references(() => leadsTable.id, { onDelete: "cascade" }),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    url: text("url").notNull(),
+    mimeType: varchar("mime_type", { length: 128 }),
+    sizeBytes: integer("size_bytes"),
+    uploadedByUserId: uuid("uploaded_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    uploadedByLabel: text("uploaded_by_label"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    leadIdx: index("lead_files_lead_idx").on(t.leadId, t.createdAt),
+  }),
+);
+
 export type Lead = typeof leadsTable.$inferSelect;
 export type LeadNote = typeof leadNotesTable.$inferSelect;
 export type LeadActivity = typeof leadActivitiesTable.$inferSelect;
+export type LeadFile = typeof leadFilesTable.$inferSelect;

@@ -56,6 +56,8 @@ import type {
   LeadConvertInput,
   LeadConvertResult,
   LeadEmbedSnippet,
+  LeadFile,
+  LeadFileInput,
   LeadInput,
   LeadLoseInput,
   LeadNote,
@@ -6295,6 +6297,138 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getLoseLeadMutationOptions(options));
+    }
+
+export const getAddLeadFileUrl = (leadId: string,) => {
+
+
+
+
+  return `/api/v1/leads/${leadId}/files`
+}
+
+export const addLeadFile = async (leadId: string,
+    leadFileInput: LeadFileInput, options?: RequestInit): Promise<LeadFile> => {
+
+  return customFetch<LeadFile>(getAddLeadFileUrl(leadId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      leadFileInput,)
+  }
+);}
+
+
+
+
+export const getAddLeadFileMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addLeadFile>>, TError,{leadId: string;data: BodyType<LeadFileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addLeadFile>>, TError,{leadId: string;data: BodyType<LeadFileInput>}, TContext> => {
+
+const mutationKey = ['addLeadFile'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addLeadFile>>, {leadId: string;data: BodyType<LeadFileInput>}> = (props) => {
+          const {leadId,data} = props ?? {};
+
+          return  addLeadFile(leadId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddLeadFileMutationResult = NonNullable<Awaited<ReturnType<typeof addLeadFile>>>
+    export type AddLeadFileMutationBody = BodyType<LeadFileInput>
+    export type AddLeadFileMutationError = ErrorType<unknown>
+
+    export const useAddLeadFile = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addLeadFile>>, TError,{leadId: string;data: BodyType<LeadFileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addLeadFile>>,
+        TError,
+        {leadId: string;data: BodyType<LeadFileInput>},
+        TContext
+      > => {
+      return useMutation(getAddLeadFileMutationOptions(options));
+    }
+
+export const getDeleteLeadFileUrl = (leadId: string,
+    fileId: string,) => {
+
+
+
+
+  return `/api/v1/leads/${leadId}/files/${fileId}`
+}
+
+export const deleteLeadFile = async (leadId: string,
+    fileId: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteLeadFileUrl(leadId,fileId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteLeadFileMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLeadFile>>, TError,{leadId: string;fileId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteLeadFile>>, TError,{leadId: string;fileId: string}, TContext> => {
+
+const mutationKey = ['deleteLeadFile'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteLeadFile>>, {leadId: string;fileId: string}> = (props) => {
+          const {leadId,fileId} = props ?? {};
+
+          return  deleteLeadFile(leadId,fileId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteLeadFileMutationResult = NonNullable<Awaited<ReturnType<typeof deleteLeadFile>>>
+
+    export type DeleteLeadFileMutationError = ErrorType<unknown>
+
+    export const useDeleteLeadFile = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLeadFile>>, TError,{leadId: string;fileId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteLeadFile>>,
+        TError,
+        {leadId: string;fileId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteLeadFileMutationOptions(options));
     }
 
 export const getGetLeadEmbedSnippetUrl = () => {

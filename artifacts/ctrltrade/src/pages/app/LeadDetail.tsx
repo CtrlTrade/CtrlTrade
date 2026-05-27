@@ -8,6 +8,8 @@ import {
   useConvertLeadToQuote,
   useLoseLead,
   useDeleteLead,
+  useAddLeadFile,
+  useDeleteLeadFile,
   getGetLeadQueryKey,
   getListLeadsQueryKey,
 } from "@workspace/api-client-react";
@@ -46,6 +48,8 @@ import {
   Trash2,
   ArrowRight,
   Clock,
+  Paperclip,
+  ExternalLink,
 } from "lucide-react";
 
 function fmtGbp(pence: number): string {
@@ -65,6 +69,8 @@ export function AppLeadDetail() {
   const [convertOpen, setConvertOpen] = useState(false);
   const [loseOpen, setLoseOpen] = useState(false);
   const [loseReason, setLoseReason] = useState("");
+  const [fileName, setFileName] = useState("");
+  const [fileUrl, setFileUrl] = useState("");
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: getGetLeadQueryKey(leadId) });
@@ -94,6 +100,15 @@ export function AppLeadDetail() {
     mutation: {
       onSuccess: () => { qc.invalidateQueries({ queryKey: getListLeadsQueryKey() }); setLocation("/leads"); },
     },
+  });
+  const addFile = useAddLeadFile({
+    mutation: {
+      onSuccess: () => { invalidate(); setFileName(""); setFileUrl(""); },
+      onError: (e: Error) => toast({ title: "Could not attach file", description: e.message, variant: "destructive" }),
+    },
+  });
+  const delFile = useDeleteLeadFile({
+    mutation: { onSuccess: invalidate },
   });
 
   if (isLoading || !lead) {
@@ -290,6 +305,53 @@ export function AppLeadDetail() {
           </CardContent>
         </Card>
       </div>
+
+      <Card className="rounded-none border-border shadow-sm" data-testid="card-lead-files">
+        <CardHeader>
+          <CardTitle className="uppercase tracking-tight flex items-center gap-2"><Paperclip className="h-5 w-5" /> Files</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-2">
+            <Input value={fileName} onChange={(e) => setFileName(e.target.value)} placeholder="File label (e.g. Site photo)" className="rounded-none" data-testid="input-file-name" />
+            <Input value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="https://… (link to PDF, image, drive, etc.)" className="rounded-none" data-testid="input-file-url" />
+            <Button
+              onClick={() => addFile.mutate({ leadId, data: { name: fileName.trim(), url: fileUrl.trim() } })}
+              disabled={!fileName.trim() || !fileUrl.trim() || addFile.isPending}
+              className="rounded-none uppercase tracking-wider text-xs font-bold"
+              data-testid="button-add-file"
+            >
+              Attach
+            </Button>
+          </div>
+          {lead.files.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No files attached.</p>
+          ) : (
+            <div className="space-y-2">
+              {lead.files.map((f) => (
+                <div key={f.id} className="flex items-center justify-between text-sm border border-border p-3 bg-background">
+                  <div className="min-w-0 flex-1">
+                    <a href={f.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 font-medium hover:underline">
+                      <ExternalLink className="h-4 w-4" /> <span className="truncate">{f.name}</span>
+                    </a>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {f.uploadedByLabel ?? "Someone"} · {new Date(f.createdAt).toLocaleString("en-GB")}
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-none"
+                    onClick={() => { if (confirm(`Remove "${f.name}"?`)) delFile.mutate({ leadId, fileId: f.id }); }}
+                    data-testid={`button-delete-file-${f.id}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

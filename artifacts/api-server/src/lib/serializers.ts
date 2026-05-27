@@ -39,6 +39,7 @@ export async function serializeTenant(t: Tenant) {
     postcode: t.postcode,
     brandColor: t.brandColor,
     logoUrl: t.logoUrl,
+    leadCaptureAllowedOrigins: t.leadCaptureAllowedOrigins ?? [],
     tradeCategorySlugs: slugs,
   };
 }

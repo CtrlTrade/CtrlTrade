@@ -43,6 +43,7 @@ export const PosLoginResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 })
 })
@@ -75,6 +76,7 @@ export const GetPosSessionResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 })
 })
@@ -280,6 +282,7 @@ export const LoginResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 }),zod.null()]).optional()
 })
@@ -307,6 +310,7 @@ export const GetSessionResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 }),zod.null()]).optional()
 })
@@ -339,6 +343,7 @@ export const GetTenantResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 })
 
@@ -352,6 +357,7 @@ export const UpdateTenantBody = zod.object({
   "postcode": zod.string().optional(),
   "brandColor": zod.string().optional(),
   "logoUrl": zod.string().optional(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 })
 
@@ -368,6 +374,7 @@ export const UpdateTenantResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 })
 
@@ -636,6 +643,7 @@ export const GetAdminTenantResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 }),
   "subscription": zod.object({
@@ -1978,6 +1986,15 @@ export const GetLeadResponse = zod.object({
   "occurredAt": zod.coerce.date(),
   "actorUserId": zod.string().nullish(),
   "actorLabel": zod.string().nullish()
+})),
+  "files": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "url": zod.string(),
+  "mimeType": zod.string().nullish(),
+  "sizeBytes": zod.number().nullish(),
+  "uploadedByLabel": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
 }))
 }))
 
@@ -2045,6 +2062,15 @@ export const UpdateLeadResponse = zod.object({
   "occurredAt": zod.coerce.date(),
   "actorUserId": zod.string().nullish(),
   "actorLabel": zod.string().nullish()
+})),
+  "files": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "url": zod.string(),
+  "mimeType": zod.string().nullish(),
+  "sizeBytes": zod.number().nullish(),
+  "uploadedByLabel": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
 }))
 }))
 
@@ -2132,6 +2158,15 @@ export const ConvertLeadToQuoteResponse = zod.object({
   "occurredAt": zod.coerce.date(),
   "actorUserId": zod.string().nullish(),
   "actorLabel": zod.string().nullish()
+})),
+  "files": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "url": zod.string(),
+  "mimeType": zod.string().nullish(),
+  "sizeBytes": zod.number().nullish(),
+  "uploadedByLabel": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
 }))
 })),
   "customer": zod.object({
@@ -2217,8 +2252,41 @@ export const LoseLeadResponse = zod.object({
   "occurredAt": zod.coerce.date(),
   "actorUserId": zod.string().nullish(),
   "actorLabel": zod.string().nullish()
+})),
+  "files": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "url": zod.string(),
+  "mimeType": zod.string().nullish(),
+  "sizeBytes": zod.number().nullish(),
+  "uploadedByLabel": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
 }))
 }))
+
+
+export const AddLeadFileParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+
+
+export const addLeadFileBodySizeBytesMin = 0;
+
+
+
+export const AddLeadFileBody = zod.object({
+  "name": zod.string().min(1),
+  "url": zod.string().min(1),
+  "mimeType": zod.string().optional(),
+  "sizeBytes": zod.number().min(addLeadFileBodySizeBytesMin).optional()
+})
+
+
+export const DeleteLeadFileParams = zod.object({
+  "leadId": zod.coerce.string(),
+  "fileId": zod.coerce.string()
+})
 
 
 export const GetLeadEmbedSnippetResponse = zod.object({

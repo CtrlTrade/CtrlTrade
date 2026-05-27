@@ -5,6 +5,8 @@ import {
   leadsTable,
   leadNotesTable,
   leadActivitiesTable,
+  leadFilesTable,
+  notificationDeliveriesTable,
   customersTable,
   quotesTable,
   quoteLineItemsTable,
@@ -13,6 +15,7 @@ import {
   type Lead,
   type LeadNote,
   type LeadActivity,
+  type LeadFile,
 } from "@workspace/db";
 import {
   ListLeadsResponse,
@@ -29,6 +32,7 @@ import {
   GetLeadEmbedSnippetResponse,
   GetLeadSourceRoiResponse,
   CaptureLeadPublicBody,
+  AddLeadFileBody,
 } from "@workspace/api-zod";
 import { requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
@@ -114,6 +118,7 @@ function serializeLead(
   currency: string,
   notes: LeadNote[],
   activities: LeadActivity[],
+  files: LeadFile[],
   now: Date,
 ) {
   return {
@@ -137,7 +142,47 @@ function serializeLead(
       actorUserId: a.actorUserId,
       actorLabel: a.actorLabel,
     })),
+    files: files.map((f) => ({
+      id: f.id,
+      name: f.name,
+      url: f.url,
+      mimeType: f.mimeType,
+      sizeBytes: f.sizeBytes,
+      uploadedByLabel: f.uploadedByLabel,
+      createdAt: f.createdAt.toISOString(),
+    })),
   };
+}
+
+async function scheduleFollowUpReminder(
+  tenantId: string,
+  leadId: string,
+  ownerUserId: string | null,
+  dueAt: Date | null,
+) {
+  // cancel any prior queued reminder for this lead
+  await db
+    .update(notificationDeliveriesTable)
+    .set({ status: "cancelled" })
+    .where(
+      and(
+        eq(notificationDeliveriesTable.tenantId, tenantId),
+        eq(notificationDeliveriesTable.subjectKind, "lead"),
+        eq(notificationDeliveriesTable.subjectId, leadId),
+        eq(notificationDeliveriesTable.status, "queued"),
+      ),
+    );
+  if (!dueAt) return;
+  await db.insert(notificationDeliveriesTable).values({
+    tenantId,
+    userId: ownerUserId,
+    channel: "reminder",
+    template: "lead.follow_up",
+    subjectKind: "lead",
+    subjectId: leadId,
+    scheduledAt: dueAt,
+    status: "queued",
+  });
 }
 
 async function loadOwnerName(ownerUserId: string | null): Promise<string | null> {
@@ -210,8 +255,9 @@ router.post("/v1/leads", requireTenant, async (req, res): Promise<void> => {
     message: `Lead ${lead.name} created (score ${lead.score})`,
     metadata: { leadId: lead.id, source: lead.source },
   });
+  await scheduleFollowUpReminder(tenantId, lead.id, lead.ownerUserId, lead.followUpDueAt);
   const ownerName = await loadOwnerName(lead.ownerUserId);
-  res.status(201).json(GetLeadResponse.parse(serializeLead(lead, ownerName, "GBP", [], [], now)));
+  res.status(201).json(GetLeadResponse.parse(serializeLead(lead, ownerName, "GBP", [], [], [], now)));
 });
 
 router.get("/v1/leads/embed-snippet", requireTenant, async (req, res): Promise<void> => {
@@ -281,12 +327,13 @@ router.get("/v1/leads/:leadId", requireTenant, async (req, res): Promise<void> =
     res.status(404).json({ error: "Lead not found" });
     return;
   }
-  const [ownerName, notes, activities] = await Promise.all([
+  const [ownerName, notes, activities, files] = await Promise.all([
     loadOwnerName(lead.ownerUserId),
     db.select().from(leadNotesTable).where(eq(leadNotesTable.leadId, lead.id)).orderBy(desc(leadNotesTable.createdAt)),
     db.select().from(leadActivitiesTable).where(eq(leadActivitiesTable.leadId, lead.id)).orderBy(desc(leadActivitiesTable.occurredAt)),
+    db.select().from(leadFilesTable).where(eq(leadFilesTable.leadId, lead.id)).orderBy(desc(leadFilesTable.createdAt)),
   ]);
-  res.json(GetLeadResponse.parse(serializeLead(lead, ownerName, "GBP", notes, activities, new Date())));
+  res.json(GetLeadResponse.parse(serializeLead(lead, ownerName, "GBP", notes, activities, files, new Date())));
 });
 
 router.patch("/v1/leads/:leadId", requireTenant, async (req, res): Promise<void> => {
@@ -355,12 +402,16 @@ router.patch("/v1/leads/:leadId", requireTenant, async (req, res): Promise<void>
       metadata: { leadId: lead.id },
     });
   }
+  if (patch.followUpDueAt !== undefined || patch.ownerUserId !== undefined) {
+    await scheduleFollowUpReminder(tenantId, lead.id, lead.ownerUserId, lead.followUpDueAt);
+  }
   const ownerName = await loadOwnerName(lead.ownerUserId);
-  const [notes, activities] = await Promise.all([
+  const [notes, activities, files] = await Promise.all([
     db.select().from(leadNotesTable).where(eq(leadNotesTable.leadId, lead.id)).orderBy(desc(leadNotesTable.createdAt)),
     db.select().from(leadActivitiesTable).where(eq(leadActivitiesTable.leadId, lead.id)).orderBy(desc(leadActivitiesTable.occurredAt)),
+    db.select().from(leadFilesTable).where(eq(leadFilesTable.leadId, lead.id)).orderBy(desc(leadFilesTable.createdAt)),
   ]);
-  res.json(UpdateLeadResponse.parse(serializeLead(lead, ownerName, "GBP", notes, activities, now)));
+  res.json(UpdateLeadResponse.parse(serializeLead(lead, ownerName, "GBP", notes, activities, files, now)));
 });
 
 router.delete("/v1/leads/:leadId", requireTenant, async (req, res): Promise<void> => {
@@ -432,7 +483,8 @@ router.post("/v1/leads/:leadId/activities", requireTenant, async (req, res): Pro
     updates.firstContactedAt = now;
     if (lead.status === "new") updates.status = "contacted";
   }
-  await db.update(leadsTable).set(updates).where(eq(leadsTable.id, lead.id));
+  const [updatedLead] = await db.update(leadsTable).set(updates).where(eq(leadsTable.id, lead.id)).returning();
+  await scheduleFollowUpReminder(tenantId, lead.id, updatedLead?.ownerUserId ?? lead.ownerUserId, updatedLead?.followUpDueAt ?? null);
   res.status(201).json(({
     id: act.id,
     kind: act.kind,
@@ -482,6 +534,13 @@ router.post("/v1/leads/:leadId/convert", requireTenant, async (req, res): Promis
         .select()
         .from(customersTable)
         .where(and(eq(customersTable.tenantId, tenantId), eq(customersTable.email, lead.email)));
+      customer = c ?? null;
+    }
+    if (!customer && lead.phone) {
+      const [c] = await tx
+        .select()
+        .from(customersTable)
+        .where(and(eq(customersTable.tenantId, tenantId), eq(customersTable.phone, lead.phone)));
       customer = c ?? null;
     }
     if (!customer) {
@@ -557,16 +616,18 @@ router.post("/v1/leads/:leadId/convert", requireTenant, async (req, res): Promis
     metadata: { leadId: updated.id, quoteId: quote.id, customerId: customer.id },
   });
 
+  await scheduleFollowUpReminder(tenantId, updated.id, updated.ownerUserId, null);
   const items = await db.select().from(quoteLineItemsTable).where(eq(quoteLineItemsTable.quoteId, quote.id));
   const totalPence = items.reduce((s, i) => s + i.quantity * i.unitPricePence, 0);
   const ownerName = await loadOwnerName(updated.ownerUserId);
-  const [notes, acts] = await Promise.all([
+  const [notes, acts, files] = await Promise.all([
     db.select().from(leadNotesTable).where(eq(leadNotesTable.leadId, updated.id)).orderBy(desc(leadNotesTable.createdAt)),
     db.select().from(leadActivitiesTable).where(eq(leadActivitiesTable.leadId, updated.id)).orderBy(desc(leadActivitiesTable.occurredAt)),
+    db.select().from(leadFilesTable).where(eq(leadFilesTable.leadId, updated.id)).orderBy(desc(leadFilesTable.createdAt)),
   ]);
 
   res.json(ConvertLeadToQuoteResponse.parse({
-    lead: serializeLead(updated, ownerName, "GBP", notes, acts, now),
+    lead: serializeLead(updated, ownerName, "GBP", notes, acts, files, now),
     customer: {
       id: customer.id,
       name: customer.name,
@@ -635,13 +696,46 @@ router.post("/v1/leads/:leadId/lose", requireTenant, async (req, res): Promise<v
     message: `Lead ${lead.name} marked lost${body.reason ? `: ${body.reason}` : ""}`,
     metadata: { leadId: lead.id },
   });
+  await scheduleFollowUpReminder(tenantId, lead.id, updated.ownerUserId, null);
   const ownerName = await loadOwnerName(updated.ownerUserId);
-  const [notes, acts] = await Promise.all([
+  const [notes, acts, files] = await Promise.all([
     db.select().from(leadNotesTable).where(eq(leadNotesTable.leadId, lead.id)).orderBy(desc(leadNotesTable.createdAt)),
     db.select().from(leadActivitiesTable).where(eq(leadActivitiesTable.leadId, lead.id)).orderBy(desc(leadActivitiesTable.occurredAt)),
+    db.select().from(leadFilesTable).where(eq(leadFilesTable.leadId, lead.id)).orderBy(desc(leadFilesTable.createdAt)),
   ]);
-  res.json(LoseLeadResponse.parse(serializeLead(updated, ownerName, "GBP", notes, acts, now)));
+  res.json(LoseLeadResponse.parse(serializeLead(updated, ownerName, "GBP", notes, acts, files, now)));
 });
+
+function isOriginAllowed(origin: string | undefined, allowlist: string[]): boolean {
+  // No Origin header = direct/form POST (curl, server-to-server, no CORS) — allow.
+  if (!origin) return true;
+  const configured = allowlist.map((s) => s.trim()).filter((s) => s.length > 0);
+  // Empty allowlist = accept any origin (matches Settings UI copy).
+  if (configured.length === 0) return true;
+  let host: string;
+  try { host = new URL(origin).host.toLowerCase(); } catch { return false; }
+  // Always allow the platform's own domains so the in-app preview/snippet works.
+  const platformHosts = [
+    ...((process.env.REPLIT_DOMAINS ?? "").split(",").map((d) => d.trim()).filter(Boolean)),
+    process.env.REPLIT_DEV_DOMAIN ?? "",
+  ].filter(Boolean).map((h) => h.toLowerCase());
+  if (platformHosts.includes(host)) return true;
+  for (const entry of configured) {
+    let allowedHost = entry.toLowerCase();
+    try { allowedHost = new URL(entry.includes("://") ? entry : `https://${entry}`).host.toLowerCase(); } catch {}
+    if (host === allowedHost || host.endsWith(`.${allowedHost}`)) return true;
+  }
+  return false;
+}
+
+function isSafeFileUrl(raw: string): boolean {
+  try {
+    const u = new URL(raw);
+    return u.protocol === "https:" || u.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
 
 // Public capture endpoint — no auth, resolves tenant by slug, origin allowlist
 router.post("/v1/public/leads/:tenantSlug", async (req, res): Promise<void> => {
@@ -652,6 +746,11 @@ router.post("/v1/public/leads/:tenantSlug", async (req, res): Promise<void> => {
     .where(eq(tenantsTable.slug, (req.params.tenantSlug as string)));
   if (!tenant) {
     res.status(404).json({ error: "Unknown tenant" });
+    return;
+  }
+  const origin = typeof req.headers.origin === "string" ? req.headers.origin : undefined;
+  if (!isOriginAllowed(origin, tenant.leadCaptureAllowedOrigins ?? [])) {
+    res.status(403).json({ error: "Origin not allowed for this tenant. Add it in Settings → Lead capture." });
     return;
   }
   const now = new Date();
@@ -691,7 +790,75 @@ router.post("/v1/public/leads/:tenantSlug", async (req, res): Promise<void> => {
     message: `Public lead captured: ${lead.name}`,
     metadata: { leadId: lead.id, referer: req.headers.referer ?? null },
   });
+  await scheduleFollowUpReminder(tenant.id, lead.id, lead.ownerUserId, lead.followUpDueAt);
   res.status(201).json(({ ok: true, leadId: lead.id }));
+});
+
+router.post("/v1/leads/:leadId/files", requireTenant, async (req, res): Promise<void> => {
+  const tenantId = req.auth!.tenant!.id;
+  const body = AddLeadFileBody.parse(req.body);
+  if (!isSafeFileUrl(body.url)) {
+    res.status(400).json({ error: "File URL must be an http(s) URL" });
+    return;
+  }
+  const lead = await loadLeadOr404(tenantId, (req.params.leadId as string));
+  if (!lead) {
+    res.status(404).json({ error: "Lead not found" });
+    return;
+  }
+  const [file] = await db.insert(leadFilesTable).values({
+    leadId: lead.id,
+    tenantId,
+    name: body.name,
+    url: body.url,
+    mimeType: body.mimeType ?? null,
+    sizeBytes: body.sizeBytes ?? null,
+    uploadedByUserId: req.auth!.user.id,
+    uploadedByLabel: req.auth!.user.name,
+  }).returning();
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    kind: "lead.file_added",
+    message: `Attached file ${file.name} to lead ${lead.name}`,
+    metadata: { leadId: lead.id, fileId: file.id, name: file.name },
+  });
+  res.status(201).json({
+    id: file.id,
+    name: file.name,
+    url: file.url,
+    mimeType: file.mimeType,
+    sizeBytes: file.sizeBytes,
+    uploadedByLabel: file.uploadedByLabel,
+    createdAt: file.createdAt.toISOString(),
+  });
+});
+
+router.delete("/v1/leads/:leadId/files/:fileId", requireTenant, async (req, res): Promise<void> => {
+  const tenantId = req.auth!.tenant!.id;
+  const leadId = req.params.leadId as string;
+  const fileId = req.params.fileId as string;
+  const [file] = await db
+    .select()
+    .from(leadFilesTable)
+    .where(and(
+      eq(leadFilesTable.tenantId, tenantId),
+      eq(leadFilesTable.leadId, leadId),
+      eq(leadFilesTable.id, fileId),
+    ));
+  if (!file) {
+    res.status(404).json({ error: "File not found" });
+    return;
+  }
+  await db.delete(leadFilesTable).where(eq(leadFilesTable.id, fileId));
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    kind: "lead.file_removed",
+    message: `Removed file ${file.name} from lead`,
+    metadata: { leadId, fileId, name: file.name },
+  });
+  res.status(204).end();
 });
 
 export default router;

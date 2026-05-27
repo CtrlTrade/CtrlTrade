@@ -15,5 +15,6 @@ export interface TenantUpdate {
   postcode?: string;
   brandColor?: string;
   logoUrl?: string;
+  leadCaptureAllowedOrigins?: string[];
   tradeCategorySlugs?: string[];
 }
