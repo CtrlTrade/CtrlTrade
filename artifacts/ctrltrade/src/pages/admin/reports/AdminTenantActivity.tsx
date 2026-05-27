@@ -1,0 +1,33 @@
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Link } from "wouter";
+import { ArrowLeft } from "lucide-react";
+
+export function AdminTenantActivityReport() {
+  return (
+    <div className="space-y-6 max-w-6xl mx-auto">
+      <div className="flex items-center gap-3">
+        <Link href="/admin/reports">
+          <button className="text-zinc-400 hover:text-white transition-colors">
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">Tenant Activity</h1>
+          <p className="text-sm text-zinc-500 mt-1">Jobs, quotes, and invoices created per tenant.</p>
+        </div>
+      </div>
+
+      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+        <CardHeader>
+          <CardTitle className="uppercase tracking-tight text-zinc-100">Activity Per Tenant</CardTitle>
+          <CardDescription>Volume of key entities created across all tenants.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="p-12 text-center text-zinc-600 font-mono text-sm border border-dashed border-zinc-800">
+            Tenant activity data coming soon.
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

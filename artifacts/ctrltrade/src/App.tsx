@@ -68,6 +68,11 @@ import { AdminFeatureFlags } from "@/pages/admin/FeatureFlags";
 import { AdminIntegrationCatalogue } from "@/pages/admin/IntegrationCatalogue";
 import { AdminWorkers } from "@/pages/admin/Workers";
 import { AdminUsage } from "@/pages/admin/Usage";
+import { AdminReportsIndex } from "@/pages/admin/reports/Index";
+import { AdminRevenueReport } from "@/pages/admin/reports/AdminRevenue";
+import { AdminTenantActivityReport } from "@/pages/admin/reports/AdminTenantActivity";
+import { AdminUsageReport } from "@/pages/admin/reports/AdminUsageReport";
+import { AdminReferralsReport } from "@/pages/admin/reports/AdminReferralsReport";
 
 // Customer portal
 import { PortalLayout } from "@/components/layout/PortalLayout";
@@ -230,15 +235,11 @@ function App() {
                   <Route path="/usage" component={AdminUsage} />
                   <Route path="/compliance" component={AdminCompliance} />
                   <Route path="/referrals" component={AdminReferrals} />
-                  <Route path="/reports" component={ReportsIndex} />
-                  <Route path="/reports/revenue">{() => <RevenueReport admin />}</Route>
-                  <Route path="/reports/lead-roi">{() => <LeadRoiReport admin />}</Route>
-                  <Route path="/reports/engineer-performance">{() => <EngineerPerformanceReport admin />}</Route>
-                  <Route path="/reports/quote-conversion">{() => <QuoteConversionReport admin />}</Route>
-                  <Route path="/reports/job-profitability">{() => <JobProfitabilityReport admin />}</Route>
-                  <Route path="/reports/customer-ltv">{() => <CustomerLtvReport admin />}</Route>
-                  <Route path="/reports/aged-debtors">{() => <AgedDebtorsReport admin />}</Route>
-                  <Route path="/reports/activity-heatmap">{() => <ActivityHeatmapReport admin />}</Route>
+                  <Route path="/reports" component={AdminReportsIndex} />
+                  <Route path="/reports/revenue">{() => <AdminRevenueReport />}</Route>
+                  <Route path="/reports/tenant-activity">{() => <AdminTenantActivityReport />}</Route>
+                  <Route path="/reports/usage">{() => <AdminUsageReport />}</Route>
+                  <Route path="/reports/referrals">{() => <AdminReferralsReport />}</Route>
                   <Route path="/integrations" component={AdminIntegrationCatalogue} />
                   <Route component={NotFound} />
                 </Switch>
