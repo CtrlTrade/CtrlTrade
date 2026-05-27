@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useGetSession, useLogout } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -31,6 +31,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   const links = [
     { href: "/", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/leads", icon: Target, label: "Leads" },
     { href: "/customers", icon: Users, label: "Customers" },
     { href: "/jobs", icon: Briefcase, label: "Jobs" },
     { href: "/quotes", icon: FileText, label: "Quotes" },

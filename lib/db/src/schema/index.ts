@@ -490,3 +490,76 @@ export const invoiceTemplatesTable = pgTable(
 
 export type InvoiceTemplate = typeof invoiceTemplatesTable.$inferSelect;
 
+// ---- Leads -----------------------------------------------------------------
+export const leadsTable = pgTable(
+  "leads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    email: varchar("email", { length: 255 }),
+    phone: text("phone"),
+    company: text("company"),
+    source: varchar("source", { length: 32 }).notNull().default("manual"), // website|manual|referral|marketplace
+    sourceDetail: text("source_detail"),
+    status: varchar("status", { length: 16 }).notNull().default("new"), // new|contacted|qualified|won|lost
+    title: text("title"),
+    message: text("message"),
+    valuePence: integer("value_pence").notNull().default(0),
+    score: integer("score").notNull().default(0),
+    ownerUserId: uuid("owner_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    convertedCustomerId: uuid("converted_customer_id").references(() => customersTable.id, { onDelete: "set null" }),
+    convertedQuoteId: uuid("converted_quote_id").references(() => quotesTable.id, { onDelete: "set null" }),
+    firstContactedAt: timestamp("first_contacted_at", { withTimezone: true }),
+    lostReason: text("lost_reason"),
+    followUpDueAt: timestamp("follow_up_due_at", { withTimezone: true }),
+    followUpDoneAt: timestamp("follow_up_done_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("leads_tenant_idx").on(t.tenantId),
+    statusIdx: index("leads_status_idx").on(t.tenantId, t.status),
+    sourceIdx: index("leads_source_idx").on(t.tenantId, t.source),
+    followUpIdx: index("leads_follow_up_idx").on(t.tenantId, t.followUpDueAt),
+  }),
+);
+
+export const leadNotesTable = pgTable(
+  "lead_notes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    leadId: uuid("lead_id").notNull().references(() => leadsTable.id, { onDelete: "cascade" }),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    authorUserId: uuid("author_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    authorLabel: text("author_label"),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    leadIdx: index("lead_notes_lead_idx").on(t.leadId),
+  }),
+);
+
+export const leadActivitiesTable = pgTable(
+  "lead_activities",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    leadId: uuid("lead_id").notNull().references(() => leadsTable.id, { onDelete: "cascade" }),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    kind: varchar("kind", { length: 24 }).notNull(), // call|email|sms|meeting|note|status
+    subject: text("subject"),
+    body: text("body"),
+    occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull().defaultNow(),
+    actorUserId: uuid("actor_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    actorLabel: text("actor_label"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    leadIdx: index("lead_activities_lead_idx").on(t.leadId, t.occurredAt),
+  }),
+);
+
+export type Lead = typeof leadsTable.$inferSelect;
+export type LeadNote = typeof leadNotesTable.$inferSelect;
+export type LeadActivity = typeof leadActivitiesTable.$inferSelect;

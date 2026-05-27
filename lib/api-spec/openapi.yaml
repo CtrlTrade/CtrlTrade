@@ -1253,6 +1253,204 @@ paths:
       responses:
         "204": { description: Deleted }
 
+  /v1/leads:
+    get:
+      operationId: listLeads
+      tags: [leads]
+      parameters:
+        - in: query
+          name: status
+          required: false
+          schema: { type: string }
+        - in: query
+          name: source
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/LeadSummary" }
+    post:
+      operationId: createLead
+      tags: [leads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lead" }
+
+  /v1/leads/{leadId}:
+    parameters:
+      - in: path
+        name: leadId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getLead
+      tags: [leads]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lead" }
+    patch:
+      operationId: updateLead
+      tags: [leads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadUpdateInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lead" }
+    delete:
+      operationId: deleteLead
+      tags: [leads]
+      responses:
+        "204": { description: Deleted }
+
+  /v1/leads/{leadId}/notes:
+    parameters:
+      - in: path
+        name: leadId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: addLeadNote
+      tags: [leads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadNoteInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadNote" }
+
+  /v1/leads/{leadId}/activities:
+    parameters:
+      - in: path
+        name: leadId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: logLeadActivity
+      tags: [leads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadActivityInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadActivity" }
+
+  /v1/leads/{leadId}/convert:
+    parameters:
+      - in: path
+        name: leadId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: convertLeadToQuote
+      tags: [leads]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadConvertInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadConvertResult" }
+
+  /v1/leads/{leadId}/lose:
+    parameters:
+      - in: path
+        name: leadId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: loseLead
+      tags: [leads]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadLoseInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lead" }
+
+  /v1/leads/embed-snippet:
+    get:
+      operationId: getLeadEmbedSnippet
+      tags: [leads]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadEmbedSnippet" }
+
+  /v1/dashboard/lead-source-roi:
+    get:
+      operationId: getLeadSourceRoi
+      tags: [leads]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadSourceRoiReport" }
+
+  /v1/public/leads/{tenantSlug}:
+    parameters:
+      - in: path
+        name: tenantSlug
+        required: true
+        schema: { type: string }
+    post:
+      operationId: captureLeadPublic
+      tags: [leads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PublicLeadInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublicLeadResult" }
+
   /v1/admin/tenants/{tenantId}/audit-log:
     get:
       operationId: getAdminTenantAuditLog
@@ -2239,3 +2437,184 @@ components:
         destination: { type: ["string", "null"] }
         deliveredAt: { type: string, format: date-time }
 
+
+    LeadSummary:
+      type: object
+      required: [id, name, source, status, score, valuePence, currency, createdAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: ["string", "null"] }
+        phone: { type: ["string", "null"] }
+        company: { type: ["string", "null"] }
+        source: { type: string }
+        sourceDetail: { type: ["string", "null"] }
+        status: { type: string }
+        title: { type: ["string", "null"] }
+        score: { type: integer }
+        valuePence: { type: integer }
+        currency: { type: string }
+        ownerUserId: { type: ["string", "null"] }
+        ownerUserName: { type: ["string", "null"] }
+        convertedQuoteId: { type: ["string", "null"] }
+        convertedCustomerId: { type: ["string", "null"] }
+        followUpDueAt: { type: ["string", "null"], format: date-time }
+        followUpOverdue: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    Lead:
+      allOf:
+        - $ref: "#/components/schemas/LeadSummary"
+        - type: object
+          required: [notes, activities]
+          properties:
+            message: { type: ["string", "null"] }
+            lostReason: { type: ["string", "null"] }
+            firstContactedAt: { type: ["string", "null"], format: date-time }
+            notes:
+              type: array
+              items: { $ref: "#/components/schemas/LeadNote" }
+            activities:
+              type: array
+              items: { $ref: "#/components/schemas/LeadActivity" }
+
+    LeadInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        email: { type: string }
+        phone: { type: string }
+        company: { type: string }
+        source: { type: string }
+        sourceDetail: { type: string }
+        title: { type: string }
+        message: { type: string }
+        valuePence: { type: integer, minimum: 0 }
+        ownerUserId: { type: string }
+
+    LeadUpdateInput:
+      type: object
+      properties:
+        name: { type: string, minLength: 1 }
+        email: { type: ["string", "null"] }
+        phone: { type: ["string", "null"] }
+        company: { type: ["string", "null"] }
+        source: { type: string }
+        sourceDetail: { type: ["string", "null"] }
+        status: { type: string, enum: [new, contacted, qualified, won, lost] }
+        title: { type: ["string", "null"] }
+        message: { type: ["string", "null"] }
+        valuePence: { type: integer, minimum: 0 }
+        ownerUserId: { type: ["string", "null"] }
+        followUpDueAt: { type: ["string", "null"], format: date-time }
+
+    LeadNote:
+      type: object
+      required: [id, body, createdAt]
+      properties:
+        id: { type: string }
+        body: { type: string }
+        authorUserId: { type: ["string", "null"] }
+        authorLabel: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    LeadNoteInput:
+      type: object
+      required: [body]
+      properties:
+        body: { type: string, minLength: 1 }
+
+    LeadActivity:
+      type: object
+      required: [id, kind, occurredAt]
+      properties:
+        id: { type: string }
+        kind: { type: string }
+        subject: { type: ["string", "null"] }
+        body: { type: ["string", "null"] }
+        occurredAt: { type: string, format: date-time }
+        actorUserId: { type: ["string", "null"] }
+        actorLabel: { type: ["string", "null"] }
+
+    LeadActivityInput:
+      type: object
+      required: [kind]
+      properties:
+        kind: { type: string, enum: [call, email, sms, meeting, note, status] }
+        subject: { type: string }
+        body: { type: string }
+        occurredAt: { type: string, format: date-time }
+
+    LeadConvertInput:
+      type: object
+      properties:
+        customerId: { type: string, description: "Reuse an existing customer instead of creating one" }
+        quoteTitle: { type: string }
+        valuePence: { type: integer, minimum: 0 }
+
+    LeadConvertResult:
+      type: object
+      required: [lead, customer, quote]
+      properties:
+        lead: { $ref: "#/components/schemas/Lead" }
+        customer: { $ref: "#/components/schemas/Customer" }
+        quote: { $ref: "#/components/schemas/Quote" }
+
+    LeadLoseInput:
+      type: object
+      properties:
+        reason: { type: string }
+
+    LeadEmbedSnippet:
+      type: object
+      required: [endpoint, tenantSlug, html, script]
+      properties:
+        tenantSlug: { type: string }
+        endpoint: { type: string }
+        html: { type: string }
+        script: { type: string }
+
+    LeadSourceRoiRow:
+      type: object
+      required: [source, totalLeads, wonLeads, conversionPct, wonValuePence, pipelineValuePence, currency]
+      properties:
+        source: { type: string }
+        totalLeads: { type: integer }
+        wonLeads: { type: integer }
+        conversionPct: { type: integer }
+        wonValuePence: { type: integer }
+        pipelineValuePence: { type: integer }
+        currency: { type: string }
+
+    LeadSourceRoiReport:
+      type: object
+      required: [currency, rows, totalLeads, wonLeads, wonValuePence, pipelineValuePence]
+      properties:
+        currency: { type: string }
+        totalLeads: { type: integer }
+        wonLeads: { type: integer }
+        wonValuePence: { type: integer }
+        pipelineValuePence: { type: integer }
+        rows:
+          type: array
+          items: { $ref: "#/components/schemas/LeadSourceRoiRow" }
+
+    PublicLeadInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        email: { type: string }
+        phone: { type: string }
+        company: { type: string }
+        title: { type: string }
+        message: { type: string }
+        sourceDetail: { type: string }
+
+    PublicLeadResult:
+      type: object
+      required: [ok]
+      properties:
+        ok: { type: boolean }
+        leadId: { type: string }

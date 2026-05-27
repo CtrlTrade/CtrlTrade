@@ -1887,6 +1887,384 @@ export const DeleteCertificateParams = zod.object({
 })
 
 
+export const ListLeadsQueryParams = zod.object({
+  "status": zod.coerce.string().optional(),
+  "source": zod.coerce.string().optional()
+})
+
+export const ListLeadsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "source": zod.string(),
+  "sourceDetail": zod.string().nullish(),
+  "status": zod.string(),
+  "title": zod.string().nullish(),
+  "score": zod.number(),
+  "valuePence": zod.number(),
+  "currency": zod.string(),
+  "ownerUserId": zod.string().nullish(),
+  "ownerUserName": zod.string().nullish(),
+  "convertedQuoteId": zod.string().nullish(),
+  "convertedCustomerId": zod.string().nullish(),
+  "followUpDueAt": zod.coerce.date().nullish(),
+  "followUpOverdue": zod.boolean().optional(),
+  "createdAt": zod.coerce.date()
+})
+export const ListLeadsResponse = zod.array(ListLeadsResponseItem)
+
+
+
+export const createLeadBodyValuePenceMin = 0;
+
+
+
+export const CreateLeadBody = zod.object({
+  "name": zod.string().min(1),
+  "email": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "company": zod.string().optional(),
+  "source": zod.string().optional(),
+  "sourceDetail": zod.string().optional(),
+  "title": zod.string().optional(),
+  "message": zod.string().optional(),
+  "valuePence": zod.number().min(createLeadBodyValuePenceMin).optional(),
+  "ownerUserId": zod.string().optional()
+})
+
+
+export const GetLeadParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+export const GetLeadResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "source": zod.string(),
+  "sourceDetail": zod.string().nullish(),
+  "status": zod.string(),
+  "title": zod.string().nullish(),
+  "score": zod.number(),
+  "valuePence": zod.number(),
+  "currency": zod.string(),
+  "ownerUserId": zod.string().nullish(),
+  "ownerUserName": zod.string().nullish(),
+  "convertedQuoteId": zod.string().nullish(),
+  "convertedCustomerId": zod.string().nullish(),
+  "followUpDueAt": zod.coerce.date().nullish(),
+  "followUpOverdue": zod.boolean().optional(),
+  "createdAt": zod.coerce.date()
+}).and(zod.object({
+  "message": zod.string().nullish(),
+  "lostReason": zod.string().nullish(),
+  "firstContactedAt": zod.coerce.date().nullish(),
+  "notes": zod.array(zod.object({
+  "id": zod.string(),
+  "body": zod.string(),
+  "authorUserId": zod.string().nullish(),
+  "authorLabel": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})),
+  "activities": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.string(),
+  "subject": zod.string().nullish(),
+  "body": zod.string().nullish(),
+  "occurredAt": zod.coerce.date(),
+  "actorUserId": zod.string().nullish(),
+  "actorLabel": zod.string().nullish()
+}))
+}))
+
+
+export const UpdateLeadParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+
+export const updateLeadBodyValuePenceMin = 0;
+
+
+
+export const UpdateLeadBody = zod.object({
+  "name": zod.string().min(1).optional(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "source": zod.string().optional(),
+  "sourceDetail": zod.string().nullish(),
+  "status": zod.enum(['new', 'contacted', 'qualified', 'won', 'lost']).optional(),
+  "title": zod.string().nullish(),
+  "message": zod.string().nullish(),
+  "valuePence": zod.number().min(updateLeadBodyValuePenceMin).optional(),
+  "ownerUserId": zod.string().nullish(),
+  "followUpDueAt": zod.coerce.date().nullish()
+})
+
+export const UpdateLeadResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "source": zod.string(),
+  "sourceDetail": zod.string().nullish(),
+  "status": zod.string(),
+  "title": zod.string().nullish(),
+  "score": zod.number(),
+  "valuePence": zod.number(),
+  "currency": zod.string(),
+  "ownerUserId": zod.string().nullish(),
+  "ownerUserName": zod.string().nullish(),
+  "convertedQuoteId": zod.string().nullish(),
+  "convertedCustomerId": zod.string().nullish(),
+  "followUpDueAt": zod.coerce.date().nullish(),
+  "followUpOverdue": zod.boolean().optional(),
+  "createdAt": zod.coerce.date()
+}).and(zod.object({
+  "message": zod.string().nullish(),
+  "lostReason": zod.string().nullish(),
+  "firstContactedAt": zod.coerce.date().nullish(),
+  "notes": zod.array(zod.object({
+  "id": zod.string(),
+  "body": zod.string(),
+  "authorUserId": zod.string().nullish(),
+  "authorLabel": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})),
+  "activities": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.string(),
+  "subject": zod.string().nullish(),
+  "body": zod.string().nullish(),
+  "occurredAt": zod.coerce.date(),
+  "actorUserId": zod.string().nullish(),
+  "actorLabel": zod.string().nullish()
+}))
+}))
+
+
+export const DeleteLeadParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+
+export const AddLeadNoteParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+
+
+
+export const AddLeadNoteBody = zod.object({
+  "body": zod.string().min(1)
+})
+
+
+export const LogLeadActivityParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+export const LogLeadActivityBody = zod.object({
+  "kind": zod.enum(['call', 'email', 'sms', 'meeting', 'note', 'status']),
+  "subject": zod.string().optional(),
+  "body": zod.string().optional(),
+  "occurredAt": zod.coerce.date().optional()
+})
+
+
+export const ConvertLeadToQuoteParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+export const convertLeadToQuoteBodyValuePenceMin = 0;
+
+
+
+export const ConvertLeadToQuoteBody = zod.object({
+  "customerId": zod.string().optional().describe('Reuse an existing customer instead of creating one'),
+  "quoteTitle": zod.string().optional(),
+  "valuePence": zod.number().min(convertLeadToQuoteBodyValuePenceMin).optional()
+})
+
+export const ConvertLeadToQuoteResponse = zod.object({
+  "lead": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "source": zod.string(),
+  "sourceDetail": zod.string().nullish(),
+  "status": zod.string(),
+  "title": zod.string().nullish(),
+  "score": zod.number(),
+  "valuePence": zod.number(),
+  "currency": zod.string(),
+  "ownerUserId": zod.string().nullish(),
+  "ownerUserName": zod.string().nullish(),
+  "convertedQuoteId": zod.string().nullish(),
+  "convertedCustomerId": zod.string().nullish(),
+  "followUpDueAt": zod.coerce.date().nullish(),
+  "followUpOverdue": zod.boolean().optional(),
+  "createdAt": zod.coerce.date()
+}).and(zod.object({
+  "message": zod.string().nullish(),
+  "lostReason": zod.string().nullish(),
+  "firstContactedAt": zod.coerce.date().nullish(),
+  "notes": zod.array(zod.object({
+  "id": zod.string(),
+  "body": zod.string(),
+  "authorUserId": zod.string().nullish(),
+  "authorLabel": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})),
+  "activities": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.string(),
+  "subject": zod.string().nullish(),
+  "body": zod.string().nullish(),
+  "occurredAt": zod.coerce.date(),
+  "actorUserId": zod.string().nullish(),
+  "actorLabel": zod.string().nullish()
+}))
+})),
+  "customer": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+}),
+  "quote": zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "notes": zod.string().nullish(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number(),
+  "sortOrder": zod.number().optional()
+})),
+  "createdAt": zod.coerce.date(),
+  "sentAt": zod.coerce.date().nullish(),
+  "acceptedAt": zod.coerce.date().nullish(),
+  "convertedJobId": zod.string().nullish()
+})
+})
+
+
+export const LoseLeadParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+export const LoseLeadBody = zod.object({
+  "reason": zod.string().optional()
+})
+
+export const LoseLeadResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "source": zod.string(),
+  "sourceDetail": zod.string().nullish(),
+  "status": zod.string(),
+  "title": zod.string().nullish(),
+  "score": zod.number(),
+  "valuePence": zod.number(),
+  "currency": zod.string(),
+  "ownerUserId": zod.string().nullish(),
+  "ownerUserName": zod.string().nullish(),
+  "convertedQuoteId": zod.string().nullish(),
+  "convertedCustomerId": zod.string().nullish(),
+  "followUpDueAt": zod.coerce.date().nullish(),
+  "followUpOverdue": zod.boolean().optional(),
+  "createdAt": zod.coerce.date()
+}).and(zod.object({
+  "message": zod.string().nullish(),
+  "lostReason": zod.string().nullish(),
+  "firstContactedAt": zod.coerce.date().nullish(),
+  "notes": zod.array(zod.object({
+  "id": zod.string(),
+  "body": zod.string(),
+  "authorUserId": zod.string().nullish(),
+  "authorLabel": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})),
+  "activities": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.string(),
+  "subject": zod.string().nullish(),
+  "body": zod.string().nullish(),
+  "occurredAt": zod.coerce.date(),
+  "actorUserId": zod.string().nullish(),
+  "actorLabel": zod.string().nullish()
+}))
+}))
+
+
+export const GetLeadEmbedSnippetResponse = zod.object({
+  "tenantSlug": zod.string(),
+  "endpoint": zod.string(),
+  "html": zod.string(),
+  "script": zod.string()
+})
+
+
+export const GetLeadSourceRoiResponse = zod.object({
+  "currency": zod.string(),
+  "totalLeads": zod.number(),
+  "wonLeads": zod.number(),
+  "wonValuePence": zod.number(),
+  "pipelineValuePence": zod.number(),
+  "rows": zod.array(zod.object({
+  "source": zod.string(),
+  "totalLeads": zod.number(),
+  "wonLeads": zod.number(),
+  "conversionPct": zod.number(),
+  "wonValuePence": zod.number(),
+  "pipelineValuePence": zod.number(),
+  "currency": zod.string()
+}))
+})
+
+
+export const CaptureLeadPublicParams = zod.object({
+  "tenantSlug": zod.coerce.string()
+})
+
+
+
+
+export const CaptureLeadPublicBody = zod.object({
+  "name": zod.string().min(1),
+  "email": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "company": zod.string().optional(),
+  "title": zod.string().optional(),
+  "message": zod.string().optional(),
+  "sourceDetail": zod.string().optional()
+})
+
+
 export const GetAdminTenantAuditLogParams = zod.object({
   "tenantId": zod.coerce.string()
 })

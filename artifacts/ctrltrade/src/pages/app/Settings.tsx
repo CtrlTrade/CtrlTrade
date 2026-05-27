@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useGetTenant, useUpdateTenant, useListTradeCategories } from "@workspace/api-client-react";
+import { useGetTenant, useUpdateTenant, useListTradeCategories, useGetLeadEmbedSnippet } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Copy } from "lucide-react";
 
 export function AppSettings() {
   const { data: tenant, isLoading: tenantLoading } = useGetTenant();
@@ -154,6 +156,49 @@ export function AppSettings() {
           </Button>
         </div>
       </form>
+
+      <LeadCaptureSnippetCard />
     </div>
+  );
+}
+
+function LeadCaptureSnippetCard() {
+  const { data, isLoading } = useGetLeadEmbedSnippet();
+  const { toast } = useToast();
+  if (isLoading || !data) return null;
+  const combined = `${data.html}\n${data.script}`;
+  const copy = (text: string, label: string) => {
+    navigator.clipboard.writeText(text).then(
+      () => toast({ title: `${label} copied` }),
+      () => toast({ title: "Copy failed", variant: "destructive" }),
+    );
+  };
+  return (
+    <Card className="rounded-none border-border shadow-sm" data-testid="card-lead-snippet">
+      <CardHeader>
+        <CardTitle className="uppercase tracking-tight">Website Lead Capture</CardTitle>
+        <CardDescription>
+          Paste this snippet on any web page to send enquiries straight into CTRLTRADE® leads.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label>Endpoint</Label>
+          <div className="flex gap-2">
+            <Input value={data.endpoint} readOnly className="rounded-none font-mono text-xs" data-testid="input-snippet-endpoint" />
+            <Button type="button" variant="outline" className="rounded-none" onClick={() => copy(data.endpoint, "Endpoint")}>
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>HTML snippet</Label>
+          <Textarea value={combined} readOnly rows={10} className="rounded-none font-mono text-xs" data-testid="textarea-snippet" />
+          <Button type="button" variant="outline" className="rounded-none uppercase tracking-wider text-xs font-bold" onClick={() => copy(combined, "Snippet")}>
+            <Copy className="h-4 w-4 mr-2" /> Copy snippet
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

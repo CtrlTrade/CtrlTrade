@@ -1,10 +1,10 @@
-import { useGetOnboarding, useGetSubscription, useUpdateSubscriptionQuantities, useCancelTenant, useGetExpiryAttention } from "@workspace/api-client-react";
+import { useGetOnboarding, useGetSubscription, useUpdateSubscriptionQuantities, useCancelTenant, useGetExpiryAttention, useGetLeadSourceRoi } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
-import { CheckCircle2, Circle, AlertTriangle, CreditCard, Users, ShoppingCart, Clock } from "lucide-react";
+import { CheckCircle2, Circle, AlertTriangle, CreditCard, Users, ShoppingCart, Clock, Target } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ export function AppDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           <AttentionRequiredCard />
+          <LeadSourceRoiCard />
           {onboarding && (
             <Card className="rounded-none border-border shadow-sm">
               <CardHeader>
@@ -72,6 +73,45 @@ export function AppDashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+function LeadSourceRoiCard() {
+  const { data, isLoading } = useGetLeadSourceRoi();
+  if (isLoading || !data) return null;
+  if (data.totalLeads === 0) return null;
+  const fmt = (p: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: data.currency, maximumFractionDigits: 0 }).format(p / 100);
+  return (
+    <Card className="rounded-none border-border shadow-sm" data-testid="card-lead-source-roi">
+      <CardHeader>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+              <Target className="h-5 w-5" /> Lead Source ROI
+            </CardTitle>
+            <CardDescription>
+              {data.totalLeads} lead{data.totalLeads === 1 ? "" : "s"} · {data.wonLeads} won · {fmt(data.wonValuePence)} closed · {fmt(data.pipelineValuePence)} in pipeline
+            </CardDescription>
+          </div>
+          <Link href="/app/leads">
+            <Button variant="outline" size="sm" className="rounded-none uppercase tracking-wider text-xs font-bold">All leads</Button>
+          </Link>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="divide-y divide-border border border-border bg-background">
+          {data.rows.map((r) => (
+            <div key={r.source} className="grid grid-cols-12 gap-2 p-3 text-sm items-center">
+              <div className="col-span-3 uppercase tracking-wider font-mono font-bold">{r.source}</div>
+              <div className="col-span-2 text-muted-foreground">{r.totalLeads} leads</div>
+              <div className="col-span-2 text-muted-foreground">{r.wonLeads} won</div>
+              <div className="col-span-2 font-mono">{r.conversionPct}%</div>
+              <div className="col-span-3 text-right font-mono font-bold">{fmt(r.wonValuePence)}</div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

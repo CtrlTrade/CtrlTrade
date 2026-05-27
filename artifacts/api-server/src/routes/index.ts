@@ -17,6 +17,7 @@ import dashboardRouter from "./dashboard";
 import posRouter from "./pos";
 import invoicesRouter from "./invoices";
 import invoiceTemplatesRouter from "./invoiceTemplates";
+import leadsRouter from "./leads";
 
 const router: IRouter = Router();
 
@@ -34,6 +35,7 @@ router.use(tenantRouter);
 router.use(subscriptionRouter);
 router.use(billingRouter);
 router.use(onboardingRouter);
+router.use(leadsRouter);
 router.use(adminRouter);
 router.use(customersRouter);
 router.use(quotesRouter);

@@ -921,6 +921,208 @@ export interface PosReceiptReceipt {
   deliveredAt: string;
 }
 
+export interface LeadSummary {
+  id: string;
+  name: string;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  company?: string | null;
+  source: string;
+  /** @nullable */
+  sourceDetail?: string | null;
+  status: string;
+  /** @nullable */
+  title?: string | null;
+  score: number;
+  valuePence: number;
+  currency: string;
+  /** @nullable */
+  ownerUserId?: string | null;
+  /** @nullable */
+  ownerUserName?: string | null;
+  /** @nullable */
+  convertedQuoteId?: string | null;
+  /** @nullable */
+  convertedCustomerId?: string | null;
+  /** @nullable */
+  followUpDueAt?: string | null;
+  followUpOverdue?: boolean;
+  createdAt: string;
+}
+
+export interface LeadNote {
+  id: string;
+  body: string;
+  /** @nullable */
+  authorUserId?: string | null;
+  /** @nullable */
+  authorLabel?: string | null;
+  createdAt: string;
+}
+
+export interface LeadActivity {
+  id: string;
+  kind: string;
+  /** @nullable */
+  subject?: string | null;
+  /** @nullable */
+  body?: string | null;
+  occurredAt: string;
+  /** @nullable */
+  actorUserId?: string | null;
+  /** @nullable */
+  actorLabel?: string | null;
+}
+
+export type Lead = LeadSummary & ({
+  /** @nullable */
+  message?: string | null;
+  /** @nullable */
+  lostReason?: string | null;
+  /** @nullable */
+  firstContactedAt?: string | null;
+  notes: LeadNote[];
+  activities: LeadActivity[];
+});
+
+export interface LeadInput {
+  /** @minLength 1 */
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  source?: string;
+  sourceDetail?: string;
+  title?: string;
+  message?: string;
+  /** @minimum 0 */
+  valuePence?: number;
+  ownerUserId?: string;
+}
+
+export type LeadUpdateInputStatus = typeof LeadUpdateInputStatus[keyof typeof LeadUpdateInputStatus];
+
+
+export const LeadUpdateInputStatus = {
+  new: 'new',
+  contacted: 'contacted',
+  qualified: 'qualified',
+  won: 'won',
+  lost: 'lost',
+} as const;
+
+export interface LeadUpdateInput {
+  /** @minLength 1 */
+  name?: string;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  company?: string | null;
+  source?: string;
+  /** @nullable */
+  sourceDetail?: string | null;
+  status?: LeadUpdateInputStatus;
+  /** @nullable */
+  title?: string | null;
+  /** @nullable */
+  message?: string | null;
+  /** @minimum 0 */
+  valuePence?: number;
+  /** @nullable */
+  ownerUserId?: string | null;
+  /** @nullable */
+  followUpDueAt?: string | null;
+}
+
+export interface LeadNoteInput {
+  /** @minLength 1 */
+  body: string;
+}
+
+export type LeadActivityInputKind = typeof LeadActivityInputKind[keyof typeof LeadActivityInputKind];
+
+
+export const LeadActivityInputKind = {
+  call: 'call',
+  email: 'email',
+  sms: 'sms',
+  meeting: 'meeting',
+  note: 'note',
+  status: 'status',
+} as const;
+
+export interface LeadActivityInput {
+  kind: LeadActivityInputKind;
+  subject?: string;
+  body?: string;
+  occurredAt?: string;
+}
+
+export interface LeadConvertInput {
+  /** Reuse an existing customer instead of creating one */
+  customerId?: string;
+  quoteTitle?: string;
+  /** @minimum 0 */
+  valuePence?: number;
+}
+
+export interface LeadConvertResult {
+  lead: Lead;
+  customer: Customer;
+  quote: Quote;
+}
+
+export interface LeadLoseInput {
+  reason?: string;
+}
+
+export interface LeadEmbedSnippet {
+  tenantSlug: string;
+  endpoint: string;
+  html: string;
+  script: string;
+}
+
+export interface LeadSourceRoiRow {
+  source: string;
+  totalLeads: number;
+  wonLeads: number;
+  conversionPct: number;
+  wonValuePence: number;
+  pipelineValuePence: number;
+  currency: string;
+}
+
+export interface LeadSourceRoiReport {
+  currency: string;
+  totalLeads: number;
+  wonLeads: number;
+  wonValuePence: number;
+  pipelineValuePence: number;
+  rows: LeadSourceRoiRow[];
+}
+
+export interface PublicLeadInput {
+  /** @minLength 1 */
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  title?: string;
+  message?: string;
+  sourceDetail?: string;
+}
+
+export interface PublicLeadResult {
+  ok: boolean;
+  leadId?: string;
+}
+
 export type ListJobsParams = {
 status?: string;
 };
@@ -932,5 +1134,10 @@ status?: string;
 export type GetScheduleParams = {
 from: string;
 to: string;
+};
+
+export type ListLeadsParams = {
+status?: string;
+source?: string;
 };
 

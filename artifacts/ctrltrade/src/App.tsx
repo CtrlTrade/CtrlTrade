@@ -31,6 +31,8 @@ import { AppCompliance } from "@/pages/app/Compliance";
 import { AppInvoices } from "@/pages/app/Invoices";
 import { AppInvoiceDetail } from "@/pages/app/InvoiceDetail";
 import { AppInvoiceTemplates } from "@/pages/app/InvoiceTemplates";
+import { AppLeads } from "@/pages/app/Leads";
+import { AppLeadDetail } from "@/pages/app/LeadDetail";
 import { PlaceholderPage } from "@/components/PlaceholderPage";
 
 // Admin
@@ -65,6 +67,8 @@ function App() {
                   <Route path="/settings" component={AppSettings} />
                   <Route path="/billing" component={AppBilling} />
                   <Route path="/customers" component={AppCustomers} />
+                  <Route path="/leads" component={AppLeads} />
+                  <Route path="/leads/:id" component={AppLeadDetail} />
                   <Route path="/quotes" component={AppQuotes} />
                   <Route path="/quotes/:id" component={AppQuoteDetail} />
                   <Route path="/jobs" component={AppJobs} />
