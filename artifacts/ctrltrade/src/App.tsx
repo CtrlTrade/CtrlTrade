@@ -42,6 +42,15 @@ import { AppProducts } from "@/pages/app/Products";
 import { AppStock } from "@/pages/app/Stock";
 import { AppSuppliers } from "@/pages/app/Suppliers";
 import { AppTradeAccounts } from "@/pages/app/TradeAccounts";
+import { ReportsIndex } from "@/pages/app/reports/Index";
+import { RevenueReport } from "@/pages/app/reports/Revenue";
+import { LeadRoiReport } from "@/pages/app/reports/LeadRoi";
+import { EngineerPerformanceReport } from "@/pages/app/reports/EngineerPerformance";
+import { QuoteConversionReport } from "@/pages/app/reports/QuoteConversion";
+import { JobProfitabilityReport } from "@/pages/app/reports/JobProfitability";
+import { CustomerLtvReport } from "@/pages/app/reports/CustomerLtv";
+import { AgedDebtorsReport } from "@/pages/app/reports/AgedDebtors";
+import { ActivityHeatmapReport } from "@/pages/app/reports/ActivityHeatmap";
 import { PlaceholderPage } from "@/components/PlaceholderPage";
 
 // Admin
@@ -135,6 +144,15 @@ function App() {
                   <Route path="/stock" component={AppStock} />
                   <Route path="/suppliers" component={AppSuppliers} />
                   <Route path="/trade-accounts" component={AppTradeAccounts} />
+                  <Route path="/reports" component={ReportsIndex} />
+                  <Route path="/reports/revenue">{() => <RevenueReport />}</Route>
+                  <Route path="/reports/lead-roi">{() => <LeadRoiReport />}</Route>
+                  <Route path="/reports/engineer-performance">{() => <EngineerPerformanceReport />}</Route>
+                  <Route path="/reports/quote-conversion">{() => <QuoteConversionReport />}</Route>
+                  <Route path="/reports/job-profitability">{() => <JobProfitabilityReport />}</Route>
+                  <Route path="/reports/customer-ltv">{() => <CustomerLtvReport />}</Route>
+                  <Route path="/reports/aged-debtors">{() => <AgedDebtorsReport />}</Route>
+                  <Route path="/reports/activity-heatmap">{() => <ActivityHeatmapReport />}</Route>
                   <Route path="/:id">
                     {() => <PlaceholderPage />}
                   </Route>
@@ -197,6 +215,15 @@ function App() {
                   <Route path="/workers" component={AdminWorkers} />
                   <Route path="/usage" component={AdminUsage} />
                   <Route path="/referrals" component={AdminReferrals} />
+                  <Route path="/reports" component={ReportsIndex} />
+                  <Route path="/reports/revenue">{() => <RevenueReport admin />}</Route>
+                  <Route path="/reports/lead-roi">{() => <LeadRoiReport admin />}</Route>
+                  <Route path="/reports/engineer-performance">{() => <EngineerPerformanceReport admin />}</Route>
+                  <Route path="/reports/quote-conversion">{() => <QuoteConversionReport admin />}</Route>
+                  <Route path="/reports/job-profitability">{() => <JobProfitabilityReport admin />}</Route>
+                  <Route path="/reports/customer-ltv">{() => <CustomerLtvReport admin />}</Route>
+                  <Route path="/reports/aged-debtors">{() => <AgedDebtorsReport admin />}</Route>
+                  <Route path="/reports/activity-heatmap">{() => <ActivityHeatmapReport admin />}</Route>
                   <Route component={NotFound} />
                 </Switch>
               </AdminLayout>

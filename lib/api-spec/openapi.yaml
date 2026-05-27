@@ -3730,6 +3730,330 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/MarketplaceReview" }
 
+  /v1/reports/revenue:
+    get:
+      operationId: getReportRevenue
+      tags: [reports]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportRevenue" }
+
+  /v1/reports/lead-roi:
+    get:
+      operationId: getReportLeadRoi
+      tags: [reports]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportLeadRoi" }
+
+  /v1/reports/engineer-performance:
+    get:
+      operationId: getReportEngineerPerformance
+      tags: [reports]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportEngineerPerformance" }
+
+  /v1/reports/quote-conversion:
+    get:
+      operationId: getReportQuoteConversion
+      tags: [reports]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportQuoteConversion" }
+
+  /v1/reports/job-profitability:
+    get:
+      operationId: getReportJobProfitability
+      tags: [reports]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportJobProfitability" }
+
+  /v1/reports/customer-ltv:
+    get:
+      operationId: getReportCustomerLtv
+      tags: [reports]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportCustomerLtv" }
+
+  /v1/reports/aged-debtors:
+    get:
+      operationId: getReportAgedDebtors
+      tags: [reports]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportAgedDebtors" }
+
+  /v1/reports/activity-heatmap:
+    get:
+      operationId: getReportActivityHeatmap
+      tags: [reports]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportActivityHeatmap" }
+
+  /v1/reports/insights:
+    get:
+      operationId: getReportInsights
+      tags: [reports]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportInsights" }
+
+  /v1/admin/reports/revenue:
+    get:
+      operationId: getAdminReportRevenue
+      tags: [admin]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportRevenue" }
+
+  /v1/admin/reports/lead-roi:
+    get:
+      operationId: getAdminReportLeadRoi
+      tags: [admin]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportLeadRoi" }
+
+  /v1/admin/reports/engineer-performance:
+    get:
+      operationId: getAdminReportEngineerPerformance
+      tags: [admin]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportEngineerPerformance" }
+
+  /v1/admin/reports/quote-conversion:
+    get:
+      operationId: getAdminReportQuoteConversion
+      tags: [admin]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportQuoteConversion" }
+
+  /v1/admin/reports/job-profitability:
+    get:
+      operationId: getAdminReportJobProfitability
+      tags: [admin]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportJobProfitability" }
+
+  /v1/admin/reports/customer-ltv:
+    get:
+      operationId: getAdminReportCustomerLtv
+      tags: [admin]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportCustomerLtv" }
+
+  /v1/admin/reports/aged-debtors:
+    get:
+      operationId: getAdminReportAgedDebtors
+      tags: [admin]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportAgedDebtors" }
+
+  /v1/admin/reports/activity-heatmap:
+    get:
+      operationId: getAdminReportActivityHeatmap
+      tags: [admin]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportActivityHeatmap" }
+
+  /v1/admin/reports/insights:
+    get:
+      operationId: getAdminReportInsights
+      tags: [admin]
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportInsights" }
+
 components:
   schemas:
     HealthStatus:
@@ -6713,3 +7037,225 @@ components:
           type: array
           items: { $ref: "#/components/schemas/PosTransactionLine" }
         createdAt: { type: string, format: date-time }
+    ReportPeriod:
+      type: object
+      required: [from, to]
+      properties:
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time }
+
+    ReportRevenuePoint:
+      type: object
+      required: [bucket, invoicedPence, collectedPence]
+      properties:
+        bucket: { type: string }
+        invoicedPence: { type: integer }
+        collectedPence: { type: integer }
+
+    ReportRevenue:
+      type: object
+      required: [currency, period, totalInvoicedPence, totalCollectedPence, outstandingPence, timeline, byMonth]
+      properties:
+        currency: { type: string }
+        period: { $ref: "#/components/schemas/ReportPeriod" }
+        totalInvoicedPence: { type: integer }
+        totalCollectedPence: { type: integer }
+        outstandingPence: { type: integer }
+        timeline:
+          type: array
+          items: { $ref: "#/components/schemas/ReportRevenuePoint" }
+        byMonth:
+          type: array
+          items: { $ref: "#/components/schemas/ReportRevenuePoint" }
+
+    ReportLeadRoiRow:
+      type: object
+      required: [source, totalLeads, wonLeads, conversionPct, wonValuePence, pipelineValuePence]
+      properties:
+        source: { type: string }
+        totalLeads: { type: integer }
+        wonLeads: { type: integer }
+        conversionPct: { type: integer }
+        wonValuePence: { type: integer }
+        pipelineValuePence: { type: integer }
+
+    ReportLeadRoi:
+      type: object
+      required: [currency, period, totalLeads, wonLeads, wonValuePence, pipelineValuePence, rows]
+      properties:
+        currency: { type: string }
+        period: { $ref: "#/components/schemas/ReportPeriod" }
+        totalLeads: { type: integer }
+        wonLeads: { type: integer }
+        wonValuePence: { type: integer }
+        pipelineValuePence: { type: integer }
+        rows:
+          type: array
+          items: { $ref: "#/components/schemas/ReportLeadRoiRow" }
+
+    ReportEngineerRow:
+      type: object
+      required: [userId, name, jobsCompleted, jobsTotal, hours, totalValuePence, onTimePct]
+      properties:
+        userId: { type: ["string", "null"] }
+        name: { type: string }
+        jobsCompleted: { type: integer }
+        jobsTotal: { type: integer }
+        hours: { type: number }
+        totalValuePence: { type: integer }
+        onTimePct: { type: integer }
+
+    ReportEngineerPerformance:
+      type: object
+      required: [currency, period, rows]
+      properties:
+        currency: { type: string }
+        period: { $ref: "#/components/schemas/ReportPeriod" }
+        rows:
+          type: array
+          items: { $ref: "#/components/schemas/ReportEngineerRow" }
+
+    ReportQuoteConversion:
+      type: object
+      required: [currency, period, draft, sent, accepted, declined, converted, sentValuePence, acceptedValuePence, convertedValuePence, acceptRatePct, conversionRatePct, timeline]
+      properties:
+        currency: { type: string }
+        period: { $ref: "#/components/schemas/ReportPeriod" }
+        draft: { type: integer }
+        sent: { type: integer }
+        accepted: { type: integer }
+        declined: { type: integer }
+        converted: { type: integer }
+        sentValuePence: { type: integer }
+        acceptedValuePence: { type: integer }
+        convertedValuePence: { type: integer }
+        acceptRatePct: { type: integer }
+        conversionRatePct: { type: integer }
+        timeline:
+          type: array
+          items:
+            type: object
+            required: [bucket, sent, accepted, converted]
+            properties:
+              bucket: { type: string }
+              sent: { type: integer }
+              accepted: { type: integer }
+              converted: { type: integer }
+
+    ReportJobProfitabilityRow:
+      type: object
+      required: [jobId, number, title, revenuePence, costPence, marginPence, marginPct]
+      properties:
+        jobId: { type: string }
+        number: { type: string }
+        title: { type: string }
+        customerName: { type: ["string", "null"] }
+        revenuePence: { type: integer }
+        costPence: { type: integer }
+        marginPence: { type: integer }
+        marginPct: { type: integer }
+
+    ReportJobProfitability:
+      type: object
+      required: [currency, period, totalRevenuePence, totalCostPence, totalMarginPence, marginPct, rows]
+      properties:
+        currency: { type: string }
+        period: { $ref: "#/components/schemas/ReportPeriod" }
+        totalRevenuePence: { type: integer }
+        totalCostPence: { type: integer }
+        totalMarginPence: { type: integer }
+        marginPct: { type: integer }
+        rows:
+          type: array
+          items: { $ref: "#/components/schemas/ReportJobProfitabilityRow" }
+
+    ReportCustomerLtvRow:
+      type: object
+      required: [customerId, name, invoiceCount, totalInvoicedPence, totalCollectedPence, firstInvoiceAt, lastInvoiceAt]
+      properties:
+        customerId: { type: string }
+        name: { type: string }
+        invoiceCount: { type: integer }
+        totalInvoicedPence: { type: integer }
+        totalCollectedPence: { type: integer }
+        firstInvoiceAt: { type: ["string", "null"], format: date-time }
+        lastInvoiceAt: { type: ["string", "null"], format: date-time }
+
+    ReportCustomerLtv:
+      type: object
+      required: [currency, period, rows]
+      properties:
+        currency: { type: string }
+        period: { $ref: "#/components/schemas/ReportPeriod" }
+        rows:
+          type: array
+          items: { $ref: "#/components/schemas/ReportCustomerLtvRow" }
+
+    ReportAgedDebtorsBucket:
+      type: object
+      required: [label, count, totalPence]
+      properties:
+        label: { type: string }
+        count: { type: integer }
+        totalPence: { type: integer }
+
+    ReportAgedDebtorsRow:
+      type: object
+      required: [invoiceId, number, customerName, totalPence, outstandingPence, daysOverdue, dueAt]
+      properties:
+        invoiceId: { type: string }
+        number: { type: string }
+        customerName: { type: string }
+        totalPence: { type: integer }
+        outstandingPence: { type: integer }
+        daysOverdue: { type: integer }
+        dueAt: { type: ["string", "null"], format: date-time }
+
+    ReportAgedDebtors:
+      type: object
+      required: [currency, totalOutstandingPence, buckets, rows]
+      properties:
+        currency: { type: string }
+        totalOutstandingPence: { type: integer }
+        buckets:
+          type: array
+          items: { $ref: "#/components/schemas/ReportAgedDebtorsBucket" }
+        rows:
+          type: array
+          items: { $ref: "#/components/schemas/ReportAgedDebtorsRow" }
+
+    ReportActivityHeatmapCell:
+      type: object
+      required: [dayOfWeek, hour, jobCount]
+      properties:
+        dayOfWeek: { type: integer }
+        hour: { type: integer }
+        jobCount: { type: integer }
+
+    ReportActivityHeatmap:
+      type: object
+      required: [period, totalJobs, cells]
+      properties:
+        period: { $ref: "#/components/schemas/ReportPeriod" }
+        totalJobs: { type: integer }
+        cells:
+          type: array
+          items: { $ref: "#/components/schemas/ReportActivityHeatmapCell" }
+
+    ReportInsightItem:
+      type: object
+      required: [title, detail, direction, changePct]
+      properties:
+        title: { type: string }
+        detail: { type: string }
+        direction: { type: string, enum: [up, down, flat] }
+        changePct: { type: integer }
+
+    ReportInsights:
+      type: object
+      required: [period, items]
+      properties:
+        period: { $ref: "#/components/schemas/ReportPeriod" }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ReportInsightItem" }

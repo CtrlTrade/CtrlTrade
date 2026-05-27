@@ -2516,564 +2516,181 @@ export interface MarketplaceReviewInput {
   comment?: string;
 }
 
-export interface StockLocation {
-  id: string;
-  name: string;
-  /** shop | warehouse | van */
-  kind: string;
-  /** @nullable */
-  code?: string | null;
-  /** @nullable */
-  addressLine1?: string | null;
-  /** @nullable */
-  city?: string | null;
-  /** @nullable */
-  postcode?: string | null;
-  isDefault: boolean;
-  archived: boolean;
-  createdAt: string;
+export interface ReportPeriod {
+  from: string;
+  to: string;
 }
 
-export interface StockLocationInput {
-  /** @minLength 1 */
-  name: string;
-  kind?: string;
-  /** @nullable */
-  code?: string | null;
-  /** @nullable */
-  addressLine1?: string | null;
-  /** @nullable */
-  city?: string | null;
-  /** @nullable */
-  postcode?: string | null;
-  isDefault?: boolean;
+export interface ReportRevenuePoint {
+  bucket: string;
+  invoicedPence: number;
+  collectedPence: number;
 }
 
-export interface ProductCategory {
-  id: string;
-  name: string;
-  sortOrder: number;
-  createdAt: string;
-}
-
-export interface ProductCategoryInput {
-  /** @minLength 1 */
-  name: string;
-  sortOrder?: number;
-}
-
-export interface Product {
-  id: string;
-  /** @nullable */
-  categoryId?: string | null;
-  /** @nullable */
-  categoryName?: string | null;
-  sku: string;
-  name: string;
-  /** @nullable */
-  description?: string | null;
-  unit: string;
-  pricePence: number;
-  costPence: number;
-  /** @nullable */
-  tradePricePence?: number | null;
-  vatRatePct: number;
-  /** @nullable */
-  barcode?: string | null;
-  trackStock: boolean;
-  reorderLevel?: number;
-  reorderQty?: number;
-  /** @nullable */
-  supplierId?: string | null;
-  /** @nullable */
-  supplierName?: string | null;
-  archived: boolean;
-  totalStock?: number;
-  createdAt: string;
-}
-
-export interface ProductInput {
-  /** @minLength 1 */
-  sku: string;
-  /** @minLength 1 */
-  name: string;
-  /** @nullable */
-  description?: string | null;
-  /** @nullable */
-  categoryId?: string | null;
-  unit?: string;
-  /** @minimum 0 */
-  pricePence?: number;
-  /** @minimum 0 */
-  costPence?: number;
-  /** @nullable */
-  tradePricePence?: number | null;
-  /**
-     * @minimum 0
-     * @maximum 100
-     */
-  vatRatePct?: number;
-  /** @nullable */
-  barcode?: string | null;
-  trackStock?: boolean;
-  /** @minimum 0 */
-  reorderLevel?: number;
-  /** @minimum 0 */
-  reorderQty?: number;
-  /** @nullable */
-  supplierId?: string | null;
-  archived?: boolean;
-}
-
-export interface PosProduct {
-  id: string;
-  sku: string;
-  name: string;
-  /** @nullable */
-  description?: string | null;
-  /** @nullable */
-  categoryId?: string | null;
-  /** @nullable */
-  categoryName?: string | null;
-  unit: string;
-  pricePence: number;
-  /** @nullable */
-  tradePricePence?: number | null;
-  vatRatePct: number;
-  /** @nullable */
-  barcode?: string | null;
-  trackStock: boolean;
-  /** Stock at the queried location (or total) */
-  stockHere: number;
-}
-
-export interface BranchStockRow {
-  id: string;
-  locationId: string;
-  locationName: string;
-  productId: string;
-  /** @nullable */
-  variantId?: string | null;
-  productSku: string;
-  productName: string;
-  qty: number;
-  reorderLevel?: number;
-  /** @nullable */
-  binCode?: string | null;
-  updatedAt?: string;
-}
-
-export interface LowStockRow {
-  productId: string;
-  productSku: string;
-  productName: string;
-  totalQty: number;
-  reorderLevel: number;
-  reorderQty?: number;
-  /** @nullable */
-  supplierId?: string | null;
-  /** @nullable */
-  supplierName?: string | null;
-}
-
-export interface StockAdjustmentInput {
-  locationId: string;
-  productId: string;
-  /** @nullable */
-  variantId?: string | null;
-  qtyDelta: number;
-  reason?: string;
-  /** @nullable */
-  note?: string | null;
-}
-
-export type StockTransferInputItemsItem = {
-  productId: string;
-  /** @nullable */
-  variantId?: string | null;
-  /** @minimum 1 */
-  quantity: number;
-};
-
-export interface StockTransferInput {
-  fromLocationId: string;
-  toLocationId: string;
-  /** @nullable */
-  note?: string | null;
-  items: StockTransferInputItemsItem[];
-}
-
-export interface StockTransferReceipt {
-  transferred: number;
-  fromLocationId: string;
-  toLocationId: string;
-}
-
-export interface Supplier {
-  id: string;
-  name: string;
-  /** @nullable */
-  contactName?: string | null;
-  /** @nullable */
-  email?: string | null;
-  /** @nullable */
-  phone?: string | null;
-  /** @nullable */
-  accountReference?: string | null;
-  paymentTermsDays: number;
-  /** @nullable */
-  notes?: string | null;
-  archived: boolean;
-  createdAt: string;
-}
-
-export interface SupplierInput {
-  /** @minLength 1 */
-  name: string;
-  /** @nullable */
-  contactName?: string | null;
-  /** @nullable */
-  email?: string | null;
-  /** @nullable */
-  phone?: string | null;
-  /** @nullable */
-  accountReference?: string | null;
-  /** @minimum 0 */
-  paymentTermsDays?: number;
-  /** @nullable */
-  notes?: string | null;
-  archived?: boolean;
-}
-
-export type SupplierOrderItemsItem = {
-  productId: string;
-  /** @nullable */
-  sku?: string | null;
-  description: string;
-  quantity: number;
-  unitCostPence: number;
-};
-
-export interface SupplierOrder {
-  id: string;
-  supplierId: string;
-  supplierName: string;
-  /** @nullable */
-  locationId?: string | null;
-  number: string;
-  status: string;
-  items: SupplierOrderItemsItem[];
-  subtotalPence: number;
-  /** @nullable */
-  notes?: string | null;
-  /** @nullable */
-  expectedAt?: string | null;
-  /** @nullable */
-  sentAt?: string | null;
-  /** @nullable */
-  receivedAt?: string | null;
-  createdAt: string;
-}
-
-export type SupplierOrderInputItemsItem = {
-  productId: string;
-  /** @nullable */
-  sku?: string | null;
-  description: string;
-  /** @minimum 1 */
-  quantity: number;
-  /** @minimum 0 */
-  unitCostPence: number;
-};
-
-export interface SupplierOrderInput {
-  supplierId: string;
-  /** @nullable */
-  locationId?: string | null;
-  /** @nullable */
-  notes?: string | null;
-  /** @nullable */
-  expectedAt?: string | null;
-  /** @minItems 1 */
-  items: SupplierOrderInputItemsItem[];
-}
-
-export type SupplierDeliveryInputItemsItem = {
-  productId: string;
-  /** @nullable */
-  variantId?: string | null;
-  /** @minimum 1 */
-  quantity: number;
-};
-
-export interface SupplierDeliveryInput {
-  locationId: string;
-  /** @nullable */
-  notes?: string | null;
-  /** @minItems 1 */
-  items: SupplierDeliveryInputItemsItem[];
-}
-
-export interface TradeAccount {
-  id: string;
-  /** @nullable */
-  customerId?: string | null;
-  accountCode: string;
-  name: string;
-  /** @nullable */
-  email?: string | null;
-  /** @nullable */
-  phone?: string | null;
-  pricingTier: string;
-  discountPct: number;
-  creditLimitPence: number;
-  balancePence: number;
-  paymentTermsDays: number;
-  archived: boolean;
-  createdAt: string;
-}
-
-export interface TradeAccountInput {
-  /** @nullable */
-  customerId?: string | null;
-  /** @minLength 1 */
-  accountCode: string;
-  /** @minLength 1 */
-  name: string;
-  /** @nullable */
-  email?: string | null;
-  /** @nullable */
-  phone?: string | null;
-  pricingTier?: string;
-  /**
-     * @minimum 0
-     * @maximum 100
-     */
-  discountPct?: number;
-  /** @minimum 0 */
-  creditLimitPence?: number;
-  /** @minimum 0 */
-  paymentTermsDays?: number;
-  /** @nullable */
-  pin?: string | null;
-  archived?: boolean;
-}
-
-export interface CashDrawer {
-  id: string;
-  /** @nullable */
-  locationId?: string | null;
-  /** @nullable */
-  locationName?: string | null;
-  name: string;
-  /** @nullable */
-  deviceCode?: string | null;
-  /** @nullable */
-  refundApprovalPin?: string | null;
-  archived: boolean;
-  createdAt: string;
-}
-
-export interface CashDrawerInput {
-  /** @nullable */
-  locationId?: string | null;
-  /** @minLength 1 */
-  name: string;
-  /** @nullable */
-  deviceCode?: string | null;
-  /** @nullable */
-  refundApprovalPin?: string | null;
-  archived?: boolean;
-}
-
-export interface TillSession {
-  id: string;
-  /** @nullable */
-  locationId?: string | null;
-  /** @nullable */
-  locationName?: string | null;
-  /** @nullable */
-  cashDrawerId?: string | null;
-  /** @nullable */
-  cashDrawerName?: string | null;
-  /** @nullable */
-  openedByUserId?: string | null;
-  /** @nullable */
-  openedByName?: string | null;
-  /** @nullable */
-  closedByUserId?: string | null;
-  /** @nullable */
-  closedByName?: string | null;
-  openingFloatPence: number;
-  /** @nullable */
-  countedCashPence?: number | null;
-  /** @nullable */
-  expectedCashPence?: number | null;
-  cashSalesPence: number;
-  cardSalesPence: number;
-  tradeSalesPence: number;
-  refundsPence: number;
-  /** @nullable */
-  variancePence?: number | null;
-  status: string;
-  /** @nullable */
-  notes?: string | null;
-  openedAt: string;
-  /** @nullable */
-  closedAt?: string | null;
-}
-
-export interface OpenTillSessionInput {
-  /** @minimum 0 */
-  openingFloatPence: number;
-  /** @nullable */
-  locationId?: string | null;
-  /** @nullable */
-  cashDrawerId?: string | null;
-  /** @nullable */
-  notes?: string | null;
-}
-
-export interface CloseTillSessionInput {
-  /** @minimum 0 */
-  countedCashPence: number;
-  /** @nullable */
-  notes?: string | null;
-  /** @nullable */
-  emailReportTo?: string | null;
-}
-
-export interface TillSessionReport {
-  session: TillSession;
-  transactionCount: number;
-  productSold: number;
-  /** @nullable */
-  emailedTo: string | null;
-}
-
-export interface PosTransactionItemInput {
-  /** @nullable */
-  productId?: string | null;
-  /** @nullable */
-  variantId?: string | null;
-  /** @nullable */
-  sku?: string | null;
-  /** @minLength 1 */
-  description: string;
-  /** @minimum 1 */
-  quantity: number;
-  /** @minimum 0 */
-  unitPricePence: number;
-  /** @minimum 0 */
-  discountPence?: number;
-  /**
-     * @minimum 0
-     * @maximum 100
-     */
-  vatRatePct?: number;
-}
-
-export interface PosTransactionInput {
-  /** @nullable */
-  tillSessionId?: string | null;
-  /** @nullable */
-  locationId?: string | null;
-  /** @nullable */
-  tradeAccountId?: string | null;
-  /** @nullable */
-  customerId?: string | null;
-  /** @nullable */
-  customerName?: string | null;
-  /** @nullable */
-  customerEmail?: string | null;
-  /** @nullable */
-  jobReference?: string | null;
-  /** cash | card | split | trade_account */
-  tender: string;
-  /** @minimum 0 */
-  cashTakenPence?: number;
-  /** @minimum 0 */
-  cardTakenPence?: number;
-  /** @minimum 0 */
-  tradeCreditPence?: number;
-  /** @nullable */
-  notes?: string | null;
-  /** @minItems 1 */
-  items: PosTransactionItemInput[];
-}
-
-export type PosRefundInputItemsItem = {
-  originalItemId: string;
-  /** @minimum 1 */
-  quantity: number;
-};
-
-export interface PosRefundInput {
-  approvalPin: string;
-  /** @nullable */
-  reason?: string | null;
-  tender?: string;
-  /** @minItems 1 */
-  items: PosRefundInputItemsItem[];
-}
-
-export interface PosTransactionLine {
-  id: string;
-  /** @nullable */
-  productId?: string | null;
-  /** @nullable */
-  variantId?: string | null;
-  /** @nullable */
-  sku?: string | null;
-  description: string;
-  quantity: number;
-  unitPricePence: number;
-  discountPence?: number;
-  taxPence?: number;
-  totalPence: number;
-}
-
-export interface PosTransaction {
-  id: string;
-  number: string;
-  /** sale | refund */
-  kind: string;
-  /** @nullable */
-  refundOfId?: string | null;
-  /** @nullable */
-  tillSessionId?: string | null;
-  /** @nullable */
-  locationId?: string | null;
-  /** @nullable */
-  tradeAccountId?: string | null;
-  /** @nullable */
-  tradeAccountName?: string | null;
-  /** @nullable */
-  customerName?: string | null;
-  /** @nullable */
-  customerEmail?: string | null;
-  subtotalPence: number;
-  discountPence?: number;
-  taxPence: number;
-  totalPence: number;
+export interface ReportRevenue {
   currency: string;
-  tender: string;
-  cashTakenPence?: number;
-  cardTakenPence?: number;
-  tradeCreditPence?: number;
-  changeGivenPence?: number;
+  period: ReportPeriod;
+  totalInvoicedPence: number;
+  totalCollectedPence: number;
+  outstandingPence: number;
+  timeline: ReportRevenuePoint[];
+  byMonth: ReportRevenuePoint[];
+}
+
+export interface ReportLeadRoiRow {
+  source: string;
+  totalLeads: number;
+  wonLeads: number;
+  conversionPct: number;
+  wonValuePence: number;
+  pipelineValuePence: number;
+}
+
+export interface ReportLeadRoi {
+  currency: string;
+  period: ReportPeriod;
+  totalLeads: number;
+  wonLeads: number;
+  wonValuePence: number;
+  pipelineValuePence: number;
+  rows: ReportLeadRoiRow[];
+}
+
+export interface ReportEngineerRow {
   /** @nullable */
-  notes?: string | null;
+  userId: string | null;
+  name: string;
+  jobsCompleted: number;
+  jobsTotal: number;
+  hours: number;
+  totalValuePence: number;
+  onTimePct: number;
+}
+
+export interface ReportEngineerPerformance {
+  currency: string;
+  period: ReportPeriod;
+  rows: ReportEngineerRow[];
+}
+
+export type ReportQuoteConversionTimelineItem = {
+  bucket: string;
+  sent: number;
+  accepted: number;
+  converted: number;
+};
+
+export interface ReportQuoteConversion {
+  currency: string;
+  period: ReportPeriod;
+  draft: number;
+  sent: number;
+  accepted: number;
+  declined: number;
+  converted: number;
+  sentValuePence: number;
+  acceptedValuePence: number;
+  convertedValuePence: number;
+  acceptRatePct: number;
+  conversionRatePct: number;
+  timeline: ReportQuoteConversionTimelineItem[];
+}
+
+export interface ReportJobProfitabilityRow {
+  jobId: string;
+  number: string;
+  title: string;
   /** @nullable */
-  createdByName?: string | null;
+  customerName?: string | null;
+  revenuePence: number;
+  costPence: number;
+  marginPence: number;
+  marginPct: number;
+}
+
+export interface ReportJobProfitability {
+  currency: string;
+  period: ReportPeriod;
+  totalRevenuePence: number;
+  totalCostPence: number;
+  totalMarginPence: number;
+  marginPct: number;
+  rows: ReportJobProfitabilityRow[];
+}
+
+export interface ReportCustomerLtvRow {
+  customerId: string;
+  name: string;
+  invoiceCount: number;
+  totalInvoicedPence: number;
+  totalCollectedPence: number;
   /** @nullable */
-  receiptDeliveredAt?: string | null;
+  firstInvoiceAt: string | null;
   /** @nullable */
-  receiptMethod?: string | null;
+  lastInvoiceAt: string | null;
+}
+
+export interface ReportCustomerLtv {
+  currency: string;
+  period: ReportPeriod;
+  rows: ReportCustomerLtvRow[];
+}
+
+export interface ReportAgedDebtorsBucket {
+  label: string;
+  count: number;
+  totalPence: number;
+}
+
+export interface ReportAgedDebtorsRow {
+  invoiceId: string;
+  number: string;
+  customerName: string;
+  totalPence: number;
+  outstandingPence: number;
+  daysOverdue: number;
   /** @nullable */
-  receiptDestination?: string | null;
-  items: PosTransactionLine[];
-  createdAt: string;
+  dueAt: string | null;
+}
+
+export interface ReportAgedDebtors {
+  currency: string;
+  totalOutstandingPence: number;
+  buckets: ReportAgedDebtorsBucket[];
+  rows: ReportAgedDebtorsRow[];
+}
+
+export interface ReportActivityHeatmapCell {
+  dayOfWeek: number;
+  hour: number;
+  jobCount: number;
+}
+
+export interface ReportActivityHeatmap {
+  period: ReportPeriod;
+  totalJobs: number;
+  cells: ReportActivityHeatmapCell[];
+}
+
+export type ReportInsightItemDirection = typeof ReportInsightItemDirection[keyof typeof ReportInsightItemDirection];
+
+
+export const ReportInsightItemDirection = {
+  up: 'up',
+  down: 'down',
+  flat: 'flat',
+} as const;
+
+export interface ReportInsightItem {
+  title: string;
+  detail: string;
+  direction: ReportInsightItemDirection;
+  changePct: number;
+}
+
+export interface ReportInsights {
+  period: ReportPeriod;
+  items: ReportInsightItem[];
 }
 
 export type ListFilesParams = {
@@ -3113,24 +2730,6 @@ export type GetHostInfoParams = {
 host?: string;
 };
 
-export type ListBranchStockParams = {
-locationId?: string;
-};
-
-export type ListPosProductsParams = {
-search?: string;
-barcode?: string;
-locationId?: string;
-};
-
-export type ListPosTradeAccountsParams = {
-search?: string;
-};
-
-export type ListPosTransactionsParams = {
-sessionId?: string;
-};
-
 export type SearchMarketplaceParams = {
 q?: string;
 category?: string;
@@ -3149,4 +2748,94 @@ export const ListMarketplacePostsScope = {
   mine: 'mine',
   all: 'all',
 } as const;
+
+export type GetReportRevenueParams = {
+from?: string;
+to?: string;
+};
+
+export type GetReportLeadRoiParams = {
+from?: string;
+to?: string;
+};
+
+export type GetReportEngineerPerformanceParams = {
+from?: string;
+to?: string;
+};
+
+export type GetReportQuoteConversionParams = {
+from?: string;
+to?: string;
+};
+
+export type GetReportJobProfitabilityParams = {
+from?: string;
+to?: string;
+};
+
+export type GetReportCustomerLtvParams = {
+from?: string;
+to?: string;
+};
+
+export type GetReportAgedDebtorsParams = {
+from?: string;
+to?: string;
+};
+
+export type GetReportActivityHeatmapParams = {
+from?: string;
+to?: string;
+};
+
+export type GetReportInsightsParams = {
+from?: string;
+to?: string;
+};
+
+export type GetAdminReportRevenueParams = {
+from?: string;
+to?: string;
+};
+
+export type GetAdminReportLeadRoiParams = {
+from?: string;
+to?: string;
+};
+
+export type GetAdminReportEngineerPerformanceParams = {
+from?: string;
+to?: string;
+};
+
+export type GetAdminReportQuoteConversionParams = {
+from?: string;
+to?: string;
+};
+
+export type GetAdminReportJobProfitabilityParams = {
+from?: string;
+to?: string;
+};
+
+export type GetAdminReportCustomerLtvParams = {
+from?: string;
+to?: string;
+};
+
+export type GetAdminReportAgedDebtorsParams = {
+from?: string;
+to?: string;
+};
+
+export type GetAdminReportActivityHeatmapParams = {
+from?: string;
+to?: string;
+};
+
+export type GetAdminReportInsightsParams = {
+from?: string;
+to?: string;
+};
 

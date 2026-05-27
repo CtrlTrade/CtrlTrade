@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useGetSession, useLogout } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, LogOut, Flag, Activity, Cpu, Handshake } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, Flag, Activity, Cpu, Handshake, BarChart3 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -34,6 +34,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { href: "/workers", icon: Cpu, label: "Workers" },
     { href: "/usage", icon: Activity, label: "Usage" },
     { href: "/referrals", icon: Handshake, label: "Referrals" },
+    { href: "/reports", icon: BarChart3, label: "Reports" },
   ];
 
   return (

@@ -4402,826 +4402,6 @@ export const UpsertNotificationTemplateResponse = zod.object({
 })
 
 
-export const ListProductsResponseItem = zod.object({
-  "id": zod.string(),
-  "categoryId": zod.string().nullish(),
-  "categoryName": zod.string().nullish(),
-  "sku": zod.string(),
-  "name": zod.string(),
-  "description": zod.string().nullish(),
-  "unit": zod.string(),
-  "pricePence": zod.number(),
-  "costPence": zod.number(),
-  "tradePricePence": zod.number().nullish(),
-  "vatRatePct": zod.number(),
-  "barcode": zod.string().nullish(),
-  "trackStock": zod.boolean(),
-  "reorderLevel": zod.number().optional(),
-  "reorderQty": zod.number().optional(),
-  "supplierId": zod.string().nullish(),
-  "supplierName": zod.string().nullish(),
-  "archived": zod.boolean(),
-  "totalStock": zod.number().optional(),
-  "createdAt": zod.coerce.date()
-})
-export const ListProductsResponse = zod.array(ListProductsResponseItem)
-
-
-
-
-export const createProductBodyPricePenceMin = 0;
-
-export const createProductBodyCostPenceMin = 0;
-
-export const createProductBodyVatRatePctMin = 0;
-export const createProductBodyVatRatePctMax = 100;
-
-export const createProductBodyReorderLevelMin = 0;
-
-export const createProductBodyReorderQtyMin = 0;
-
-
-
-export const CreateProductBody = zod.object({
-  "sku": zod.string().min(1),
-  "name": zod.string().min(1),
-  "description": zod.string().nullish(),
-  "categoryId": zod.string().nullish(),
-  "unit": zod.string().optional(),
-  "pricePence": zod.number().min(createProductBodyPricePenceMin).optional(),
-  "costPence": zod.number().min(createProductBodyCostPenceMin).optional(),
-  "tradePricePence": zod.number().nullish(),
-  "vatRatePct": zod.number().min(createProductBodyVatRatePctMin).max(createProductBodyVatRatePctMax).optional(),
-  "barcode": zod.string().nullish(),
-  "trackStock": zod.boolean().optional(),
-  "reorderLevel": zod.number().min(createProductBodyReorderLevelMin).optional(),
-  "reorderQty": zod.number().min(createProductBodyReorderQtyMin).optional(),
-  "supplierId": zod.string().nullish(),
-  "archived": zod.boolean().optional()
-})
-
-
-export const UpdateProductParams = zod.object({
-  "productId": zod.coerce.string()
-})
-
-
-
-export const updateProductBodyPricePenceMin = 0;
-
-export const updateProductBodyCostPenceMin = 0;
-
-export const updateProductBodyVatRatePctMin = 0;
-export const updateProductBodyVatRatePctMax = 100;
-
-export const updateProductBodyReorderLevelMin = 0;
-
-export const updateProductBodyReorderQtyMin = 0;
-
-
-
-export const UpdateProductBody = zod.object({
-  "sku": zod.string().min(1),
-  "name": zod.string().min(1),
-  "description": zod.string().nullish(),
-  "categoryId": zod.string().nullish(),
-  "unit": zod.string().optional(),
-  "pricePence": zod.number().min(updateProductBodyPricePenceMin).optional(),
-  "costPence": zod.number().min(updateProductBodyCostPenceMin).optional(),
-  "tradePricePence": zod.number().nullish(),
-  "vatRatePct": zod.number().min(updateProductBodyVatRatePctMin).max(updateProductBodyVatRatePctMax).optional(),
-  "barcode": zod.string().nullish(),
-  "trackStock": zod.boolean().optional(),
-  "reorderLevel": zod.number().min(updateProductBodyReorderLevelMin).optional(),
-  "reorderQty": zod.number().min(updateProductBodyReorderQtyMin).optional(),
-  "supplierId": zod.string().nullish(),
-  "archived": zod.boolean().optional()
-})
-
-export const UpdateProductResponse = zod.object({
-  "id": zod.string(),
-  "categoryId": zod.string().nullish(),
-  "categoryName": zod.string().nullish(),
-  "sku": zod.string(),
-  "name": zod.string(),
-  "description": zod.string().nullish(),
-  "unit": zod.string(),
-  "pricePence": zod.number(),
-  "costPence": zod.number(),
-  "tradePricePence": zod.number().nullish(),
-  "vatRatePct": zod.number(),
-  "barcode": zod.string().nullish(),
-  "trackStock": zod.boolean(),
-  "reorderLevel": zod.number().optional(),
-  "reorderQty": zod.number().optional(),
-  "supplierId": zod.string().nullish(),
-  "supplierName": zod.string().nullish(),
-  "archived": zod.boolean(),
-  "totalStock": zod.number().optional(),
-  "createdAt": zod.coerce.date()
-})
-
-
-export const ArchiveProductParams = zod.object({
-  "productId": zod.coerce.string()
-})
-
-
-export const ListProductCategoriesResponseItem = zod.object({
-  "id": zod.string(),
-  "name": zod.string(),
-  "sortOrder": zod.number(),
-  "createdAt": zod.coerce.date()
-})
-export const ListProductCategoriesResponse = zod.array(ListProductCategoriesResponseItem)
-
-
-
-
-
-export const CreateProductCategoryBody = zod.object({
-  "name": zod.string().min(1),
-  "sortOrder": zod.number().optional()
-})
-
-
-export const ListStockLocationsResponseItem = zod.object({
-  "id": zod.string(),
-  "name": zod.string(),
-  "kind": zod.string().describe('shop | warehouse | van'),
-  "code": zod.string().nullish(),
-  "addressLine1": zod.string().nullish(),
-  "city": zod.string().nullish(),
-  "postcode": zod.string().nullish(),
-  "isDefault": zod.boolean(),
-  "archived": zod.boolean(),
-  "createdAt": zod.coerce.date()
-})
-export const ListStockLocationsResponse = zod.array(ListStockLocationsResponseItem)
-
-
-
-
-
-export const CreateStockLocationBody = zod.object({
-  "name": zod.string().min(1),
-  "kind": zod.string().optional(),
-  "code": zod.string().nullish(),
-  "addressLine1": zod.string().nullish(),
-  "city": zod.string().nullish(),
-  "postcode": zod.string().nullish(),
-  "isDefault": zod.boolean().optional()
-})
-
-
-export const ListBranchStockQueryParams = zod.object({
-  "locationId": zod.coerce.string().optional()
-})
-
-export const ListBranchStockResponseItem = zod.object({
-  "id": zod.string(),
-  "locationId": zod.string(),
-  "locationName": zod.string(),
-  "productId": zod.string(),
-  "variantId": zod.string().nullish(),
-  "productSku": zod.string(),
-  "productName": zod.string(),
-  "qty": zod.number(),
-  "reorderLevel": zod.number().optional(),
-  "binCode": zod.string().nullish(),
-  "updatedAt": zod.coerce.date().optional()
-})
-export const ListBranchStockResponse = zod.array(ListBranchStockResponseItem)
-
-
-export const AdjustStockBody = zod.object({
-  "locationId": zod.string(),
-  "productId": zod.string(),
-  "variantId": zod.string().nullish(),
-  "qtyDelta": zod.number(),
-  "reason": zod.string().optional(),
-  "note": zod.string().nullish()
-})
-
-export const AdjustStockResponse = zod.object({
-  "id": zod.string(),
-  "locationId": zod.string(),
-  "locationName": zod.string(),
-  "productId": zod.string(),
-  "variantId": zod.string().nullish(),
-  "productSku": zod.string(),
-  "productName": zod.string(),
-  "qty": zod.number(),
-  "reorderLevel": zod.number().optional(),
-  "binCode": zod.string().nullish(),
-  "updatedAt": zod.coerce.date().optional()
-})
-
-
-
-
-
-export const TransferStockBody = zod.object({
-  "fromLocationId": zod.string(),
-  "toLocationId": zod.string(),
-  "note": zod.string().nullish(),
-  "items": zod.array(zod.object({
-  "productId": zod.string(),
-  "variantId": zod.string().nullish(),
-  "quantity": zod.number().min(1)
-}))
-})
-
-export const TransferStockResponse = zod.object({
-  "transferred": zod.number(),
-  "fromLocationId": zod.string(),
-  "toLocationId": zod.string()
-})
-
-
-export const ListLowStockResponseItem = zod.object({
-  "productId": zod.string(),
-  "productSku": zod.string(),
-  "productName": zod.string(),
-  "totalQty": zod.number(),
-  "reorderLevel": zod.number(),
-  "reorderQty": zod.number().optional(),
-  "supplierId": zod.string().nullish(),
-  "supplierName": zod.string().nullish()
-})
-export const ListLowStockResponse = zod.array(ListLowStockResponseItem)
-
-
-export const ListSuppliersResponseItem = zod.object({
-  "id": zod.string(),
-  "name": zod.string(),
-  "contactName": zod.string().nullish(),
-  "email": zod.string().nullish(),
-  "phone": zod.string().nullish(),
-  "accountReference": zod.string().nullish(),
-  "paymentTermsDays": zod.number(),
-  "notes": zod.string().nullish(),
-  "archived": zod.boolean(),
-  "createdAt": zod.coerce.date()
-})
-export const ListSuppliersResponse = zod.array(ListSuppliersResponseItem)
-
-
-
-export const createSupplierBodyPaymentTermsDaysMin = 0;
-
-
-
-export const CreateSupplierBody = zod.object({
-  "name": zod.string().min(1),
-  "contactName": zod.string().nullish(),
-  "email": zod.string().nullish(),
-  "phone": zod.string().nullish(),
-  "accountReference": zod.string().nullish(),
-  "paymentTermsDays": zod.number().min(createSupplierBodyPaymentTermsDaysMin).optional(),
-  "notes": zod.string().nullish(),
-  "archived": zod.boolean().optional()
-})
-
-
-export const UpdateSupplierParams = zod.object({
-  "supplierId": zod.coerce.string()
-})
-
-
-export const updateSupplierBodyPaymentTermsDaysMin = 0;
-
-
-
-export const UpdateSupplierBody = zod.object({
-  "name": zod.string().min(1),
-  "contactName": zod.string().nullish(),
-  "email": zod.string().nullish(),
-  "phone": zod.string().nullish(),
-  "accountReference": zod.string().nullish(),
-  "paymentTermsDays": zod.number().min(updateSupplierBodyPaymentTermsDaysMin).optional(),
-  "notes": zod.string().nullish(),
-  "archived": zod.boolean().optional()
-})
-
-export const UpdateSupplierResponse = zod.object({
-  "id": zod.string(),
-  "name": zod.string(),
-  "contactName": zod.string().nullish(),
-  "email": zod.string().nullish(),
-  "phone": zod.string().nullish(),
-  "accountReference": zod.string().nullish(),
-  "paymentTermsDays": zod.number(),
-  "notes": zod.string().nullish(),
-  "archived": zod.boolean(),
-  "createdAt": zod.coerce.date()
-})
-
-
-export const ListSupplierOrdersResponseItem = zod.object({
-  "id": zod.string(),
-  "supplierId": zod.string(),
-  "supplierName": zod.string(),
-  "locationId": zod.string().nullish(),
-  "number": zod.string(),
-  "status": zod.string(),
-  "items": zod.array(zod.object({
-  "productId": zod.string(),
-  "sku": zod.string().nullish(),
-  "description": zod.string(),
-  "quantity": zod.number(),
-  "unitCostPence": zod.number()
-})),
-  "subtotalPence": zod.number(),
-  "notes": zod.string().nullish(),
-  "expectedAt": zod.coerce.date().nullish(),
-  "sentAt": zod.coerce.date().nullish(),
-  "receivedAt": zod.coerce.date().nullish(),
-  "createdAt": zod.coerce.date()
-})
-export const ListSupplierOrdersResponse = zod.array(ListSupplierOrdersResponseItem)
-
-
-
-export const createSupplierOrderBodyItemsItemUnitCostPenceMin = 0;
-
-
-
-
-export const CreateSupplierOrderBody = zod.object({
-  "supplierId": zod.string(),
-  "locationId": zod.string().nullish(),
-  "notes": zod.string().nullish(),
-  "expectedAt": zod.coerce.date().nullish(),
-  "items": zod.array(zod.object({
-  "productId": zod.string(),
-  "sku": zod.string().nullish(),
-  "description": zod.string(),
-  "quantity": zod.number().min(1),
-  "unitCostPence": zod.number().min(createSupplierOrderBodyItemsItemUnitCostPenceMin)
-})).min(1)
-})
-
-
-export const ReceiveSupplierOrderParams = zod.object({
-  "orderId": zod.coerce.string()
-})
-
-
-
-
-
-export const ReceiveSupplierOrderBody = zod.object({
-  "locationId": zod.string(),
-  "notes": zod.string().nullish(),
-  "items": zod.array(zod.object({
-  "productId": zod.string(),
-  "variantId": zod.string().nullish(),
-  "quantity": zod.number().min(1)
-})).min(1)
-})
-
-export const ReceiveSupplierOrderResponse = zod.object({
-  "id": zod.string(),
-  "supplierId": zod.string(),
-  "supplierName": zod.string(),
-  "locationId": zod.string().nullish(),
-  "number": zod.string(),
-  "status": zod.string(),
-  "items": zod.array(zod.object({
-  "productId": zod.string(),
-  "sku": zod.string().nullish(),
-  "description": zod.string(),
-  "quantity": zod.number(),
-  "unitCostPence": zod.number()
-})),
-  "subtotalPence": zod.number(),
-  "notes": zod.string().nullish(),
-  "expectedAt": zod.coerce.date().nullish(),
-  "sentAt": zod.coerce.date().nullish(),
-  "receivedAt": zod.coerce.date().nullish(),
-  "createdAt": zod.coerce.date()
-})
-
-
-export const ListTradeAccountsResponseItem = zod.object({
-  "id": zod.string(),
-  "customerId": zod.string().nullish(),
-  "accountCode": zod.string(),
-  "name": zod.string(),
-  "email": zod.string().nullish(),
-  "phone": zod.string().nullish(),
-  "pricingTier": zod.string(),
-  "discountPct": zod.number(),
-  "creditLimitPence": zod.number(),
-  "balancePence": zod.number(),
-  "paymentTermsDays": zod.number(),
-  "archived": zod.boolean(),
-  "createdAt": zod.coerce.date()
-})
-export const ListTradeAccountsResponse = zod.array(ListTradeAccountsResponseItem)
-
-
-
-
-export const createTradeAccountBodyDiscountPctMin = 0;
-export const createTradeAccountBodyDiscountPctMax = 100;
-
-export const createTradeAccountBodyCreditLimitPenceMin = 0;
-
-export const createTradeAccountBodyPaymentTermsDaysMin = 0;
-
-
-
-export const CreateTradeAccountBody = zod.object({
-  "customerId": zod.string().nullish(),
-  "accountCode": zod.string().min(1),
-  "name": zod.string().min(1),
-  "email": zod.string().nullish(),
-  "phone": zod.string().nullish(),
-  "pricingTier": zod.string().optional(),
-  "discountPct": zod.number().min(createTradeAccountBodyDiscountPctMin).max(createTradeAccountBodyDiscountPctMax).optional(),
-  "creditLimitPence": zod.number().min(createTradeAccountBodyCreditLimitPenceMin).optional(),
-  "paymentTermsDays": zod.number().min(createTradeAccountBodyPaymentTermsDaysMin).optional(),
-  "pin": zod.string().nullish(),
-  "archived": zod.boolean().optional()
-})
-
-
-export const UpdateTradeAccountParams = zod.object({
-  "tradeAccountId": zod.coerce.string()
-})
-
-
-
-export const updateTradeAccountBodyDiscountPctMin = 0;
-export const updateTradeAccountBodyDiscountPctMax = 100;
-
-export const updateTradeAccountBodyCreditLimitPenceMin = 0;
-
-export const updateTradeAccountBodyPaymentTermsDaysMin = 0;
-
-
-
-export const UpdateTradeAccountBody = zod.object({
-  "customerId": zod.string().nullish(),
-  "accountCode": zod.string().min(1),
-  "name": zod.string().min(1),
-  "email": zod.string().nullish(),
-  "phone": zod.string().nullish(),
-  "pricingTier": zod.string().optional(),
-  "discountPct": zod.number().min(updateTradeAccountBodyDiscountPctMin).max(updateTradeAccountBodyDiscountPctMax).optional(),
-  "creditLimitPence": zod.number().min(updateTradeAccountBodyCreditLimitPenceMin).optional(),
-  "paymentTermsDays": zod.number().min(updateTradeAccountBodyPaymentTermsDaysMin).optional(),
-  "pin": zod.string().nullish(),
-  "archived": zod.boolean().optional()
-})
-
-export const UpdateTradeAccountResponse = zod.object({
-  "id": zod.string(),
-  "customerId": zod.string().nullish(),
-  "accountCode": zod.string(),
-  "name": zod.string(),
-  "email": zod.string().nullish(),
-  "phone": zod.string().nullish(),
-  "pricingTier": zod.string(),
-  "discountPct": zod.number(),
-  "creditLimitPence": zod.number(),
-  "balancePence": zod.number(),
-  "paymentTermsDays": zod.number(),
-  "archived": zod.boolean(),
-  "createdAt": zod.coerce.date()
-})
-
-
-export const ListCashDrawersResponseItem = zod.object({
-  "id": zod.string(),
-  "locationId": zod.string().nullish(),
-  "locationName": zod.string().nullish(),
-  "name": zod.string(),
-  "deviceCode": zod.string().nullish(),
-  "refundApprovalPin": zod.string().nullish(),
-  "archived": zod.boolean(),
-  "createdAt": zod.coerce.date()
-})
-export const ListCashDrawersResponse = zod.array(ListCashDrawersResponseItem)
-
-
-
-
-
-export const CreateCashDrawerBody = zod.object({
-  "locationId": zod.string().nullish(),
-  "name": zod.string().min(1),
-  "deviceCode": zod.string().nullish(),
-  "refundApprovalPin": zod.string().nullish(),
-  "archived": zod.boolean().optional()
-})
-
-
-export const ListPosProductsQueryParams = zod.object({
-  "search": zod.coerce.string().optional(),
-  "barcode": zod.coerce.string().optional(),
-  "locationId": zod.coerce.string().optional()
-})
-
-export const ListPosProductsResponseItem = zod.object({
-  "id": zod.string(),
-  "sku": zod.string(),
-  "name": zod.string(),
-  "description": zod.string().nullish(),
-  "categoryId": zod.string().nullish(),
-  "categoryName": zod.string().nullish(),
-  "unit": zod.string(),
-  "pricePence": zod.number(),
-  "tradePricePence": zod.number().nullish(),
-  "vatRatePct": zod.number(),
-  "barcode": zod.string().nullish(),
-  "trackStock": zod.boolean(),
-  "stockHere": zod.number().describe('Stock at the queried location (or total)')
-})
-export const ListPosProductsResponse = zod.array(ListPosProductsResponseItem)
-
-
-export const ListPosTradeAccountsQueryParams = zod.object({
-  "search": zod.coerce.string().optional()
-})
-
-export const ListPosTradeAccountsResponseItem = zod.object({
-  "id": zod.string(),
-  "customerId": zod.string().nullish(),
-  "accountCode": zod.string(),
-  "name": zod.string(),
-  "email": zod.string().nullish(),
-  "phone": zod.string().nullish(),
-  "pricingTier": zod.string(),
-  "discountPct": zod.number(),
-  "creditLimitPence": zod.number(),
-  "balancePence": zod.number(),
-  "paymentTermsDays": zod.number(),
-  "archived": zod.boolean(),
-  "createdAt": zod.coerce.date()
-})
-export const ListPosTradeAccountsResponse = zod.array(ListPosTradeAccountsResponseItem)
-
-
-export const ListPosStockLocationsResponseItem = zod.object({
-  "id": zod.string(),
-  "name": zod.string(),
-  "kind": zod.string().describe('shop | warehouse | van'),
-  "code": zod.string().nullish(),
-  "addressLine1": zod.string().nullish(),
-  "city": zod.string().nullish(),
-  "postcode": zod.string().nullish(),
-  "isDefault": zod.boolean(),
-  "archived": zod.boolean(),
-  "createdAt": zod.coerce.date()
-})
-export const ListPosStockLocationsResponse = zod.array(ListPosStockLocationsResponseItem)
-
-
-export const GetCurrentTillSessionResponse = zod.union([zod.object({
-  "id": zod.string(),
-  "locationId": zod.string().nullish(),
-  "locationName": zod.string().nullish(),
-  "cashDrawerId": zod.string().nullish(),
-  "cashDrawerName": zod.string().nullish(),
-  "openedByUserId": zod.string().nullish(),
-  "openedByName": zod.string().nullish(),
-  "closedByUserId": zod.string().nullish(),
-  "closedByName": zod.string().nullish(),
-  "openingFloatPence": zod.number(),
-  "countedCashPence": zod.number().nullish(),
-  "expectedCashPence": zod.number().nullish(),
-  "cashSalesPence": zod.number(),
-  "cardSalesPence": zod.number(),
-  "tradeSalesPence": zod.number(),
-  "refundsPence": zod.number(),
-  "variancePence": zod.number().nullish(),
-  "status": zod.string(),
-  "notes": zod.string().nullish(),
-  "openedAt": zod.coerce.date(),
-  "closedAt": zod.coerce.date().nullish()
-}),zod.null()])
-
-
-export const openTillSessionBodyOpeningFloatPenceMin = 0;
-
-
-
-export const OpenTillSessionBody = zod.object({
-  "openingFloatPence": zod.number().min(openTillSessionBodyOpeningFloatPenceMin),
-  "locationId": zod.string().nullish(),
-  "cashDrawerId": zod.string().nullish(),
-  "notes": zod.string().nullish()
-})
-
-
-export const CloseTillSessionParams = zod.object({
-  "sessionId": zod.coerce.string()
-})
-
-export const closeTillSessionBodyCountedCashPenceMin = 0;
-
-
-
-export const CloseTillSessionBody = zod.object({
-  "countedCashPence": zod.number().min(closeTillSessionBodyCountedCashPenceMin),
-  "notes": zod.string().nullish(),
-  "emailReportTo": zod.string().nullish()
-})
-
-export const CloseTillSessionResponse = zod.object({
-  "session": zod.object({
-  "id": zod.string(),
-  "locationId": zod.string().nullish(),
-  "locationName": zod.string().nullish(),
-  "cashDrawerId": zod.string().nullish(),
-  "cashDrawerName": zod.string().nullish(),
-  "openedByUserId": zod.string().nullish(),
-  "openedByName": zod.string().nullish(),
-  "closedByUserId": zod.string().nullish(),
-  "closedByName": zod.string().nullish(),
-  "openingFloatPence": zod.number(),
-  "countedCashPence": zod.number().nullish(),
-  "expectedCashPence": zod.number().nullish(),
-  "cashSalesPence": zod.number(),
-  "cardSalesPence": zod.number(),
-  "tradeSalesPence": zod.number(),
-  "refundsPence": zod.number(),
-  "variancePence": zod.number().nullish(),
-  "status": zod.string(),
-  "notes": zod.string().nullish(),
-  "openedAt": zod.coerce.date(),
-  "closedAt": zod.coerce.date().nullish()
-}),
-  "transactionCount": zod.number(),
-  "productSold": zod.number(),
-  "emailedTo": zod.string().nullable()
-})
-
-
-export const GetTillSessionReportParams = zod.object({
-  "sessionId": zod.coerce.string()
-})
-
-export const GetTillSessionReportResponse = zod.object({
-  "session": zod.object({
-  "id": zod.string(),
-  "locationId": zod.string().nullish(),
-  "locationName": zod.string().nullish(),
-  "cashDrawerId": zod.string().nullish(),
-  "cashDrawerName": zod.string().nullish(),
-  "openedByUserId": zod.string().nullish(),
-  "openedByName": zod.string().nullish(),
-  "closedByUserId": zod.string().nullish(),
-  "closedByName": zod.string().nullish(),
-  "openingFloatPence": zod.number(),
-  "countedCashPence": zod.number().nullish(),
-  "expectedCashPence": zod.number().nullish(),
-  "cashSalesPence": zod.number(),
-  "cardSalesPence": zod.number(),
-  "tradeSalesPence": zod.number(),
-  "refundsPence": zod.number(),
-  "variancePence": zod.number().nullish(),
-  "status": zod.string(),
-  "notes": zod.string().nullish(),
-  "openedAt": zod.coerce.date(),
-  "closedAt": zod.coerce.date().nullish()
-}),
-  "transactionCount": zod.number(),
-  "productSold": zod.number(),
-  "emailedTo": zod.string().nullable()
-})
-
-
-export const ListPosTransactionsQueryParams = zod.object({
-  "sessionId": zod.coerce.string().optional()
-})
-
-export const ListPosTransactionsResponseItem = zod.object({
-  "id": zod.string(),
-  "number": zod.string(),
-  "kind": zod.string().describe('sale | refund'),
-  "refundOfId": zod.string().nullish(),
-  "tillSessionId": zod.string().nullish(),
-  "locationId": zod.string().nullish(),
-  "tradeAccountId": zod.string().nullish(),
-  "tradeAccountName": zod.string().nullish(),
-  "customerName": zod.string().nullish(),
-  "customerEmail": zod.string().nullish(),
-  "subtotalPence": zod.number(),
-  "discountPence": zod.number().optional(),
-  "taxPence": zod.number(),
-  "totalPence": zod.number(),
-  "currency": zod.string(),
-  "tender": zod.string(),
-  "cashTakenPence": zod.number().optional(),
-  "cardTakenPence": zod.number().optional(),
-  "tradeCreditPence": zod.number().optional(),
-  "changeGivenPence": zod.number().optional(),
-  "notes": zod.string().nullish(),
-  "createdByName": zod.string().nullish(),
-  "receiptDeliveredAt": zod.coerce.date().nullish(),
-  "receiptMethod": zod.string().nullish(),
-  "receiptDestination": zod.string().nullish(),
-  "items": zod.array(zod.object({
-  "id": zod.string(),
-  "productId": zod.string().nullish(),
-  "variantId": zod.string().nullish(),
-  "sku": zod.string().nullish(),
-  "description": zod.string(),
-  "quantity": zod.number(),
-  "unitPricePence": zod.number(),
-  "discountPence": zod.number().optional(),
-  "taxPence": zod.number().optional(),
-  "totalPence": zod.number()
-})),
-  "createdAt": zod.coerce.date()
-})
-export const ListPosTransactionsResponse = zod.array(ListPosTransactionsResponseItem)
-
-
-export const createPosTransactionBodyCashTakenPenceMin = 0;
-
-export const createPosTransactionBodyCardTakenPenceMin = 0;
-
-export const createPosTransactionBodyTradeCreditPenceMin = 0;
-
-
-
-export const createPosTransactionBodyItemsItemUnitPricePenceMin = 0;
-
-export const createPosTransactionBodyItemsItemDiscountPenceMin = 0;
-
-export const createPosTransactionBodyItemsItemVatRatePctMin = 0;
-export const createPosTransactionBodyItemsItemVatRatePctMax = 100;
-
-
-
-
-export const CreatePosTransactionBody = zod.object({
-  "tillSessionId": zod.string().nullish(),
-  "locationId": zod.string().nullish(),
-  "tradeAccountId": zod.string().nullish(),
-  "customerId": zod.string().nullish(),
-  "customerName": zod.string().nullish(),
-  "customerEmail": zod.string().nullish(),
-  "jobReference": zod.string().nullish(),
-  "tender": zod.string().describe('cash | card | split | trade_account'),
-  "cashTakenPence": zod.number().min(createPosTransactionBodyCashTakenPenceMin).optional(),
-  "cardTakenPence": zod.number().min(createPosTransactionBodyCardTakenPenceMin).optional(),
-  "tradeCreditPence": zod.number().min(createPosTransactionBodyTradeCreditPenceMin).optional(),
-  "notes": zod.string().nullish(),
-  "items": zod.array(zod.object({
-  "productId": zod.string().nullish(),
-  "variantId": zod.string().nullish(),
-  "sku": zod.string().nullish(),
-  "description": zod.string().min(1),
-  "quantity": zod.number().min(1),
-  "unitPricePence": zod.number().min(createPosTransactionBodyItemsItemUnitPricePenceMin),
-  "discountPence": zod.number().min(createPosTransactionBodyItemsItemDiscountPenceMin).optional(),
-  "vatRatePct": zod.number().min(createPosTransactionBodyItemsItemVatRatePctMin).max(createPosTransactionBodyItemsItemVatRatePctMax).optional()
-})).min(1)
-})
-
-
-export const RefundPosTransactionParams = zod.object({
-  "transactionId": zod.coerce.string()
-})
-
-
-
-
-
-export const RefundPosTransactionBody = zod.object({
-  "approvalPin": zod.string(),
-  "reason": zod.string().nullish(),
-  "tender": zod.string().optional(),
-  "items": zod.array(zod.object({
-  "originalItemId": zod.string(),
-  "quantity": zod.number().min(1)
-})).min(1)
-})
-
-
-export const SendPosTransactionReceiptParams = zod.object({
-  "transactionId": zod.coerce.string()
-})
-
-export const SendPosTransactionReceiptBody = zod.object({
-  "method": zod.string().describe('email | print'),
-  "destination": zod.string().nullish()
-})
-
-export const SendPosTransactionReceiptResponse = zod.object({
-  "delivered": zod.boolean(),
-  "method": zod.string(),
-  "destination": zod.string().nullish(),
-  "deliveredAt": zod.coerce.date()
-})
-
-
 export const partnerSignupBodyPasswordMin = 8;
 
 
@@ -5924,6 +5104,446 @@ export const createMarketplaceReviewBodyRatingMax = 5;
 export const CreateMarketplaceReviewBody = zod.object({
   "rating": zod.number().min(1).max(createMarketplaceReviewBodyRatingMax),
   "comment": zod.string().optional()
+})
+
+
+export const GetReportRevenueQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetReportRevenueResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "totalInvoicedPence": zod.number(),
+  "totalCollectedPence": zod.number(),
+  "outstandingPence": zod.number(),
+  "timeline": zod.array(zod.object({
+  "bucket": zod.string(),
+  "invoicedPence": zod.number(),
+  "collectedPence": zod.number()
+})),
+  "byMonth": zod.array(zod.object({
+  "bucket": zod.string(),
+  "invoicedPence": zod.number(),
+  "collectedPence": zod.number()
+}))
+})
+
+
+export const GetReportLeadRoiQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetReportLeadRoiResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "totalLeads": zod.number(),
+  "wonLeads": zod.number(),
+  "wonValuePence": zod.number(),
+  "pipelineValuePence": zod.number(),
+  "rows": zod.array(zod.object({
+  "source": zod.string(),
+  "totalLeads": zod.number(),
+  "wonLeads": zod.number(),
+  "conversionPct": zod.number(),
+  "wonValuePence": zod.number(),
+  "pipelineValuePence": zod.number()
+}))
+})
+
+
+export const GetReportEngineerPerformanceQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetReportEngineerPerformanceResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "rows": zod.array(zod.object({
+  "userId": zod.string().nullable(),
+  "name": zod.string(),
+  "jobsCompleted": zod.number(),
+  "jobsTotal": zod.number(),
+  "hours": zod.number(),
+  "totalValuePence": zod.number(),
+  "onTimePct": zod.number()
+}))
+})
+
+
+export const GetReportQuoteConversionQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetReportQuoteConversionResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "draft": zod.number(),
+  "sent": zod.number(),
+  "accepted": zod.number(),
+  "declined": zod.number(),
+  "converted": zod.number(),
+  "sentValuePence": zod.number(),
+  "acceptedValuePence": zod.number(),
+  "convertedValuePence": zod.number(),
+  "acceptRatePct": zod.number(),
+  "conversionRatePct": zod.number(),
+  "timeline": zod.array(zod.object({
+  "bucket": zod.string(),
+  "sent": zod.number(),
+  "accepted": zod.number(),
+  "converted": zod.number()
+}))
+})
+
+
+export const GetReportJobProfitabilityQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetReportJobProfitabilityResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "totalRevenuePence": zod.number(),
+  "totalCostPence": zod.number(),
+  "totalMarginPence": zod.number(),
+  "marginPct": zod.number(),
+  "rows": zod.array(zod.object({
+  "jobId": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "customerName": zod.string().nullish(),
+  "revenuePence": zod.number(),
+  "costPence": zod.number(),
+  "marginPence": zod.number(),
+  "marginPct": zod.number()
+}))
+})
+
+
+export const GetReportCustomerLtvQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetReportCustomerLtvResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "rows": zod.array(zod.object({
+  "customerId": zod.string(),
+  "name": zod.string(),
+  "invoiceCount": zod.number(),
+  "totalInvoicedPence": zod.number(),
+  "totalCollectedPence": zod.number(),
+  "firstInvoiceAt": zod.coerce.date().nullable(),
+  "lastInvoiceAt": zod.coerce.date().nullable()
+}))
+})
+
+
+export const GetReportAgedDebtorsQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetReportAgedDebtorsResponse = zod.object({
+  "currency": zod.string(),
+  "totalOutstandingPence": zod.number(),
+  "buckets": zod.array(zod.object({
+  "label": zod.string(),
+  "count": zod.number(),
+  "totalPence": zod.number()
+})),
+  "rows": zod.array(zod.object({
+  "invoiceId": zod.string(),
+  "number": zod.string(),
+  "customerName": zod.string(),
+  "totalPence": zod.number(),
+  "outstandingPence": zod.number(),
+  "daysOverdue": zod.number(),
+  "dueAt": zod.coerce.date().nullable()
+}))
+})
+
+
+export const GetReportActivityHeatmapQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetReportActivityHeatmapResponse = zod.object({
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "totalJobs": zod.number(),
+  "cells": zod.array(zod.object({
+  "dayOfWeek": zod.number(),
+  "hour": zod.number(),
+  "jobCount": zod.number()
+}))
+})
+
+
+export const GetReportInsightsQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetReportInsightsResponse = zod.object({
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "items": zod.array(zod.object({
+  "title": zod.string(),
+  "detail": zod.string(),
+  "direction": zod.enum(['up', 'down', 'flat']),
+  "changePct": zod.number()
+}))
+})
+
+
+export const GetAdminReportRevenueQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetAdminReportRevenueResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "totalInvoicedPence": zod.number(),
+  "totalCollectedPence": zod.number(),
+  "outstandingPence": zod.number(),
+  "timeline": zod.array(zod.object({
+  "bucket": zod.string(),
+  "invoicedPence": zod.number(),
+  "collectedPence": zod.number()
+})),
+  "byMonth": zod.array(zod.object({
+  "bucket": zod.string(),
+  "invoicedPence": zod.number(),
+  "collectedPence": zod.number()
+}))
+})
+
+
+export const GetAdminReportLeadRoiQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetAdminReportLeadRoiResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "totalLeads": zod.number(),
+  "wonLeads": zod.number(),
+  "wonValuePence": zod.number(),
+  "pipelineValuePence": zod.number(),
+  "rows": zod.array(zod.object({
+  "source": zod.string(),
+  "totalLeads": zod.number(),
+  "wonLeads": zod.number(),
+  "conversionPct": zod.number(),
+  "wonValuePence": zod.number(),
+  "pipelineValuePence": zod.number()
+}))
+})
+
+
+export const GetAdminReportEngineerPerformanceQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetAdminReportEngineerPerformanceResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "rows": zod.array(zod.object({
+  "userId": zod.string().nullable(),
+  "name": zod.string(),
+  "jobsCompleted": zod.number(),
+  "jobsTotal": zod.number(),
+  "hours": zod.number(),
+  "totalValuePence": zod.number(),
+  "onTimePct": zod.number()
+}))
+})
+
+
+export const GetAdminReportQuoteConversionQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetAdminReportQuoteConversionResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "draft": zod.number(),
+  "sent": zod.number(),
+  "accepted": zod.number(),
+  "declined": zod.number(),
+  "converted": zod.number(),
+  "sentValuePence": zod.number(),
+  "acceptedValuePence": zod.number(),
+  "convertedValuePence": zod.number(),
+  "acceptRatePct": zod.number(),
+  "conversionRatePct": zod.number(),
+  "timeline": zod.array(zod.object({
+  "bucket": zod.string(),
+  "sent": zod.number(),
+  "accepted": zod.number(),
+  "converted": zod.number()
+}))
+})
+
+
+export const GetAdminReportJobProfitabilityQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetAdminReportJobProfitabilityResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "totalRevenuePence": zod.number(),
+  "totalCostPence": zod.number(),
+  "totalMarginPence": zod.number(),
+  "marginPct": zod.number(),
+  "rows": zod.array(zod.object({
+  "jobId": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "customerName": zod.string().nullish(),
+  "revenuePence": zod.number(),
+  "costPence": zod.number(),
+  "marginPence": zod.number(),
+  "marginPct": zod.number()
+}))
+})
+
+
+export const GetAdminReportCustomerLtvQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetAdminReportCustomerLtvResponse = zod.object({
+  "currency": zod.string(),
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "rows": zod.array(zod.object({
+  "customerId": zod.string(),
+  "name": zod.string(),
+  "invoiceCount": zod.number(),
+  "totalInvoicedPence": zod.number(),
+  "totalCollectedPence": zod.number(),
+  "firstInvoiceAt": zod.coerce.date().nullable(),
+  "lastInvoiceAt": zod.coerce.date().nullable()
+}))
+})
+
+
+export const GetAdminReportAgedDebtorsQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetAdminReportAgedDebtorsResponse = zod.object({
+  "currency": zod.string(),
+  "totalOutstandingPence": zod.number(),
+  "buckets": zod.array(zod.object({
+  "label": zod.string(),
+  "count": zod.number(),
+  "totalPence": zod.number()
+})),
+  "rows": zod.array(zod.object({
+  "invoiceId": zod.string(),
+  "number": zod.string(),
+  "customerName": zod.string(),
+  "totalPence": zod.number(),
+  "outstandingPence": zod.number(),
+  "daysOverdue": zod.number(),
+  "dueAt": zod.coerce.date().nullable()
+}))
+})
+
+
+export const GetAdminReportActivityHeatmapQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetAdminReportActivityHeatmapResponse = zod.object({
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "totalJobs": zod.number(),
+  "cells": zod.array(zod.object({
+  "dayOfWeek": zod.number(),
+  "hour": zod.number(),
+  "jobCount": zod.number()
+}))
+})
+
+
+export const GetAdminReportInsightsQueryParams = zod.object({
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const GetAdminReportInsightsResponse = zod.object({
+  "period": zod.object({
+  "from": zod.coerce.date(),
+  "to": zod.coerce.date()
+}),
+  "items": zod.array(zod.object({
+  "title": zod.string(),
+  "detail": zod.string(),
+  "direction": zod.enum(['up', 'down', 'flat']),
+  "changePct": zod.number()
+}))
 })
 
 
