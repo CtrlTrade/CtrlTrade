@@ -1870,6 +1870,7 @@ export const ListTeamResponse = zod.object({
   "seatType": zod.string(),
   "status": zod.string(),
   "isYou": zod.boolean(),
+  "defaultHourlyRatePence": zod.number().nullish(),
   "invitedAt": zod.coerce.date().nullish(),
   "disabledAt": zod.coerce.date().nullish(),
   "lastLoginAt": zod.coerce.date().nullish()
@@ -1945,7 +1946,8 @@ export const UpdateMemberParams = zod.object({
 export const UpdateMemberBody = zod.object({
   "role": zod.string().optional(),
   "seatType": zod.string().optional(),
-  "status": zod.string().optional().describe('active | disabled')
+  "status": zod.string().optional().describe('active | disabled'),
+  "defaultHourlyRatePence": zod.number().nullish()
 })
 
 export const UpdateMemberResponse = zod.object({
@@ -1956,6 +1958,7 @@ export const UpdateMemberResponse = zod.object({
   "seatType": zod.string(),
   "status": zod.string(),
   "isYou": zod.boolean(),
+  "defaultHourlyRatePence": zod.number().nullish(),
   "invitedAt": zod.coerce.date().nullish(),
   "disabledAt": zod.coerce.date().nullish(),
   "lastLoginAt": zod.coerce.date().nullish()
@@ -2983,6 +2986,106 @@ export const ListJobCheckinsResponseItem = zod.object({
   "createdAt": zod.coerce.date()
 })
 export const ListJobCheckinsResponse = zod.array(ListJobCheckinsResponseItem)
+
+
+/**
+ * @summary List all cost entries for a job plus a cost summary.
+ */
+export const ListJobCostEntriesParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+export const ListJobCostEntriesResponse = zod.object({
+  "entries": zod.array(zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "kind": zod.string().describe('labour|material|other'),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitCostPence": zod.number(),
+  "totalCostPence": zod.number(),
+  "productId": zod.string().nullish(),
+  "productName": zod.string().nullish(),
+  "userId": zod.string().nullish(),
+  "userName": zod.string().nullish(),
+  "createdByUserId": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
+})),
+  "quotedValuePence": zod.number(),
+  "actualCostPence": zod.number(),
+  "grossMarginPct": zod.number(),
+  "labourCostPence": zod.number().optional(),
+  "materialCostPence": zod.number().optional(),
+  "otherCostPence": zod.number().optional()
+})
+
+
+/**
+ * @summary Add a cost entry to a job.
+ */
+export const CreateJobCostEntryParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+
+
+
+export const CreateJobCostEntryBody = zod.object({
+  "kind": zod.string().describe('labour|material|other'),
+  "description": zod.string().min(1),
+  "quantity": zod.number().optional(),
+  "unitCostPence": zod.number().optional(),
+  "productId": zod.string().nullish(),
+  "userId": zod.string().nullish()
+})
+
+
+/**
+ * @summary Update a cost entry.
+ */
+export const UpdateJobCostEntryParams = zod.object({
+  "jobId": zod.coerce.string(),
+  "costId": zod.coerce.string()
+})
+
+
+
+
+export const UpdateJobCostEntryBody = zod.object({
+  "kind": zod.string().optional(),
+  "description": zod.string().min(1).optional(),
+  "quantity": zod.number().optional(),
+  "unitCostPence": zod.number().optional(),
+  "productId": zod.string().nullish(),
+  "userId": zod.string().nullish()
+})
+
+export const UpdateJobCostEntryResponse = zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "kind": zod.string().describe('labour|material|other'),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitCostPence": zod.number(),
+  "totalCostPence": zod.number(),
+  "productId": zod.string().nullish(),
+  "productName": zod.string().nullish(),
+  "userId": zod.string().nullish(),
+  "userName": zod.string().nullish(),
+  "createdByUserId": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
+})
+
+
+/**
+ * @summary Delete a cost entry.
+ */
+export const DeleteJobCostEntryParams = zod.object({
+  "jobId": zod.coerce.string(),
+  "costId": zod.coerce.string()
+})
 
 
 export const ListTimesheetsQueryParams = zod.object({
@@ -7107,7 +7210,8 @@ export const GetReportJobProfitabilityResponse = zod.object({
   "revenuePence": zod.number(),
   "costPence": zod.number(),
   "marginPence": zod.number(),
-  "marginPct": zod.number()
+  "marginPct": zod.number(),
+  "hasActualCosts": zod.boolean().optional()
 }))
 })
 
@@ -7327,7 +7431,8 @@ export const GetAdminReportJobProfitabilityResponse = zod.object({
   "revenuePence": zod.number(),
   "costPence": zod.number(),
   "marginPence": zod.number(),
-  "marginPct": zod.number()
+  "marginPct": zod.number(),
+  "hasActualCosts": zod.boolean().optional()
 }))
 })
 

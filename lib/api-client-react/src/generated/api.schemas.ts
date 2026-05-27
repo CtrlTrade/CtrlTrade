@@ -735,6 +735,8 @@ export interface TeamMember {
   status: string;
   isYou: boolean;
   /** @nullable */
+  defaultHourlyRatePence?: number | null;
+  /** @nullable */
   invitedAt?: string | null;
   /** @nullable */
   disabledAt?: string | null;
@@ -783,6 +785,8 @@ export interface UpdateMemberInput {
   seatType?: string;
   /** active | disabled */
   status?: string;
+  /** @nullable */
+  defaultHourlyRatePence?: number | null;
 }
 
 export interface PublicInvitationPreview {
@@ -3424,6 +3428,64 @@ export interface ReportQuoteConversion {
   timeline: ReportQuoteConversionTimelineItem[];
 }
 
+export interface JobCostEntry {
+  id: string;
+  jobId: string;
+  /** labour|material|other */
+  kind: string;
+  description: string;
+  quantity: number;
+  unitCostPence: number;
+  totalCostPence: number;
+  /** @nullable */
+  productId?: string | null;
+  /** @nullable */
+  productName?: string | null;
+  /** @nullable */
+  userId?: string | null;
+  /** @nullable */
+  userName?: string | null;
+  /** @nullable */
+  createdByUserId?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateJobCostEntryInput {
+  /** labour|material|other */
+  kind: string;
+  /** @minLength 1 */
+  description: string;
+  quantity?: number;
+  unitCostPence?: number;
+  /** @nullable */
+  productId?: string | null;
+  /** @nullable */
+  userId?: string | null;
+}
+
+export interface UpdateJobCostEntryInput {
+  kind?: string;
+  /** @minLength 1 */
+  description?: string;
+  quantity?: number;
+  unitCostPence?: number;
+  /** @nullable */
+  productId?: string | null;
+  /** @nullable */
+  userId?: string | null;
+}
+
+export interface JobCostsSummary {
+  entries: JobCostEntry[];
+  quotedValuePence: number;
+  actualCostPence: number;
+  grossMarginPct: number;
+  labourCostPence?: number;
+  materialCostPence?: number;
+  otherCostPence?: number;
+}
+
 export interface ReportJobProfitabilityRow {
   jobId: string;
   number: string;
@@ -3434,6 +3496,7 @@ export interface ReportJobProfitabilityRow {
   costPence: number;
   marginPence: number;
   marginPct: number;
+  hasActualCosts?: boolean;
 }
 
 export interface ReportJobProfitability {

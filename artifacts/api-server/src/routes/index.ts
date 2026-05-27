@@ -46,6 +46,7 @@ import adminComplianceRouter from "./adminCompliance";
 import bookingWidgetRouter from "./bookingWidget";
 import branchesRouter from "./branches";
 import areaManagersRouter from "./areaManagers";
+import jobCostsRouter from "./jobCosts";
 
 const router: IRouter = Router();
 
@@ -103,5 +104,6 @@ router.use(twoFactorRouter);
 router.use(adminComplianceRouter);
 router.use(branchesRouter);
 router.use(areaManagersRouter);
+router.use(jobCostsRouter);
 
 export default router;

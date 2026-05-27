@@ -1816,6 +1816,70 @@ paths:
                 type: array
                 items: { $ref: "#/components/schemas/JobCheckin" }
 
+  /v1/jobs/{jobId}/costs:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: listJobCostEntries
+      tags: [jobs]
+      summary: List all cost entries for a job plus a cost summary.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JobCostsSummary" }
+    post:
+      operationId: createJobCostEntry
+      tags: [jobs]
+      summary: Add a cost entry to a job.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateJobCostEntryInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JobCostEntry" }
+
+  /v1/jobs/{jobId}/costs/{costId}:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+      - in: path
+        name: costId
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateJobCostEntry
+      tags: [jobs]
+      summary: Update a cost entry.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateJobCostEntryInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JobCostEntry" }
+    delete:
+      operationId: deleteJobCostEntry
+      tags: [jobs]
+      summary: Delete a cost entry.
+      responses:
+        "204": { description: No content }
+
   /v1/timesheets:
     get:
       operationId: listTimesheets
@@ -6101,6 +6165,7 @@ components:
         seatType: { type: string }
         status: { type: string }
         isYou: { type: boolean }
+        defaultHourlyRatePence: { type: ["integer", "null"] }
         invitedAt: { type: ["string", "null"], format: date-time }
         disabledAt: { type: ["string", "null"], format: date-time }
         lastLoginAt: { type: ["string", "null"], format: date-time }
@@ -6161,6 +6226,7 @@ components:
         status:
           type: string
           description: "active | disabled"
+        defaultHourlyRatePence: { type: ["integer", "null"] }
 
     PublicInvitationPreview:
       type: object
@@ -8602,6 +8668,60 @@ components:
               accepted: { type: integer }
               converted: { type: integer }
 
+    JobCostEntry:
+      type: object
+      required: [id, jobId, kind, description, quantity, unitCostPence, totalCostPence, createdAt]
+      properties:
+        id: { type: string }
+        jobId: { type: string }
+        kind: { type: string, description: "labour|material|other" }
+        description: { type: string }
+        quantity: { type: number }
+        unitCostPence: { type: integer }
+        totalCostPence: { type: integer }
+        productId: { type: ["string", "null"] }
+        productName: { type: ["string", "null"] }
+        userId: { type: ["string", "null"] }
+        userName: { type: ["string", "null"] }
+        createdByUserId: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    CreateJobCostEntryInput:
+      type: object
+      required: [kind, description]
+      properties:
+        kind: { type: string, description: "labour|material|other" }
+        description: { type: string, minLength: 1 }
+        quantity: { type: number }
+        unitCostPence: { type: integer }
+        productId: { type: ["string", "null"] }
+        userId: { type: ["string", "null"] }
+
+    UpdateJobCostEntryInput:
+      type: object
+      properties:
+        kind: { type: string }
+        description: { type: string, minLength: 1 }
+        quantity: { type: number }
+        unitCostPence: { type: integer }
+        productId: { type: ["string", "null"] }
+        userId: { type: ["string", "null"] }
+
+    JobCostsSummary:
+      type: object
+      required: [entries, quotedValuePence, actualCostPence, grossMarginPct]
+      properties:
+        entries:
+          type: array
+          items: { $ref: "#/components/schemas/JobCostEntry" }
+        quotedValuePence: { type: integer }
+        actualCostPence: { type: integer }
+        grossMarginPct: { type: integer }
+        labourCostPence: { type: integer }
+        materialCostPence: { type: integer }
+        otherCostPence: { type: integer }
+
     ReportJobProfitabilityRow:
       type: object
       required: [jobId, number, title, revenuePence, costPence, marginPence, marginPct]
@@ -8614,6 +8734,7 @@ components:
         costPence: { type: integer }
         marginPence: { type: integer }
         marginPct: { type: integer }
+        hasActualCosts: { type: boolean }
 
     ReportJobProfitability:
       type: object

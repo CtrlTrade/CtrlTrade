@@ -15,6 +15,8 @@ export interface TeamMember {
   status: string;
   isYou: boolean;
   /** @nullable */
+  defaultHourlyRatePence?: number | null;
+  /** @nullable */
   invitedAt?: Date | null;
   /** @nullable */
   disabledAt?: Date | null;

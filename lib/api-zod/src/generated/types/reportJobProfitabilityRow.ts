@@ -16,4 +16,5 @@ export interface ReportJobProfitabilityRow {
   costPence: number;
   marginPence: number;
   marginPct: number;
+  hasActualCosts?: boolean;
 }

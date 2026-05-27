@@ -13,7 +13,7 @@ export function JobProfitabilityReport({ admin = false }: { admin?: boolean }) {
   return (
     <ReportShell
       title="Job Profitability"
-      description="Revenue, cost and margin per job. Cost is estimated from a 60% margin baseline until material/labour cost-tracking is captured."
+      description="Revenue, cost and margin per job. Jobs with actual cost entries show real margin; others use a 60% margin estimate."
       range={range}
       onChange={setRange}
       exportRows={
@@ -25,6 +25,7 @@ export function JobProfitabilityReport({ admin = false }: { admin?: boolean }) {
           cost_pence: r.costPence,
           margin_pence: r.marginPence,
           margin_pct: r.marginPct,
+          has_actual_costs: (r as any).hasActualCosts ? "yes" : "no",
         })) ?? []
       }
       exportFilename={`job-profitability-${range.from.toISOString().slice(0, 10)}_${range.to.toISOString().slice(0, 10)}.csv`}
@@ -36,7 +37,7 @@ export function JobProfitabilityReport({ admin = false }: { admin?: boolean }) {
           <KpiRow
             items={[
               { label: "Revenue", value: fmtGbp(data.totalRevenuePence) },
-              { label: "Cost (est.)", value: fmtGbp(data.totalCostPence) },
+              { label: "Actual/Est. Cost", value: fmtGbp(data.totalCostPence) },
               { label: "Margin", value: fmtGbp(data.totalMarginPence) },
               { label: "Margin %", value: `${data.marginPct}%` },
             ]}
@@ -60,18 +61,27 @@ export function JobProfitabilityReport({ admin = false }: { admin?: boolean }) {
                   )}
                   {data.rows.map((r) => (
                     <tr key={r.jobId} className="border-t border-border">
-                      <td className="p-3"><span className="font-mono text-xs text-muted-foreground">{r.number}</span> {r.title}</td>
+                      <td className="p-3">
+                        <span className="font-mono text-xs text-muted-foreground">{r.number}</span>{" "}
+                        {r.title}
+                        {!(r as any).hasActualCosts && (
+                          <span className="ml-2 text-[10px] text-amber-600 uppercase font-bold border border-amber-300 px-1 rounded">est.</span>
+                        )}
+                      </td>
                       <td className="p-3">{r.customerName ?? "—"}</td>
                       <td className="p-3 text-right font-mono">{fmtGbp(r.revenuePence)}</td>
                       <td className="p-3 text-right font-mono">{fmtGbp(r.costPence)}</td>
                       <td className="p-3 text-right font-mono">{fmtGbp(r.marginPence)}</td>
-                      <td className="p-3 text-right font-mono">{r.marginPct}%</td>
+                      <td className={`p-3 text-right font-mono ${r.marginPct < 0 ? "text-red-600" : ""}`}>{r.marginPct}%</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </CardContent>
           </Card>
+          <p className="text-xs text-muted-foreground mt-2">
+            Jobs tagged <span className="text-amber-600 font-bold uppercase">est.</span> use a 60% gross margin estimate — add cost entries on those jobs to see real margin.
+          </p>
         </>
       )}
     </ReportShell>

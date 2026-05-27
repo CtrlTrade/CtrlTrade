@@ -76,6 +76,7 @@ import type {
   ConnectApiKeyBody,
   ConnectIntegration200,
   CreateChildTenantInput,
+  CreateJobCostEntryInput,
   CrmSearchInput,
   CrmSearchResult,
   CustomDomain,
@@ -137,6 +138,8 @@ import type {
   JobAssignmentInput,
   JobCheckin,
   JobCompleteInput,
+  JobCostEntry,
+  JobCostsSummary,
   JobInput,
   JobSummary,
   JobSummaryInput,
@@ -324,6 +327,7 @@ import type {
   UpcomingRenewal,
   UpdateAdminIntegrationCatalogue200,
   UpdateInvoiceTemplateInput,
+  UpdateJobCostEntryInput,
   UpdateMemberInput,
   UpdateTimesheetEntryInput,
   UploadUrlRequest,
@@ -8381,6 +8385,301 @@ export function useListJobCheckins<TData = Awaited<ReturnType<typeof listJobChec
 
 
 
+
+export const getListJobCostEntriesUrl = (jobId: string,) => {
+
+
+
+
+  return `/api/v1/jobs/${jobId}/costs`
+}
+
+/**
+ * @summary List all cost entries for a job plus a cost summary.
+ */
+export const listJobCostEntries = async (jobId: string, options?: RequestInit): Promise<JobCostsSummary> => {
+
+  return customFetch<JobCostsSummary>(getListJobCostEntriesUrl(jobId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListJobCostEntriesQueryKey = (jobId: string,) => {
+    return [
+    `/api/v1/jobs/${jobId}/costs`
+    ] as const;
+    }
+
+
+export const getListJobCostEntriesQueryOptions = <TData = Awaited<ReturnType<typeof listJobCostEntries>>, TError = ErrorType<unknown>>(jobId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listJobCostEntries>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListJobCostEntriesQueryKey(jobId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listJobCostEntries>>> = ({ signal }) => listJobCostEntries(jobId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(jobId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listJobCostEntries>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListJobCostEntriesQueryResult = NonNullable<Awaited<ReturnType<typeof listJobCostEntries>>>
+export type ListJobCostEntriesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List all cost entries for a job plus a cost summary.
+ */
+
+export function useListJobCostEntries<TData = Awaited<ReturnType<typeof listJobCostEntries>>, TError = ErrorType<unknown>>(
+ jobId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listJobCostEntries>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListJobCostEntriesQueryOptions(jobId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateJobCostEntryUrl = (jobId: string,) => {
+
+
+
+
+  return `/api/v1/jobs/${jobId}/costs`
+}
+
+/**
+ * @summary Add a cost entry to a job.
+ */
+export const createJobCostEntry = async (jobId: string,
+    createJobCostEntryInput: CreateJobCostEntryInput, options?: RequestInit): Promise<JobCostEntry> => {
+
+  return customFetch<JobCostEntry>(getCreateJobCostEntryUrl(jobId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createJobCostEntryInput,)
+  }
+);}
+
+
+
+
+export const getCreateJobCostEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createJobCostEntry>>, TError,{jobId: string;data: BodyType<CreateJobCostEntryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createJobCostEntry>>, TError,{jobId: string;data: BodyType<CreateJobCostEntryInput>}, TContext> => {
+
+const mutationKey = ['createJobCostEntry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createJobCostEntry>>, {jobId: string;data: BodyType<CreateJobCostEntryInput>}> = (props) => {
+          const {jobId,data} = props ?? {};
+
+          return  createJobCostEntry(jobId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateJobCostEntryMutationResult = NonNullable<Awaited<ReturnType<typeof createJobCostEntry>>>
+    export type CreateJobCostEntryMutationBody = BodyType<CreateJobCostEntryInput>
+    export type CreateJobCostEntryMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Add a cost entry to a job.
+ */
+export const useCreateJobCostEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createJobCostEntry>>, TError,{jobId: string;data: BodyType<CreateJobCostEntryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createJobCostEntry>>,
+        TError,
+        {jobId: string;data: BodyType<CreateJobCostEntryInput>},
+        TContext
+      > => {
+      return useMutation(getCreateJobCostEntryMutationOptions(options));
+    }
+
+export const getUpdateJobCostEntryUrl = (jobId: string,
+    costId: string,) => {
+
+
+
+
+  return `/api/v1/jobs/${jobId}/costs/${costId}`
+}
+
+/**
+ * @summary Update a cost entry.
+ */
+export const updateJobCostEntry = async (jobId: string,
+    costId: string,
+    updateJobCostEntryInput: UpdateJobCostEntryInput, options?: RequestInit): Promise<JobCostEntry> => {
+
+  return customFetch<JobCostEntry>(getUpdateJobCostEntryUrl(jobId,costId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateJobCostEntryInput,)
+  }
+);}
+
+
+
+
+export const getUpdateJobCostEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateJobCostEntry>>, TError,{jobId: string;costId: string;data: BodyType<UpdateJobCostEntryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateJobCostEntry>>, TError,{jobId: string;costId: string;data: BodyType<UpdateJobCostEntryInput>}, TContext> => {
+
+const mutationKey = ['updateJobCostEntry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateJobCostEntry>>, {jobId: string;costId: string;data: BodyType<UpdateJobCostEntryInput>}> = (props) => {
+          const {jobId,costId,data} = props ?? {};
+
+          return  updateJobCostEntry(jobId,costId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateJobCostEntryMutationResult = NonNullable<Awaited<ReturnType<typeof updateJobCostEntry>>>
+    export type UpdateJobCostEntryMutationBody = BodyType<UpdateJobCostEntryInput>
+    export type UpdateJobCostEntryMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update a cost entry.
+ */
+export const useUpdateJobCostEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateJobCostEntry>>, TError,{jobId: string;costId: string;data: BodyType<UpdateJobCostEntryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateJobCostEntry>>,
+        TError,
+        {jobId: string;costId: string;data: BodyType<UpdateJobCostEntryInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateJobCostEntryMutationOptions(options));
+    }
+
+export const getDeleteJobCostEntryUrl = (jobId: string,
+    costId: string,) => {
+
+
+
+
+  return `/api/v1/jobs/${jobId}/costs/${costId}`
+}
+
+/**
+ * @summary Delete a cost entry.
+ */
+export const deleteJobCostEntry = async (jobId: string,
+    costId: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteJobCostEntryUrl(jobId,costId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteJobCostEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteJobCostEntry>>, TError,{jobId: string;costId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteJobCostEntry>>, TError,{jobId: string;costId: string}, TContext> => {
+
+const mutationKey = ['deleteJobCostEntry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteJobCostEntry>>, {jobId: string;costId: string}> = (props) => {
+          const {jobId,costId} = props ?? {};
+
+          return  deleteJobCostEntry(jobId,costId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteJobCostEntryMutationResult = NonNullable<Awaited<ReturnType<typeof deleteJobCostEntry>>>
+
+    export type DeleteJobCostEntryMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete a cost entry.
+ */
+export const useDeleteJobCostEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteJobCostEntry>>, TError,{jobId: string;costId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteJobCostEntry>>,
+        TError,
+        {jobId: string;costId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteJobCostEntryMutationOptions(options));
+    }
 
 export const getListTimesheetsUrl = (params?: ListTimesheetsParams,) => {
   const normalizedParams = new URLSearchParams();

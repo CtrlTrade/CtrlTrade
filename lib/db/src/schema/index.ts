@@ -159,6 +159,7 @@ export const membershipsTable = pgTable(
     seatType: varchar("seat_type", { length: 16 }).notNull(), // control|field
     status: varchar("status", { length: 16 }).notNull().default("active"), // active|disabled
     branchId: uuid("branch_id"),
+    defaultHourlyRatePence: integer("default_hourly_rate_pence"),
     invitedAt: timestamp("invited_at", { withTimezone: true }),
     disabledAt: timestamp("disabled_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -2053,7 +2054,34 @@ export const areaManagersTable = pgTable(
 
 export type AreaManager = typeof areaManagersTable.$inferSelect;
 
-// ---- Job Checkins (timesheets) ---------------------------------------------
+// ---- Job Cost Entries -------------------------------------------------------
+export const jobCostEntriesTable = pgTable(
+  "job_cost_entries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    jobId: uuid("job_id").notNull().references(() => jobsTable.id, { onDelete: "cascade" }),
+    kind: varchar("kind", { length: 16 }).notNull(), // labour|material|other
+    description: text("description").notNull(),
+    quantity: text("quantity").notNull().default("1"), // stored as numeric string for decimal support
+    unitCostPence: integer("unit_cost_pence").notNull().default(0),
+    totalCostPence: integer("total_cost_pence").notNull().default(0),
+    productId: uuid("product_id").references(() => productsTable.id, { onDelete: "set null" }),
+    userId: uuid("user_id").references(() => usersTable.id, { onDelete: "set null" }), // labour: the staff member
+    createdByUserId: uuid("created_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("job_cost_entries_tenant_idx").on(t.tenantId),
+    jobIdx: index("job_cost_entries_job_idx").on(t.jobId),
+    kindIdx: index("job_cost_entries_kind_idx").on(t.tenantId, t.kind),
+  }),
+);
+
+export type JobCostEntry = typeof jobCostEntriesTable.$inferSelect;
+
+// ---- Job Checkins (GPS tracking / timesheets) -------------------------------------------
 export const jobCheckinsTable = pgTable(
   "job_checkins",
   {

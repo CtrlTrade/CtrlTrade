@@ -93,6 +93,7 @@ async function loadOverview(tenantId: string, currentUserId: string) {
       role: membershipsTable.role,
       seatType: membershipsTable.seatType,
       status: membershipsTable.status,
+      defaultHourlyRatePence: membershipsTable.defaultHourlyRatePence,
       invitedAt: membershipsTable.invitedAt,
       disabledAt: membershipsTable.disabledAt,
     })
@@ -134,6 +135,7 @@ async function loadOverview(tenantId: string, currentUserId: string) {
       seatType: m.seatType,
       status: m.status,
       isYou: m.userId === currentUserId,
+      defaultHourlyRatePence: m.defaultHourlyRatePence ?? null,
       invitedAt: m.invitedAt?.toISOString() ?? null,
       disabledAt: m.disabledAt?.toISOString() ?? null,
       lastLoginAt: m.lastLoginAt?.toISOString() ?? null,
@@ -439,6 +441,10 @@ router.patch(
       updates.status = parsed.data.status;
       audit.push(`status ${target.status}→${parsed.data.status}`);
     }
+    if (parsed.data.defaultHourlyRatePence !== undefined) {
+      updates.defaultHourlyRatePence = parsed.data.defaultHourlyRatePence;
+      audit.push(`hourly rate updated`);
+    }
 
     if (Object.keys(updates).length === 0) {
       // No-op — return current.
@@ -505,6 +511,7 @@ router.patch(
         seatType: updated.seatType,
         status: updated.status,
         isYou: req.auth!.user.id === userId,
+        defaultHourlyRatePence: updated.defaultHourlyRatePence ?? null,
         invitedAt: updated.invitedAt?.toISOString() ?? null,
         disabledAt: updated.disabledAt?.toISOString() ?? null,
         lastLoginAt: userRow.lastLoginAt?.toISOString() ?? null,

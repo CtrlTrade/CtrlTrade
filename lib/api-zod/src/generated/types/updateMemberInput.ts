@@ -11,4 +11,6 @@ export interface UpdateMemberInput {
   seatType?: string;
   /** active | disabled */
   status?: string;
+  /** @nullable */
+  defaultHourlyRatePence?: number | null;
 }

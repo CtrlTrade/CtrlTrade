@@ -10,6 +10,7 @@ import {
   customersTable,
   usersTable,
   timesheetEntriesTable,
+  jobCostEntriesTable,
 } from "@workspace/db";
 import {
   GetReportRevenueResponse,
@@ -337,10 +338,28 @@ async function buildJobProfitability(scope: Scope, from: Date, to: Date) {
     .orderBy(sql`${jobsTable.valuePence} DESC`)
     .limit(200);
 
+  // Fetch actual costs per job from job_cost_entries
+  const jobIds = rows.map((r) => r.jobId);
+  const costMap = new Map<string, number>();
+  if (jobIds.length > 0) {
+    const costRows = await db
+      .select({
+        jobId: jobCostEntriesTable.jobId,
+        total: sql<number>`coalesce(sum(${jobCostEntriesTable.totalCostPence}), 0)::int`,
+      })
+      .from(jobCostEntriesTable)
+      .where(sql`${jobCostEntriesTable.jobId} = ANY(${jobIds})`)
+      .groupBy(jobCostEntriesTable.jobId);
+    for (const c of costRows) {
+      costMap.set(c.jobId, c.total);
+    }
+  }
+
   const out = rows.map((r) => {
     const revenue = r.revenue ?? 0;
-    // No cost-tracking yet — assume 60% gross margin baseline so chart is non-empty.
-    const cost = Math.round(revenue * 0.4);
+    const hasActualCosts = costMap.has(r.jobId) && (costMap.get(r.jobId) ?? 0) > 0;
+    // Use actual costs if available; otherwise fall back to 40% estimated cost
+    const cost = hasActualCosts ? (costMap.get(r.jobId) ?? 0) : Math.round(revenue * 0.4);
     const margin = revenue - cost;
     return {
       jobId: r.jobId,
@@ -351,6 +370,7 @@ async function buildJobProfitability(scope: Scope, from: Date, to: Date) {
       costPence: cost,
       marginPence: margin,
       marginPct: revenue > 0 ? Math.round((margin / revenue) * 100) : 0,
+      hasActualCosts,
     };
   });
   const totalRevenue = out.reduce((s, r) => s + r.revenuePence, 0);

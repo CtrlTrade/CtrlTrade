@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, RotateCw, KeyRound, Power } from "lucide-react";
+import { Trash2, RotateCw, KeyRound, Power, Pencil, Check, X } from "lucide-react";
 
 export function AppStaff() {
   const { data, isLoading } = useListTeam();
@@ -36,6 +36,8 @@ export function AppStaff() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"admin" | "manager" | "staff">("staff");
   const [seatType, setSeatType] = useState<"control" | "field">("field");
+  const [editingRateUserId, setEditingRateUserId] = useState<string | null>(null);
+  const [rateInput, setRateInput] = useState("");
 
   if (isLoading || !data) return <div className="space-y-4"><Skeleton className="h-32" /><Skeleton className="h-64" /></div>;
 
@@ -143,7 +145,15 @@ export function AppStaff() {
         <CardContent className="space-y-2">
           <table className="w-full text-sm">
             <thead className="text-xs uppercase text-muted-foreground border-b border-border">
-              <tr><th className="text-left py-2">Name</th><th className="text-left">Email</th><th className="text-left">Role</th><th className="text-left">Seat</th><th className="text-left">Status</th><th className="text-right">Actions</th></tr>
+              <tr>
+                <th className="text-left py-2">Name</th>
+                <th className="text-left">Email</th>
+                <th className="text-left">Role</th>
+                <th className="text-left">Seat</th>
+                <th className="text-left">Hourly rate</th>
+                <th className="text-left">Status</th>
+                <th className="text-right">Actions</th>
+              </tr>
             </thead>
             <tbody>
               {data.members.map((m) => (
@@ -175,6 +185,53 @@ export function AppStaff() {
                           <SelectItem value="field">Field</SelectItem>
                         </SelectContent>
                       </Select>
+                    )}
+                  </td>
+                  <td className="min-w-[120px]">
+                    {editingRateUserId === m.userId ? (
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground">£</span>
+                        <Input
+                          className="rounded-none h-7 w-20 font-mono text-sm"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={rateInput}
+                          onChange={(e) => setRateInput(e.target.value)}
+                          data-testid={`input-hourly-rate-${m.userId}`}
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              const pence = rateInput ? Math.round(parseFloat(rateInput) * 100) : null;
+                              update.mutate({ userId: m.userId, data: { defaultHourlyRatePence: pence } });
+                              setEditingRateUserId(null);
+                            } else if (e.key === "Escape") {
+                              setEditingRateUserId(null);
+                            }
+                          }}
+                        />
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => {
+                          const pence = rateInput ? Math.round(parseFloat(rateInput) * 100) : null;
+                          update.mutate({ userId: m.userId, data: { defaultHourlyRatePence: pence } });
+                          setEditingRateUserId(null);
+                        }}><Check className="h-3 w-3 text-emerald-600" /></Button>
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => setEditingRateUserId(null)}><X className="h-3 w-3" /></Button>
+                      </div>
+                    ) : (
+                      <button
+                        className="flex items-center gap-1.5 text-sm font-mono hover:underline group"
+                        title="Click to edit hourly rate"
+                        data-testid={`button-edit-hourly-rate-${m.userId}`}
+                        onClick={() => {
+                          setEditingRateUserId(m.userId);
+                          setRateInput(m.defaultHourlyRatePence ? String((m.defaultHourlyRatePence / 100).toFixed(2)) : "");
+                        }}
+                      >
+                        {m.defaultHourlyRatePence
+                          ? <span>{new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(m.defaultHourlyRatePence / 100)}</span>
+                          : <span className="text-muted-foreground text-xs">—</span>}
+                        <Pencil className="h-3 w-3 opacity-0 group-hover:opacity-60 transition-opacity" />
+                      </button>
                     )}
                   </td>
                   <td>
