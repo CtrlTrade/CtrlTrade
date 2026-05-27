@@ -53,6 +53,7 @@ import { AgedDebtorsReport } from "@/pages/app/reports/AgedDebtors";
 import { ActivityHeatmapReport } from "@/pages/app/reports/ActivityHeatmap";
 import { AppAutomation } from "@/pages/app/Automation";
 import { AppVoice } from "@/pages/app/Voice";
+import { AppTimesheets } from "@/pages/app/Timesheets";
 import { PlaceholderPage } from "@/components/PlaceholderPage";
 
 // Admin
@@ -156,6 +157,7 @@ function App() {
                   <Route path="/reports/customer-ltv">{() => <CustomerLtvReport />}</Route>
                   <Route path="/reports/aged-debtors">{() => <AgedDebtorsReport />}</Route>
                   <Route path="/reports/activity-heatmap">{() => <ActivityHeatmapReport />}</Route>
+                  <Route path="/timesheets" component={AppTimesheets} />
                   <Route path="/automation" component={AppAutomation} />
                   <Route path="/voice" component={AppVoice} />
                   <Route path="/:id">

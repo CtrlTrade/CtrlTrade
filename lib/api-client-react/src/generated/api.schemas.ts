@@ -3659,6 +3659,61 @@ export interface VoicemailsResponse {
   voicemails: Voicemail[];
 }
 
+export interface CheckinInput {
+  /** @nullable */
+  lat?: string | null;
+  /** @nullable */
+  lng?: string | null;
+  /** @nullable */
+  notes?: string | null;
+}
+
+export interface CheckoutInput {
+  /** @nullable */
+  lat?: string | null;
+  /** @nullable */
+  lng?: string | null;
+  /** @nullable */
+  notes?: string | null;
+}
+
+export interface JobCheckin {
+  id: string;
+  jobId: string;
+  /** @nullable */
+  jobNumber?: string | null;
+  /** @nullable */
+  jobTitle?: string | null;
+  userId: string;
+  /** @nullable */
+  userName: string | null;
+  checkedInAt: string;
+  /** @nullable */
+  checkedOutAt?: string | null;
+  /** @nullable */
+  checkInLat?: string | null;
+  /** @nullable */
+  checkInLng?: string | null;
+  /** @nullable */
+  checkOutLat?: string | null;
+  /** @nullable */
+  checkOutLng?: string | null;
+  /** @nullable */
+  notes?: string | null;
+  /** @nullable */
+  durationMinutes?: number | null;
+  createdAt: string;
+}
+
+export interface TimesheetEntry {
+  userId: string;
+  /** @nullable */
+  userName: string | null;
+  date: string;
+  totalMinutes: number;
+  entries: JobCheckin[];
+}
+
 export type ConnectIntegration200 = {
   authUrl: string;
 };
@@ -3686,6 +3741,12 @@ tenantId?: string;
 
 export type ListJobsParams = {
 status?: string;
+};
+
+export type ListTimesheetsParams = {
+userId?: string;
+from?: string;
+to?: string;
 };
 
 export type ListInvoicesParams = {

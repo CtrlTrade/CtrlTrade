@@ -38,6 +38,7 @@ import integrationsRouter from "./integrations";
 import automationRouter from "./automation";
 import aiRouter from "./ai";
 import voiceRouter from "./voice";
+import timesheetsRouter from "./timesheets";
 
 const router: IRouter = Router();
 
@@ -87,5 +88,6 @@ router.use(integrationsRouter);
 router.use(automationRouter);
 router.use(aiRouter);
 router.use(voiceRouter);
+router.use(timesheetsRouter);
 
 export default router;

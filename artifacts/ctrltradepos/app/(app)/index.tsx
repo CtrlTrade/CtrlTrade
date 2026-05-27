@@ -99,6 +99,19 @@ export default function JobsScreen() {
     });
   };
 
+  const goJobDetail = (job: PosJob) => {
+    router.push({
+      pathname: "/(app)/job-detail",
+      params: {
+        jobId: job.id,
+        jobReference: job.reference,
+        customerName: job.customerName,
+        address: job.address ?? "",
+        status: job.status,
+      },
+    });
+  };
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top", "left", "right"]}>
       <Header
@@ -139,7 +152,7 @@ export default function JobsScreen() {
         ) : (
           <View style={styles.list}>
             {(jobsQuery.data ?? []).map((job) => (
-              <JobCard key={job.id} job={job} onPress={() => goSale(job)} />
+              <JobCard key={job.id} job={job} onPress={() => goJobDetail(job)} />
             ))}
             {(jobsQuery.data ?? []).length === 0 ? (
               <Text style={[styles.empty, { color: colors.mutedForeground }]}>

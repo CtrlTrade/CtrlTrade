@@ -60,6 +60,8 @@ import type {
   CashDrawerInput,
   Certificate,
   CertificateInput,
+  CheckinInput,
+  CheckoutInput,
   ChildTenantSummary,
   CloseTillSessionInput,
   ConnectIntegration200,
@@ -123,6 +125,7 @@ import type {
   InvoiceTemplateInput,
   Job,
   JobAssignmentInput,
+  JobCheckin,
   JobInput,
   JobSummary,
   JobSummaryInput,
@@ -158,6 +161,7 @@ import type {
   ListPosProductsParams,
   ListPosTradeAccountsParams,
   ListPosTransactionsParams,
+  ListTimesheetsParams,
   LoginCredentials,
   LowStockRow,
   MarkVoicemailListened200,
@@ -284,6 +288,7 @@ import type {
   TenantUsage,
   TillSession,
   TillSessionReport,
+  TimesheetEntry,
   TradeAccount,
   TradeAccountInput,
   TradeCategory,
@@ -6902,6 +6907,287 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAssignJobMutationOptions(options));
     }
+
+export const getJobCheckinUrl = (jobId: string,) => {
+
+
+
+
+  return `/api/v1/jobs/${jobId}/checkin`
+}
+
+export const jobCheckin = async (jobId: string,
+    checkinInput: CheckinInput, options?: RequestInit): Promise<JobCheckin> => {
+
+  return customFetch<JobCheckin>(getJobCheckinUrl(jobId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      checkinInput,)
+  }
+);}
+
+
+
+
+export const getJobCheckinMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof jobCheckin>>, TError,{jobId: string;data: BodyType<CheckinInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof jobCheckin>>, TError,{jobId: string;data: BodyType<CheckinInput>}, TContext> => {
+
+const mutationKey = ['jobCheckin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof jobCheckin>>, {jobId: string;data: BodyType<CheckinInput>}> = (props) => {
+          const {jobId,data} = props ?? {};
+
+          return  jobCheckin(jobId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type JobCheckinMutationResult = NonNullable<Awaited<ReturnType<typeof jobCheckin>>>
+    export type JobCheckinMutationBody = BodyType<CheckinInput>
+    export type JobCheckinMutationError = ErrorType<unknown>
+
+    export const useJobCheckin = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof jobCheckin>>, TError,{jobId: string;data: BodyType<CheckinInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof jobCheckin>>,
+        TError,
+        {jobId: string;data: BodyType<CheckinInput>},
+        TContext
+      > => {
+      return useMutation(getJobCheckinMutationOptions(options));
+    }
+
+export const getJobCheckoutUrl = (jobId: string,) => {
+
+
+
+
+  return `/api/v1/jobs/${jobId}/checkout`
+}
+
+export const jobCheckout = async (jobId: string,
+    checkoutInput: CheckoutInput, options?: RequestInit): Promise<JobCheckin> => {
+
+  return customFetch<JobCheckin>(getJobCheckoutUrl(jobId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      checkoutInput,)
+  }
+);}
+
+
+
+
+export const getJobCheckoutMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof jobCheckout>>, TError,{jobId: string;data: BodyType<CheckoutInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof jobCheckout>>, TError,{jobId: string;data: BodyType<CheckoutInput>}, TContext> => {
+
+const mutationKey = ['jobCheckout'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof jobCheckout>>, {jobId: string;data: BodyType<CheckoutInput>}> = (props) => {
+          const {jobId,data} = props ?? {};
+
+          return  jobCheckout(jobId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type JobCheckoutMutationResult = NonNullable<Awaited<ReturnType<typeof jobCheckout>>>
+    export type JobCheckoutMutationBody = BodyType<CheckoutInput>
+    export type JobCheckoutMutationError = ErrorType<unknown>
+
+    export const useJobCheckout = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof jobCheckout>>, TError,{jobId: string;data: BodyType<CheckoutInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof jobCheckout>>,
+        TError,
+        {jobId: string;data: BodyType<CheckoutInput>},
+        TContext
+      > => {
+      return useMutation(getJobCheckoutMutationOptions(options));
+    }
+
+export const getListJobCheckinsUrl = (jobId: string,) => {
+
+
+
+
+  return `/api/v1/jobs/${jobId}/checkins`
+}
+
+export const listJobCheckins = async (jobId: string, options?: RequestInit): Promise<JobCheckin[]> => {
+
+  return customFetch<JobCheckin[]>(getListJobCheckinsUrl(jobId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListJobCheckinsQueryKey = (jobId: string,) => {
+    return [
+    `/api/v1/jobs/${jobId}/checkins`
+    ] as const;
+    }
+
+
+export const getListJobCheckinsQueryOptions = <TData = Awaited<ReturnType<typeof listJobCheckins>>, TError = ErrorType<unknown>>(jobId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listJobCheckins>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListJobCheckinsQueryKey(jobId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listJobCheckins>>> = ({ signal }) => listJobCheckins(jobId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(jobId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listJobCheckins>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListJobCheckinsQueryResult = NonNullable<Awaited<ReturnType<typeof listJobCheckins>>>
+export type ListJobCheckinsQueryError = ErrorType<unknown>
+
+
+
+export function useListJobCheckins<TData = Awaited<ReturnType<typeof listJobCheckins>>, TError = ErrorType<unknown>>(
+ jobId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listJobCheckins>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListJobCheckinsQueryOptions(jobId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListTimesheetsUrl = (params?: ListTimesheetsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/timesheets?${stringifiedParams}` : `/api/v1/timesheets`
+}
+
+export const listTimesheets = async (params?: ListTimesheetsParams, options?: RequestInit): Promise<TimesheetEntry[]> => {
+
+  return customFetch<TimesheetEntry[]>(getListTimesheetsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListTimesheetsQueryKey = (params?: ListTimesheetsParams,) => {
+    return [
+    `/api/v1/timesheets`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListTimesheetsQueryOptions = <TData = Awaited<ReturnType<typeof listTimesheets>>, TError = ErrorType<unknown>>(params?: ListTimesheetsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTimesheets>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTimesheetsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTimesheets>>> = ({ signal }) => listTimesheets(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTimesheets>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListTimesheetsQueryResult = NonNullable<Awaited<ReturnType<typeof listTimesheets>>>
+export type ListTimesheetsQueryError = ErrorType<unknown>
+
+
+
+export function useListTimesheets<TData = Awaited<ReturnType<typeof listTimesheets>>, TError = ErrorType<unknown>>(
+ params?: ListTimesheetsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTimesheets>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListTimesheetsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getListInvoicesUrl = (params?: ListInvoicesParams,) => {
   const normalizedParams = new URLSearchParams();

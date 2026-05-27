@@ -1886,3 +1886,29 @@ export type ApprovalRequest = typeof approvalRequestsTable.$inferSelect;
 export type TenantPhoneNumber = typeof tenantPhoneNumbersTable.$inferSelect;
 export type CallRecord = typeof callRecordsTable.$inferSelect;
 export type Voicemail = typeof voicemailsTable.$inferSelect;
+
+// ---- Job Checkins (timesheets) ---------------------------------------------
+export const jobCheckinsTable = pgTable(
+  "job_checkins",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    jobId: uuid("job_id").notNull().references(() => jobsTable.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+    checkedInAt: timestamp("checked_in_at", { withTimezone: true }).notNull().defaultNow(),
+    checkedOutAt: timestamp("checked_out_at", { withTimezone: true }),
+    checkInLat: text("check_in_lat"),
+    checkInLng: text("check_in_lng"),
+    checkOutLat: text("check_out_lat"),
+    checkOutLng: text("check_out_lng"),
+    notes: text("notes"),
+    durationMinutes: integer("duration_minutes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("job_checkins_tenant_idx").on(t.tenantId),
+    jobIdx: index("job_checkins_job_idx").on(t.jobId),
+    userIdx: index("job_checkins_user_idx").on(t.userId, t.checkedInAt),
+  }),
+);
+export type JobCheckin = typeof jobCheckinsTable.$inferSelect;

@@ -1478,6 +1478,92 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Job" }
 
+  /v1/jobs/{jobId}/checkin:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: jobCheckin
+      tags: [timesheets]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CheckinInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JobCheckin" }
+
+  /v1/jobs/{jobId}/checkout:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: jobCheckout
+      tags: [timesheets]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CheckoutInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JobCheckin" }
+
+  /v1/jobs/{jobId}/checkins:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: listJobCheckins
+      tags: [timesheets]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/JobCheckin" }
+
+  /v1/timesheets:
+    get:
+      operationId: listTimesheets
+      tags: [timesheets]
+      parameters:
+        - in: query
+          name: userId
+          required: false
+          schema: { type: string }
+        - in: query
+          name: from
+          required: false
+          schema: { type: string, format: date }
+        - in: query
+          name: to
+          required: false
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TimesheetEntry" }
+
   /v1/invoices:
     get:
       operationId: listInvoices
@@ -8240,3 +8326,49 @@ components:
         voicemails:
           type: array
           items: { $ref: "#/components/schemas/Voicemail" }
+
+    CheckinInput:
+      type: object
+      properties:
+        lat: { type: ["string", "null"] }
+        lng: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+
+    CheckoutInput:
+      type: object
+      properties:
+        lat: { type: ["string", "null"] }
+        lng: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+
+    JobCheckin:
+      type: object
+      required: [id, jobId, userId, userName, checkedInAt, createdAt]
+      properties:
+        id: { type: string }
+        jobId: { type: string }
+        jobNumber: { type: ["string", "null"] }
+        jobTitle: { type: ["string", "null"] }
+        userId: { type: string }
+        userName: { type: ["string", "null"] }
+        checkedInAt: { type: string, format: date-time }
+        checkedOutAt: { type: ["string", "null"], format: date-time }
+        checkInLat: { type: ["string", "null"] }
+        checkInLng: { type: ["string", "null"] }
+        checkOutLat: { type: ["string", "null"] }
+        checkOutLng: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        durationMinutes: { type: ["integer", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    TimesheetEntry:
+      type: object
+      required: [userId, userName, date, totalMinutes, entries]
+      properties:
+        userId: { type: string }
+        userName: { type: ["string", "null"] }
+        date: { type: string, format: date }
+        totalMinutes: { type: integer }
+        entries:
+          type: array
+          items: { $ref: "#/components/schemas/JobCheckin" }

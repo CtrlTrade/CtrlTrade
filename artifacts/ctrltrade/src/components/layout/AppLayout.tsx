@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useGetSession, useLogout, useStopImpersonation, useListIntegrations } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target, Inbox, Package, Warehouse, Handshake, Zap, Phone } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target, Inbox, Package, Warehouse, Handshake, Zap, Phone, ClipboardList } from "lucide-react";
 import { useGetInboxUnreadCount } from "@workspace/api-client-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -56,6 +56,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/invoices", icon: FileSpreadsheet, label: "Invoices" },
     { href: "/schedule", icon: Calendar, label: "Schedule" },
     { href: "/fleet", icon: Truck, label: "Fleet" },
+    { href: "/timesheets", icon: ClipboardList, label: "Timesheets" },
     { href: "/compliance", icon: ShieldCheck, label: "Compliance" },
     { href: "/pos", icon: ShoppingCart, label: "CtrlTradePos®" },
     { href: "/products", icon: Package, label: "Products" },

@@ -2482,6 +2482,102 @@ export const AssignJobResponse = zod.object({
 })
 
 
+export const JobCheckinParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+export const JobCheckinBody = zod.object({
+  "lat": zod.string().nullish(),
+  "lng": zod.string().nullish(),
+  "notes": zod.string().nullish()
+})
+
+
+export const JobCheckoutParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+export const JobCheckoutBody = zod.object({
+  "lat": zod.string().nullish(),
+  "lng": zod.string().nullish(),
+  "notes": zod.string().nullish()
+})
+
+export const JobCheckoutResponse = zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "jobNumber": zod.string().nullish(),
+  "jobTitle": zod.string().nullish(),
+  "userId": zod.string(),
+  "userName": zod.string().nullable(),
+  "checkedInAt": zod.coerce.date(),
+  "checkedOutAt": zod.coerce.date().nullish(),
+  "checkInLat": zod.string().nullish(),
+  "checkInLng": zod.string().nullish(),
+  "checkOutLat": zod.string().nullish(),
+  "checkOutLng": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "durationMinutes": zod.number().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const ListJobCheckinsParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+export const ListJobCheckinsResponseItem = zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "jobNumber": zod.string().nullish(),
+  "jobTitle": zod.string().nullish(),
+  "userId": zod.string(),
+  "userName": zod.string().nullable(),
+  "checkedInAt": zod.coerce.date(),
+  "checkedOutAt": zod.coerce.date().nullish(),
+  "checkInLat": zod.string().nullish(),
+  "checkInLng": zod.string().nullish(),
+  "checkOutLat": zod.string().nullish(),
+  "checkOutLng": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "durationMinutes": zod.number().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListJobCheckinsResponse = zod.array(ListJobCheckinsResponseItem)
+
+
+export const ListTimesheetsQueryParams = zod.object({
+  "userId": zod.coerce.string().optional(),
+  "from": zod.date().optional(),
+  "to": zod.date().optional()
+})
+
+export const ListTimesheetsResponseItem = zod.object({
+  "userId": zod.string(),
+  "userName": zod.string().nullable(),
+  "date": zod.coerce.date(),
+  "totalMinutes": zod.number(),
+  "entries": zod.array(zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "jobNumber": zod.string().nullish(),
+  "jobTitle": zod.string().nullish(),
+  "userId": zod.string(),
+  "userName": zod.string().nullable(),
+  "checkedInAt": zod.coerce.date(),
+  "checkedOutAt": zod.coerce.date().nullish(),
+  "checkInLat": zod.string().nullish(),
+  "checkInLng": zod.string().nullish(),
+  "checkOutLat": zod.string().nullish(),
+  "checkOutLng": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "durationMinutes": zod.number().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+})
+export const ListTimesheetsResponse = zod.array(ListTimesheetsResponseItem)
+
+
 export const ListInvoicesQueryParams = zod.object({
   "status": zod.coerce.string().optional()
 })

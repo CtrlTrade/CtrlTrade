@@ -6,6 +6,7 @@ import {
   useListTeam,
   useListVehicles,
   useGenerateInvoiceFromJob,
+  useListJobCheckins,
   getGetJobQueryKey,
   getListJobsQueryKey,
   getListInvoicesQueryKey,
@@ -18,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Receipt } from "lucide-react";
+import { ArrowLeft, Receipt, MapPin, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { TenantThread } from "@/components/TenantThread";
 import { AiPanel } from "@/components/ai/AiPanel";
@@ -36,9 +37,26 @@ function toLocalInput(iso: string | null | undefined) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+function fmtCheckinTime(iso: string | null | undefined) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function fmtCheckinDate(iso: string) {
+  return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+}
+
+function fmtDuration(minutes: number | null | undefined) {
+  if (!minutes) return null;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
 export function AppJobDetail() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading } = useGetJob(id);
+  const { data: checkins } = useListJobCheckins(id);
   const { data: team } = useListTeam();
   const { data: vehicles } = useListVehicles();
   const qc = useQueryClient();
@@ -191,6 +209,73 @@ export function AppJobDetail() {
       <FileAttachments parentKind="job" parentId={id} kind="job_photo" title="Photos & files" />
 
       <CustomerInbox jobId={id} customerId={(data as any).customerId} title="Customer messages" />
+
+      {checkins && checkins.length > 0 && (
+        <Card className="border-border shadow-sm">
+          <CardHeader>
+            <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Check-in History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <table className="w-full text-sm">
+              <thead className="text-xs uppercase text-muted-foreground border-b border-border">
+                <tr>
+                  <th className="text-left py-2">Staff</th>
+                  <th className="text-left">Date</th>
+                  <th className="text-left">Check-in</th>
+                  <th className="text-left">Check-out</th>
+                  <th className="text-left">Duration</th>
+                  <th className="text-left">GPS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {checkins.map((c) => (
+                  <tr key={c.id} className="border-b border-border last:border-0">
+                    <td className="py-2 font-medium">{c.userName ?? "—"}</td>
+                    <td>{fmtCheckinDate(c.checkedInAt)}</td>
+                    <td className="font-mono">{fmtCheckinTime(c.checkedInAt)}</td>
+                    <td className="font-mono">
+                      {c.checkedOutAt ? fmtCheckinTime(c.checkedOutAt) : (
+                        <Badge variant="outline" className="text-amber-500 border-amber-500 uppercase text-xs">Active</Badge>
+                      )}
+                    </td>
+                    <td className="font-mono">{fmtDuration(c.durationMinutes) ?? "—"}</td>
+                    <td>
+                      {c.checkInLat && c.checkInLng ? (
+                        <a
+                          href={`https://maps.google.com/?q=${c.checkInLat},${c.checkInLng}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-emerald-600 hover:underline"
+                        >
+                          <MapPin className="h-3 w-3" />
+                          <span className="text-xs">View</span>
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="mt-3 pt-3 border-t border-border flex items-center gap-2 text-sm text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              Total time on site:{" "}
+              <span className="font-mono font-bold text-foreground">
+                {(() => {
+                  const total = checkins.reduce((acc, c) => acc + (c.durationMinutes ?? 0), 0);
+                  const h = Math.floor(total / 60);
+                  const m = total % 60;
+                  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+                })()}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <TenantThread subjectKind="job" subjectId={id} />
     </div>
