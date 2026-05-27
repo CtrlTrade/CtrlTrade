@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/ctrltradepos/"
+title = "CtrlTradePos"
+version = "1.0.0"
+id = "artifacts/ctrltradepos"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/ctrltradepos/" ]
+localPort = 22878
+
+[services.development]
+run = "pnpm --filter @workspace/ctrltradepos run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ctrltradepos", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/ctrltradepos", "run", "serve" ]
+
+[services.env]
+PORT = "22878"
+BASE_PATH = "/ctrltradepos/"

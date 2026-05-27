@@ -25,7 +25,110 @@ tags:
   - name: fleet
   - name: compliance
   - name: team
+  - name: pos
 paths:
+  /v1/pos/login:
+    post:
+      operationId: posLogin
+      tags: [pos]
+      summary: Authenticate a field/control user for the CtrlTradePos till
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginCredentials"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PosSession"
+
+  /v1/pos/me:
+    get:
+      operationId: getPosSession
+      tags: [pos]
+      summary: Resolve the current POS session from the bearer token
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PosSession"
+
+  /v1/pos/jobs:
+    get:
+      operationId: listPosJobs
+      tags: [pos]
+      summary: Jobs assigned to the current user for today
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PosJob"
+
+  /v1/pos/sales:
+    get:
+      operationId: listPosSales
+      tags: [pos]
+      summary: Recent sales recorded on this till
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PosSale"
+    post:
+      operationId: createPosSale
+      tags: [pos]
+      summary: Capture a sale (line items + tender) from the field
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PosSaleInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PosSale"
+
+  /v1/pos/sales/{saleId}/receipt:
+    post:
+      operationId: sendPosReceipt
+      tags: [pos]
+      parameters:
+        - in: path
+          name: saleId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PosReceiptRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PosReceiptReceipt"
+
   /healthz:
     get:
       operationId: healthCheck
@@ -1572,7 +1675,6 @@ components:
         expiresAt: { type: string, format: date-time }
         documentUrl: { type: string }
         notes: { type: string }
-
     ExpiryItem:
       type: object
       required: [kind, label, expiresAt, daysUntil, expired, recordId, href]
@@ -1596,3 +1698,97 @@ components:
         items:
           type: array
           items: { $ref: "#/components/schemas/ExpiryItem" }
+
+    PosSession:
+      type: object
+      required: [token, expiresAt, user, tenant]
+      properties:
+        token: { type: string }
+        expiresAt: { type: string, format: date-time }
+        user: { $ref: "#/components/schemas/SessionUser" }
+        tenant: { $ref: "#/components/schemas/Tenant" }
+
+    PosJob:
+      type: object
+      required: [id, reference, customerName, address, scheduledFor, status, jobType, estimatedTotal, currency]
+      properties:
+        id: { type: string }
+        reference: { type: string }
+        customerName: { type: string }
+        address: { type: string }
+        scheduledFor: { type: string, format: date-time }
+        status:
+          type: string
+          description: "scheduled | en_route | on_site | completed"
+        jobType: { type: string }
+        notes: { type: ["string", "null"] }
+        estimatedTotal: { type: number }
+        currency: { type: string }
+
+    PosSaleLine:
+      type: object
+      required: [description, quantity, unitPrice]
+      properties:
+        description: { type: string }
+        quantity: { type: number }
+        unitPrice: { type: number }
+
+    PosSaleInput:
+      type: object
+      required: [lines, tender, subtotal, taxAmount, total, currency]
+      properties:
+        jobReference: { type: ["string", "null"] }
+        customerName: { type: ["string", "null"] }
+        customerEmail: { type: ["string", "null"] }
+        lines:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/PosSaleLine" }
+        subtotal: { type: number }
+        taxAmount: { type: number }
+        total: { type: number }
+        currency: { type: string }
+        tender:
+          type: string
+          description: "cash | card"
+        notes: { type: ["string", "null"] }
+
+    PosSale:
+      type: object
+      required: [id, tenantId, lines, subtotal, taxAmount, total, currency, tender, createdAt, createdByName]
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        jobReference: { type: ["string", "null"] }
+        customerName: { type: ["string", "null"] }
+        customerEmail: { type: ["string", "null"] }
+        lines:
+          type: array
+          items: { $ref: "#/components/schemas/PosSaleLine" }
+        subtotal: { type: number }
+        taxAmount: { type: number }
+        total: { type: number }
+        currency: { type: string }
+        tender: { type: string }
+        notes: { type: ["string", "null"] }
+        createdByName: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    PosReceiptRequest:
+      type: object
+      required: [method]
+      properties:
+        method:
+          type: string
+          description: "email | print"
+        destination: { type: ["string", "null"] }
+
+    PosReceiptReceipt:
+      type: object
+      required: [delivered, method, deliveredAt]
+      properties:
+        delivered: { type: boolean }
+        method: { type: string }
+        destination: { type: ["string", "null"] }
+        deliveredAt: { type: string, format: date-time }
+

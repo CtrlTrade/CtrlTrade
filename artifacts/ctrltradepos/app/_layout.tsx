@@ -1,0 +1,92 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Stack, useRouter, useSegments } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
+import React, { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import Constants from "expo-constants";
+import {
+  setAuthTokenGetter,
+  setBaseUrl,
+} from "@workspace/api-client-react";
+
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AuthProvider, getAuthToken, useAuth } from "@/contexts/AuthContext";
+import { useColors } from "@/hooks/useColors";
+
+SplashScreen.preventAutoHideAsync();
+
+function resolveBaseUrl(): string {
+  const expoDomain =
+    process.env.EXPO_PUBLIC_DOMAIN ??
+    (Constants.expoConfig?.extra as { replitDomain?: string } | undefined)?.replitDomain;
+  if (expoDomain) {
+    const trimmed = expoDomain.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+    return `https://${trimmed}`;
+  }
+  return "";
+}
+
+setBaseUrl(resolveBaseUrl());
+setAuthTokenGetter(() => getAuthToken());
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
+});
+
+function AuthGate() {
+  const { state } = useAuth();
+  const router = useRouter();
+  const segments = useSegments();
+
+  useEffect(() => {
+    if (state.status === "loading") return;
+    const first = segments[0] as string | undefined;
+    const inApp = first === "(app)";
+    const onLogin = first === "login";
+    if (state.status === "signed-in" && !inApp) {
+      router.replace("/(app)");
+    } else if (state.status === "signed-out" && !onLogin) {
+      router.replace("/login");
+    }
+  }, [state.status, segments, router]);
+
+  return (
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#14181F" } }}>
+      <Stack.Screen name="login" />
+      <Stack.Screen name="(app)" />
+      <Stack.Screen name="+not-found" />
+    </Stack>
+  );
+}
+
+function ThemedRoot() {
+  const colors = useColors();
+  useEffect(() => {
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+  return (
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
+      <KeyboardProvider>
+        <StatusBar style="light" />
+        <AuthGate />
+      </KeyboardProvider>
+    </GestureHandlerRootView>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <SafeAreaProvider>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <ThemedRoot />
+          </AuthProvider>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </SafeAreaProvider>
+  );
+}

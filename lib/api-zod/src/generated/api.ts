@@ -9,6 +9,163 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary Authenticate a field/control user for the CtrlTradePos till
+ */
+
+
+
+export const PosLoginBody = zod.object({
+  "email": zod.string().email(),
+  "password": zod.string().min(1)
+})
+
+export const PosLoginResponse = zod.object({
+  "token": zod.string(),
+  "expiresAt": zod.coerce.date(),
+  "user": zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "role": zod.string(),
+  "isSuperAdmin": zod.boolean(),
+  "seatType": zod.string().nullish().describe('control | field | null')
+}),
+  "tenant": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string().describe('trial | active | past_due | paused | cancelled'),
+  "createdAt": zod.coerce.date(),
+  "country": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "tradeCategorySlugs": zod.array(zod.string()).optional()
+})
+})
+
+
+/**
+ * @summary Resolve the current POS session from the bearer token
+ */
+export const GetPosSessionResponse = zod.object({
+  "token": zod.string(),
+  "expiresAt": zod.coerce.date(),
+  "user": zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "role": zod.string(),
+  "isSuperAdmin": zod.boolean(),
+  "seatType": zod.string().nullish().describe('control | field | null')
+}),
+  "tenant": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string().describe('trial | active | past_due | paused | cancelled'),
+  "createdAt": zod.coerce.date(),
+  "country": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "tradeCategorySlugs": zod.array(zod.string()).optional()
+})
+})
+
+
+/**
+ * @summary Jobs assigned to the current user for today
+ */
+export const ListPosJobsResponseItem = zod.object({
+  "id": zod.string(),
+  "reference": zod.string(),
+  "customerName": zod.string(),
+  "address": zod.string(),
+  "scheduledFor": zod.coerce.date(),
+  "status": zod.string().describe('scheduled | en_route | on_site | completed'),
+  "jobType": zod.string(),
+  "notes": zod.string().nullish(),
+  "estimatedTotal": zod.number(),
+  "currency": zod.string()
+})
+export const ListPosJobsResponse = zod.array(ListPosJobsResponseItem)
+
+
+/**
+ * @summary Recent sales recorded on this till
+ */
+export const ListPosSalesResponseItem = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "jobReference": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
+  "lines": zod.array(zod.object({
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPrice": zod.number()
+})),
+  "subtotal": zod.number(),
+  "taxAmount": zod.number(),
+  "total": zod.number(),
+  "currency": zod.string(),
+  "tender": zod.string(),
+  "notes": zod.string().nullish(),
+  "createdByName": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+export const ListPosSalesResponse = zod.array(ListPosSalesResponseItem)
+
+
+/**
+ * @summary Capture a sale (line items + tender) from the field
+ */
+
+
+
+export const CreatePosSaleBody = zod.object({
+  "jobReference": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
+  "lines": zod.array(zod.object({
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPrice": zod.number()
+})).min(1),
+  "subtotal": zod.number(),
+  "taxAmount": zod.number(),
+  "total": zod.number(),
+  "currency": zod.string(),
+  "tender": zod.string().describe('cash | card'),
+  "notes": zod.string().nullish()
+})
+
+
+export const SendPosReceiptParams = zod.object({
+  "saleId": zod.coerce.string()
+})
+
+export const SendPosReceiptBody = zod.object({
+  "method": zod.string().describe('email | print'),
+  "destination": zod.string().nullish()
+})
+
+export const SendPosReceiptResponse = zod.object({
+  "delivered": zod.boolean(),
+  "method": zod.string(),
+  "destination": zod.string().nullish(),
+  "deliveredAt": zod.coerce.date()
+})
+
+
+/**
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({

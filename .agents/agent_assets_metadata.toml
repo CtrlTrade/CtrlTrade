@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "zmqRdPZq5k3qWLjHKZjw3"
+uri = "file://artifacts/ctrltradepos/assets/images/icon.png"
+type = "image"
+title = "ctrltradepos icon"

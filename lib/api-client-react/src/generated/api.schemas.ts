@@ -630,6 +630,89 @@ export interface ExpiryAttention {
   items: ExpiryItem[];
 }
 
+export interface PosSession {
+  token: string;
+  expiresAt: string;
+  user: SessionUser;
+  tenant: Tenant;
+}
+
+export interface PosJob {
+  id: string;
+  reference: string;
+  customerName: string;
+  address: string;
+  scheduledFor: string;
+  /** scheduled | en_route | on_site | completed */
+  status: string;
+  jobType: string;
+  /** @nullable */
+  notes?: string | null;
+  estimatedTotal: number;
+  currency: string;
+}
+
+export interface PosSaleLine {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface PosSaleInput {
+  /** @nullable */
+  jobReference?: string | null;
+  /** @nullable */
+  customerName?: string | null;
+  /** @nullable */
+  customerEmail?: string | null;
+  /** @minItems 1 */
+  lines: PosSaleLine[];
+  subtotal: number;
+  taxAmount: number;
+  total: number;
+  currency: string;
+  /** cash | card */
+  tender: string;
+  /** @nullable */
+  notes?: string | null;
+}
+
+export interface PosSale {
+  id: string;
+  tenantId: string;
+  /** @nullable */
+  jobReference?: string | null;
+  /** @nullable */
+  customerName?: string | null;
+  /** @nullable */
+  customerEmail?: string | null;
+  lines: PosSaleLine[];
+  subtotal: number;
+  taxAmount: number;
+  total: number;
+  currency: string;
+  tender: string;
+  /** @nullable */
+  notes?: string | null;
+  createdByName: string;
+  createdAt: string;
+}
+
+export interface PosReceiptRequest {
+  /** email | print */
+  method: string;
+  /** @nullable */
+  destination?: string | null;
+}
+
+export interface PosReceiptReceipt {
+  delivered: boolean;
+  method: string;
+  /** @nullable */
+  destination?: string | null;
+  deliveredAt: string;
+}
+
 export type ListJobsParams = {
 status?: string;
 };

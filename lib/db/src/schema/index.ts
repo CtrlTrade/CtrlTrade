@@ -339,6 +339,34 @@ export const certificatesTable = pgTable(
   }),
 );
 
+// ---- POS sales (CtrlTradePos till) ----------------------------------------
+export const posSalesTable = pgTable(
+  "pos_sales",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull().references(() => usersTable.id, { onDelete: "set null" }),
+    jobReference: text("job_reference"),
+    customerName: text("customer_name"),
+    customerEmail: text("customer_email"),
+    lines: jsonb("lines").notNull(),
+    subtotal: integer("subtotal_pence").notNull(),
+    taxAmount: integer("tax_pence").notNull(),
+    total: integer("total_pence").notNull(),
+    currency: varchar("currency", { length: 8 }).notNull().default("gbp"),
+    tender: varchar("tender", { length: 16 }).notNull(),
+    notes: text("notes"),
+    receiptDeliveredAt: timestamp("receipt_delivered_at", { withTimezone: true }),
+    receiptMethod: varchar("receipt_method", { length: 16 }),
+    receiptDestination: text("receipt_destination"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("pos_sales_tenant_idx").on(t.tenantId),
+    createdIdx: index("pos_sales_created_idx").on(t.createdAt),
+  }),
+);
+
 // ---- Types ----------------------------------------------------------------
 export type Tenant = typeof tenantsTable.$inferSelect;
 export type User = typeof usersTable.$inferSelect;
@@ -353,3 +381,4 @@ export type Job = typeof jobsTable.$inferSelect;
 export type Vehicle = typeof vehiclesTable.$inferSelect;
 export type VehicleLocation = typeof vehicleLocationsTable.$inferSelect;
 export type Certificate = typeof certificatesTable.$inferSelect;
+export type PosSale = typeof posSalesTable.$inferSelect;
