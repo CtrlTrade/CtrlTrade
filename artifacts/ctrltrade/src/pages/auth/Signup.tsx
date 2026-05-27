@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useSignup, useGetPricing, useListTradeCategories, useCreateSetupIntent } from "@workspace/api-client-react";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +12,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowRight, ArrowLeft, Plus, Minus, CreditCard } from "lucide-react";
 
-// The key will be available when we connect stripe, but if it is undefined we want a fallback gracefully.
-const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY 
-  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) 
-  : null;
+// Publishable key is fetched from the server (sourced from the Stripe Replit integration).
+// If Stripe isn't connected, the endpoint returns 503 and we fall back to the no-Stripe flow.
+let stripePromiseCache: Promise<Stripe | null> | null = null;
+async function loadStripePromise(baseUrl: string): Promise<Stripe | null> {
+  if (stripePromiseCache) return stripePromiseCache;
+  stripePromiseCache = (async () => {
+    const resp = await fetch(`${baseUrl}api/v1/stripe/publishable-key`, { credentials: "include" });
+    if (!resp.ok) return null;
+    const data = (await resp.json()) as { publishableKey?: string };
+    if (!data.publishableKey) return null;
+    return loadStripe(data.publishableKey);
+  })();
+  return stripePromiseCache;
+}
 
 export function Signup() {
   const [, setLocation] = useLocation();
@@ -35,6 +45,21 @@ export function Signup() {
   const [tills, setTills] = useState(0);
   const [owner, setOwner] = useState({ name: "", email: "", password: "" });
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
+  const [stripeChecked, setStripeChecked] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const promise = loadStripePromise(import.meta.env.BASE_URL ?? "/");
+    promise.then((s) => {
+      if (cancelled) return;
+      setStripePromise(s ? promise : null);
+      setStripeChecked(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const nextStep = () => setStep(s => Math.min(6, s + 1));
   const prevStep = () => setStep(s => Math.max(1, s - 1));
@@ -255,7 +280,9 @@ export function Signup() {
 
             {step === 5 && (
               <div className="space-y-6">
-                {!stripePromise ? (
+                {!stripeChecked ? (
+                  <div className="py-12 flex justify-center"><Skeleton className="h-10 w-10 rounded-full" /></div>
+                ) : !stripePromise ? (
                   <div className="border border-destructive/50 bg-destructive/10 p-6 text-center">
                     <CreditCard className="h-10 w-10 text-destructive mx-auto mb-4" />
                     <h3 className="font-bold uppercase tracking-tight text-destructive mb-2">Stripe Not Connected</h3>

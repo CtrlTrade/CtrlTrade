@@ -6,8 +6,22 @@ import {
 } from "@workspace/api-zod";
 import { db, tradeCategoriesTable } from "@workspace/db";
 import { asc } from "drizzle-orm";
+import { getStripePublishableKey, isStripeConnected } from "../stripeClient";
 
 const router: IRouter = Router();
+
+router.get("/v1/stripe/publishable-key", async (_req, res): Promise<void> => {
+  if (!(await isStripeConnected())) {
+    res.status(503).json({ error: "Stripe is not connected" });
+    return;
+  }
+  try {
+    const publishableKey = await getStripePublishableKey();
+    res.json({ publishableKey });
+  } catch (err: any) {
+    res.status(503).json({ error: err?.message ?? "Stripe unavailable" });
+  }
+});
 
 router.get("/v1/pricing", (_req, res) => {
   const body = GetPricingResponse.parse({
