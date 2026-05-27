@@ -1149,6 +1149,195 @@ export interface PublicLeadResult {
   leadId?: string;
 }
 
+export interface PortalBranding {
+  tenantName: string;
+  tenantSlug: string;
+  /** @nullable */
+  brandColor?: string | null;
+  /** @nullable */
+  logoUrl?: string | null;
+}
+
+export interface PortalMagicLinkRequest {
+  email: string;
+}
+
+export interface PortalMagicLinkResult {
+  ok: boolean;
+  /**
+     * Set in non-production so testers can complete login without email transport.
+     * @nullable
+     */
+  devLink?: string | null;
+}
+
+export interface PortalVerifyInput {
+  /** @minLength 1 */
+  token: string;
+}
+
+export interface PortalCustomer {
+  id: string;
+  name: string;
+  /** @nullable */
+  email: string | null;
+}
+
+export interface PortalSession {
+  tenant: PortalBranding;
+  customer: PortalCustomer;
+}
+
+export interface PortalQuoteSummary {
+  id: string;
+  number: string;
+  title: string;
+  status: string;
+  totalPence: number;
+  currency: string;
+  createdAt: string;
+  /** @nullable */
+  acceptedAt?: string | null;
+}
+
+export type PortalQuoteItemsItem = {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPricePence: number;
+};
+
+export type PortalQuote = PortalQuoteSummary & ({
+  /** @nullable */
+  notes?: string | null;
+  depositPct?: number;
+  items: PortalQuoteItemsItem[];
+});
+
+export interface PortalQuoteAcceptInput {
+  /** @minLength 1 */
+  signatureName: string;
+}
+
+export interface PortalQuoteAcceptResult {
+  quote: PortalQuote;
+  /** @nullable */
+  jobId?: string | null;
+  /** @nullable */
+  depositInvoiceId?: string | null;
+}
+
+export interface PortalQuoteDeclineInput {
+  reason?: string;
+}
+
+export interface PortalInvoiceSummary {
+  id: string;
+  number: string;
+  title: string;
+  status: string;
+  totalPence: number;
+  currency: string;
+  isDeposit: boolean;
+  /** @nullable */
+  dueAt?: string | null;
+  /** @nullable */
+  paidAt?: string | null;
+  createdAt: string;
+}
+
+export type PortalInvoiceItemsItem = {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPricePence: number;
+};
+
+export type PortalInvoice = PortalInvoiceSummary & ({
+  /** @nullable */
+  paymentLinkUrl: string | null;
+  items: PortalInvoiceItemsItem[];
+});
+
+export interface PortalPaymentRedirect {
+  /** @nullable */
+  url: string | null;
+}
+
+export interface PortalJobSummary {
+  id: string;
+  number: string;
+  title: string;
+  status: string;
+  /** @nullable */
+  scheduledStart?: string | null;
+  /** @nullable */
+  scheduledEnd?: string | null;
+  /** @nullable */
+  engineerName?: string | null;
+  createdAt: string;
+}
+
+export type PortalJobTimelineItem = {
+  kind: string;
+  label: string;
+  at: string;
+};
+
+export interface PortalReview {
+  id: string;
+  rating: number;
+  /** @nullable */
+  comment?: string | null;
+  createdAt: string;
+}
+
+export type PortalJob = PortalJobSummary & ({
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  addressLine1?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  postcode?: string | null;
+  timeline: PortalJobTimelineItem[];
+  review?: PortalReview | null;
+});
+
+export interface PortalReviewInput {
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  rating: number;
+  comment?: string;
+}
+
+export interface PortalDashboard {
+  unreadMessageCount: number;
+  quotes: PortalQuoteSummary[];
+  jobs: PortalJobSummary[];
+  invoices: PortalInvoiceSummary[];
+}
+
+export interface CustomerMessage {
+  id: string;
+  subjectKind: string;
+  /** @nullable */
+  subjectId?: string | null;
+  fromRole: string;
+  /** @nullable */
+  authorLabel?: string | null;
+  body: string;
+  createdAt: string;
+}
+
+export interface CustomerMessageInput {
+  /** @minLength 1 */
+  body: string;
+}
+
 export type ListJobsParams = {
 status?: string;
 };

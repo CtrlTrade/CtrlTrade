@@ -472,6 +472,66 @@ export type Invoice = typeof invoicesTable.$inferSelect;
 export type InvoiceItem = typeof invoiceItemsTable.$inferSelect;
 export type Payment = typeof paymentsTable.$inferSelect;
 
+// ---- Customer portal -------------------------------------------------------
+export const portalTokensTable = pgTable(
+  "portal_tokens",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").notNull().references(() => customersTable.id, { onDelete: "cascade" }),
+    tokenHash: varchar("token_hash", { length: 128 }).notNull().unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("portal_tokens_tenant_idx").on(t.tenantId),
+    customerIdx: index("portal_tokens_customer_idx").on(t.customerId),
+  }),
+);
+
+export const customerMessagesTable = pgTable(
+  "customer_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").notNull().references(() => customersTable.id, { onDelete: "cascade" }),
+    subjectKind: varchar("subject_kind", { length: 16 }).notNull(), // quote|job|general
+    subjectId: uuid("subject_id"),
+    fromRole: varchar("from_role", { length: 16 }).notNull(), // customer|staff
+    authorUserId: uuid("author_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    authorLabel: text("author_label"),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("customer_messages_tenant_idx").on(t.tenantId),
+    threadIdx: index("customer_messages_thread_idx").on(t.tenantId, t.subjectKind, t.subjectId),
+  }),
+);
+
+export const customerReviewsTable = pgTable(
+  "customer_reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").notNull().references(() => customersTable.id, { onDelete: "cascade" }),
+    jobId: uuid("job_id").references(() => jobsTable.id, { onDelete: "set null" }),
+    rating: integer("rating").notNull(),
+    comment: text("comment"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("customer_reviews_tenant_idx").on(t.tenantId),
+    jobIdx: index("customer_reviews_job_idx").on(t.jobId),
+    uniqJob: unique("customer_reviews_job_uniq").on(t.tenantId, t.jobId),
+  }),
+);
+
+export type PortalToken = typeof portalTokensTable.$inferSelect;
+export type CustomerMessage = typeof customerMessagesTable.$inferSelect;
+export type CustomerReview = typeof customerReviewsTable.$inferSelect;
+
 export const invoiceTemplatesTable = pgTable(
   "invoice_templates",
   {

@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Receipt } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { TenantThread } from "@/components/TenantThread";
 
 function formatGBP(pence: number) {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(pence / 100);
@@ -163,6 +164,8 @@ export function AppJobDetail() {
           )}
         </CardContent>
       </Card>
+
+      <TenantThread subjectKind="job" subjectId={id} />
     </div>
   );
 }

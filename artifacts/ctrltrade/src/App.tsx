@@ -40,6 +40,15 @@ import { AdminDashboard } from "@/pages/admin/Dashboard";
 import { AdminTenants } from "@/pages/admin/Tenants";
 import { AdminTenantDetail } from "@/pages/admin/TenantDetail";
 
+// Customer portal
+import { PortalLayout } from "@/components/layout/PortalLayout";
+import { PortalLogin } from "@/pages/portal/PortalLogin";
+import { PortalVerify } from "@/pages/portal/PortalVerify";
+import { PortalDashboard } from "@/pages/portal/PortalDashboard";
+import { PortalQuote } from "@/pages/portal/PortalQuote";
+import { PortalInvoice } from "@/pages/portal/PortalInvoice";
+import { PortalJob } from "@/pages/portal/PortalJob";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -84,6 +93,29 @@ function App() {
                   </Route>
                 </Switch>
               </AppLayout>
+            </Route>
+
+            {/* Customer portal */}
+            <Route path="/portal/:tenantSlug" nest>
+              {(params) => (
+                <PortalLayout>
+                  <Switch>
+                    <Route path="/" component={PortalLogin} />
+                    <Route path="/verify" component={PortalVerify} />
+                    <Route path="/app" component={PortalDashboard} />
+                    <Route path="/quotes/:id">
+                      {(p) => <PortalQuote key={`${params.tenantSlug}-${p.id}`} />}
+                    </Route>
+                    <Route path="/invoices/:id">
+                      {(p) => <PortalInvoice key={`${params.tenantSlug}-${p.id}`} />}
+                    </Route>
+                    <Route path="/jobs/:id">
+                      {(p) => <PortalJob key={`${params.tenantSlug}-${p.id}`} />}
+                    </Route>
+                    <Route component={NotFound} />
+                  </Switch>
+                </PortalLayout>
+              )}
             </Route>
 
             {/* Admin */}

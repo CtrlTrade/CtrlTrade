@@ -1489,6 +1489,293 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/PublicLeadResult" }
 
+  /v1/public/portal/{tenantSlug}/branding:
+    parameters:
+      - in: path
+        name: tenantSlug
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getPortalBranding
+      tags: [portal]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalBranding" }
+
+  /v1/public/portal/{tenantSlug}/magic-link:
+    parameters:
+      - in: path
+        name: tenantSlug
+        required: true
+        schema: { type: string }
+    post:
+      operationId: requestPortalMagicLink
+      tags: [portal]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PortalMagicLinkRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalMagicLinkResult" }
+
+  /v1/public/portal/{tenantSlug}/verify:
+    parameters:
+      - in: path
+        name: tenantSlug
+        required: true
+        schema: { type: string }
+    post:
+      operationId: verifyPortalMagicLink
+      tags: [portal]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PortalVerifyInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalSession" }
+
+  /v1/portal/logout:
+    post:
+      operationId: portalLogout
+      tags: [portal]
+      responses:
+        "204":
+          description: Logged out
+
+  /v1/portal/me:
+    get:
+      operationId: getPortalSession
+      tags: [portal]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalSession" }
+
+  /v1/portal/dashboard:
+    get:
+      operationId: getPortalDashboard
+      tags: [portal]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalDashboard" }
+
+  /v1/portal/quotes/{quoteId}:
+    parameters:
+      - in: path
+        name: quoteId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getPortalQuote
+      tags: [portal]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalQuote" }
+
+  /v1/portal/quotes/{quoteId}/accept:
+    parameters:
+      - in: path
+        name: quoteId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: acceptPortalQuote
+      tags: [portal]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PortalQuoteAcceptInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalQuoteAcceptResult" }
+
+  /v1/portal/quotes/{quoteId}/decline:
+    parameters:
+      - in: path
+        name: quoteId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: declinePortalQuote
+      tags: [portal]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PortalQuoteDeclineInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalQuote" }
+
+  /v1/portal/invoices/{invoiceId}:
+    parameters:
+      - in: path
+        name: invoiceId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getPortalInvoice
+      tags: [portal]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalInvoice" }
+
+  /v1/portal/invoices/{invoiceId}/pay:
+    parameters:
+      - in: path
+        name: invoiceId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: payPortalInvoice
+      tags: [portal]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalPaymentRedirect" }
+
+  /v1/portal/jobs/{jobId}:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getPortalJob
+      tags: [portal]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalJob" }
+
+  /v1/portal/jobs/{jobId}/review:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: submitPortalReview
+      tags: [portal]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PortalReviewInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalReview" }
+
+  /v1/portal/threads/{subjectKind}/{subjectId}/messages:
+    parameters:
+      - in: path
+        name: subjectKind
+        required: true
+        schema: { type: string, enum: [quote, job, general] }
+      - in: path
+        name: subjectId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: listPortalThreadMessages
+      tags: [portal]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/CustomerMessage" }
+    post:
+      operationId: postPortalThreadMessage
+      tags: [portal]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerMessageInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomerMessage" }
+
+  /v1/threads/{subjectKind}/{subjectId}/messages:
+    parameters:
+      - in: path
+        name: subjectKind
+        required: true
+        schema: { type: string, enum: [quote, job, general] }
+      - in: path
+        name: subjectId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: listTenantThreadMessages
+      tags: [portal]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/CustomerMessage" }
+    post:
+      operationId: postTenantThreadMessage
+      tags: [portal]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerMessageInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomerMessage" }
+
   /v1/admin/tenants/{tenantId}/audit-log:
     get:
       operationId: getAdminTenantAuditLog
@@ -2686,3 +2973,224 @@ components:
       properties:
         ok: { type: boolean }
         leadId: { type: string }
+
+    PortalBranding:
+      type: object
+      required: [tenantName, tenantSlug]
+      properties:
+        tenantName: { type: string }
+        tenantSlug: { type: string }
+        brandColor: { type: ["string", "null"] }
+        logoUrl: { type: ["string", "null"] }
+
+    PortalMagicLinkRequest:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string, format: email }
+
+    PortalMagicLinkResult:
+      type: object
+      required: [ok]
+      properties:
+        ok: { type: boolean }
+        devLink:
+          type: ["string", "null"]
+          description: "Set in non-production so testers can complete login without email transport."
+
+    PortalVerifyInput:
+      type: object
+      required: [token]
+      properties:
+        token: { type: string, minLength: 1 }
+
+    PortalCustomer:
+      type: object
+      required: [id, name, email]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: ["string", "null"] }
+
+    PortalSession:
+      type: object
+      required: [tenant, customer]
+      properties:
+        tenant: { $ref: "#/components/schemas/PortalBranding" }
+        customer: { $ref: "#/components/schemas/PortalCustomer" }
+
+    PortalQuoteSummary:
+      type: object
+      required: [id, number, title, status, totalPence, currency, createdAt]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        title: { type: string }
+        status: { type: string }
+        totalPence: { type: integer }
+        currency: { type: string }
+        createdAt: { type: string, format: date-time }
+        acceptedAt: { type: ["string", "null"], format: date-time }
+
+    PortalQuote:
+      allOf:
+        - $ref: "#/components/schemas/PortalQuoteSummary"
+        - type: object
+          required: [items]
+          properties:
+            notes: { type: ["string", "null"] }
+            depositPct: { type: integer }
+            items:
+              type: array
+              items:
+                type: object
+                required: [id, description, quantity, unitPricePence]
+                properties:
+                  id: { type: string }
+                  description: { type: string }
+                  quantity: { type: integer }
+                  unitPricePence: { type: integer }
+
+    PortalQuoteAcceptInput:
+      type: object
+      required: [signatureName]
+      properties:
+        signatureName: { type: string, minLength: 1 }
+
+    PortalQuoteAcceptResult:
+      type: object
+      required: [quote]
+      properties:
+        quote: { $ref: "#/components/schemas/PortalQuote" }
+        jobId: { type: ["string", "null"] }
+        depositInvoiceId: { type: ["string", "null"] }
+
+    PortalQuoteDeclineInput:
+      type: object
+      properties:
+        reason: { type: string }
+
+    PortalInvoiceSummary:
+      type: object
+      required: [id, number, title, status, totalPence, currency, createdAt, isDeposit]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        title: { type: string }
+        status: { type: string }
+        totalPence: { type: integer }
+        currency: { type: string }
+        isDeposit: { type: boolean }
+        dueAt: { type: ["string", "null"], format: date-time }
+        paidAt: { type: ["string", "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+
+    PortalInvoice:
+      allOf:
+        - $ref: "#/components/schemas/PortalInvoiceSummary"
+        - type: object
+          required: [items, paymentLinkUrl]
+          properties:
+            paymentLinkUrl: { type: ["string", "null"] }
+            items:
+              type: array
+              items:
+                type: object
+                required: [id, description, quantity, unitPricePence]
+                properties:
+                  id: { type: string }
+                  description: { type: string }
+                  quantity: { type: integer }
+                  unitPricePence: { type: integer }
+
+    PortalPaymentRedirect:
+      type: object
+      required: [url]
+      properties:
+        url: { type: ["string", "null"] }
+
+    PortalJobSummary:
+      type: object
+      required: [id, number, title, status, createdAt]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        title: { type: string }
+        status: { type: string }
+        scheduledStart: { type: ["string", "null"], format: date-time }
+        scheduledEnd: { type: ["string", "null"], format: date-time }
+        engineerName: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    PortalJob:
+      allOf:
+        - $ref: "#/components/schemas/PortalJobSummary"
+        - type: object
+          required: [timeline]
+          properties:
+            description: { type: ["string", "null"] }
+            addressLine1: { type: ["string", "null"] }
+            city: { type: ["string", "null"] }
+            postcode: { type: ["string", "null"] }
+            timeline:
+              type: array
+              items:
+                type: object
+                required: [kind, label, at]
+                properties:
+                  kind: { type: string }
+                  label: { type: string }
+                  at: { type: string, format: date-time }
+            review:
+              oneOf:
+                - $ref: "#/components/schemas/PortalReview"
+                - type: "null"
+
+    PortalReviewInput:
+      type: object
+      required: [rating]
+      properties:
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        comment: { type: string }
+
+    PortalReview:
+      type: object
+      required: [id, rating, createdAt]
+      properties:
+        id: { type: string }
+        rating: { type: integer }
+        comment: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    PortalDashboard:
+      type: object
+      required: [quotes, jobs, invoices, unreadMessageCount]
+      properties:
+        unreadMessageCount: { type: integer }
+        quotes:
+          type: array
+          items: { $ref: "#/components/schemas/PortalQuoteSummary" }
+        jobs:
+          type: array
+          items: { $ref: "#/components/schemas/PortalJobSummary" }
+        invoices:
+          type: array
+          items: { $ref: "#/components/schemas/PortalInvoiceSummary" }
+
+    CustomerMessage:
+      type: object
+      required: [id, subjectKind, fromRole, body, createdAt]
+      properties:
+        id: { type: string }
+        subjectKind: { type: string }
+        subjectId: { type: ["string", "null"] }
+        fromRole: { type: string }
+        authorLabel: { type: ["string", "null"] }
+        body: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    CustomerMessageInput:
+      type: object
+      required: [body]
+      properties:
+        body: { type: string, minLength: 1 }

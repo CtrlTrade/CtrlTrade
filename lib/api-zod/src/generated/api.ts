@@ -2333,6 +2333,348 @@ export const CaptureLeadPublicBody = zod.object({
 })
 
 
+export const GetPortalBrandingParams = zod.object({
+  "tenantSlug": zod.coerce.string()
+})
+
+export const GetPortalBrandingResponse = zod.object({
+  "tenantName": zod.string(),
+  "tenantSlug": zod.string(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish()
+})
+
+
+export const RequestPortalMagicLinkParams = zod.object({
+  "tenantSlug": zod.coerce.string()
+})
+
+export const RequestPortalMagicLinkBody = zod.object({
+  "email": zod.string().email()
+})
+
+export const RequestPortalMagicLinkResponse = zod.object({
+  "ok": zod.boolean(),
+  "devLink": zod.string().nullish().describe('Set in non-production so testers can complete login without email transport.')
+})
+
+
+export const VerifyPortalMagicLinkParams = zod.object({
+  "tenantSlug": zod.coerce.string()
+})
+
+
+
+
+export const VerifyPortalMagicLinkBody = zod.object({
+  "token": zod.string().min(1)
+})
+
+export const VerifyPortalMagicLinkResponse = zod.object({
+  "tenant": zod.object({
+  "tenantName": zod.string(),
+  "tenantSlug": zod.string(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish()
+}),
+  "customer": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullable()
+})
+})
+
+
+export const GetPortalSessionResponse = zod.object({
+  "tenant": zod.object({
+  "tenantName": zod.string(),
+  "tenantSlug": zod.string(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish()
+}),
+  "customer": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullable()
+})
+})
+
+
+export const GetPortalDashboardResponse = zod.object({
+  "unreadMessageCount": zod.number(),
+  "quotes": zod.array(zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "acceptedAt": zod.coerce.date().nullish()
+})),
+  "jobs": zod.array(zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "scheduledStart": zod.coerce.date().nullish(),
+  "scheduledEnd": zod.coerce.date().nullish(),
+  "engineerName": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})),
+  "invoices": zod.array(zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "isDeposit": zod.boolean(),
+  "dueAt": zod.coerce.date().nullish(),
+  "paidAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+export const GetPortalQuoteParams = zod.object({
+  "quoteId": zod.coerce.string()
+})
+
+export const GetPortalQuoteResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "acceptedAt": zod.coerce.date().nullish()
+}).and(zod.object({
+  "notes": zod.string().nullish(),
+  "depositPct": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number()
+}))
+}))
+
+
+export const AcceptPortalQuoteParams = zod.object({
+  "quoteId": zod.coerce.string()
+})
+
+
+
+
+export const AcceptPortalQuoteBody = zod.object({
+  "signatureName": zod.string().min(1)
+})
+
+export const AcceptPortalQuoteResponse = zod.object({
+  "quote": zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "acceptedAt": zod.coerce.date().nullish()
+}).and(zod.object({
+  "notes": zod.string().nullish(),
+  "depositPct": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number()
+}))
+})),
+  "jobId": zod.string().nullish(),
+  "depositInvoiceId": zod.string().nullish()
+})
+
+
+export const DeclinePortalQuoteParams = zod.object({
+  "quoteId": zod.coerce.string()
+})
+
+export const DeclinePortalQuoteBody = zod.object({
+  "reason": zod.string().optional()
+})
+
+export const DeclinePortalQuoteResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "acceptedAt": zod.coerce.date().nullish()
+}).and(zod.object({
+  "notes": zod.string().nullish(),
+  "depositPct": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number()
+}))
+}))
+
+
+export const GetPortalInvoiceParams = zod.object({
+  "invoiceId": zod.coerce.string()
+})
+
+export const GetPortalInvoiceResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "isDeposit": zod.boolean(),
+  "dueAt": zod.coerce.date().nullish(),
+  "paidAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+}).and(zod.object({
+  "paymentLinkUrl": zod.string().nullable(),
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number()
+}))
+}))
+
+
+export const PayPortalInvoiceParams = zod.object({
+  "invoiceId": zod.coerce.string()
+})
+
+export const PayPortalInvoiceResponse = zod.object({
+  "url": zod.string().nullable()
+})
+
+
+export const GetPortalJobParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+export const GetPortalJobResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "scheduledStart": zod.coerce.date().nullish(),
+  "scheduledEnd": zod.coerce.date().nullish(),
+  "engineerName": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+}).and(zod.object({
+  "description": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "timeline": zod.array(zod.object({
+  "kind": zod.string(),
+  "label": zod.string(),
+  "at": zod.coerce.date()
+})),
+  "review": zod.union([zod.object({
+  "id": zod.string(),
+  "rating": zod.number(),
+  "comment": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+}),zod.null()]).optional()
+}))
+
+
+export const SubmitPortalReviewParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+export const submitPortalReviewBodyRatingMax = 5;
+
+
+
+export const SubmitPortalReviewBody = zod.object({
+  "rating": zod.number().min(1).max(submitPortalReviewBodyRatingMax),
+  "comment": zod.string().optional()
+})
+
+export const SubmitPortalReviewResponse = zod.object({
+  "id": zod.string(),
+  "rating": zod.number(),
+  "comment": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const ListPortalThreadMessagesParams = zod.object({
+  "subjectKind": zod.enum(['quote', 'job', 'general']),
+  "subjectId": zod.coerce.string()
+})
+
+export const ListPortalThreadMessagesResponseItem = zod.object({
+  "id": zod.string(),
+  "subjectKind": zod.string(),
+  "subjectId": zod.string().nullish(),
+  "fromRole": zod.string(),
+  "authorLabel": zod.string().nullish(),
+  "body": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+export const ListPortalThreadMessagesResponse = zod.array(ListPortalThreadMessagesResponseItem)
+
+
+export const PostPortalThreadMessageParams = zod.object({
+  "subjectKind": zod.enum(['quote', 'job', 'general']),
+  "subjectId": zod.coerce.string()
+})
+
+
+
+
+export const PostPortalThreadMessageBody = zod.object({
+  "body": zod.string().min(1)
+})
+
+
+export const ListTenantThreadMessagesParams = zod.object({
+  "subjectKind": zod.enum(['quote', 'job', 'general']),
+  "subjectId": zod.coerce.string()
+})
+
+export const ListTenantThreadMessagesResponseItem = zod.object({
+  "id": zod.string(),
+  "subjectKind": zod.string(),
+  "subjectId": zod.string().nullish(),
+  "fromRole": zod.string(),
+  "authorLabel": zod.string().nullish(),
+  "body": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+export const ListTenantThreadMessagesResponse = zod.array(ListTenantThreadMessagesResponseItem)
+
+
+export const PostTenantThreadMessageParams = zod.object({
+  "subjectKind": zod.enum(['quote', 'job', 'general']),
+  "subjectId": zod.coerce.string()
+})
+
+
+
+
+export const PostTenantThreadMessageBody = zod.object({
+  "body": zod.string().min(1)
+})
+
+
 export const GetAdminTenantAuditLogParams = zod.object({
   "tenantId": zod.coerce.string()
 })
