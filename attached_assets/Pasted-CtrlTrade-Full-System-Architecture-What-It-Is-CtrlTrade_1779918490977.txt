@@ -1,0 +1,466 @@
+CtrlTrade — Full System Architecture
+What It Is
+CtrlTrade is a multi-tenant SaaS CRM platform purpose-built for UK trades businesses. It has two distinct user tiers living inside the same application:
+
+Super Admin — the CtrlTrade team (Alan, Daniel). Manages all tenants, billing, plans, marketplace, compliance queue, and platform-wide settings.
+Tenant (CRM user) — a trades business (e.g. a roofing company). Gets their own company workspace with staff, customers, jobs, quotes, invoices, and all CRM features.
+Both tiers are served by the same React frontend (artifacts/roofing-crm), the same Express API (artifacts/api-server), and the same PostgreSQL database — isolated by companyId / tenantId at every data layer.
+
+Deployment Topology
+ctrltrade.co.uk             ← live production domain
+  /                         → Marketing Site  (artifacts/marketing, Vite/React)
+  /app                      → CRM Frontend    (artifacts/roofing-crm, Vite/React)
+  /api                      → API Server      (artifacts/api-server, Express 5)
+  /portal/:slug             → Customer Portal (same CRM frontend, portal routes)
+
+All traffic routes through a shared reverse proxy. The API is a single Express process bundled with esbuild, serving from port 8080. Static frontends are served by Vite in dev and built to static files in production.
+
+Tech Stack
+Layer	Technology
+Language	TypeScript 5.9, Node.js 24
+Frontend	React 19, Vite 7, Wouter (routing), Framer Motion
+UI	shadcn/ui, Tailwind CSS, Lucide React, Recharts
+API	Express 5, Zod v4 validation
+Database	PostgreSQL via Drizzle ORM
+Auth	Replit OIDC + credential login, encrypted cookie sessions
+Email	Outlook via Replit Connectors SDK
+Payments	Stripe (payment links, webhook-ready)
+Accounting	Xero OAuth 2.0 (two-way sync)
+Calendar	Google Calendar OAuth 2.0
+Mobile	Expo / React Native (artifacts/crm-mobile)
+Package Mgmt	pnpm workspaces (monorepo)
+Build	esbuild (API), Vite (frontends)
+Monorepo Structure
+artifacts/
+  api-server/       — Express API (all business logic)
+  roofing-crm/      — Main CRM + Super Admin + Customer Portal (React/Vite)
+  marketing/        — Public marketing site (React/Vite)
+  crm-mobile/       — Mobile app (Expo/React Native)
+  mockup-sandbox/   — UI dev sandbox (Vite, dev only)
+lib/
+  db/               — Drizzle ORM schema + migrations
+  api-spec/         — OpenAPI spec + codegen (Orval → React Query hooks + Zod)
+  api-client-react/ — Generated React Query hooks
+  api-zod/          — Generated Zod schemas
+  replit-auth-web/  — useAuth() hook for frontend session state
+
+Layer 1 — Super Admin (Platform SaaS)
+Super admins (isSuperAdmin = "true" in the users table) see a completely different UI — a platform operations dashboard — instead of any tenant CRM. Detected via /api/platform/me on login; the flag is enforced at API server startup for designated emails.
+
+Super Admin Frontend Pages (/app/admin/...)
+Page	Purpose
+Platform Overview	MRR, active tenants, new signups, health metrics
+Tenants	List of all tenant accounts; edit seats, plan, status, add-ons
+Tenant Detail	Full profile of one tenant — billing, staff, jobs, history
+Pricing & Plans	Edit per-plan pricing, seat costs, add-on prices
+Add-on Manager	Create/edit/deactivate add-ons (Compliance, Fleet, AI, Field Seat, etc.)
+Billing	Stripe subscription status per tenant, revenue breakdown
+Platform Leads	Leads submitted via the marketing "Book a Demo" contact form
+Marketplace Moderation	Approve/reject marketplace listings across all tenants
+Compliance Queue	Review & approve tenant compliance verification submissions
+Trade Categories	Manage the master list of 40+ trade categories shown on signup
+Platform Staff	View all CtrlTrade internal staff accounts
+Support	View and reply to all support tickets from all tenants
+Licences	Licence/feature flag management per tenant
+Super Admin API Routes (/api/platform/...)
+GET  /platform/overview          — KPI dashboard data (MRR, seats, tenants)
+GET  /platform/tenants           — All tenants with seat counts and MRR
+GET  /platform/tenants/:id       — Single tenant detail
+PUT  /platform/tenants/:id       — Update tenant (plan, status, notes)
+GET  /platform/staff             — All platform staff
+GET  /platform/leads             — All demo/sales leads
+POST /platform/leads/import      — Bulk import leads
+GET  /platform/leads/:id/messages
+POST /platform/leads/:id/outreach
+GET  /platform/marketplace-listings
+PUT  /platform/marketplace-listings/:id/status
+GET  /platform/compliance-queue  — Pending verification submissions
+GET  /platform/support/tickets   — All support tickets
+GET/POST /platform/support/tickets/:id/replies
+GET  /platform/tenant-integrations
+GET  /platform/plans             — Plan definitions
+GET  /platform/me                — Current user identity + isSuperAdmin flag
+POST /platform/seed-demo-tenants — Manually trigger demo tenant seeding
+GET  /pricing/admin              — Full pricing config
+PUT  /pricing/admin              — Update plan/seat pricing
+GET  /pricing/admin/add-on-revenue
+PUT  /pricing/tenant/:id/seats   — Update tenant Control + Field seat counts
+GET  /pricing/tenant/:id/add-ons
+PUT  /pricing/tenant/:id/add-ons/:addOnId/activate
+PUT  /pricing/tenant/:id/add-ons/:addOnId/deactivate
+PUT  /pricing/tenant/:id/add-ons/:addOnId/price-override
+GET  /pricing/tenant/:id/summary
+
+Layer 2 — Tenant CRM
+Every registered trades business gets their own isolated workspace. All data is scoped by companyId (resolved from the session via tenantUsersTable → companyTable).
+
+Tenant Frontend Pages (/app/...)
+Sales
+
+/dashboard — KPI cards, revenue pipeline chart, recent activity feed
+/leads — Kanban pipeline (New → Site Visit → Quote Sent → Won/Lost)
+/customers — Customer list + search
+/customers/:id — Customer detail: history, notes, attachments, jobs
+/quotes — Quote list
+/quotes/:id — Quote detail + PDF preview
+Operations
+
+/jobs — Job list with status filters
+/jobs/:id — Job detail: tasks, staff, costs, photos, checklists
+/calendar — Drag-and-drop scheduling calendar
+/scheduling — Dispatch view
+/projects — Multi-job project tracking
+/availability — Staff availability calendar
+Finance
+
+/invoices — Invoice list
+/invoices/:id — Invoice detail + PDF preview
+/purchase-orders — Purchase orders from suppliers
+/reports — Sales and profitability reports
+/advanced-reports — Extended analytics
+Resources
+
+/staff — Staff list, roles, seat types
+/teams — Team groupings
+/materials — Materials catalogue and stock
+/suppliers — Supplier records
+/subcontractors — Subcontractor register
+/vehicles — Fleet register (MOT, service, documents)
+/compliance — Compliance document tracker (certificates, insurance)
+Communications
+
+/emails — Outlook email history (linked to customer records)
+/documents — All uploaded files
+/marketplace — Marketplace: post work, find subcontractors, submit proposals
+Settings
+
+/settings/company — Branding, business details
+/settings/roles — Role-based permission editor
+/settings/seats — Seat management (Control vs Field)
+/settings/integrations — Hub: Xero, Stripe, Outlook, Google Calendar, MyJobQuote, Checkatrade
+/settings/xero-integration — Xero OAuth connect/disconnect + sync logs
+/settings/google-calendar — Google Calendar OAuth + sync settings
+/settings/stripe-integration — Stripe publishable key + webhook secret
+/settings/outlook-integration — Outlook connector status + setup guide
+/settings/myjobquote-integration — MyJobQuote API key
+/settings/checkatrade-integration — Checkatrade API key
+/settings/compliance-verification — Submit compliance docs for CtrlTrade verification badge
+Other
+
+/branches — Multi-branch / multi-location management
+/area-managers — Area manager assignments
+/support — Submit support tickets to CtrlTrade
+Tenant API Routes (/api/...)
+CRM Core
+
+GET/POST         /customers
+GET/PUT/DELETE   /customers/:id
+GET/POST         /customers/:id/notes
+DELETE           /customers/:id/notes/:noteId
+GET/POST         /leads
+GET/PUT/DELETE   /leads/:id
+POST             /leads/:id/convert
+GET              /leads/export
+POST             /leads/import
+GET/POST         /quotes
+GET/PUT/DELETE   /quotes/:id
+POST             /quotes/:id/convert        — quote → job
+GET/POST         /jobs
+GET/PUT/DELETE   /jobs/:id
+GET/PUT          /jobs/:id/checklist
+GET/POST/DELETE  /jobs/:id/staff-costs
+GET/POST/DELETE  /jobs/:id/overheads
+GET/POST/DELETE  /jobs/:id/photos
+GET              /jobs/job-types
+GET/POST         /invoices
+GET/PUT/DELETE   /invoices/:id
+GET/POST         /purchase-orders
+GET/PUT/DELETE   /purchase-orders/:id
+POST             /purchase-orders/scan-receipt
+GET/POST         /projects
+GET/PUT/DELETE   /projects/:id
+
+Resources
+
+GET/POST         /staff
+GET/PUT/DELETE   /staff/:id
+GET/PUT          /staff/:id/permissions
+PUT              /staff/:id/set-password
+GET              /staff/me
+GET              /staff/seat-summary
+GET/POST         /teams + /:id
+GET/POST         /materials + /:id
+GET/POST         /suppliers + /:id
+GET/POST         /subcontractors + /:id
+GET/POST         /vehicles + /:id
+GET              /vehicles/expiring
+GET              /vehicles/by-staff/:staffId
+GET/POST         /roles + /:id
+GET/POST         /branches + /:id
+GET/POST         /calendar/events + /:id
+
+Finance & Reports
+
+GET              /dashboard/summary
+GET              /dashboard/pipeline
+GET              /dashboard/financials
+GET              /dashboard/recent-activity
+GET              /dashboard/notifications-count
+GET              /reports/sales
+GET              /reports/profitability
+
+Compliance
+
+GET/POST         /compliance/documents
+GET              /compliance/documents/:id
+DELETE           /compliance-documents/:id
+GET              /compliance-documents/:id/serve
+POST             /compliance/documents/:id/verify    (super admin only)
+GET              /compliance/alerts
+POST             /compliance/alerts/:id/dismiss
+GET              /compliance/availability
+POST             /compliance/request-verification
+GET              /compliance/verification-status
+POST             /compliance/verify-tenant            (super admin only)
+
+Communications & Documents
+
+GET              /email-logs
+GET              /outlook/emails
+GET              /outlook/email/:messageId
+POST             /outlook/send
+GET/POST         /attachments
+GET/DELETE       /attachments/:id
+POST             /upload
+GET              /upload/:id
+GET              /storage/objects/*path
+GET              /storage/public-objects/*filePath
+POST             /storage/uploads/request-url
+
+Marketplace
+
+GET/POST         /marketplace/listings + /:id
+POST             /marketplace/listings/:id/apply
+GET              /marketplace/contractors
+GET              /marketplace/my-listings
+GET              /marketplace/my-applications
+GET/PUT          /marketplace/applications/:id
+GET/POST         /reviews
+GET              /reviews/aggregate
+
+Integrations
+
+GET              /xero/status
+GET              /xero/connect
+GET              /xero/callback
+POST             /xero/disconnect
+GET/PUT          /xero/settings
+POST             /xero/sync/invoice/:invoiceId
+POST             /xero/sync/customer/:customerId
+POST             /xero/sync/supplier/:supplierId
+POST             /xero/sync/bill/:billId
+POST             /xero/pull/payments
+GET              /xero/sync-logs
+GET              /google-calendar/connect
+GET              /google-calendar/callback
+POST             /google-calendar/disconnect
+GET              /google-calendar/status
+GET              /google-calendar/calendars
+GET/PUT          /google-calendar/settings
+POST             /google-calendar/sync/:jobId
+POST             /google-calendar/sync-all
+DELETE           /google-calendar/sync/:jobId
+GET/PUT/DELETE   /integrations/stripe + /status
+GET              /integrations/outlook/status
+GET/PUT/DELETE   /integrations/myjobquote + /status
+GET/PUT/DELETE   /integrations/checkatrade + /status
+
+Pricing & Seats (Tenant-facing)
+
+GET              /pricing/feed           — public plan+price feed for marketing
+GET              /pricing/my-seats
+GET              /pricing/my-add-ons
+GET              /pricing/my-snapshot
+POST             /pricing/my-add-ons/:slug/request
+
+Layer 3 — Customer Portal
+Each tenant gets a white-labelled customer portal at /portal/:slug — publicly accessible, no CRM login needed. Customers authenticate via magic link or email token.
+
+Route	Purpose
+POST /portal/:slug/auth	Authenticate customer (magic link token)
+GET /portal/:slug/info	Tenant branding for portal chrome
+GET /portal/:slug/quotes	Customer's quotes
+POST /portal/:slug/quotes/:id/accept	Accept a quote online
+POST /portal/:slug/quotes/:id/decline	Decline a quote
+GET /portal/:slug/invoices	Customer's invoices
+POST /portal/:slug/invoices/:id/pay	Pay via Stripe
+GET /portal/:slug/jobs	Live job progress
+POST /portal/:slug/message	Message the team
+POST /portal/:slug/request-job	Request new work
+POST /portal/:slug/review	Leave a review
+GET /portal/:slug/stripe-config	Tenant's Stripe publishable key
+Database — All 50+ Tables
+Platform / Auth
+
+Table	Purpose
+users	All accounts (OIDC + credential); isSuperAdmin, email, profile
+sessions	Server-side encrypted cookie sessions
+password_reset_tokens	Password reset flow tokens
+tenants	One row per registered business (plan, status, Stripe IDs, seat counts)
+tenant_users	Joins users ↔ tenants with role (admin/member)
+add_ons	Master add-on catalogue (Compliance, Fleet, AI, Field Seat, etc.)
+tenant_add_ons	Which add-ons each tenant has activated + quantity + price override
+pricing_config	Platform-wide plan pricing (Control seat price, plan tiers)
+tenant_pricing_snapshots	Point-in-time pricing snapshot per tenant (for MRR calculations)
+trade_categories	Master list of 40+ trade types with emoji + slug
+contact_submissions	Demo requests and contact form submissions
+platform_leads	Sales pipeline for CtrlTrade itself
+platform_lead_messages	Outreach thread per platform lead
+support_tickets	Support tickets from tenants
+support_ticket_replies	Replies on support tickets
+Company / Tenant Config
+
+Table	Purpose
+company	Tenant's company profile (name, logo, branding, onboardingComplete, workType, integration keys)
+branches	Multi-branch / multi-location entries
+roles	Custom permission roles per company
+teams	Team groupings of staff
+CRM Core
+
+Table	Purpose
+customers	Customer records with properties
+customer_notes	Notes on customers (type, privacy, author)
+leads	Sales leads with pipeline stage
+quotes	Quotes with line items (stored as JSON)
+jobs	Job records (status, dates, assignment, costs)
+job_staff	Many-to-many: jobs ↔ staff members
+job_overheads	Overhead cost lines per job
+projects	Multi-job project containers
+invoices	Invoices linked to jobs/customers
+purchase_orders	POs from suppliers
+materials	Materials catalogue
+suppliers	Supplier register
+Resources
+
+Table	Purpose
+staff	Staff profiles (role, seat type, email, active flag)
+subcontractors	External subcontractor records
+vehicles	Fleet register (MOT date, service date, documents)
+Compliance
+
+Table	Purpose
+compliance_documents	Uploaded certs/insurance docs with expiry dates
+compliance_notifications	Expiry alert events
+Communications
+
+Table	Purpose
+email_logs	Outlook email history linked to customers
+attachments	File metadata (stored in object storage)
+activity_log	Audit trail — who did what, when
+calendar_events	Scheduled events / job appointments
+Portal & Reviews
+
+Table	Purpose
+portal_tokens	Customer portal magic-link auth tokens
+reviews	Customer reviews submitted via portal
+Marketplace
+
+Table	Purpose
+marketplace_listings	Work listings posted by tenants
+marketplace_applications	Applications by subcontractors to listings
+Integrations
+
+Table	Purpose
+xero_integration	Encrypted Xero OAuth tokens + tenant mapping + settings
+xero_sync_log	Log of every Xero push/pull operation
+google_calendar_settings	Encrypted Google OAuth tokens + calendar preferences
+Authentication & Authorization
+Login methods:
+
+Replit OIDC — Google/social login via Replit's OpenID Connect proxy. Calls upsertUser() on every login. This is the primary path for Alan and Daniel (super admins) and tenant owners.
+Credential login (POST /api/auth/login) — Email + bcrypt password for hardcoded team accounts (user-alon, user-howlett, user-daniel) and self-service registered tenants.
+Mobile (POST /api/mobile-auth/credential-login) — Same credential check but returns a session cookie for the Expo app.
+Sessions: Server-side, stored in the PostgreSQL sessions table, signed with SESSION_SECRET. Session ID delivered via sid HttpOnly cookie.
+
+Super Admin detection:
+
+isSuperAdmin = "true" column on users table
+Set automatically at startup for known emails (enforced in seedDemoTenants.ts)
+Set on every OIDC login via upsertUser() for SUPER_ADMIN_EMAILS
+Set on every credential login for user-alon / user-daniel
+Tenant resolution:
+
+Every authenticated API request resolves the caller's company via companyResolver.ts
+Chain: session.user.id → tenant_users.tenantId → company.linkedTenantId
+Returns TenantNotFoundError → HTTP 403 if no company found (fail-closed)
+Seat-based access:
+
+Control Seat — Full CRM access (office/admin/management users)
+Field Seat — Limited to: assigned jobs, calendar, customer details, documents, assigned vehicle
+FieldSeatGuard component on frontend; requireControlSeat middleware on sensitive API routes
+Role-based permissions:
+
+Tenant admins can define custom roles with granular permission toggles
+roles table stores JSON permission maps
+staff.permissions stores granted permissions per staff member
+can(key) helper in permissions context checks admin/super-admin bypass first
+Integrations Detail
+Integration	Auth	What It Does
+Xero	OAuth 2.0 (AES-256-GCM encrypted refresh token)	Push invoices, customers, suppliers, POs as bills; pull payment status back
+Stripe	API keys stored per tenant in company table	Invoice payment links; customer portal card payments
+Outlook	Replit Connectors SDK (managed OAuth)	Read/send emails; log email history against customer records
+Google Calendar	OAuth 2.0 (AES-256-GCM encrypted token)	Push job appointments to engineer's Google Calendar; two-way sync settings
+MyJobQuote	API key per tenant	Lead auto-import (coming soon)
+Checkatrade	API key per tenant	Lead auto-import (coming soon)
+Marketing Site (/)
+Separate Vite/React app at artifacts/marketing. Fully public, no auth.
+
+Pages: Home, Features (12 feature areas), Pricing, About, Contact, Privacy Policy, Terms
+
+Key content:
+
+Animated product walkthrough in hero (4 CRM screens, auto-cycles)
+12 feature cards matching the CRM feature set
+Live pricing feed from /api/pricing/feed (so displayed price always matches platform config)
+Integration logos bar (Xero, Stripe, Outlook, Google Calendar, MyJobQuote, Checkatrade)
+"Utility Umbrella AI" and "Utility Umbrella Voice" partner feature callouts
+Mobile App (artifacts/crm-mobile)
+Expo / React Native app serving field engineers. Connects to the same API server (/api/mobile-auth/credential-login, then same session-based API). Covers:
+
+Assigned job list
+GPS directions to site
+Site photos and document capture
+Customer notes and sign-off
+Digital job completion forms
+Push notifications
+Key Business Logic Flows
+Lead → Quote → Job → Invoice pipeline:
+
+Lead created manually or via webhook import
+Lead converted → Quote (POST /leads/:id/convert creates draft quote)
+Quote sent to customer (PDF or portal link)
+Customer accepts via portal or manually marked won → POST /quotes/:id/convert creates a Job
+Job runs; photos, costs, checklists logged
+Job marked complete → Invoice auto-generated
+Invoice sent via portal; customer pays via Stripe or manually marked paid
+Invoice optionally pushed to Xero via sync
+Compliance expiry monitoring:
+
+Nightly job (12-hour interval) scans compliance_documents for items expiring within 60 days
+Creates compliance_notifications entries
+Dashboard shows alert badge; email sent to company
+Multi-tenant billing:
+
+pricing_config holds master seat/plan prices
+On tenant signup, a tenant_pricing_snapshots row is created locking in the price
+MRR = snapshot seat price × seat count + active add-on revenue
+Platform overview aggregates all tenant MRR for platform revenue dashboard
+Infrastructure & Security
+CORS: Allowlist from REPLIT_DOMAINS env in production; open in dev. Fail-closed (403) if no origins configured in prod.
+CSP: No unsafe-inline or unsafe-eval. Strict directives.
+IDOR protection: Every /:id sub-route verifies the record belongs to the caller's companyId before returning or mutating.
+File uploads: Two-pass MIME validation (Content-Type header + magic bytes). Stored in Replit Object Storage.
+Secrets encrypted at rest: Xero and Google OAuth tokens encrypted with AES-256-GCM using ENCRYPTION_KEY (64 hex chars). Server throws on startup if key is missing.
+Readiness check: GET /api/readyz verifies DB connection, sessions table, ENCRYPTION_KEY, and SESSION_SECRET. Returns 503 if any are missing.
+Audit trail: activity_log table records significant data changes with actor, timestamp, and before/after snapshot.
+This is the complete picture — from the public marketing site and customer portal through to the tenant CRM and the super admin platform layer, all running on the same codebase, same API, and same PostgreSQL database.
