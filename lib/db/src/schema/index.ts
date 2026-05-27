@@ -158,6 +158,7 @@ export const membershipsTable = pgTable(
     role: varchar("role", { length: 32 }).notNull(), // owner|admin|manager|staff
     seatType: varchar("seat_type", { length: 16 }).notNull(), // control|field
     status: varchar("status", { length: 16 }).notNull().default("active"), // active|disabled
+    branchId: uuid("branch_id"),
     invitedAt: timestamp("invited_at", { withTimezone: true }),
     disabledAt: timestamp("disabled_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -436,11 +437,13 @@ export const customersTable = pgTable(
     city: text("city"),
     postcode: text("postcode"),
     notes: text("notes"),
+    branchId: uuid("branch_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
   (t) => ({
     tenantIdx: index("customers_tenant_idx").on(t.tenantId),
+    branchIdx: index("customers_branch_idx").on(t.branchId),
   }),
 );
 
@@ -512,6 +515,7 @@ export const jobsTable = pgTable(
     signoffName: text("signoff_name"),
     signoffAt: timestamp("signoff_at", { withTimezone: true }),
     signoffNote: text("signoff_note"),
+    branchId: uuid("branch_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
@@ -522,6 +526,7 @@ export const jobsTable = pgTable(
     assignedIdx: index("jobs_assigned_idx").on(t.assignedUserId),
     contractIdx: index("jobs_contract_idx").on(t.parentContractId),
     uniqNum: unique("jobs_tenant_number_uniq").on(t.tenantId, t.number),
+    branchIdx: index("jobs_branch_idx").on(t.branchId),
   }),
 );
 
@@ -2005,7 +2010,48 @@ export const timesheetEntriesTable = pgTable(
 );
 export type TimesheetEntry = typeof timesheetEntriesTable.$inferSelect;
 
-// ---- Job Checkins (GPS tracking) -------------------------------------------
+// ---- Branches --------------------------------------------------------------
+export const branchesTable = pgTable(
+  "branches",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    addressLine1: text("address_line_1"),
+    city: text("city"),
+    postcode: text("postcode"),
+    phone: text("phone"),
+    region: text("region"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("branches_tenant_idx").on(t.tenantId),
+  }),
+);
+
+export type Branch = typeof branchesTable.$inferSelect;
+
+// ---- Area Managers ---------------------------------------------------------
+export const areaManagersTable = pgTable(
+  "area_managers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+    branchIds: uuid("branch_ids").array().notNull().default(sql`'{}'::uuid[]`),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("area_managers_tenant_idx").on(t.tenantId),
+    uniq: unique("area_managers_tenant_user_uniq").on(t.tenantId, t.userId),
+  }),
+);
+
+export type AreaManager = typeof areaManagersTable.$inferSelect;
+
+// ---- Job Checkins (timesheets) ---------------------------------------------
 export const jobCheckinsTable = pgTable(
   "job_checkins",
   {

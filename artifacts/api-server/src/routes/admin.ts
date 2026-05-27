@@ -17,6 +17,7 @@ import {
   jobsTable,
   invoicesTable,
   leadsTable,
+  branchesTable,
 } from "@workspace/db";
 import {
   GetAdminDashboardResponse,
@@ -337,6 +338,11 @@ router.get("/v1/admin/tenants/:tenantId", async (req, res): Promise<void> => {
     .orderBy(desc(auditLogsTable.createdAt))
     .limit(20);
 
+  const [branchCountRow] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(branchesTable)
+    .where(eq(branchesTable.tenantId, tenant.id));
+
   res.json(
     GetAdminTenantResponse.parse({
       tenant: await serializeTenant(tenant),
@@ -356,6 +362,7 @@ router.get("/v1/admin/tenants/:tenantId", async (req, res): Promise<void> => {
         actor: e.actorLabel ?? null,
         createdAt: e.createdAt.toISOString(),
       })),
+      branchCount: branchCountRow?.count ?? 0,
     }),
   );
 });

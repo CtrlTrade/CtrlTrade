@@ -57,6 +57,8 @@ import { AppVoice } from "@/pages/app/Voice";
 import { AppTimesheets } from "@/pages/app/Timesheets";
 import { AppMaintenanceContracts } from "@/pages/app/MaintenanceContracts";
 import { AppAvailability } from "@/pages/app/Availability";
+import { AppBranches } from "@/pages/app/Branches";
+import { AppAreaManagers } from "@/pages/app/AreaManagers";
 import { PlaceholderPage } from "@/components/PlaceholderPage";
 
 // Admin
@@ -172,6 +174,8 @@ function App() {
                   <Route path="/reports/activity-heatmap">{() => <ActivityHeatmapReport />}</Route>
                   <Route path="/timesheets" component={AppTimesheets} />
                   <Route path="/availability" component={AppAvailability} />
+                  <Route path="/branches" component={AppBranches} />
+                  <Route path="/area-managers" component={AppAreaManagers} />
                   <Route path="/automation" component={AppAutomation} />
                   <Route path="/voice" component={AppVoice} />
                   <Route path="/contracts" component={AppMaintenanceContracts} />

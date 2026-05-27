@@ -5,6 +5,7 @@ import {
   useCreateJob,
   useListCustomers,
   useListTeam,
+  useListBranches,
   getListJobsQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -36,11 +37,13 @@ export function AppJobs() {
   const { data, isLoading } = useListJobs();
   const { data: customers } = useListCustomers();
   const { data: team } = useListTeam();
+  const { data: branches } = useListBranches();
   const qc = useQueryClient();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [customerId, setCustomerId] = useState("");
   const [assignedUserId, setAssignedUserId] = useState<string>("");
+  const [branchFilter, setBranchFilter] = useState<string>("all");
   const create = useCreateJob({
     mutation: {
       onSuccess: () => {
@@ -77,11 +80,30 @@ export function AppJobs() {
     });
   }
 
+  const branchList = branches ?? [];
+  const filteredJobs = (data ?? []).filter((j) =>
+    branchFilter === "all" ? true : (j as any).branchId === branchFilter,
+  );
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold uppercase tracking-tighter">Jobs</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <div className="flex items-center gap-3">
+          {branchList.length > 0 && (
+            <Select value={branchFilter} onValueChange={setBranchFilter}>
+              <SelectTrigger className="w-44 rounded-none text-xs" data-testid="select-branch-filter-jobs">
+                <SelectValue placeholder="All branches" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All branches</SelectItem>
+                {branchList.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-job">
               <Plus className="h-4 w-4 mr-2" /> New Job
@@ -125,7 +147,8 @@ export function AppJobs() {
               </DialogFooter>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <Card className=" border-border shadow-sm">
@@ -133,8 +156,8 @@ export function AppJobs() {
           <CardTitle className="uppercase tracking-tight flex items-center gap-2"><Briefcase className="h-5 w-5" /> All jobs</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? <Skeleton className="h-48" /> : !data || data.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No jobs yet.</p>
+          {isLoading ? <Skeleton className="h-48" /> : filteredJobs.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No jobs{branchFilter !== "all" ? " for this branch" : " yet"}.</p>
           ) : (
             <Table>
               <TableHeader><TableRow>
@@ -144,7 +167,7 @@ export function AppJobs() {
                 <TableHead className="text-right">Value</TableHead>
               </TableRow></TableHeader>
               <TableBody>
-                {data.map((j) => (
+                {filteredJobs.map((j) => (
                   <TableRow key={j.id} data-testid={`row-job-${j.id}`}>
                     <TableCell className="font-mono">
                       <Link href={`/app/jobs/${j.id}`} className="hover:underline">{j.number}</Link>

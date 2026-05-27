@@ -15,4 +15,5 @@ export interface AdminTenantDetail {
   subscription: Subscription;
   owner: SessionUser;
   recentEvents: AuditLogEntry[];
+  branchCount: number;
 }

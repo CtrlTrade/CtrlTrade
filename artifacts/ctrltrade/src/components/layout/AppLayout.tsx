@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useGetSession, useLogout, useStopImpersonation, useListIntegrations } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target, Inbox, Package, Warehouse, Handshake, Zap, Phone, ClipboardList, UserX } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target, Inbox, Package, Warehouse, Handshake, Zap, Phone, ClipboardList, UserX, Building2, UserCog } from "lucide-react";
 import { useGetInboxUnreadCount } from "@workspace/api-client-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,6 +68,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/reports", icon: BarChart, label: "Reports" },
     { href: "/automation", icon: Zap, label: "CtrlWorkflow" },
     { href: "/voice", icon: Phone, label: "CtrlVoice" },
+    { href: "/branches", icon: Building2, label: "Branches" },
+    { href: "/area-managers", icon: UserCog, label: "Area Managers" },
     { href: "/settings", icon: Settings, label: "Settings" },
     { href: "/billing", icon: CreditCard, label: "Billing" },
   ];

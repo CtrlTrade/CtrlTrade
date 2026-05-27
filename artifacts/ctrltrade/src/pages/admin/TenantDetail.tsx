@@ -181,6 +181,10 @@ export function AdminTenantDetail() {
                 {subscription.controlSeats}C / {subscription.fieldSeats}F / {subscription.tills}T
               </span>
             </div>
+            <div className="grid grid-cols-3 gap-2 border-b border-zinc-800 pb-2">
+              <span className="text-zinc-500 uppercase font-bold text-xs">Branches</span>
+              <span className="col-span-2 font-mono text-zinc-300 font-bold">{detail.branchCount}</span>
+            </div>
           </CardContent>
         </Card>
       </div>

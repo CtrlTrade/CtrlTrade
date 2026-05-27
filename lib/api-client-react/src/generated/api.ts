@@ -41,6 +41,8 @@ import type {
   ApprovalDecision,
   ApprovalsResponse,
   ApproveVerificationSubmission200,
+  AreaManager,
+  AreaManagerInput,
   AuditLogEntry,
   AutomationRuleInput,
   AutomationRuleResponse,
@@ -53,6 +55,9 @@ import type {
   BillingSetupIntent,
   BookingWidgetConfig,
   BookingWidgetConfigUpdate,
+  Branch,
+  BranchDetail,
+  BranchInput,
   BranchStockRow,
   Branding,
   BrandingUpdate,
@@ -347,6 +352,740 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
+
+export const getListBranchesUrl = () => {
+
+
+
+
+  return `/api/v1/branches`
+}
+
+/**
+ * @summary List branches for the current tenant.
+ */
+export const listBranches = async ( options?: RequestInit): Promise<Branch[]> => {
+
+  return customFetch<Branch[]>(getListBranchesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListBranchesQueryKey = () => {
+    return [
+    `/api/v1/branches`
+    ] as const;
+    }
+
+
+export const getListBranchesQueryOptions = <TData = Awaited<ReturnType<typeof listBranches>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listBranches>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListBranchesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listBranches>>> = ({ signal }) => listBranches({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listBranches>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListBranchesQueryResult = NonNullable<Awaited<ReturnType<typeof listBranches>>>
+export type ListBranchesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List branches for the current tenant.
+ */
+
+export function useListBranches<TData = Awaited<ReturnType<typeof listBranches>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listBranches>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListBranchesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateBranchUrl = () => {
+
+
+
+
+  return `/api/v1/branches`
+}
+
+/**
+ * @summary Create a new branch.
+ */
+export const createBranch = async (branchInput: BranchInput, options?: RequestInit): Promise<Branch> => {
+
+  return customFetch<Branch>(getCreateBranchUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      branchInput,)
+  }
+);}
+
+
+
+
+export const getCreateBranchMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createBranch>>, TError,{data: BodyType<BranchInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createBranch>>, TError,{data: BodyType<BranchInput>}, TContext> => {
+
+const mutationKey = ['createBranch'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createBranch>>, {data: BodyType<BranchInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createBranch(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateBranchMutationResult = NonNullable<Awaited<ReturnType<typeof createBranch>>>
+    export type CreateBranchMutationBody = BodyType<BranchInput>
+    export type CreateBranchMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Create a new branch.
+ */
+export const useCreateBranch = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createBranch>>, TError,{data: BodyType<BranchInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createBranch>>,
+        TError,
+        {data: BodyType<BranchInput>},
+        TContext
+      > => {
+      return useMutation(getCreateBranchMutationOptions(options));
+    }
+
+export const getGetBranchUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/branches/${id}`
+}
+
+/**
+ * @summary Get a branch with staff, job, and revenue stats.
+ */
+export const getBranch = async (id: string, options?: RequestInit): Promise<BranchDetail> => {
+
+  return customFetch<BranchDetail>(getGetBranchUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBranchQueryKey = (id: string,) => {
+    return [
+    `/api/v1/branches/${id}`
+    ] as const;
+    }
+
+
+export const getGetBranchQueryOptions = <TData = Awaited<ReturnType<typeof getBranch>>, TError = ErrorType<unknown>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBranch>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBranchQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBranch>>> = ({ signal }) => getBranch(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBranch>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetBranchQueryResult = NonNullable<Awaited<ReturnType<typeof getBranch>>>
+export type GetBranchQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get a branch with staff, job, and revenue stats.
+ */
+
+export function useGetBranch<TData = Awaited<ReturnType<typeof getBranch>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBranch>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetBranchQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateBranchUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/branches/${id}`
+}
+
+/**
+ * @summary Update a branch.
+ */
+export const updateBranch = async (id: string,
+    branchInput: BranchInput, options?: RequestInit): Promise<Branch> => {
+
+  return customFetch<Branch>(getUpdateBranchUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      branchInput,)
+  }
+);}
+
+
+
+
+export const getUpdateBranchMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBranch>>, TError,{id: string;data: BodyType<BranchInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateBranch>>, TError,{id: string;data: BodyType<BranchInput>}, TContext> => {
+
+const mutationKey = ['updateBranch'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateBranch>>, {id: string;data: BodyType<BranchInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateBranch(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateBranchMutationResult = NonNullable<Awaited<ReturnType<typeof updateBranch>>>
+    export type UpdateBranchMutationBody = BodyType<BranchInput>
+    export type UpdateBranchMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update a branch.
+ */
+export const useUpdateBranch = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBranch>>, TError,{id: string;data: BodyType<BranchInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateBranch>>,
+        TError,
+        {id: string;data: BodyType<BranchInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateBranchMutationOptions(options));
+    }
+
+export const getDeleteBranchUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/branches/${id}`
+}
+
+/**
+ * @summary Delete a branch.
+ */
+export const deleteBranch = async (id: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteBranchUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteBranchMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteBranch>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteBranch>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteBranch'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteBranch>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteBranch(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteBranchMutationResult = NonNullable<Awaited<ReturnType<typeof deleteBranch>>>
+
+    export type DeleteBranchMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete a branch.
+ */
+export const useDeleteBranch = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteBranch>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteBranch>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getDeleteBranchMutationOptions(options));
+    }
+
+export const getListAreaManagersUrl = () => {
+
+
+
+
+  return `/api/v1/area-managers`
+}
+
+/**
+ * @summary List area managers for the current tenant.
+ */
+export const listAreaManagers = async ( options?: RequestInit): Promise<AreaManager[]> => {
+
+  return customFetch<AreaManager[]>(getListAreaManagersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAreaManagersQueryKey = () => {
+    return [
+    `/api/v1/area-managers`
+    ] as const;
+    }
+
+
+export const getListAreaManagersQueryOptions = <TData = Awaited<ReturnType<typeof listAreaManagers>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAreaManagers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAreaManagersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAreaManagers>>> = ({ signal }) => listAreaManagers({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAreaManagers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAreaManagersQueryResult = NonNullable<Awaited<ReturnType<typeof listAreaManagers>>>
+export type ListAreaManagersQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List area managers for the current tenant.
+ */
+
+export function useListAreaManagers<TData = Awaited<ReturnType<typeof listAreaManagers>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAreaManagers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAreaManagersQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateAreaManagerUrl = () => {
+
+
+
+
+  return `/api/v1/area-managers`
+}
+
+/**
+ * @summary Assign a staff member as an area manager.
+ */
+export const createAreaManager = async (areaManagerInput: AreaManagerInput, options?: RequestInit): Promise<AreaManager> => {
+
+  return customFetch<AreaManager>(getCreateAreaManagerUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      areaManagerInput,)
+  }
+);}
+
+
+
+
+export const getCreateAreaManagerMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAreaManager>>, TError,{data: BodyType<AreaManagerInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAreaManager>>, TError,{data: BodyType<AreaManagerInput>}, TContext> => {
+
+const mutationKey = ['createAreaManager'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAreaManager>>, {data: BodyType<AreaManagerInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAreaManager(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAreaManagerMutationResult = NonNullable<Awaited<ReturnType<typeof createAreaManager>>>
+    export type CreateAreaManagerMutationBody = BodyType<AreaManagerInput>
+    export type CreateAreaManagerMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Assign a staff member as an area manager.
+ */
+export const useCreateAreaManager = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAreaManager>>, TError,{data: BodyType<AreaManagerInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createAreaManager>>,
+        TError,
+        {data: BodyType<AreaManagerInput>},
+        TContext
+      > => {
+      return useMutation(getCreateAreaManagerMutationOptions(options));
+    }
+
+export const getGetAreaManagerUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/area-managers/${id}`
+}
+
+/**
+ * @summary Get a specific area manager.
+ */
+export const getAreaManager = async (id: string, options?: RequestInit): Promise<AreaManager> => {
+
+  return customFetch<AreaManager>(getGetAreaManagerUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAreaManagerQueryKey = (id: string,) => {
+    return [
+    `/api/v1/area-managers/${id}`
+    ] as const;
+    }
+
+
+export const getGetAreaManagerQueryOptions = <TData = Awaited<ReturnType<typeof getAreaManager>>, TError = ErrorType<unknown>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAreaManager>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAreaManagerQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAreaManager>>> = ({ signal }) => getAreaManager(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAreaManager>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAreaManagerQueryResult = NonNullable<Awaited<ReturnType<typeof getAreaManager>>>
+export type GetAreaManagerQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get a specific area manager.
+ */
+
+export function useGetAreaManager<TData = Awaited<ReturnType<typeof getAreaManager>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAreaManager>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAreaManagerQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateAreaManagerUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/area-managers/${id}`
+}
+
+/**
+ * @summary Update an area manager's branch assignments.
+ */
+export const updateAreaManager = async (id: string,
+    areaManagerInput: AreaManagerInput, options?: RequestInit): Promise<AreaManager> => {
+
+  return customFetch<AreaManager>(getUpdateAreaManagerUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      areaManagerInput,)
+  }
+);}
+
+
+
+
+export const getUpdateAreaManagerMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAreaManager>>, TError,{id: string;data: BodyType<AreaManagerInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAreaManager>>, TError,{id: string;data: BodyType<AreaManagerInput>}, TContext> => {
+
+const mutationKey = ['updateAreaManager'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAreaManager>>, {id: string;data: BodyType<AreaManagerInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAreaManager(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAreaManagerMutationResult = NonNullable<Awaited<ReturnType<typeof updateAreaManager>>>
+    export type UpdateAreaManagerMutationBody = BodyType<AreaManagerInput>
+    export type UpdateAreaManagerMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update an area manager's branch assignments.
+ */
+export const useUpdateAreaManager = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAreaManager>>, TError,{id: string;data: BodyType<AreaManagerInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAreaManager>>,
+        TError,
+        {id: string;data: BodyType<AreaManagerInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateAreaManagerMutationOptions(options));
+    }
+
+export const getDeleteAreaManagerUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/area-managers/${id}`
+}
+
+/**
+ * @summary Remove area manager assignment.
+ */
+export const deleteAreaManager = async (id: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteAreaManagerUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteAreaManagerMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAreaManager>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAreaManager>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteAreaManager'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAreaManager>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAreaManager(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAreaManagerMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAreaManager>>>
+
+    export type DeleteAreaManagerMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Remove area manager assignment.
+ */
+export const useDeleteAreaManager = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAreaManager>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAreaManager>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getDeleteAreaManagerMutationOptions(options));
+    }
 
 export const getListIntegrationProvidersUrl = () => {
 

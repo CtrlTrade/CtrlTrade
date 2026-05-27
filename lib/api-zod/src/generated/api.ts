@@ -9,6 +9,198 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary List branches for the current tenant.
+ */
+export const ListBranchesResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "region": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListBranchesResponse = zod.array(ListBranchesResponseItem)
+
+
+/**
+ * @summary Create a new branch.
+ */
+
+
+
+export const CreateBranchBody = zod.object({
+  "name": zod.string().min(1),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "region": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get a branch with staff, job, and revenue stats.
+ */
+export const GetBranchParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetBranchResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "region": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}).and(zod.object({
+  "stats": zod.object({
+  "totalJobs": zod.number(),
+  "activeJobs": zod.number(),
+  "revenuePaidPence": zod.number(),
+  "staffCount": zod.number()
+}),
+  "staff": zod.array(zod.object({
+  "userId": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "role": zod.string(),
+  "seatType": zod.string()
+}))
+}))
+
+
+/**
+ * @summary Update a branch.
+ */
+export const UpdateBranchParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+
+
+
+export const UpdateBranchBody = zod.object({
+  "name": zod.string().min(1),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "region": zod.string().nullish()
+})
+
+export const UpdateBranchResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "region": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a branch.
+ */
+export const DeleteBranchParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+
+/**
+ * @summary List area managers for the current tenant.
+ */
+export const ListAreaManagersResponseItem = zod.object({
+  "id": zod.string(),
+  "userId": zod.string(),
+  "userName": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "branchIds": zod.array(zod.string()),
+  "branches": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+})),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListAreaManagersResponse = zod.array(ListAreaManagersResponseItem)
+
+
+/**
+ * @summary Assign a staff member as an area manager.
+ */
+export const CreateAreaManagerBody = zod.object({
+  "userId": zod.string(),
+  "branchIds": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Get a specific area manager.
+ */
+export const GetAreaManagerParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetAreaManagerResponse = zod.object({
+  "id": zod.string(),
+  "userId": zod.string(),
+  "userName": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "branchIds": zod.array(zod.string()),
+  "branches": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+})),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Update an area manager's branch assignments.
+ */
+export const UpdateAreaManagerParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const UpdateAreaManagerBody = zod.object({
+  "userId": zod.string(),
+  "branchIds": zod.array(zod.string())
+})
+
+export const UpdateAreaManagerResponse = zod.object({
+  "id": zod.string(),
+  "userId": zod.string(),
+  "userName": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "branchIds": zod.array(zod.string()),
+  "branches": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+})),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Remove area manager assignment.
+ */
+export const DeleteAreaManagerParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+
+/**
  * @summary List all available integration providers and their availability.
  */
 export const ListIntegrationProvidersResponseItem = zod.object({
@@ -1528,7 +1720,8 @@ export const GetAdminTenantResponse = zod.object({
   "message": zod.string(),
   "actor": zod.string().nullish(),
   "createdAt": zod.coerce.date()
-}))
+})),
+  "branchCount": zod.number()
 })
 
 

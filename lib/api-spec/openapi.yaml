@@ -28,7 +28,163 @@ tags:
   - name: pos
   - name: invoices
   - name: integrations
+  - name: branches
+  - name: area-managers
 paths:
+  /v1/branches:
+    get:
+      operationId: listBranches
+      tags: [branches]
+      summary: List branches for the current tenant.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Branch" }
+    post:
+      operationId: createBranch
+      tags: [branches]
+      summary: Create a new branch.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BranchInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Branch" }
+
+  /v1/branches/{id}:
+    get:
+      operationId: getBranch
+      tags: [branches]
+      summary: Get a branch with staff, job, and revenue stats.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BranchDetail" }
+    put:
+      operationId: updateBranch
+      tags: [branches]
+      summary: Update a branch.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BranchInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Branch" }
+    delete:
+      operationId: deleteBranch
+      tags: [branches]
+      summary: Delete a branch.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: No content }
+
+  /v1/area-managers:
+    get:
+      operationId: listAreaManagers
+      tags: [area-managers]
+      summary: List area managers for the current tenant.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AreaManager" }
+    post:
+      operationId: createAreaManager
+      tags: [area-managers]
+      summary: Assign a staff member as an area manager.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AreaManagerInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AreaManager" }
+
+  /v1/area-managers/{id}:
+    get:
+      operationId: getAreaManager
+      tags: [area-managers]
+      summary: Get a specific area manager.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AreaManager" }
+    put:
+      operationId: updateAreaManager
+      tags: [area-managers]
+      summary: Update an area manager's branch assignments.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AreaManagerInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AreaManager" }
+    delete:
+      operationId: deleteAreaManager
+      tags: [area-managers]
+      summary: Remove area manager assignment.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: No content }
+
   /v1/integrations/providers:
     get:
       operationId: listIntegrationProviders
@@ -5892,7 +6048,7 @@ components:
 
     AdminTenantDetail:
       type: object
-      required: [tenant, subscription, owner, recentEvents]
+      required: [tenant, subscription, owner, recentEvents, branchCount]
       properties:
         tenant: { $ref: "#/components/schemas/Tenant" }
         subscription: { $ref: "#/components/schemas/Subscription" }
@@ -5900,6 +6056,7 @@ components:
         recentEvents:
           type: array
           items: { $ref: "#/components/schemas/AuditLogEntry" }
+        branchCount: { type: integer }
 
     AuditLogEntry:
       type: object
@@ -9072,3 +9229,87 @@ components:
       required: [reason]
       properties:
         reason: { type: string, minLength: 1 }
+
+    Branch:
+      type: object
+      required: [id, name, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+        phone: { type: ["string", "null"] }
+        region: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    BranchDetail:
+      allOf:
+        - $ref: "#/components/schemas/Branch"
+        - type: object
+          required: [stats, staff]
+          properties:
+            stats:
+              type: object
+              required: [totalJobs, activeJobs, revenuePaidPence, staffCount]
+              properties:
+                totalJobs: { type: integer }
+                activeJobs: { type: integer }
+                revenuePaidPence: { type: integer }
+                staffCount: { type: integer }
+            staff:
+              type: array
+              items:
+                type: object
+                required: [userId, name, email, role, seatType]
+                properties:
+                  userId: { type: string }
+                  name: { type: string }
+                  email: { type: string }
+                  role: { type: string }
+                  seatType: { type: string }
+
+    BranchInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+        phone: { type: ["string", "null"] }
+        region: { type: ["string", "null"] }
+
+    AreaManagerBranch:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string }
+        name: { type: string }
+
+    AreaManager:
+      type: object
+      required: [id, userId, branchIds, branches, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        userId: { type: string }
+        userName: { type: ["string", "null"] }
+        userEmail: { type: ["string", "null"] }
+        branchIds:
+          type: array
+          items: { type: string }
+        branches:
+          type: array
+          items: { $ref: "#/components/schemas/AreaManagerBranch" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    AreaManagerInput:
+      type: object
+      required: [userId, branchIds]
+      properties:
+        userId: { type: string }
+        branchIds:
+          type: array
+          items: { type: string }

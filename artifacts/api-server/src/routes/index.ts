@@ -44,6 +44,8 @@ import staffAvailabilityRouter from "./staffAvailability";
 import twoFactorRouter from "./twoFactor";
 import adminComplianceRouter from "./adminCompliance";
 import bookingWidgetRouter from "./bookingWidget";
+import branchesRouter from "./branches";
+import areaManagersRouter from "./areaManagers";
 
 const router: IRouter = Router();
 
@@ -99,5 +101,7 @@ router.use(contractsRouter);
 router.use(staffAvailabilityRouter);
 router.use(twoFactorRouter);
 router.use(adminComplianceRouter);
+router.use(branchesRouter);
+router.use(areaManagersRouter);
 
 export default router;

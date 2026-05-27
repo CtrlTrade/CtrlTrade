@@ -8,28 +8,24 @@ import {
   usersTable,
   membershipsTable,
 } from "@workspace/db";
-import { requireTenant } from "../middlewares/auth";
 import type { JobCheckin } from "@workspace/db";
+import { requireTenant } from "../middlewares/auth";
+import {
+  JobCheckinBody,
+  JobCheckoutBody,
+  CreateTimesheetEntryBody,
+  UpdateTimesheetEntryBody,
+  RejectTimesheetEntryBody,
+  ListTimesheetsQueryParams,
+} from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
-const CheckinInput = z.object({
-  lat: z.string().nullable().optional(),
-  lng: z.string().nullable().optional(),
-  notes: z.string().nullable().optional(),
-});
-
-const CheckoutInput = z.object({
-  lat: z.string().nullable().optional(),
-  lng: z.string().nullable().optional(),
-  notes: z.string().nullable().optional(),
-});
-
-const TimesheetsQuery = z.object({
-  userId: z.string().uuid().optional(),
-  from: z.string().optional(),
-  to: z.string().optional(),
-});
+const CheckinInput = JobCheckinBody;
+const CheckoutInput = JobCheckoutBody;
+const CreateEntryInput = CreateTimesheetEntryBody;
+const UpdateEntryInput = UpdateTimesheetEntryBody;
+const RejectEntryInput = RejectTimesheetEntryBody;
 
 function serializeCheckin(
   c: JobCheckin,

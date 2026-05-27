@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useListCustomers, useCreateCustomer, getListCustomersQueryKey } from "@workspace/api-client-react";
+import { useListCustomers, useCreateCustomer, useListBranches, getListCustomersQueryKey } from "@workspace/api-client-react";
 import { FileAttachments } from "@/components/FileAttachments";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Users as UsersIcon } from "lucide-react";
@@ -15,11 +16,17 @@ import { useToast } from "@/hooks/use-toast";
 
 export function AppCustomers() {
   const { data, isLoading } = useListCustomers();
+  const { data: branches } = useListBranches();
   const qc = useQueryClient();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
-  const selectedCustomer = data?.find((c) => c.id === selectedCustomerId) ?? null;
+  const [branchFilter, setBranchFilter] = useState<string>("all");
+  const branchList = branches ?? [];
+  const filteredCustomers = (data ?? []).filter((c) =>
+    branchFilter === "all" ? true : (c as any).branchId === branchFilter,
+  );
+  const selectedCustomer = filteredCustomers.find((c) => c.id === selectedCustomerId) ?? null;
   const create = useCreateCustomer({
     mutation: {
       onSuccess: () => {
@@ -51,6 +58,20 @@ export function AppCustomers() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold uppercase tracking-tighter">Customers</h1>
+        <div className="flex items-center gap-3">
+          {branchList.length > 0 && (
+            <Select value={branchFilter} onValueChange={setBranchFilter}>
+              <SelectTrigger className="w-44 rounded-none text-xs" data-testid="select-branch-filter-customers">
+                <SelectValue placeholder="All branches" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All branches</SelectItem>
+                {branchList.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-customer">
@@ -80,7 +101,8 @@ export function AppCustomers() {
               </DialogFooter>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <Card className=" border-border shadow-sm">
@@ -92,8 +114,8 @@ export function AppCustomers() {
         <CardContent>
           {isLoading ? (
             <Skeleton className="h-48" />
-          ) : !data || data.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No customers yet. Add your first one.</p>
+          ) : filteredCustomers.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No customers{branchFilter !== "all" ? " for this branch" : " yet. Add your first one."}.</p>
           ) : (
             <Table>
               <TableHeader>
@@ -103,7 +125,7 @@ export function AppCustomers() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.map((c) => (
+                {filteredCustomers.map((c) => (
                   <TableRow
                     key={c.id}
                     data-testid={`row-customer-${c.id}`}

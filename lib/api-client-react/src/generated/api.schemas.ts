@@ -723,6 +723,7 @@ export interface AdminTenantDetail {
   subscription: Subscription;
   owner: SessionUser;
   recentEvents: AuditLogEntry[];
+  branchCount: number;
 }
 
 export interface TeamMember {
@@ -4027,6 +4028,81 @@ export interface UpdateTimesheetEntryInput {
 export interface RejectTimesheetEntryInput {
   /** @minLength 1 */
   reason: string;
+}
+
+export interface Branch {
+  id: string;
+  name: string;
+  /** @nullable */
+  addressLine1?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  postcode?: string | null;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  region?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type BranchDetailStats = {
+  totalJobs: number;
+  activeJobs: number;
+  revenuePaidPence: number;
+  staffCount: number;
+};
+
+export type BranchDetailStaffItem = {
+  userId: string;
+  name: string;
+  email: string;
+  role: string;
+  seatType: string;
+};
+
+export type BranchDetail = Branch & {
+  stats: BranchDetailStats;
+  staff: BranchDetailStaffItem[];
+};
+
+export interface BranchInput {
+  /** @minLength 1 */
+  name: string;
+  /** @nullable */
+  addressLine1?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  postcode?: string | null;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  region?: string | null;
+}
+
+export interface AreaManagerBranch {
+  id: string;
+  name: string;
+}
+
+export interface AreaManager {
+  id: string;
+  userId: string;
+  /** @nullable */
+  userName?: string | null;
+  /** @nullable */
+  userEmail?: string | null;
+  branchIds: string[];
+  branches: AreaManagerBranch[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AreaManagerInput {
+  userId: string;
+  branchIds: string[];
 }
 
 export type ConnectIntegration200 = {
