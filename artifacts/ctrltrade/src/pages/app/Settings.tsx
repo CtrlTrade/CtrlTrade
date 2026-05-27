@@ -8,7 +8,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Copy } from "lucide-react";
+import { Copy, Palette } from "lucide-react";
+import { Link } from "wouter";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AppStaff } from "./Staff";
 
@@ -124,20 +125,18 @@ export function AppSettings() {
         <Card className="rounded-none border-border shadow-sm">
           <CardHeader>
             <CardTitle className="uppercase tracking-tight">Brand Identity</CardTitle>
-            <CardDescription>Customize how CTRLTRADE® looks to your customers.</CardDescription>
+            <CardDescription>
+              Logos, colours, fonts and document templates are managed in the dedicated branding editor — applied across CRM, customer portal, PDFs, emails and POS.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Brand Color (Hex)</Label>
-              <div className="flex gap-2">
-                <Input value={formData.brandColor} onChange={e => setFormData({...formData, brandColor: e.target.value})} placeholder="#FF5500" className="rounded-none font-mono" />
-                <div className="w-10 h-10 border border-border" style={{ backgroundColor: formData.brandColor || 'var(--primary)' }} />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Logo URL</Label>
-              <Input value={formData.logoUrl} onChange={e => setFormData({...formData, logoUrl: e.target.value})} placeholder="https://..." className="rounded-none" />
-            </div>
+          <CardContent>
+            <Link
+              href="/app/settings/branding"
+              className="inline-flex items-center gap-2 rounded-none uppercase tracking-wider font-bold bg-primary text-primary-foreground px-4 py-2 text-sm hover:opacity-90"
+              data-testid="link-branding-editor"
+            >
+              <Palette className="h-4 w-4" /> Open branding editor
+            </Link>
           </CardContent>
         </Card>
 

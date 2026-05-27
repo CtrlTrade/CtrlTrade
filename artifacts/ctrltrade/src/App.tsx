@@ -21,6 +21,7 @@ import { ForgotPassword, ResetPassword } from "@/pages/auth/PasswordReset";
 // App
 import { AppDashboard } from "@/pages/app/Dashboard";
 import { AppSettings } from "@/pages/app/Settings";
+import { AppBrandingEditor } from "@/pages/app/BrandingEditor";
 import { AppBilling } from "@/pages/app/Billing";
 import { AppCustomers } from "@/pages/app/Customers";
 import { AppQuotes } from "@/pages/app/Quotes";
@@ -80,6 +81,7 @@ function App() {
                 <Switch>
                   <Route path="/" component={AppDashboard} />
                   <Route path="/settings" component={AppSettings} />
+                  <Route path="/settings/branding" component={AppBrandingEditor} />
                   <Route path="/billing" component={AppBilling} />
                   <Route path="/customers" component={AppCustomers} />
                   <Route path="/leads" component={AppLeads} />

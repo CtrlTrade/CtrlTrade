@@ -39,6 +39,19 @@ export const tenantsTable = pgTable(
     companyNumber: text("company_number"),
     brandColor: varchar("brand_color", { length: 16 }),
     logoUrl: text("logo_url"),
+    logoPortalUrl: text("logo_portal_url"),
+    logoPosUrl: text("logo_pos_url"),
+    faviconUrl: text("favicon_url"),
+    primaryColor: varchar("primary_color", { length: 16 }),
+    accentColor: varchar("accent_color", { length: 16 }),
+    surfaceColor: varchar("surface_color", { length: 16 }),
+    fontFamily: varchar("font_family", { length: 64 }),
+    brandTemplates: jsonb("brand_templates").$type<{
+      invoice?: { header?: string; footer?: string; notes?: string };
+      quote?: { header?: string; footer?: string; notes?: string };
+      email?: { signature?: string; header?: string };
+      posReceipt?: { header?: string; footer?: string };
+    }>(),
     leadCaptureAllowedOrigins: text("lead_capture_allowed_origins").array().notNull().default(sql`'{}'::text[]`),
     vatRatePct: integer("vat_rate_pct").notNull().default(20),
     invoiceNumberSeq: integer("invoice_number_seq").notNull().default(0),
@@ -256,9 +269,22 @@ export const filesTable = pgTable("files", {
   tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
   url: text("url").notNull(),
   kind: varchar("kind", { length: 32 }).notNull(),
+  parentKind: varchar("parent_kind", { length: 32 }),
+  parentId: uuid("parent_id"),
+  name: text("name"),
+  label: text("label"),
+  mimeType: varchar("mime_type", { length: 128 }),
+  sizeBytes: integer("size_bytes"),
+  uploadedByUserId: uuid("uploaded_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+  uploadedByLabel: text("uploaded_by_label"),
   meta: jsonb("meta"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-}, (t) => ({ tenantIdx: index("files_tenant_idx").on(t.tenantId) }));
+}, (t) => ({
+  tenantIdx: index("files_tenant_idx").on(t.tenantId),
+  parentIdx: index("files_parent_idx").on(t.tenantId, t.parentKind, t.parentId),
+}));
+
+export type FileRow = typeof filesTable.$inferSelect;
 
 // ============================================================================
 // Layer 2 — tenant workspace domain tables

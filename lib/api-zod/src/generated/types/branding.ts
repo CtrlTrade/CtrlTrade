@@ -7,25 +7,8 @@
  */
 import type { BrandTemplates } from './brandTemplates';
 
-export interface Tenant {
-  id: string;
-  name: string;
-  slug: string;
-  /** trial | active | past_due | paused | cancelled */
-  status: string;
-  createdAt: Date;
-  /** @nullable */
-  country?: string | null;
-  /** @nullable */
-  phone?: string | null;
-  /** @nullable */
-  addressLine1?: string | null;
-  /** @nullable */
-  city?: string | null;
-  /** @nullable */
-  postcode?: string | null;
-  /** @nullable */
-  brandColor?: string | null;
+export interface Branding {
+  tenantId: string;
   /** @nullable */
   logoUrl?: string | null;
   /** @nullable */
@@ -41,8 +24,8 @@ export interface Tenant {
   /** @nullable */
   surfaceColor?: string | null;
   /** @nullable */
+  brandColor?: string | null;
+  /** @nullable */
   fontFamily?: string | null;
   brandTemplates?: null | BrandTemplates;
-  leadCaptureAllowedOrigins?: string[];
-  tradeCategorySlugs?: string[];
 }

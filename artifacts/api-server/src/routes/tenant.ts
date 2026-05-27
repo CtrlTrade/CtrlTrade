@@ -35,7 +35,11 @@ router.patch("/v1/tenant", requireTenant, async (req, res): Promise<void> => {
   }
   const tenantId = req.auth!.tenant!.id;
   const updates: Record<string, unknown> = {};
-  for (const k of ["name", "country", "phone", "addressLine1", "city", "postcode", "brandColor", "logoUrl"] as const) {
+  for (const k of [
+    "name", "country", "phone", "addressLine1", "city", "postcode",
+    "brandColor", "logoUrl", "logoPortalUrl", "logoPosUrl", "faviconUrl",
+    "primaryColor", "accentColor", "surfaceColor", "fontFamily", "brandTemplates",
+  ] as const) {
     if (parsed.data[k] !== undefined) updates[k] = parsed.data[k];
   }
   if (parsed.data.leadCaptureAllowedOrigins !== undefined) {

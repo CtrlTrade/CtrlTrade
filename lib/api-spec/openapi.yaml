@@ -130,6 +130,107 @@ paths:
               schema:
                 $ref: "#/components/schemas/PosReceiptReceipt"
 
+  /storage/uploads/request-url:
+    post:
+      operationId: requestUploadUrl
+      tags: [storage]
+      summary: Request a presigned URL for file upload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UploadUrlRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UploadUrlResponse" }
+
+  /v1/files:
+    get:
+      operationId: listFiles
+      tags: [files]
+      parameters:
+        - in: query
+          name: parentKind
+          required: true
+          schema: { type: string }
+        - in: query
+          name: parentId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/FileMeta" }
+    post:
+      operationId: createFile
+      tags: [files]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FileInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FileMeta" }
+
+  /v1/files/{fileId}:
+    delete:
+      operationId: deleteFile
+      tags: [files]
+      parameters:
+        - in: path
+          name: fileId
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: No Content }
+
+  /v1/branding:
+    get:
+      operationId: getBranding
+      tags: [branding]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Branding" }
+    patch:
+      operationId: updateBranding
+      tags: [branding]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BrandingUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Branding" }
+
+  /v1/pos/branding:
+    get:
+      operationId: getPosBranding
+      tags: [pos]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Branding" }
+
   /healthz:
     get:
       operationId: healthCheck
@@ -2269,6 +2370,17 @@ components:
         postcode: { type: ["string", "null"] }
         brandColor: { type: ["string", "null"] }
         logoUrl: { type: ["string", "null"] }
+        logoPortalUrl: { type: ["string", "null"] }
+        logoPosUrl: { type: ["string", "null"] }
+        faviconUrl: { type: ["string", "null"] }
+        primaryColor: { type: ["string", "null"] }
+        accentColor: { type: ["string", "null"] }
+        surfaceColor: { type: ["string", "null"] }
+        fontFamily: { type: ["string", "null"] }
+        brandTemplates:
+          anyOf:
+            - type: "null"
+            - $ref: "#/components/schemas/BrandTemplates"
         leadCaptureAllowedOrigins:
           type: array
           items: { type: string }
@@ -2287,12 +2399,132 @@ components:
         postcode: { type: string }
         brandColor: { type: string }
         logoUrl: { type: string }
+        logoPortalUrl: { type: string }
+        logoPosUrl: { type: string }
+        faviconUrl: { type: string }
+        primaryColor: { type: string }
+        accentColor: { type: string }
+        surfaceColor: { type: string }
+        fontFamily: { type: string }
+        brandTemplates: { $ref: "#/components/schemas/BrandTemplates" }
         leadCaptureAllowedOrigins:
           type: array
           items: { type: string }
         tradeCategorySlugs:
           type: array
           items: { type: string }
+
+    BrandTemplates:
+      type: object
+      properties:
+        invoice:
+          type: object
+          properties:
+            header: { type: string }
+            footer: { type: string }
+            notes: { type: string }
+        quote:
+          type: object
+          properties:
+            header: { type: string }
+            footer: { type: string }
+            notes: { type: string }
+        email:
+          type: object
+          properties:
+            header: { type: string }
+            signature: { type: string }
+        posReceipt:
+          type: object
+          properties:
+            header: { type: string }
+            footer: { type: string }
+
+    Branding:
+      type: object
+      required: [tenantId]
+      properties:
+        tenantId: { type: string }
+        logoUrl: { type: ["string", "null"] }
+        logoPortalUrl: { type: ["string", "null"] }
+        logoPosUrl: { type: ["string", "null"] }
+        faviconUrl: { type: ["string", "null"] }
+        primaryColor: { type: ["string", "null"] }
+        accentColor: { type: ["string", "null"] }
+        surfaceColor: { type: ["string", "null"] }
+        brandColor: { type: ["string", "null"] }
+        fontFamily: { type: ["string", "null"] }
+        brandTemplates:
+          anyOf:
+            - type: "null"
+            - $ref: "#/components/schemas/BrandTemplates"
+
+    BrandingUpdate:
+      type: object
+      properties:
+        logoUrl: { type: ["string", "null"] }
+        logoPortalUrl: { type: ["string", "null"] }
+        logoPosUrl: { type: ["string", "null"] }
+        faviconUrl: { type: ["string", "null"] }
+        primaryColor: { type: ["string", "null"] }
+        accentColor: { type: ["string", "null"] }
+        surfaceColor: { type: ["string", "null"] }
+        brandColor: { type: ["string", "null"] }
+        fontFamily: { type: ["string", "null"] }
+        brandTemplates: { $ref: "#/components/schemas/BrandTemplates" }
+
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string }
+        size: { type: integer }
+        contentType: { type: string }
+
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL: { type: string }
+        objectPath: { type: string }
+        metadata:
+          type: object
+          properties:
+            name: { type: string }
+            size: { type: integer }
+            contentType: { type: string }
+
+    FileInput:
+      type: object
+      required: [url, kind]
+      properties:
+        url: { type: string, minLength: 1 }
+        kind: { type: string, minLength: 1 }
+        parentKind: { type: string }
+        parentId: { type: string }
+        name: { type: string }
+        label: { type: string }
+        mimeType: { type: string }
+        sizeBytes: { type: integer }
+
+    FileMeta:
+      type: object
+      required: [id, tenantId, url, kind, createdAt]
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        url: { type: string }
+        kind: { type: string }
+        parentKind: { type: ["string", "null"] }
+        parentId: { type: ["string", "null"] }
+        name: { type: ["string", "null"] }
+        label: { type: ["string", "null"] }
+        mimeType: { type: ["string", "null"] }
+        sizeBytes: { type: ["integer", "null"] }
+        uploadedByUserId: { type: ["string", "null"] }
+        uploadedByLabel: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
 
     CancellationRequest:
       type: object

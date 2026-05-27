@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useListCustomers, useCreateCustomer, getListCustomersQueryKey } from "@workspace/api-client-react";
+import { FileAttachments } from "@/components/FileAttachments";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +18,8 @@ export function AppCustomers() {
   const qc = useQueryClient();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const selectedCustomer = data?.find((c) => c.id === selectedCustomerId) ?? null;
   const create = useCreateCustomer({
     mutation: {
       onSuccess: () => {
@@ -101,7 +104,12 @@ export function AppCustomers() {
               </TableHeader>
               <TableBody>
                 {data.map((c) => (
-                  <TableRow key={c.id} data-testid={`row-customer-${c.id}`}>
+                  <TableRow
+                    key={c.id}
+                    data-testid={`row-customer-${c.id}`}
+                    className="cursor-pointer hover:bg-muted/30"
+                    onClick={() => setSelectedCustomerId(selectedCustomerId === c.id ? null : c.id)}
+                  >
                     <TableCell className="font-medium">{c.name}</TableCell>
                     <TableCell>{c.email ?? "—"}</TableCell>
                     <TableCell>{c.phone ?? "—"}</TableCell>
@@ -113,6 +121,15 @@ export function AppCustomers() {
           )}
         </CardContent>
       </Card>
+
+      {selectedCustomer && (
+        <FileAttachments
+          parentKind="customer"
+          parentId={selectedCustomer.id}
+          kind="customer_file"
+          title={`Files — ${selectedCustomer.name}`}
+        />
+      )}
     </div>
   );
 }

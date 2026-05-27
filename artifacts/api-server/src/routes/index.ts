@@ -20,6 +20,9 @@ import invoiceTemplatesRouter from "./invoiceTemplates";
 import leadsRouter from "./leads";
 import portalRouter from "./portal";
 import invitationsRouter from "./invitations";
+import storageRouter from "./storage";
+import filesRouter from "./files";
+import brandingRouter from "./branding";
 
 const router: IRouter = Router();
 
@@ -51,5 +54,8 @@ router.use(invoicesRouter);
 router.use(invoiceTemplatesRouter);
 router.use(portalRouter);
 router.use(invitationsRouter);
+router.use(storageRouter);
+router.use(filesRouter);
+router.use(brandingRouter);
 
 export default router;

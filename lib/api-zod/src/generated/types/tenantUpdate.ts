@@ -5,6 +5,7 @@
  * CtrlTrade SaaS Portal API
  * OpenAPI spec version: 0.1.0
  */
+import type { BrandTemplates } from './brandTemplates';
 
 export interface TenantUpdate {
   name?: string;
@@ -15,6 +16,14 @@ export interface TenantUpdate {
   postcode?: string;
   brandColor?: string;
   logoUrl?: string;
+  logoPortalUrl?: string;
+  logoPosUrl?: string;
+  faviconUrl?: string;
+  primaryColor?: string;
+  accentColor?: string;
+  surfaceColor?: string;
+  fontFamily?: string;
+  brandTemplates?: BrandTemplates;
   leadCaptureAllowedOrigins?: string[];
   tradeCategorySlugs?: string[];
 }

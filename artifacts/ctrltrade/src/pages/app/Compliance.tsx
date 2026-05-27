@@ -18,6 +18,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, ShieldCheck, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ObjectUploader, useUpload } from "@workspace/object-storage-web";
+import { Upload } from "lucide-react";
 
 function daysUntil(iso: string | null | undefined): number | null {
   if (!iso) return null;
@@ -31,13 +33,34 @@ export function AppCompliance() {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [holderUserId, setHolderUserId] = useState<string>("");
+  const [documentUrl, setDocumentUrl] = useState<string>("");
+  const { getUploadParameters } = useUpload();
   const create = useCreateCertificate({
     mutation: {
-      onSuccess: () => {
+      onSuccess: async (cert) => {
         qc.invalidateQueries({ queryKey: getListCertificatesQueryKey() });
+        if (documentUrl && cert?.id) {
+          try {
+            await fetch(`/api/v1/files`, {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                url: documentUrl,
+                kind: "compliance_cert",
+                parentKind: "certificate",
+                parentId: cert.id,
+                name: documentUrl.split("/").pop(),
+              }),
+            });
+          } catch {
+            // non-fatal: documentUrl is still stored on the certificate row
+          }
+        }
         toast({ title: "Certificate added" });
         setOpen(false);
         setHolderUserId("");
+        setDocumentUrl("");
       },
       onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
     },
@@ -58,7 +81,7 @@ export function AppCompliance() {
         reference: (fd.get("reference") as string) || undefined,
         issuedAt: toIso("issuedAt"),
         expiresAt: toIso("expiresAt"),
-        documentUrl: (fd.get("documentUrl") as string) || undefined,
+        documentUrl: documentUrl || (fd.get("documentUrl") as string) || undefined,
         notes: (fd.get("notes") as string) || undefined,
       },
     });
@@ -93,7 +116,31 @@ export function AppCompliance() {
                 <div><Label>Issued</Label><Input name="issuedAt" type="date" /></div>
                 <div><Label>Expires</Label><Input name="expiresAt" type="date" /></div>
               </div>
-              <div><Label>Document URL</Label><Input name="documentUrl" type="url" /></div>
+              <div className="space-y-2">
+                <Label>Certificate document</Label>
+                <div className="flex items-center gap-2">
+                  <ObjectUploader
+                    maxNumberOfFiles={1}
+                    maxFileSize={10 * 1024 * 1024}
+                    onGetUploadParameters={getUploadParameters}
+                    onComplete={(result) => {
+                      const url = (result.successful?.[0] as { uploadURL?: string } | undefined)?.uploadURL;
+                      if (url) setDocumentUrl(url);
+                    }}
+                    buttonClassName="inline-flex items-center gap-2 rounded-none uppercase tracking-wider font-bold bg-secondary text-secondary-foreground px-3 py-2 text-xs hover:opacity-90"
+                  >
+                    <Upload className="h-3 w-3" /> Upload document
+                  </ObjectUploader>
+                  {documentUrl && <span className="text-xs text-muted-foreground truncate">Uploaded</span>}
+                </div>
+                <Input
+                  name="documentUrl"
+                  type="url"
+                  placeholder="…or paste a URL"
+                  value={documentUrl}
+                  onChange={(e) => setDocumentUrl(e.target.value)}
+                />
+              </div>
               <div><Label>Notes</Label><Textarea name="notes" /></div>
               <DialogFooter>
                 <Button type="submit" disabled={create.isPending} className="rounded-none uppercase tracking-wider font-bold">

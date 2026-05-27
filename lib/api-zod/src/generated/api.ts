@@ -43,6 +43,33 @@ export const PosLoginResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 })
@@ -76,6 +103,33 @@ export const GetPosSessionResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 })
@@ -164,6 +218,204 @@ export const SendPosReceiptResponse = zod.object({
   "method": zod.string(),
   "destination": zod.string().nullish(),
   "deliveredAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+export const RequestUploadUrlBody = zod.object({
+  "name": zod.string(),
+  "size": zod.number(),
+  "contentType": zod.string()
+})
+
+export const RequestUploadUrlResponse = zod.object({
+  "uploadURL": zod.string(),
+  "objectPath": zod.string(),
+  "metadata": zod.object({
+  "name": zod.string().optional(),
+  "size": zod.number().optional(),
+  "contentType": zod.string().optional()
+}).optional()
+})
+
+
+export const ListFilesQueryParams = zod.object({
+  "parentKind": zod.coerce.string(),
+  "parentId": zod.coerce.string()
+})
+
+export const ListFilesResponseItem = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "url": zod.string(),
+  "kind": zod.string(),
+  "parentKind": zod.string().nullish(),
+  "parentId": zod.string().nullish(),
+  "name": zod.string().nullish(),
+  "label": zod.string().nullish(),
+  "mimeType": zod.string().nullish(),
+  "sizeBytes": zod.number().nullish(),
+  "uploadedByUserId": zod.string().nullish(),
+  "uploadedByLabel": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListFilesResponse = zod.array(ListFilesResponseItem)
+
+
+
+
+
+
+export const CreateFileBody = zod.object({
+  "url": zod.string().min(1),
+  "kind": zod.string().min(1),
+  "parentKind": zod.string().optional(),
+  "parentId": zod.string().optional(),
+  "name": zod.string().optional(),
+  "label": zod.string().optional(),
+  "mimeType": zod.string().optional(),
+  "sizeBytes": zod.number().optional()
+})
+
+
+export const DeleteFileParams = zod.object({
+  "fileId": zod.coerce.string()
+})
+
+
+export const GetBrandingResponse = zod.object({
+  "tenantId": zod.string(),
+  "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional()
+})
+
+
+export const UpdateBrandingBody = zod.object({
+  "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+}).optional()
+})
+
+export const UpdateBrandingResponse = zod.object({
+  "tenantId": zod.string(),
+  "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional()
+})
+
+
+export const GetPosBrandingResponse = zod.object({
+  "tenantId": zod.string(),
+  "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional()
 })
 
 
@@ -282,6 +534,33 @@ export const LoginResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 }),zod.null()]).optional(),
@@ -316,6 +595,33 @@ export const GetSessionResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 }),zod.null()]).optional(),
@@ -355,6 +661,33 @@ export const GetTenantResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 })
@@ -369,6 +702,33 @@ export const UpdateTenantBody = zod.object({
   "postcode": zod.string().optional(),
   "brandColor": zod.string().optional(),
   "logoUrl": zod.string().optional(),
+  "logoPortalUrl": zod.string().optional(),
+  "logoPosUrl": zod.string().optional(),
+  "faviconUrl": zod.string().optional(),
+  "primaryColor": zod.string().optional(),
+  "accentColor": zod.string().optional(),
+  "surfaceColor": zod.string().optional(),
+  "fontFamily": zod.string().optional(),
+  "brandTemplates": zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+}).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 })
@@ -386,6 +746,33 @@ export const UpdateTenantResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 })
@@ -655,6 +1042,33 @@ export const GetAdminTenantResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 }),
@@ -956,6 +1370,33 @@ export const AcceptInvitationResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 }),zod.null()]).optional(),
@@ -1020,6 +1461,33 @@ export const StartImpersonationResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 }),zod.null()]).optional(),
@@ -1054,6 +1522,33 @@ export const StopImpersonationResponse = zod.object({
   "postcode": zod.string().nullish(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
 }),zod.null()]).optional(),

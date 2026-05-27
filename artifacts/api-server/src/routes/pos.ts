@@ -90,6 +90,26 @@ router.get("/v1/pos/me", requirePosAuth, async (req, res): Promise<void> => {
 });
 
 // ---------------------------------------------------------------------------
+// GET /v1/pos/branding
+// ---------------------------------------------------------------------------
+router.get("/v1/pos/branding", requirePosAuth, async (req, res): Promise<void> => {
+  const { tenant } = req.posAuth!;
+  res.json({
+    tenantId: tenant.id,
+    logoUrl: tenant.logoUrl,
+    logoPortalUrl: tenant.logoPortalUrl,
+    logoPosUrl: tenant.logoPosUrl,
+    faviconUrl: tenant.faviconUrl,
+    primaryColor: tenant.primaryColor,
+    accentColor: tenant.accentColor,
+    surfaceColor: tenant.surfaceColor,
+    brandColor: tenant.brandColor,
+    fontFamily: tenant.fontFamily,
+    brandTemplates: tenant.brandTemplates ?? null,
+  });
+});
+
+// ---------------------------------------------------------------------------
 // GET /v1/pos/jobs
 // Returns a deterministic, tenant-scoped set of sample jobs for "today".
 // The forthcoming tenant-workspace (Layer 2) work will replace this stub

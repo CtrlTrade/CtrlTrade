@@ -31,6 +31,8 @@ import type {
   BillingOverrideBody,
   BillingOverview,
   BillingSetupIntent,
+  Branding,
+  BrandingUpdate,
   CancellationReceipt,
   CancellationRequest,
   Certificate,
@@ -42,6 +44,8 @@ import type {
   DepositInvoiceInput,
   ExpiryAttention,
   FeatureFlagRecord,
+  FileInput,
+  FileMeta,
   ForgotPasswordBody,
   GdprDeletionState,
   GetScheduleParams,
@@ -75,6 +79,7 @@ import type {
   LeadSummary,
   LeadUpdateInput,
   ListFeatureFlagsParams,
+  ListFilesParams,
   ListInvoicesParams,
   ListJobsParams,
   ListLeadsParams,
@@ -130,6 +135,8 @@ import type {
   UpcomingRenewal,
   UpdateInvoiceTemplateInput,
   UpdateMemberInput,
+  UploadUrlRequest,
+  UploadUrlResponse,
   UpsertFeatureFlagInput,
   Vehicle,
   VehicleInput,
@@ -587,6 +594,491 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getSendPosReceiptMutationOptions(options));
     }
+
+export const getRequestUploadUrlUrl = () => {
+
+
+
+
+  return `/api/storage/uploads/request-url`
+}
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+export const requestUploadUrl = async (uploadUrlRequest: UploadUrlRequest, options?: RequestInit): Promise<UploadUrlResponse> => {
+
+  return customFetch<UploadUrlResponse>(getRequestUploadUrlUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      uploadUrlRequest,)
+  }
+);}
+
+
+
+
+export const getRequestUploadUrlMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestUploadUrl>>, TError,{data: BodyType<UploadUrlRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestUploadUrl>>, TError,{data: BodyType<UploadUrlRequest>}, TContext> => {
+
+const mutationKey = ['requestUploadUrl'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestUploadUrl>>, {data: BodyType<UploadUrlRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestUploadUrl(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestUploadUrlMutationResult = NonNullable<Awaited<ReturnType<typeof requestUploadUrl>>>
+    export type RequestUploadUrlMutationBody = BodyType<UploadUrlRequest>
+    export type RequestUploadUrlMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Request a presigned URL for file upload
+ */
+export const useRequestUploadUrl = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestUploadUrl>>, TError,{data: BodyType<UploadUrlRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestUploadUrl>>,
+        TError,
+        {data: BodyType<UploadUrlRequest>},
+        TContext
+      > => {
+      return useMutation(getRequestUploadUrlMutationOptions(options));
+    }
+
+export const getListFilesUrl = (params: ListFilesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/files?${stringifiedParams}` : `/api/v1/files`
+}
+
+export const listFiles = async (params: ListFilesParams, options?: RequestInit): Promise<FileMeta[]> => {
+
+  return customFetch<FileMeta[]>(getListFilesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListFilesQueryKey = (params?: ListFilesParams,) => {
+    return [
+    `/api/v1/files`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListFilesQueryOptions = <TData = Awaited<ReturnType<typeof listFiles>>, TError = ErrorType<unknown>>(params: ListFilesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFiles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListFilesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listFiles>>> = ({ signal }) => listFiles(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listFiles>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListFilesQueryResult = NonNullable<Awaited<ReturnType<typeof listFiles>>>
+export type ListFilesQueryError = ErrorType<unknown>
+
+
+
+export function useListFiles<TData = Awaited<ReturnType<typeof listFiles>>, TError = ErrorType<unknown>>(
+ params: ListFilesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFiles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListFilesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateFileUrl = () => {
+
+
+
+
+  return `/api/v1/files`
+}
+
+export const createFile = async (fileInput: FileInput, options?: RequestInit): Promise<FileMeta> => {
+
+  return customFetch<FileMeta>(getCreateFileUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      fileInput,)
+  }
+);}
+
+
+
+
+export const getCreateFileMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFile>>, TError,{data: BodyType<FileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createFile>>, TError,{data: BodyType<FileInput>}, TContext> => {
+
+const mutationKey = ['createFile'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createFile>>, {data: BodyType<FileInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createFile(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateFileMutationResult = NonNullable<Awaited<ReturnType<typeof createFile>>>
+    export type CreateFileMutationBody = BodyType<FileInput>
+    export type CreateFileMutationError = ErrorType<unknown>
+
+    export const useCreateFile = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFile>>, TError,{data: BodyType<FileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createFile>>,
+        TError,
+        {data: BodyType<FileInput>},
+        TContext
+      > => {
+      return useMutation(getCreateFileMutationOptions(options));
+    }
+
+export const getDeleteFileUrl = (fileId: string,) => {
+
+
+
+
+  return `/api/v1/files/${fileId}`
+}
+
+export const deleteFile = async (fileId: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteFileUrl(fileId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteFileMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFile>>, TError,{fileId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteFile>>, TError,{fileId: string}, TContext> => {
+
+const mutationKey = ['deleteFile'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteFile>>, {fileId: string}> = (props) => {
+          const {fileId} = props ?? {};
+
+          return  deleteFile(fileId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteFileMutationResult = NonNullable<Awaited<ReturnType<typeof deleteFile>>>
+
+    export type DeleteFileMutationError = ErrorType<unknown>
+
+    export const useDeleteFile = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFile>>, TError,{fileId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteFile>>,
+        TError,
+        {fileId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteFileMutationOptions(options));
+    }
+
+export const getGetBrandingUrl = () => {
+
+
+
+
+  return `/api/v1/branding`
+}
+
+export const getBranding = async ( options?: RequestInit): Promise<Branding> => {
+
+  return customFetch<Branding>(getGetBrandingUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBrandingQueryKey = () => {
+    return [
+    `/api/v1/branding`
+    ] as const;
+    }
+
+
+export const getGetBrandingQueryOptions = <TData = Awaited<ReturnType<typeof getBranding>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBranding>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBrandingQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBranding>>> = ({ signal }) => getBranding({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBranding>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetBrandingQueryResult = NonNullable<Awaited<ReturnType<typeof getBranding>>>
+export type GetBrandingQueryError = ErrorType<unknown>
+
+
+
+export function useGetBranding<TData = Awaited<ReturnType<typeof getBranding>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBranding>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetBrandingQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateBrandingUrl = () => {
+
+
+
+
+  return `/api/v1/branding`
+}
+
+export const updateBranding = async (brandingUpdate: BrandingUpdate, options?: RequestInit): Promise<Branding> => {
+
+  return customFetch<Branding>(getUpdateBrandingUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      brandingUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateBrandingMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBranding>>, TError,{data: BodyType<BrandingUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateBranding>>, TError,{data: BodyType<BrandingUpdate>}, TContext> => {
+
+const mutationKey = ['updateBranding'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateBranding>>, {data: BodyType<BrandingUpdate>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateBranding(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateBrandingMutationResult = NonNullable<Awaited<ReturnType<typeof updateBranding>>>
+    export type UpdateBrandingMutationBody = BodyType<BrandingUpdate>
+    export type UpdateBrandingMutationError = ErrorType<unknown>
+
+    export const useUpdateBranding = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBranding>>, TError,{data: BodyType<BrandingUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateBranding>>,
+        TError,
+        {data: BodyType<BrandingUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateBrandingMutationOptions(options));
+    }
+
+export const getGetPosBrandingUrl = () => {
+
+
+
+
+  return `/api/v1/pos/branding`
+}
+
+export const getPosBranding = async ( options?: RequestInit): Promise<Branding> => {
+
+  return customFetch<Branding>(getGetPosBrandingUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPosBrandingQueryKey = () => {
+    return [
+    `/api/v1/pos/branding`
+    ] as const;
+    }
+
+
+export const getGetPosBrandingQueryOptions = <TData = Awaited<ReturnType<typeof getPosBranding>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPosBranding>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPosBrandingQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPosBranding>>> = ({ signal }) => getPosBranding({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPosBranding>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPosBrandingQueryResult = NonNullable<Awaited<ReturnType<typeof getPosBranding>>>
+export type GetPosBrandingQueryError = ErrorType<unknown>
+
+
+
+export function useGetPosBranding<TData = Awaited<ReturnType<typeof getPosBranding>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPosBranding>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPosBrandingQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getHealthCheckUrl = () => {
 

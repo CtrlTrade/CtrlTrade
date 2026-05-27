@@ -84,6 +84,35 @@ export interface SessionUser {
   seatType?: string | null;
 }
 
+export type BrandTemplatesInvoice = {
+  header?: string;
+  footer?: string;
+  notes?: string;
+};
+
+export type BrandTemplatesQuote = {
+  header?: string;
+  footer?: string;
+  notes?: string;
+};
+
+export type BrandTemplatesEmail = {
+  header?: string;
+  signature?: string;
+};
+
+export type BrandTemplatesPosReceipt = {
+  header?: string;
+  footer?: string;
+};
+
+export interface BrandTemplates {
+  invoice?: BrandTemplatesInvoice;
+  quote?: BrandTemplatesQuote;
+  email?: BrandTemplatesEmail;
+  posReceipt?: BrandTemplatesPosReceipt;
+}
+
 export interface Tenant {
   id: string;
   name: string;
@@ -105,6 +134,21 @@ export interface Tenant {
   brandColor?: string | null;
   /** @nullable */
   logoUrl?: string | null;
+  /** @nullable */
+  logoPortalUrl?: string | null;
+  /** @nullable */
+  logoPosUrl?: string | null;
+  /** @nullable */
+  faviconUrl?: string | null;
+  /** @nullable */
+  primaryColor?: string | null;
+  /** @nullable */
+  accentColor?: string | null;
+  /** @nullable */
+  surfaceColor?: string | null;
+  /** @nullable */
+  fontFamily?: string | null;
+  brandTemplates?: null | BrandTemplates;
   leadCaptureAllowedOrigins?: string[];
   tradeCategorySlugs?: string[];
 }
@@ -131,8 +175,116 @@ export interface TenantUpdate {
   postcode?: string;
   brandColor?: string;
   logoUrl?: string;
+  logoPortalUrl?: string;
+  logoPosUrl?: string;
+  faviconUrl?: string;
+  primaryColor?: string;
+  accentColor?: string;
+  surfaceColor?: string;
+  fontFamily?: string;
+  brandTemplates?: BrandTemplates;
   leadCaptureAllowedOrigins?: string[];
   tradeCategorySlugs?: string[];
+}
+
+export interface Branding {
+  tenantId: string;
+  /** @nullable */
+  logoUrl?: string | null;
+  /** @nullable */
+  logoPortalUrl?: string | null;
+  /** @nullable */
+  logoPosUrl?: string | null;
+  /** @nullable */
+  faviconUrl?: string | null;
+  /** @nullable */
+  primaryColor?: string | null;
+  /** @nullable */
+  accentColor?: string | null;
+  /** @nullable */
+  surfaceColor?: string | null;
+  /** @nullable */
+  brandColor?: string | null;
+  /** @nullable */
+  fontFamily?: string | null;
+  brandTemplates?: null | BrandTemplates;
+}
+
+export interface BrandingUpdate {
+  /** @nullable */
+  logoUrl?: string | null;
+  /** @nullable */
+  logoPortalUrl?: string | null;
+  /** @nullable */
+  logoPosUrl?: string | null;
+  /** @nullable */
+  faviconUrl?: string | null;
+  /** @nullable */
+  primaryColor?: string | null;
+  /** @nullable */
+  accentColor?: string | null;
+  /** @nullable */
+  surfaceColor?: string | null;
+  /** @nullable */
+  brandColor?: string | null;
+  /** @nullable */
+  fontFamily?: string | null;
+  brandTemplates?: BrandTemplates;
+}
+
+export interface UploadUrlRequest {
+  name: string;
+  size: number;
+  contentType: string;
+}
+
+export type UploadUrlResponseMetadata = {
+  name?: string;
+  size?: number;
+  contentType?: string;
+};
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata?: UploadUrlResponseMetadata;
+}
+
+export interface FileInput {
+  /** @minLength 1 */
+  url: string;
+  /** @minLength 1 */
+  kind: string;
+  parentKind?: string;
+  parentId?: string;
+  name?: string;
+  label?: string;
+  mimeType?: string;
+  sizeBytes?: number;
+}
+
+export interface FileMeta {
+  id: string;
+  tenantId: string;
+  url: string;
+  kind: string;
+  /** @nullable */
+  parentKind?: string | null;
+  /** @nullable */
+  parentId?: string | null;
+  /** @nullable */
+  name?: string | null;
+  /** @nullable */
+  label?: string | null;
+  /** @nullable */
+  mimeType?: string | null;
+  /** @nullable */
+  sizeBytes?: number | null;
+  /** @nullable */
+  uploadedByUserId?: string | null;
+  /** @nullable */
+  uploadedByLabel?: string | null;
+  createdAt: string;
 }
 
 export interface CancellationRequest {
@@ -1496,6 +1648,11 @@ export interface CustomerMessageInput {
   /** @minLength 1 */
   body: string;
 }
+
+export type ListFilesParams = {
+parentKind: string;
+parentId: string;
+};
 
 export type ListFeatureFlagsParams = {
 tenantId?: string;
