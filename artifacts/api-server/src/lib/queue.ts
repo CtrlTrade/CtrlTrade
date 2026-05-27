@@ -20,7 +20,8 @@ export type JobKind =
   | "notification_retry"
   | "notification_digest_daily"
   | "notification_digest_weekly"
-  | "contract_job_generation";
+  | "contract_job_generation"
+  | "job_signoff_email";
 
 export const ALL_JOB_KINDS: JobKind[] = [
   "send_email",
@@ -39,6 +40,7 @@ export const ALL_JOB_KINDS: JobKind[] = [
   "notification_digest_daily",
   "notification_digest_weekly",
   "contract_job_generation",
+  "job_signoff_email",
 ];
 
 let _boss: PgBoss | null = null;

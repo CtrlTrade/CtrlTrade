@@ -34,5 +34,15 @@ export interface Job {
   /** @nullable */
   assignedVehicleId?: string | null;
   valuePence: number;
+  /** @nullable */
+  completedAt?: Date | null;
+  /** @nullable */
+  signoffImageUrl?: string | null;
+  /** @nullable */
+  signoffName?: string | null;
+  /** @nullable */
+  signoffAt?: Date | null;
+  /** @nullable */
+  signoffNote?: string | null;
   createdAt: Date;
 }

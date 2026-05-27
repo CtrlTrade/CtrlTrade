@@ -155,6 +155,7 @@ export * from './invoiceTemplateItemInput';
 export * from './job';
 export * from './jobAssignmentInput';
 export * from './jobCheckin';
+export * from './jobCompleteInput';
 export * from './jobInput';
 export * from './jobSummary';
 export * from './jobSummaryInput';

@@ -1557,6 +1557,27 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Job" }
 
+  /v1/jobs/{jobId}/complete:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: completeJob
+      tags: [jobs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/JobCompleteInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Job" }
+
   /v1/jobs/{jobId}/checkin:
     parameters:
       - in: path
@@ -6136,7 +6157,20 @@ components:
         assignedUserName: { type: ["string", "null"] }
         assignedVehicleId: { type: ["string", "null"] }
         valuePence: { type: integer }
+        completedAt: { type: ["string", "null"], format: date-time }
+        signoffImageUrl: { type: ["string", "null"] }
+        signoffName: { type: ["string", "null"] }
+        signoffAt: { type: ["string", "null"], format: date-time }
+        signoffNote: { type: ["string", "null"] }
         createdAt: { type: string, format: date-time }
+
+    JobCompleteInput:
+      type: object
+      required: [signoffName, signoffImageUrl]
+      properties:
+        signoffName: { type: string, minLength: 1 }
+        signoffImageUrl: { type: string }
+        signoffNote: { type: string }
 
     JobInput:
       type: object

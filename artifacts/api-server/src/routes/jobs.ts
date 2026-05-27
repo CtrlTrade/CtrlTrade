@@ -7,6 +7,9 @@ import {
   usersTable,
   membershipsTable,
   staffAvailabilityTable,
+  invoicesTable,
+  invoiceItemsTable,
+  quoteLineItemsTable,
   type Job,
 } from "@workspace/db";
 import {
@@ -19,11 +22,13 @@ import {
   AssignJobResponse,
   GetScheduleResponse,
   GetScheduleQueryParams,
+  CompleteJobBody,
+  CompleteJobResponse,
 } from "@workspace/api-zod";
 import { requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
 import { emitWorkflowEvent } from "../lib/automationEngine";
-import { nextJobNumber } from "../lib/numbering";
+import { nextJobNumber, nextInvoiceNumber } from "../lib/numbering";
 import { isTenantCustomer, isTenantVehicle, isTenantMember } from "../lib/tenantGuards";
 import { enqueueJob } from "../lib/queue";
 import { logger } from "../lib/logger";
@@ -64,6 +69,11 @@ function serializeJob(j: Job, customerName: string, assignedUserName: string | n
     city: j.city,
     postcode: j.postcode,
     assignedVehicleId: j.assignedVehicleId,
+    completedAt: j.completedAt?.toISOString() ?? null,
+    signoffImageUrl: j.signoffImageUrl ?? null,
+    signoffName: j.signoffName ?? null,
+    signoffAt: j.signoffAt?.toISOString() ?? null,
+    signoffNote: j.signoffNote ?? null,
   };
 }
 
@@ -270,6 +280,147 @@ router.post("/v1/jobs/:jobId/assign", requireTenant, async (req, res): Promise<v
   await enqueueIntegrationSync(tenantId, updated.id, "job.upsert");
   const ctx = (await loadJobJoined(tenantId, updated.id))!;
   res.json(AssignJobResponse.parse(serializeJob(ctx.j, ctx.customerName, ctx.assignedUserName)));
+});
+
+router.post("/v1/jobs/:jobId/complete", requireTenant, async (req, res): Promise<void> => {
+  const parsed = CompleteJobBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  const tenantId = req.auth!.tenant!.id;
+  const jobId = req.params.jobId as string;
+
+  const ctx = await loadJobJoined(tenantId, jobId);
+  if (!ctx) {
+    res.status(404).json({ error: "Job not found" });
+    return;
+  }
+  if (ctx.j.status === "cancelled") {
+    res.status(409).json({ error: "Cannot complete a cancelled job" });
+    return;
+  }
+
+  const now = new Date();
+  const [updated] = await db
+    .update(jobsTable)
+    .set({
+      status: "completed",
+      completedAt: now,
+      signoffImageUrl: parsed.data.signoffImageUrl,
+      signoffName: parsed.data.signoffName,
+      signoffAt: now,
+      signoffNote: parsed.data.signoffNote ?? null,
+    })
+    .where(and(eq(jobsTable.tenantId, tenantId), eq(jobsTable.id, jobId)))
+    .returning();
+
+  if (!updated) {
+    res.status(404).json({ error: "Job not found" });
+    return;
+  }
+
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: req.auth!.user.email,
+    kind: "job.completed",
+    message: `Job ${updated.number} completed and signed off by ${parsed.data.signoffName}`,
+    metadata: { jobId: updated.id, signoffName: parsed.data.signoffName } as Record<string, unknown>,
+  });
+
+  // Auto-create draft invoice if setting is enabled
+  const tenant = req.auth!.tenant!;
+  const tenantMeta = tenant as unknown as { settings?: Record<string, unknown> };
+  const autoInvoice = tenantMeta.settings?.autoInvoiceOnSignoff === true;
+  if (autoInvoice) {
+    try {
+      const existingInvoice = await db
+        .select({ id: invoicesTable.id })
+        .from(invoicesTable)
+        .where(and(eq(invoicesTable.tenantId, tenantId), eq(invoicesTable.jobId, jobId)));
+      if (existingInvoice.length === 0) {
+        let items: { description: string; quantity: number; unitPricePence: number }[] = [];
+        if (updated.quoteId) {
+          const qItems = await db
+            .select()
+            .from(quoteLineItemsTable)
+            .where(eq(quoteLineItemsTable.quoteId, updated.quoteId))
+            .orderBy(asc(quoteLineItemsTable.sortOrder));
+          items = qItems.map((it) => ({
+            description: it.description,
+            quantity: it.quantity,
+            unitPricePence: it.unitPricePence,
+          }));
+        }
+        if (items.length === 0) {
+          items = [{ description: updated.title, quantity: 1, unitPricePence: updated.valuePence }];
+        }
+        const vatRatePct = (tenant as any).vatRatePct ?? 20;
+        const invNumber = await nextInvoiceNumber(tenantId);
+        const subtotal = items.reduce((s, i) => s + i.quantity * i.unitPricePence, 0);
+        const tax = Math.round((subtotal * vatRatePct) / 100);
+        await db.insert(invoicesTable).values({
+          tenantId,
+          customerId: updated.customerId,
+          jobId: updated.id,
+          quoteId: updated.quoteId ?? null,
+          number: invNumber,
+          title: `Invoice for ${updated.title}`,
+          status: "draft",
+          notes: updated.description ?? null,
+          vatRatePct,
+          subtotalPence: subtotal,
+          taxPence: tax,
+          totalPence: subtotal + tax,
+          dueAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+        });
+      }
+    } catch (err) {
+      logger.warn({ err, jobId }, "auto-invoice creation failed on signoff");
+    }
+  }
+
+  // Enqueue completion email to customer
+  try {
+    const customer = await db
+      .select({ email: customersTable.email, name: customersTable.name })
+      .from(customersTable)
+      .where(and(eq(customersTable.tenantId, tenantId), eq(customersTable.id, updated.customerId)));
+    if (customer[0]?.email) {
+      await enqueueJob({
+        kind: "job_signoff_email",
+        payload: {
+          tenantId,
+          jobId: updated.id,
+          jobNumber: updated.number,
+          jobTitle: updated.title,
+          signoffName: parsed.data.signoffName,
+          signoffNote: parsed.data.signoffNote ?? null,
+          signoffImageUrl: parsed.data.signoffImageUrl,
+          signoffAt: now.toISOString(),
+          customerEmail: customer[0].email,
+          customerName: customer[0].name,
+        },
+      });
+    }
+  } catch (err) {
+    logger.warn({ err, jobId }, "job_signoff_email enqueue failed");
+  }
+
+  await enqueueIntegrationSync(tenantId, updated.id, "job.upsert");
+
+  emitWorkflowEvent(tenantId, "job.completed", {
+    jobId: updated.id,
+    jobNumber: updated.number,
+    status: "completed",
+    customerName: ctx.customerName,
+    assignedUserName: ctx.assignedUserName,
+    signoffName: parsed.data.signoffName,
+  }).catch(() => {});
+
+  const fresh = (await loadJobJoined(tenantId, updated.id))!;
+  res.json(CompleteJobResponse.parse(serializeJob(fresh.j, fresh.customerName, fresh.assignedUserName)));
 });
 
 router.get("/v1/schedule", requireTenant, async (req, res): Promise<void> => {

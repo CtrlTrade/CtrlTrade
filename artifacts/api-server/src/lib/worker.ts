@@ -127,6 +127,41 @@ const handlers: Record<JobKind, Handler> = {
       }
     }
   },
+  job_signoff_email: async (p) => {
+    if (!p?.customerEmail || !p?.tenantId) {
+      logger.warn({ payload: p }, "job_signoff_email: missing required fields");
+      return;
+    }
+    const signoffDate = p.signoffAt ? new Date(p.signoffAt).toLocaleString("en-GB", { timeZone: "UTC" }) : "now";
+    const notesSection = p.signoffNote ? `<p><strong>Work notes:</strong> ${p.signoffNote}</p>` : "";
+    const signatureSection = p.signoffImageUrl
+      ? `<p><img src="${p.signoffImageUrl}" alt="Customer signature" style="max-width:300px;border:1px solid #ccc;" /></p>`
+      : "";
+    await sendEmail({
+      tenantId: p.tenantId,
+      template: "job_completion",
+      to: [{ email: p.customerEmail, name: p.customerName ?? undefined }],
+      subject: `Job ${p.jobNumber} Completed — ${p.jobTitle}`,
+      text: [
+        `Dear ${p.customerName ?? "Customer"},`,
+        ``,
+        `Your job "${p.jobTitle}" (${p.jobNumber}) has been completed and signed off by ${p.signoffName} on ${signoffDate}.`,
+        p.signoffNote ? `Work notes: ${p.signoffNote}` : "",
+        ``,
+        `Thank you for your business.`,
+      ].filter(Boolean).join("\n"),
+      html: `
+        <p>Dear ${p.customerName ?? "Customer"},</p>
+        <p>Your job <strong>"${p.jobTitle}"</strong> (${p.jobNumber}) has been completed and signed off by <strong>${p.signoffName}</strong> on ${signoffDate}.</p>
+        ${notesSection}
+        ${signatureSection}
+        <p>Thank you for your business.</p>
+      `,
+      metadata: { jobId: p.jobId },
+      jobId: p.jobId,
+    });
+    logger.info({ jobId: p.jobId, to: p.customerEmail }, "job_signoff_email sent");
+  },
 };
 
 /** Register all job handlers on pg-boss. Called by the worker entrypoint. */

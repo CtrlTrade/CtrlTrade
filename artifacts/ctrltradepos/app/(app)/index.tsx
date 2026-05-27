@@ -36,8 +36,9 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function JobCard({ job, onPress }: { job: PosJob; onPress: () => void }) {
+function JobCard({ job, onPress, onSignOff }: { job: PosJob; onPress: () => void; onSignOff: () => void }) {
   const colors = useColors();
+  const isCompleted = job.status === "completed";
   return (
     <Pressable
       onPress={onPress}
@@ -73,8 +74,24 @@ function JobCard({ job, onPress }: { job: PosJob; onPress: () => void }) {
             {formatMoney(job.estimatedTotal, job.currency)}
           </Text>
         </View>
-        <View style={[styles.captureBtn, { borderColor: colors.primary }]}>
-          <Text style={[styles.captureBtnText, { color: colors.primary }]}>CAPTURE SALE →</Text>
+        <View style={styles.actions}>
+          <Pressable
+            onPress={onPress}
+            style={({ pressed }) => [styles.captureBtn, { borderColor: colors.primary, opacity: pressed ? 0.7 : 1 }]}
+          >
+            <Text style={[styles.captureBtnText, { color: colors.primary }]}>CAPTURE SALE →</Text>
+          </Pressable>
+          {!isCompleted && (
+            <Pressable
+              onPress={(e) => { e.stopPropagation?.(); onSignOff(); }}
+              style={({ pressed }) => [
+                styles.signoffBtn,
+                { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1 },
+              ]}
+            >
+              <Text style={[styles.signoffBtnText, { color: colors.primaryForeground }]}>SIGN OFF</Text>
+            </Pressable>
+          )}
         </View>
       </View>
     </Pressable>
@@ -108,6 +125,17 @@ export default function JobsScreen() {
         customerName: job.customerName,
         address: job.address ?? "",
         status: job.status,
+      },
+    });
+  };
+
+  const goSignOff = (job: PosJob) => {
+    router.push({
+      pathname: "/(app)/job-signoff",
+      params: {
+        jobId: job.id,
+        jobNumber: job.reference,
+        jobTitle: job.customerName,
       },
     });
   };
@@ -152,7 +180,7 @@ export default function JobsScreen() {
         ) : (
           <View style={styles.list}>
             {(jobsQuery.data ?? []).map((job) => (
-              <JobCard key={job.id} job={job} onPress={() => goJobDetail(job)} />
+              <JobCard key={job.id} job={job} onPress={() => goJobDetail(job)} onSignOff={() => goSignOff(job)} />
             ))}
             {(jobsQuery.data ?? []).length === 0 ? (
               <Text style={[styles.empty, { color: colors.mutedForeground }]}>
@@ -187,8 +215,11 @@ const styles = StyleSheet.create({
   },
   metaLabel: { fontFamily: MONO_FONT, fontSize: 10, letterSpacing: 2, marginBottom: 4 },
   metaValue: { fontFamily: MONO_FONT, fontSize: 13, fontWeight: "700" },
+  actions: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
   captureBtn: { borderWidth: 1, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 6 },
   captureBtnText: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 2, fontWeight: "700" },
+  signoffBtn: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 6 },
+  signoffBtnText: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 2, fontWeight: "700" },
   empty: { fontFamily: MONO_FONT, fontSize: 13, textAlign: "center", marginTop: 32 },
   error: { fontFamily: MONO_FONT, fontSize: 13, textAlign: "center", marginTop: 32 },
   headerLink: { borderWidth: 1, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6 },

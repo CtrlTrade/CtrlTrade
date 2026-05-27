@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Receipt, MapPin, Clock } from "lucide-react";
+import { ArrowLeft, Receipt, MapPin, Clock, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { TenantThread } from "@/components/TenantThread";
 import { AiPanel } from "@/components/ai/AiPanel";
@@ -185,6 +185,47 @@ export function AppJobDetail() {
           )}
         </CardContent>
       </Card>
+
+      {(data as any).signoffAt && (
+        <Card className="border-border shadow-sm">
+          <CardHeader>
+            <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-500" />
+              Job Completion Sign-off
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Signed by</p>
+                <p className="font-semibold">{(data as any).signoffName}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Signed at</p>
+                <p className="font-semibold">{new Date((data as any).signoffAt).toLocaleString("en-GB")}</p>
+              </div>
+              {(data as any).signoffNote && (
+                <div className="col-span-2">
+                  <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Work done notes</p>
+                  <p className="whitespace-pre-wrap">{(data as any).signoffNote}</p>
+                </div>
+              )}
+            </div>
+            {(data as any).signoffImageUrl && (
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wider mb-2">Customer Signature</p>
+                <div className="border border-border rounded p-3 bg-white inline-block">
+                  <img
+                    src={(data as any).signoffImageUrl}
+                    alt="Customer signature"
+                    className="max-w-xs max-h-40 object-contain"
+                  />
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <AiPanel
         title="CtrlAI — Job Summary"

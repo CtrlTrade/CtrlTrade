@@ -1028,7 +1028,24 @@ export interface Job {
   /** @nullable */
   assignedVehicleId?: string | null;
   valuePence: number;
+  /** @nullable */
+  completedAt?: string | null;
+  /** @nullable */
+  signoffImageUrl?: string | null;
+  /** @nullable */
+  signoffName?: string | null;
+  /** @nullable */
+  signoffAt?: string | null;
+  /** @nullable */
+  signoffNote?: string | null;
   createdAt: string;
+}
+
+export interface JobCompleteInput {
+  /** @minLength 1 */
+  signoffName: string;
+  signoffImageUrl: string;
+  signoffNote?: string;
 }
 
 export interface JobInput {

@@ -128,6 +128,7 @@ import type {
   Job,
   JobAssignmentInput,
   JobCheckin,
+  JobCompleteInput,
   JobInput,
   JobSummary,
   JobSummaryInput,
@@ -7293,6 +7294,72 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getAssignJobMutationOptions(options));
+    }
+
+export const getCompleteJobUrl = (jobId: string,) => {
+
+
+
+
+  return `/api/v1/jobs/${jobId}/complete`
+}
+
+export const completeJob = async (jobId: string,
+    jobCompleteInput: JobCompleteInput, options?: RequestInit): Promise<Job> => {
+
+  return customFetch<Job>(getCompleteJobUrl(jobId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      jobCompleteInput,)
+  }
+);}
+
+
+
+
+export const getCompleteJobMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeJob>>, TError,{jobId: string;data: BodyType<JobCompleteInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof completeJob>>, TError,{jobId: string;data: BodyType<JobCompleteInput>}, TContext> => {
+
+const mutationKey = ['completeJob'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeJob>>, {jobId: string;data: BodyType<JobCompleteInput>}> = (props) => {
+          const {jobId,data} = props ?? {};
+
+          return  completeJob(jobId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompleteJobMutationResult = NonNullable<Awaited<ReturnType<typeof completeJob>>>
+    export type CompleteJobMutationBody = BodyType<JobCompleteInput>
+    export type CompleteJobMutationError = ErrorType<unknown>
+
+    export const useCompleteJob = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeJob>>, TError,{jobId: string;data: BodyType<JobCompleteInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof completeJob>>,
+        TError,
+        {jobId: string;data: BodyType<JobCompleteInput>},
+        TContext
+      > => {
+      return useMutation(getCompleteJobMutationOptions(options));
     }
 
 export const getJobCheckinUrl = (jobId: string,) => {

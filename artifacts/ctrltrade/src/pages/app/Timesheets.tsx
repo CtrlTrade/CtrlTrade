@@ -255,12 +255,15 @@ export function AppTimesheets() {
   const { toast } = useToast();
 
   const { data: team } = useListTeam();
-  const { data, isLoading } = useListTimesheets({
-    from,
-    to,
-    ...(userId !== "all" ? { userId } : {}),
-    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
-  });
+  const { data, isLoading } = useListTimesheets(
+    {
+      from,
+      to,
+      ...(userId !== "all" ? { userId } : {}),
+      ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+    },
+    { query: { keepPreviousData: true } as any },
+  );
 
   const approveMutation = useApproveTimesheetEntry();
   const rejectMutation = useRejectTimesheetEntry();

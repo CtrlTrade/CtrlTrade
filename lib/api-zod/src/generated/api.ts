@@ -2481,6 +2481,11 @@ export const ConvertQuoteToJobResponse = zod.object({
   "assignedUserName": zod.string().nullish(),
   "assignedVehicleId": zod.string().nullish(),
   "valuePence": zod.number(),
+  "completedAt": zod.coerce.date().nullish(),
+  "signoffImageUrl": zod.string().nullish(),
+  "signoffName": zod.string().nullish(),
+  "signoffAt": zod.coerce.date().nullish(),
+  "signoffNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
 
@@ -2549,6 +2554,11 @@ export const GetJobResponse = zod.object({
   "assignedUserName": zod.string().nullish(),
   "assignedVehicleId": zod.string().nullish(),
   "valuePence": zod.number(),
+  "completedAt": zod.coerce.date().nullish(),
+  "signoffImageUrl": zod.string().nullish(),
+  "signoffName": zod.string().nullish(),
+  "signoffAt": zod.coerce.date().nullish(),
+  "signoffNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
 
@@ -2595,6 +2605,11 @@ export const UpdateJobResponse = zod.object({
   "assignedUserName": zod.string().nullish(),
   "assignedVehicleId": zod.string().nullish(),
   "valuePence": zod.number(),
+  "completedAt": zod.coerce.date().nullish(),
+  "signoffImageUrl": zod.string().nullish(),
+  "signoffName": zod.string().nullish(),
+  "signoffAt": zod.coerce.date().nullish(),
+  "signoffNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
 
@@ -2628,6 +2643,51 @@ export const AssignJobResponse = zod.object({
   "assignedUserName": zod.string().nullish(),
   "assignedVehicleId": zod.string().nullish(),
   "valuePence": zod.number(),
+  "completedAt": zod.coerce.date().nullish(),
+  "signoffImageUrl": zod.string().nullish(),
+  "signoffName": zod.string().nullish(),
+  "signoffAt": zod.coerce.date().nullish(),
+  "signoffNote": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const CompleteJobParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+
+
+
+export const CompleteJobBody = zod.object({
+  "signoffName": zod.string().min(1),
+  "signoffImageUrl": zod.string(),
+  "signoffNote": zod.string().optional()
+})
+
+export const CompleteJobResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "quoteId": zod.string().nullish(),
+  "scheduledStart": zod.coerce.date().nullish(),
+  "scheduledEnd": zod.coerce.date().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "assignedUserId": zod.string().nullish(),
+  "assignedUserName": zod.string().nullish(),
+  "assignedVehicleId": zod.string().nullish(),
+  "valuePence": zod.number(),
+  "completedAt": zod.coerce.date().nullish(),
+  "signoffImageUrl": zod.string().nullish(),
+  "signoffName": zod.string().nullish(),
+  "signoffAt": zod.coerce.date().nullish(),
+  "signoffNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
 
