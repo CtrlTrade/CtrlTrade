@@ -12,13 +12,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const unauthorized = !isLoading && (!session || !session.tenant);
 
   useEffect(() => {
-    if (unauthorized) setLocation("/login");
+    if (unauthorized) setLocation("~/login");
   }, [unauthorized, setLocation]);
 
   const handleLogout = () => {
     logout.mutate(undefined, {
       onSuccess: () => {
-        setLocation("/login");
+        setLocation("~/login");
       }
     });
   };
