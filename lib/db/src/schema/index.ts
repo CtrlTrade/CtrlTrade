@@ -176,6 +176,169 @@ export const filesTable = pgTable("files", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({ tenantIdx: index("files_tenant_idx").on(t.tenantId) }));
 
+// ============================================================================
+// Layer 2 — tenant workspace domain tables
+// ============================================================================
+
+// ---- Customers -------------------------------------------------------------
+export const customersTable = pgTable(
+  "customers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    email: varchar("email", { length: 255 }),
+    phone: text("phone"),
+    addressLine1: text("address_line_1"),
+    city: text("city"),
+    postcode: text("postcode"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("customers_tenant_idx").on(t.tenantId),
+  }),
+);
+
+// ---- Quotes ----------------------------------------------------------------
+export const quotesTable = pgTable(
+  "quotes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").notNull().references(() => customersTable.id, { onDelete: "restrict" }),
+    number: varchar("number", { length: 32 }).notNull(),
+    title: text("title").notNull(),
+    status: varchar("status", { length: 24 }).notNull().default("draft"), // draft|sent|accepted|declined|converted
+    currency: varchar("currency", { length: 8 }).notNull().default("gbp"),
+    notes: text("notes"),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    acceptedAt: timestamp("accepted_at", { withTimezone: true }),
+    convertedJobId: uuid("converted_job_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("quotes_tenant_idx").on(t.tenantId),
+    statusIdx: index("quotes_status_idx").on(t.status),
+    uniqNum: unique("quotes_tenant_number_uniq").on(t.tenantId, t.number),
+  }),
+);
+
+export const quoteLineItemsTable = pgTable(
+  "quote_line_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    quoteId: uuid("quote_id").notNull().references(() => quotesTable.id, { onDelete: "cascade" }),
+    description: text("description").notNull(),
+    quantity: integer("quantity").notNull().default(1),
+    unitPricePence: integer("unit_price_pence").notNull().default(0),
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (t) => ({
+    quoteIdx: index("quote_items_quote_idx").on(t.quoteId),
+  }),
+);
+
+// ---- Jobs + scheduling -----------------------------------------------------
+export const jobsTable = pgTable(
+  "jobs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").notNull().references(() => customersTable.id, { onDelete: "restrict" }),
+    quoteId: uuid("quote_id").references(() => quotesTable.id, { onDelete: "set null" }),
+    number: varchar("number", { length: 32 }).notNull(),
+    title: text("title").notNull(),
+    description: text("description"),
+    status: varchar("status", { length: 24 }).notNull().default("scheduled"), // scheduled|in_progress|completed|cancelled
+    scheduledStart: timestamp("scheduled_start", { withTimezone: true }),
+    scheduledEnd: timestamp("scheduled_end", { withTimezone: true }),
+    addressLine1: text("address_line_1"),
+    city: text("city"),
+    postcode: text("postcode"),
+    assignedUserId: uuid("assigned_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    assignedVehicleId: uuid("assigned_vehicle_id"),
+    valuePence: integer("value_pence").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("jobs_tenant_idx").on(t.tenantId),
+    statusIdx: index("jobs_status_idx").on(t.status),
+    scheduleIdx: index("jobs_schedule_idx").on(t.tenantId, t.scheduledStart),
+    assignedIdx: index("jobs_assigned_idx").on(t.assignedUserId),
+    uniqNum: unique("jobs_tenant_number_uniq").on(t.tenantId, t.number),
+  }),
+);
+
+// ---- Fleet -----------------------------------------------------------------
+export const vehiclesTable = pgTable(
+  "vehicles",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    label: text("label").notNull(),
+    registration: varchar("registration", { length: 32 }).notNull(),
+    make: text("make"),
+    model: text("model"),
+    year: integer("year"),
+    motDueAt: timestamp("mot_due_at", { withTimezone: true }),
+    taxDueAt: timestamp("tax_due_at", { withTimezone: true }),
+    serviceDueAt: timestamp("service_due_at", { withTimezone: true }),
+    assignedDriverId: uuid("assigned_driver_id").references(() => usersTable.id, { onDelete: "set null" }),
+    status: varchar("status", { length: 24 }).notNull().default("active"), // active|maintenance|retired
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("vehicles_tenant_idx").on(t.tenantId),
+    uniqReg: unique("vehicles_tenant_reg_uniq").on(t.tenantId, t.registration),
+  }),
+);
+
+export const vehicleLocationsTable = pgTable(
+  "vehicle_locations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    vehicleId: uuid("vehicle_id").notNull().references(() => vehiclesTable.id, { onDelete: "cascade" }),
+    lat: text("lat").notNull(),
+    lng: text("lng").notNull(),
+    speedKph: integer("speed_kph"),
+    headingDeg: integer("heading_deg"),
+    recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("vlocs_tenant_idx").on(t.tenantId),
+    vehicleIdx: index("vlocs_vehicle_idx").on(t.vehicleId, t.recordedAt),
+  }),
+);
+
+// ---- Compliance / certificates --------------------------------------------
+export const certificatesTable = pgTable(
+  "certificates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    holderUserId: uuid("holder_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    holderLabel: text("holder_label"),
+    kind: varchar("kind", { length: 64 }).notNull(), // gas_safe|niceic|cscs|first_aid|insurance|other
+    reference: text("reference"),
+    issuedAt: timestamp("issued_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    documentUrl: text("document_url"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("certs_tenant_idx").on(t.tenantId),
+    expiresIdx: index("certs_expires_idx").on(t.tenantId, t.expiresAt),
+  }),
+);
+
 // ---- Types ----------------------------------------------------------------
 export type Tenant = typeof tenantsTable.$inferSelect;
 export type User = typeof usersTable.$inferSelect;
@@ -183,3 +346,10 @@ export type Membership = typeof membershipsTable.$inferSelect;
 export type TradeCategory = typeof tradeCategoriesTable.$inferSelect;
 export type SubscriptionRow = typeof subscriptionsTable.$inferSelect;
 export type AuditLog = typeof auditLogsTable.$inferSelect;
+export type Customer = typeof customersTable.$inferSelect;
+export type Quote = typeof quotesTable.$inferSelect;
+export type QuoteLineItem = typeof quoteLineItemsTable.$inferSelect;
+export type Job = typeof jobsTable.$inferSelect;
+export type Vehicle = typeof vehiclesTable.$inferSelect;
+export type VehicleLocation = typeof vehicleLocationsTable.$inferSelect;
+export type Certificate = typeof certificatesTable.$inferSelect;

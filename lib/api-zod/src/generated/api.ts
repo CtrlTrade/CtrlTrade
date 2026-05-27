@@ -538,6 +538,641 @@ export const AdminSyncTenantResponse = zod.object({
 })
 
 
+/**
+ * @summary List members of current tenant
+ */
+export const ListTeamResponseItem = zod.object({
+  "userId": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "role": zod.string(),
+  "seatType": zod.string()
+})
+export const ListTeamResponse = zod.array(ListTeamResponseItem)
+
+
+export const ListCustomersResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListCustomersResponse = zod.array(ListCustomersResponseItem)
+
+
+
+
+
+export const CreateCustomerBody = zod.object({
+  "name": zod.string().min(1),
+  "email": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "addressLine1": zod.string().optional(),
+  "city": zod.string().optional(),
+  "postcode": zod.string().optional(),
+  "notes": zod.string().optional()
+})
+
+
+export const GetCustomerParams = zod.object({
+  "customerId": zod.coerce.string()
+})
+
+export const GetCustomerResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const UpdateCustomerParams = zod.object({
+  "customerId": zod.coerce.string()
+})
+
+
+
+
+export const UpdateCustomerBody = zod.object({
+  "name": zod.string().min(1),
+  "email": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "addressLine1": zod.string().optional(),
+  "city": zod.string().optional(),
+  "postcode": zod.string().optional(),
+  "notes": zod.string().optional()
+})
+
+export const UpdateCustomerResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const DeleteCustomerParams = zod.object({
+  "customerId": zod.coerce.string()
+})
+
+
+export const ListQuotesResponseItem = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "sentAt": zod.coerce.date().nullish(),
+  "acceptedAt": zod.coerce.date().nullish()
+})
+export const ListQuotesResponse = zod.array(ListQuotesResponseItem)
+
+
+
+
+
+export const createQuoteBodyItemsItemUnitPricePenceMin = 0;
+
+
+
+export const CreateQuoteBody = zod.object({
+  "customerId": zod.string(),
+  "title": zod.string().min(1),
+  "notes": zod.string().optional(),
+  "items": zod.array(zod.object({
+  "description": zod.string().min(1),
+  "quantity": zod.number().min(1),
+  "unitPricePence": zod.number().min(createQuoteBodyItemsItemUnitPricePenceMin)
+}))
+})
+
+
+export const GetQuoteParams = zod.object({
+  "quoteId": zod.coerce.string()
+})
+
+export const GetQuoteResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "notes": zod.string().nullish(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number(),
+  "sortOrder": zod.number().optional()
+})),
+  "createdAt": zod.coerce.date(),
+  "sentAt": zod.coerce.date().nullish(),
+  "acceptedAt": zod.coerce.date().nullish(),
+  "convertedJobId": zod.string().nullish()
+})
+
+
+export const UpdateQuoteParams = zod.object({
+  "quoteId": zod.coerce.string()
+})
+
+
+
+
+export const updateQuoteBodyItemsItemUnitPricePenceMin = 0;
+
+
+
+export const UpdateQuoteBody = zod.object({
+  "customerId": zod.string(),
+  "title": zod.string().min(1),
+  "notes": zod.string().optional(),
+  "items": zod.array(zod.object({
+  "description": zod.string().min(1),
+  "quantity": zod.number().min(1),
+  "unitPricePence": zod.number().min(updateQuoteBodyItemsItemUnitPricePenceMin)
+}))
+})
+
+export const UpdateQuoteResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "notes": zod.string().nullish(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number(),
+  "sortOrder": zod.number().optional()
+})),
+  "createdAt": zod.coerce.date(),
+  "sentAt": zod.coerce.date().nullish(),
+  "acceptedAt": zod.coerce.date().nullish(),
+  "convertedJobId": zod.string().nullish()
+})
+
+
+export const SendQuoteParams = zod.object({
+  "quoteId": zod.coerce.string()
+})
+
+export const SendQuoteResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "notes": zod.string().nullish(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number(),
+  "sortOrder": zod.number().optional()
+})),
+  "createdAt": zod.coerce.date(),
+  "sentAt": zod.coerce.date().nullish(),
+  "acceptedAt": zod.coerce.date().nullish(),
+  "convertedJobId": zod.string().nullish()
+})
+
+
+export const AcceptQuoteParams = zod.object({
+  "quoteId": zod.coerce.string()
+})
+
+export const AcceptQuoteResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "notes": zod.string().nullish(),
+  "totalPence": zod.number(),
+  "currency": zod.string(),
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number(),
+  "sortOrder": zod.number().optional()
+})),
+  "createdAt": zod.coerce.date(),
+  "sentAt": zod.coerce.date().nullish(),
+  "acceptedAt": zod.coerce.date().nullish(),
+  "convertedJobId": zod.string().nullish()
+})
+
+
+export const ConvertQuoteToJobParams = zod.object({
+  "quoteId": zod.coerce.string()
+})
+
+export const ConvertQuoteToJobBody = zod.object({
+  "scheduledStart": zod.coerce.date().optional(),
+  "scheduledEnd": zod.coerce.date().optional(),
+  "assignedUserId": zod.string().optional()
+})
+
+export const ConvertQuoteToJobResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "quoteId": zod.string().nullish(),
+  "scheduledStart": zod.coerce.date().nullish(),
+  "scheduledEnd": zod.coerce.date().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "assignedUserId": zod.string().nullish(),
+  "assignedUserName": zod.string().nullish(),
+  "assignedVehicleId": zod.string().nullish(),
+  "valuePence": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const ListJobsQueryParams = zod.object({
+  "status": zod.coerce.string().optional()
+})
+
+export const ListJobsResponseItem = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "scheduledStart": zod.coerce.date().nullish(),
+  "scheduledEnd": zod.coerce.date().nullish(),
+  "assignedUserId": zod.string().nullish(),
+  "assignedUserName": zod.string().nullish(),
+  "valuePence": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListJobsResponse = zod.array(ListJobsResponseItem)
+
+
+
+export const createJobBodyValuePenceMin = 0;
+
+
+
+export const CreateJobBody = zod.object({
+  "customerId": zod.string(),
+  "title": zod.string().min(1),
+  "description": zod.string().optional(),
+  "status": zod.string().optional(),
+  "scheduledStart": zod.coerce.date().optional(),
+  "scheduledEnd": zod.coerce.date().optional(),
+  "addressLine1": zod.string().optional(),
+  "city": zod.string().optional(),
+  "postcode": zod.string().optional(),
+  "assignedUserId": zod.string().optional(),
+  "assignedVehicleId": zod.string().optional(),
+  "valuePence": zod.number().min(createJobBodyValuePenceMin).optional()
+})
+
+
+export const GetJobParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+export const GetJobResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "quoteId": zod.string().nullish(),
+  "scheduledStart": zod.coerce.date().nullish(),
+  "scheduledEnd": zod.coerce.date().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "assignedUserId": zod.string().nullish(),
+  "assignedUserName": zod.string().nullish(),
+  "assignedVehicleId": zod.string().nullish(),
+  "valuePence": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const UpdateJobParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+
+export const updateJobBodyValuePenceMin = 0;
+
+
+
+export const UpdateJobBody = zod.object({
+  "customerId": zod.string(),
+  "title": zod.string().min(1),
+  "description": zod.string().optional(),
+  "status": zod.string().optional(),
+  "scheduledStart": zod.coerce.date().optional(),
+  "scheduledEnd": zod.coerce.date().optional(),
+  "addressLine1": zod.string().optional(),
+  "city": zod.string().optional(),
+  "postcode": zod.string().optional(),
+  "assignedUserId": zod.string().optional(),
+  "assignedVehicleId": zod.string().optional(),
+  "valuePence": zod.number().min(updateJobBodyValuePenceMin).optional()
+})
+
+export const UpdateJobResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "quoteId": zod.string().nullish(),
+  "scheduledStart": zod.coerce.date().nullish(),
+  "scheduledEnd": zod.coerce.date().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "assignedUserId": zod.string().nullish(),
+  "assignedUserName": zod.string().nullish(),
+  "assignedVehicleId": zod.string().nullish(),
+  "valuePence": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const AssignJobParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+export const AssignJobBody = zod.object({
+  "assignedUserId": zod.string().nullish(),
+  "assignedVehicleId": zod.string().nullish(),
+  "scheduledStart": zod.coerce.date().nullish(),
+  "scheduledEnd": zod.coerce.date().nullish()
+})
+
+export const AssignJobResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "quoteId": zod.string().nullish(),
+  "scheduledStart": zod.coerce.date().nullish(),
+  "scheduledEnd": zod.coerce.date().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "assignedUserId": zod.string().nullish(),
+  "assignedUserName": zod.string().nullish(),
+  "assignedVehicleId": zod.string().nullish(),
+  "valuePence": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const GetScheduleQueryParams = zod.object({
+  "from": zod.date(),
+  "to": zod.date()
+})
+
+export const GetScheduleResponseItem = zod.object({
+  "jobId": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "start": zod.coerce.date(),
+  "end": zod.coerce.date().nullish(),
+  "assignedUserId": zod.string().nullish(),
+  "assignedUserName": zod.string().nullish(),
+  "customerName": zod.string()
+})
+export const GetScheduleResponse = zod.array(GetScheduleResponseItem)
+
+
+export const ListVehiclesResponseItem = zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "registration": zod.string(),
+  "make": zod.string().nullish(),
+  "model": zod.string().nullish(),
+  "year": zod.number().nullish(),
+  "motDueAt": zod.coerce.date().nullish(),
+  "taxDueAt": zod.coerce.date().nullish(),
+  "serviceDueAt": zod.coerce.date().nullish(),
+  "assignedDriverId": zod.string().nullish(),
+  "assignedDriverName": zod.string().nullish(),
+  "status": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+export const ListVehiclesResponse = zod.array(ListVehiclesResponseItem)
+
+
+
+
+
+
+export const CreateVehicleBody = zod.object({
+  "label": zod.string().min(1),
+  "registration": zod.string().min(1),
+  "make": zod.string().optional(),
+  "model": zod.string().optional(),
+  "year": zod.number().optional(),
+  "motDueAt": zod.coerce.date().optional(),
+  "taxDueAt": zod.coerce.date().optional(),
+  "serviceDueAt": zod.coerce.date().optional(),
+  "assignedDriverId": zod.string().optional(),
+  "status": zod.string().optional()
+})
+
+
+export const UpdateVehicleParams = zod.object({
+  "vehicleId": zod.coerce.string()
+})
+
+
+
+
+
+export const UpdateVehicleBody = zod.object({
+  "label": zod.string().min(1),
+  "registration": zod.string().min(1),
+  "make": zod.string().optional(),
+  "model": zod.string().optional(),
+  "year": zod.number().optional(),
+  "motDueAt": zod.coerce.date().optional(),
+  "taxDueAt": zod.coerce.date().optional(),
+  "serviceDueAt": zod.coerce.date().optional(),
+  "assignedDriverId": zod.string().optional(),
+  "status": zod.string().optional()
+})
+
+export const UpdateVehicleResponse = zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "registration": zod.string(),
+  "make": zod.string().nullish(),
+  "model": zod.string().nullish(),
+  "year": zod.number().nullish(),
+  "motDueAt": zod.coerce.date().nullish(),
+  "taxDueAt": zod.coerce.date().nullish(),
+  "serviceDueAt": zod.coerce.date().nullish(),
+  "assignedDriverId": zod.string().nullish(),
+  "assignedDriverName": zod.string().nullish(),
+  "status": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const DeleteVehicleParams = zod.object({
+  "vehicleId": zod.coerce.string()
+})
+
+
+export const RecordVehicleLocationParams = zod.object({
+  "vehicleId": zod.coerce.string()
+})
+
+export const RecordVehicleLocationBody = zod.object({
+  "lat": zod.string(),
+  "lng": zod.string(),
+  "speedKph": zod.number().optional(),
+  "headingDeg": zod.number().optional()
+})
+
+export const RecordVehicleLocationResponse = zod.object({
+  "id": zod.string().optional(),
+  "vehicleId": zod.string(),
+  "lat": zod.string(),
+  "lng": zod.string(),
+  "speedKph": zod.number().nullish(),
+  "headingDeg": zod.number().nullish(),
+  "recordedAt": zod.coerce.date()
+})
+
+
+export const ListLatestVehicleLocationsResponseItem = zod.object({
+  "id": zod.string().optional(),
+  "vehicleId": zod.string(),
+  "lat": zod.string(),
+  "lng": zod.string(),
+  "speedKph": zod.number().nullish(),
+  "headingDeg": zod.number().nullish(),
+  "recordedAt": zod.coerce.date()
+})
+export const ListLatestVehicleLocationsResponse = zod.array(ListLatestVehicleLocationsResponseItem)
+
+
+export const ListCertificatesResponseItem = zod.object({
+  "id": zod.string(),
+  "holderUserId": zod.string().nullish(),
+  "holderLabel": zod.string().nullish(),
+  "kind": zod.string(),
+  "reference": zod.string().nullish(),
+  "issuedAt": zod.coerce.date().nullish(),
+  "expiresAt": zod.coerce.date().nullish(),
+  "documentUrl": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListCertificatesResponse = zod.array(ListCertificatesResponseItem)
+
+
+
+
+
+export const CreateCertificateBody = zod.object({
+  "holderUserId": zod.string().optional(),
+  "holderLabel": zod.string().optional(),
+  "kind": zod.string().min(1),
+  "reference": zod.string().optional(),
+  "issuedAt": zod.coerce.date().optional(),
+  "expiresAt": zod.coerce.date().optional(),
+  "documentUrl": zod.string().optional(),
+  "notes": zod.string().optional()
+})
+
+
+export const UpdateCertificateParams = zod.object({
+  "certificateId": zod.coerce.string()
+})
+
+
+
+
+export const UpdateCertificateBody = zod.object({
+  "holderUserId": zod.string().optional(),
+  "holderLabel": zod.string().optional(),
+  "kind": zod.string().min(1),
+  "reference": zod.string().optional(),
+  "issuedAt": zod.coerce.date().optional(),
+  "expiresAt": zod.coerce.date().optional(),
+  "documentUrl": zod.string().optional(),
+  "notes": zod.string().optional()
+})
+
+export const UpdateCertificateResponse = zod.object({
+  "id": zod.string(),
+  "holderUserId": zod.string().nullish(),
+  "holderLabel": zod.string().nullish(),
+  "kind": zod.string(),
+  "reference": zod.string().nullish(),
+  "issuedAt": zod.coerce.date().nullish(),
+  "expiresAt": zod.coerce.date().nullish(),
+  "documentUrl": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const DeleteCertificateParams = zod.object({
+  "certificateId": zod.coerce.string()
+})
+
+
 export const GetAdminTenantAuditLogParams = zod.object({
   "tenantId": zod.coerce.string()
 })

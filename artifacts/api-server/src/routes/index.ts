@@ -6,6 +6,12 @@ import tenantRouter from "./tenant";
 import subscriptionRouter from "./subscription";
 import onboardingRouter from "./onboarding";
 import adminRouter from "./admin";
+import customersRouter from "./customers";
+import quotesRouter from "./quotes";
+import jobsRouter from "./jobs";
+import fleetRouter from "./fleet";
+import complianceRouter from "./compliance";
+import teamRouter from "./team";
 
 const router: IRouter = Router();
 
@@ -23,5 +29,11 @@ router.use(tenantRouter);
 router.use(subscriptionRouter);
 router.use(onboardingRouter);
 router.use(adminRouter);
+router.use(customersRouter);
+router.use(quotesRouter);
+router.use(jobsRouter);
+router.use(fleetRouter);
+router.use(complianceRouter);
+router.use(teamRouter);
 
 export default router;

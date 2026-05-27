@@ -20,6 +20,14 @@ import { Signup } from "@/pages/auth/Signup";
 import { AppDashboard } from "@/pages/app/Dashboard";
 import { AppSettings } from "@/pages/app/Settings";
 import { AppBilling } from "@/pages/app/Billing";
+import { AppCustomers } from "@/pages/app/Customers";
+import { AppQuotes } from "@/pages/app/Quotes";
+import { AppQuoteDetail } from "@/pages/app/QuoteDetail";
+import { AppJobs } from "@/pages/app/Jobs";
+import { AppJobDetail } from "@/pages/app/JobDetail";
+import { AppSchedule } from "@/pages/app/Schedule";
+import { AppFleet } from "@/pages/app/Fleet";
+import { AppCompliance } from "@/pages/app/Compliance";
 import { PlaceholderPage } from "@/components/PlaceholderPage";
 
 // Admin
@@ -53,6 +61,14 @@ function App() {
                   <Route path="/" component={AppDashboard} />
                   <Route path="/settings" component={AppSettings} />
                   <Route path="/billing" component={AppBilling} />
+                  <Route path="/customers" component={AppCustomers} />
+                  <Route path="/quotes" component={AppQuotes} />
+                  <Route path="/quotes/:id" component={AppQuoteDetail} />
+                  <Route path="/jobs" component={AppJobs} />
+                  <Route path="/jobs/:id" component={AppJobDetail} />
+                  <Route path="/schedule" component={AppSchedule} />
+                  <Route path="/fleet" component={AppFleet} />
+                  <Route path="/compliance" component={AppCompliance} />
                   <Route path="/:id">
                     {() => <PlaceholderPage />}
                   </Route>

@@ -17,6 +17,13 @@ tags:
   - name: pricing
   - name: onboarding
   - name: admin
+  - name: customers
+  - name: quotes
+  - name: jobs
+  - name: schedule
+  - name: fleet
+  - name: compliance
+  - name: team
 paths:
   /healthz:
     get:
@@ -402,6 +409,437 @@ paths:
               schema:
                 $ref: "#/components/schemas/Subscription"
 
+  /v1/team:
+    get:
+      operationId: listTeam
+      tags: [team]
+      summary: List members of current tenant
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TeamMember" }
+
+  /v1/customers:
+    get:
+      operationId: listCustomers
+      tags: [customers]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Customer" }
+    post:
+      operationId: createCustomer
+      tags: [customers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+
+  /v1/customers/{customerId}:
+    parameters:
+      - in: path
+        name: customerId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getCustomer
+      tags: [customers]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+    patch:
+      operationId: updateCustomer
+      tags: [customers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+    delete:
+      operationId: deleteCustomer
+      tags: [customers]
+      responses:
+        "204": { description: Deleted }
+
+  /v1/quotes:
+    get:
+      operationId: listQuotes
+      tags: [quotes]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/QuoteSummary" }
+    post:
+      operationId: createQuote
+      tags: [quotes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/QuoteInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Quote" }
+
+  /v1/quotes/{quoteId}:
+    parameters:
+      - in: path
+        name: quoteId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getQuote
+      tags: [quotes]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Quote" }
+    patch:
+      operationId: updateQuote
+      tags: [quotes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/QuoteInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Quote" }
+
+  /v1/quotes/{quoteId}/send:
+    parameters:
+      - in: path
+        name: quoteId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: sendQuote
+      tags: [quotes]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Quote" }
+
+  /v1/quotes/{quoteId}/accept:
+    parameters:
+      - in: path
+        name: quoteId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: acceptQuote
+      tags: [quotes]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Quote" }
+
+  /v1/quotes/{quoteId}/convert:
+    parameters:
+      - in: path
+        name: quoteId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: convertQuoteToJob
+      tags: [quotes]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/QuoteConvertInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Job" }
+
+  /v1/jobs:
+    get:
+      operationId: listJobs
+      tags: [jobs]
+      parameters:
+        - in: query
+          name: status
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/JobSummary" }
+    post:
+      operationId: createJob
+      tags: [jobs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/JobInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Job" }
+
+  /v1/jobs/{jobId}:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getJob
+      tags: [jobs]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Job" }
+    patch:
+      operationId: updateJob
+      tags: [jobs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/JobInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Job" }
+
+  /v1/jobs/{jobId}/assign:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: assignJob
+      tags: [jobs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/JobAssignmentInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Job" }
+
+  /v1/schedule:
+    get:
+      operationId: getSchedule
+      tags: [schedule]
+      parameters:
+        - in: query
+          name: from
+          required: true
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          required: true
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ScheduleEntry" }
+
+  /v1/fleet/vehicles:
+    get:
+      operationId: listVehicles
+      tags: [fleet]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Vehicle" }
+    post:
+      operationId: createVehicle
+      tags: [fleet]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VehicleInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Vehicle" }
+
+  /v1/fleet/vehicles/{vehicleId}:
+    parameters:
+      - in: path
+        name: vehicleId
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateVehicle
+      tags: [fleet]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VehicleInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Vehicle" }
+    delete:
+      operationId: deleteVehicle
+      tags: [fleet]
+      responses:
+        "204": { description: Deleted }
+
+  /v1/fleet/vehicles/{vehicleId}/location:
+    parameters:
+      - in: path
+        name: vehicleId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: recordVehicleLocation
+      tags: [fleet]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VehicleLocationInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VehicleLocation" }
+
+  /v1/fleet/locations:
+    get:
+      operationId: listLatestVehicleLocations
+      tags: [fleet]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/VehicleLocation" }
+
+  /v1/compliance/certificates:
+    get:
+      operationId: listCertificates
+      tags: [compliance]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Certificate" }
+    post:
+      operationId: createCertificate
+      tags: [compliance]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CertificateInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Certificate" }
+
+  /v1/compliance/certificates/{certificateId}:
+    parameters:
+      - in: path
+        name: certificateId
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateCertificate
+      tags: [compliance]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CertificateInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Certificate" }
+    delete:
+      operationId: deleteCertificate
+      tags: [compliance]
+      responses:
+        "204": { description: Deleted }
+
   /v1/admin/tenants/{tenantId}/audit-log:
     get:
       operationId: getAdminTenantAuditLog
@@ -729,3 +1167,272 @@ components:
         message: { type: string }
         actor: { type: ["string", "null"] }
         createdAt: { type: string, format: date-time }
+
+    TeamMember:
+      type: object
+      required: [userId, name, email, role, seatType]
+      properties:
+        userId: { type: string }
+        name: { type: string }
+        email: { type: string }
+        role: { type: string }
+        seatType: { type: string }
+
+    Customer:
+      type: object
+      required: [id, name, createdAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: ["string", "null"] }
+        phone: { type: ["string", "null"] }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    CustomerInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        email: { type: string }
+        phone: { type: string }
+        addressLine1: { type: string }
+        city: { type: string }
+        postcode: { type: string }
+        notes: { type: string }
+
+    QuoteLineItem:
+      type: object
+      required: [id, description, quantity, unitPricePence]
+      properties:
+        id: { type: string }
+        description: { type: string }
+        quantity: { type: integer }
+        unitPricePence: { type: integer }
+        sortOrder: { type: integer }
+
+    QuoteLineItemInput:
+      type: object
+      required: [description, quantity, unitPricePence]
+      properties:
+        description: { type: string, minLength: 1 }
+        quantity: { type: integer, minimum: 1 }
+        unitPricePence: { type: integer, minimum: 0 }
+
+    QuoteSummary:
+      type: object
+      required: [id, number, title, status, customerId, customerName, totalPence, currency, createdAt]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        title: { type: string }
+        status: { type: string }
+        customerId: { type: string }
+        customerName: { type: string }
+        totalPence: { type: integer }
+        currency: { type: string }
+        createdAt: { type: string, format: date-time }
+        sentAt: { type: ["string", "null"], format: date-time }
+        acceptedAt: { type: ["string", "null"], format: date-time }
+
+    Quote:
+      type: object
+      required: [id, number, title, status, customerId, customerName, totalPence, currency, createdAt, items]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        title: { type: string }
+        status: { type: string }
+        customerId: { type: string }
+        customerName: { type: string }
+        notes: { type: ["string", "null"] }
+        totalPence: { type: integer }
+        currency: { type: string }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/QuoteLineItem" }
+        createdAt: { type: string, format: date-time }
+        sentAt: { type: ["string", "null"], format: date-time }
+        acceptedAt: { type: ["string", "null"], format: date-time }
+        convertedJobId: { type: ["string", "null"] }
+
+    QuoteInput:
+      type: object
+      required: [customerId, title, items]
+      properties:
+        customerId: { type: string }
+        title: { type: string, minLength: 1 }
+        notes: { type: string }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/QuoteLineItemInput" }
+
+    QuoteConvertInput:
+      type: object
+      properties:
+        scheduledStart: { type: string, format: date-time }
+        scheduledEnd: { type: string, format: date-time }
+        assignedUserId: { type: string }
+
+    JobSummary:
+      type: object
+      required: [id, number, title, status, customerId, customerName, valuePence, createdAt]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        title: { type: string }
+        status: { type: string }
+        customerId: { type: string }
+        customerName: { type: string }
+        scheduledStart: { type: ["string", "null"], format: date-time }
+        scheduledEnd: { type: ["string", "null"], format: date-time }
+        assignedUserId: { type: ["string", "null"] }
+        assignedUserName: { type: ["string", "null"] }
+        valuePence: { type: integer }
+        createdAt: { type: string, format: date-time }
+
+    Job:
+      type: object
+      required: [id, number, title, status, customerId, customerName, valuePence, createdAt]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        title: { type: string }
+        description: { type: ["string", "null"] }
+        status: { type: string }
+        customerId: { type: string }
+        customerName: { type: string }
+        quoteId: { type: ["string", "null"] }
+        scheduledStart: { type: ["string", "null"], format: date-time }
+        scheduledEnd: { type: ["string", "null"], format: date-time }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+        assignedUserId: { type: ["string", "null"] }
+        assignedUserName: { type: ["string", "null"] }
+        assignedVehicleId: { type: ["string", "null"] }
+        valuePence: { type: integer }
+        createdAt: { type: string, format: date-time }
+
+    JobInput:
+      type: object
+      required: [customerId, title]
+      properties:
+        customerId: { type: string }
+        title: { type: string, minLength: 1 }
+        description: { type: string }
+        status: { type: string }
+        scheduledStart: { type: string, format: date-time }
+        scheduledEnd: { type: string, format: date-time }
+        addressLine1: { type: string }
+        city: { type: string }
+        postcode: { type: string }
+        assignedUserId: { type: string }
+        assignedVehicleId: { type: string }
+        valuePence: { type: integer, minimum: 0 }
+
+    JobAssignmentInput:
+      type: object
+      properties:
+        assignedUserId: { type: ["string", "null"] }
+        assignedVehicleId: { type: ["string", "null"] }
+        scheduledStart: { type: ["string", "null"], format: date-time }
+        scheduledEnd: { type: ["string", "null"], format: date-time }
+
+    ScheduleEntry:
+      type: object
+      required: [jobId, title, status, start, customerName]
+      properties:
+        jobId: { type: string }
+        title: { type: string }
+        status: { type: string }
+        start: { type: string, format: date-time }
+        end: { type: ["string", "null"], format: date-time }
+        assignedUserId: { type: ["string", "null"] }
+        assignedUserName: { type: ["string", "null"] }
+        customerName: { type: string }
+
+    Vehicle:
+      type: object
+      required: [id, label, registration, status, createdAt]
+      properties:
+        id: { type: string }
+        label: { type: string }
+        registration: { type: string }
+        make: { type: ["string", "null"] }
+        model: { type: ["string", "null"] }
+        year: { type: ["integer", "null"] }
+        motDueAt: { type: ["string", "null"], format: date-time }
+        taxDueAt: { type: ["string", "null"], format: date-time }
+        serviceDueAt: { type: ["string", "null"], format: date-time }
+        assignedDriverId: { type: ["string", "null"] }
+        assignedDriverName: { type: ["string", "null"] }
+        status: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    VehicleInput:
+      type: object
+      required: [label, registration]
+      properties:
+        label: { type: string, minLength: 1 }
+        registration: { type: string, minLength: 1 }
+        make: { type: string }
+        model: { type: string }
+        year: { type: integer }
+        motDueAt: { type: string, format: date-time }
+        taxDueAt: { type: string, format: date-time }
+        serviceDueAt: { type: string, format: date-time }
+        assignedDriverId: { type: string }
+        status: { type: string }
+
+    VehicleLocation:
+      type: object
+      required: [vehicleId, lat, lng, recordedAt]
+      properties:
+        id: { type: string }
+        vehicleId: { type: string }
+        lat: { type: string }
+        lng: { type: string }
+        speedKph: { type: ["integer", "null"] }
+        headingDeg: { type: ["integer", "null"] }
+        recordedAt: { type: string, format: date-time }
+
+    VehicleLocationInput:
+      type: object
+      required: [lat, lng]
+      properties:
+        lat: { type: string }
+        lng: { type: string }
+        speedKph: { type: integer }
+        headingDeg: { type: integer }
+
+    Certificate:
+      type: object
+      required: [id, kind, createdAt]
+      properties:
+        id: { type: string }
+        holderUserId: { type: ["string", "null"] }
+        holderLabel: { type: ["string", "null"] }
+        kind: { type: string }
+        reference: { type: ["string", "null"] }
+        issuedAt: { type: ["string", "null"], format: date-time }
+        expiresAt: { type: ["string", "null"], format: date-time }
+        documentUrl: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    CertificateInput:
+      type: object
+      required: [kind]
+      properties:
+        holderUserId: { type: string }
+        holderLabel: { type: string }
+        kind: { type: string, minLength: 1 }
+        reference: { type: string }
+        issuedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        documentUrl: { type: string }
+        notes: { type: string }

@@ -264,3 +264,299 @@ export interface AdminTenantDetail {
   recentEvents: AuditLogEntry[];
 }
 
+export interface TeamMember {
+  userId: string;
+  name: string;
+  email: string;
+  role: string;
+  seatType: string;
+}
+
+export interface Customer {
+  id: string;
+  name: string;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  addressLine1?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  postcode?: string | null;
+  /** @nullable */
+  notes?: string | null;
+  createdAt: string;
+}
+
+export interface CustomerInput {
+  /** @minLength 1 */
+  name: string;
+  email?: string;
+  phone?: string;
+  addressLine1?: string;
+  city?: string;
+  postcode?: string;
+  notes?: string;
+}
+
+export interface QuoteLineItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPricePence: number;
+  sortOrder?: number;
+}
+
+export interface QuoteLineItemInput {
+  /** @minLength 1 */
+  description: string;
+  /** @minimum 1 */
+  quantity: number;
+  /** @minimum 0 */
+  unitPricePence: number;
+}
+
+export interface QuoteSummary {
+  id: string;
+  number: string;
+  title: string;
+  status: string;
+  customerId: string;
+  customerName: string;
+  totalPence: number;
+  currency: string;
+  createdAt: string;
+  /** @nullable */
+  sentAt?: string | null;
+  /** @nullable */
+  acceptedAt?: string | null;
+}
+
+export interface Quote {
+  id: string;
+  number: string;
+  title: string;
+  status: string;
+  customerId: string;
+  customerName: string;
+  /** @nullable */
+  notes?: string | null;
+  totalPence: number;
+  currency: string;
+  items: QuoteLineItem[];
+  createdAt: string;
+  /** @nullable */
+  sentAt?: string | null;
+  /** @nullable */
+  acceptedAt?: string | null;
+  /** @nullable */
+  convertedJobId?: string | null;
+}
+
+export interface QuoteInput {
+  customerId: string;
+  /** @minLength 1 */
+  title: string;
+  notes?: string;
+  items: QuoteLineItemInput[];
+}
+
+export interface QuoteConvertInput {
+  scheduledStart?: string;
+  scheduledEnd?: string;
+  assignedUserId?: string;
+}
+
+export interface JobSummary {
+  id: string;
+  number: string;
+  title: string;
+  status: string;
+  customerId: string;
+  customerName: string;
+  /** @nullable */
+  scheduledStart?: string | null;
+  /** @nullable */
+  scheduledEnd?: string | null;
+  /** @nullable */
+  assignedUserId?: string | null;
+  /** @nullable */
+  assignedUserName?: string | null;
+  valuePence: number;
+  createdAt: string;
+}
+
+export interface Job {
+  id: string;
+  number: string;
+  title: string;
+  /** @nullable */
+  description?: string | null;
+  status: string;
+  customerId: string;
+  customerName: string;
+  /** @nullable */
+  quoteId?: string | null;
+  /** @nullable */
+  scheduledStart?: string | null;
+  /** @nullable */
+  scheduledEnd?: string | null;
+  /** @nullable */
+  addressLine1?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  postcode?: string | null;
+  /** @nullable */
+  assignedUserId?: string | null;
+  /** @nullable */
+  assignedUserName?: string | null;
+  /** @nullable */
+  assignedVehicleId?: string | null;
+  valuePence: number;
+  createdAt: string;
+}
+
+export interface JobInput {
+  customerId: string;
+  /** @minLength 1 */
+  title: string;
+  description?: string;
+  status?: string;
+  scheduledStart?: string;
+  scheduledEnd?: string;
+  addressLine1?: string;
+  city?: string;
+  postcode?: string;
+  assignedUserId?: string;
+  assignedVehicleId?: string;
+  /** @minimum 0 */
+  valuePence?: number;
+}
+
+export interface JobAssignmentInput {
+  /** @nullable */
+  assignedUserId?: string | null;
+  /** @nullable */
+  assignedVehicleId?: string | null;
+  /** @nullable */
+  scheduledStart?: string | null;
+  /** @nullable */
+  scheduledEnd?: string | null;
+}
+
+export interface ScheduleEntry {
+  jobId: string;
+  title: string;
+  status: string;
+  start: string;
+  /** @nullable */
+  end?: string | null;
+  /** @nullable */
+  assignedUserId?: string | null;
+  /** @nullable */
+  assignedUserName?: string | null;
+  customerName: string;
+}
+
+export interface Vehicle {
+  id: string;
+  label: string;
+  registration: string;
+  /** @nullable */
+  make?: string | null;
+  /** @nullable */
+  model?: string | null;
+  /** @nullable */
+  year?: number | null;
+  /** @nullable */
+  motDueAt?: string | null;
+  /** @nullable */
+  taxDueAt?: string | null;
+  /** @nullable */
+  serviceDueAt?: string | null;
+  /** @nullable */
+  assignedDriverId?: string | null;
+  /** @nullable */
+  assignedDriverName?: string | null;
+  status: string;
+  createdAt: string;
+}
+
+export interface VehicleInput {
+  /** @minLength 1 */
+  label: string;
+  /** @minLength 1 */
+  registration: string;
+  make?: string;
+  model?: string;
+  year?: number;
+  motDueAt?: string;
+  taxDueAt?: string;
+  serviceDueAt?: string;
+  assignedDriverId?: string;
+  status?: string;
+}
+
+export interface VehicleLocation {
+  id?: string;
+  vehicleId: string;
+  lat: string;
+  lng: string;
+  /** @nullable */
+  speedKph?: number | null;
+  /** @nullable */
+  headingDeg?: number | null;
+  recordedAt: string;
+}
+
+export interface VehicleLocationInput {
+  lat: string;
+  lng: string;
+  speedKph?: number;
+  headingDeg?: number;
+}
+
+export interface Certificate {
+  id: string;
+  /** @nullable */
+  holderUserId?: string | null;
+  /** @nullable */
+  holderLabel?: string | null;
+  kind: string;
+  /** @nullable */
+  reference?: string | null;
+  /** @nullable */
+  issuedAt?: string | null;
+  /** @nullable */
+  expiresAt?: string | null;
+  /** @nullable */
+  documentUrl?: string | null;
+  /** @nullable */
+  notes?: string | null;
+  createdAt: string;
+}
+
+export interface CertificateInput {
+  holderUserId?: string;
+  holderLabel?: string;
+  /** @minLength 1 */
+  kind: string;
+  reference?: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  documentUrl?: string;
+  notes?: string;
+}
+
+export type ListJobsParams = {
+status?: string;
+};
+
+export type GetScheduleParams = {
+from: string;
+to: string;
+};
+
