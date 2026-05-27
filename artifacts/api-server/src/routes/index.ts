@@ -25,6 +25,8 @@ import filesRouter from "./files";
 import brandingRouter from "./branding";
 import usageRouter from "./usage";
 import adminWorkersRouter from "./adminWorkers";
+import inboxRouter from "./inbox";
+import notificationsRouter from "./notifications";
 
 const router: IRouter = Router();
 
@@ -61,5 +63,7 @@ router.use(filesRouter);
 router.use(brandingRouter);
 router.use(usageRouter);
 router.use(adminWorkersRouter);
+router.use(inboxRouter);
+router.use(notificationsRouter);
 
 export default router;

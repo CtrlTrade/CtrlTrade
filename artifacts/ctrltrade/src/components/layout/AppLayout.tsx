@@ -3,8 +3,20 @@ import { Link, useLocation } from "wouter";
 import { useGetSession, useLogout, useStopImpersonation } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target, Inbox } from "lucide-react";
+import { useGetInboxUnreadCount } from "@workspace/api-client-react";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+
+function InboxBadge() {
+  const { data } = useGetInboxUnreadCount({ query: { refetchInterval: 30000 } as any });
+  if (!data || data.count <= 0) return null;
+  return (
+    <Badge className="rounded-none bg-primary text-primary-foreground text-[10px] px-1.5" data-testid="badge-inbox-unread">
+      {data.count}
+    </Badge>
+  );
+}
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
@@ -36,6 +48,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/leads", icon: Target, label: "Leads" },
     { href: "/customers", icon: Users, label: "Customers" },
+    { href: "/inbox", icon: Inbox, label: "Inbox" },
     { href: "/jobs", icon: Briefcase, label: "Jobs" },
     { href: "/quotes", icon: FileText, label: "Quotes" },
     { href: "/invoices", icon: FileSpreadsheet, label: "Invoices" },
@@ -57,10 +70,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <nav className="flex-1 overflow-y-auto p-4 space-y-1">
           {links.map((link) => {
             const active = location === link.href || (link.href !== "/" && location.startsWith(link.href));
+            const showBadge = link.href === "/inbox";
             return (
               <Link key={link.href} href={link.href} className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent/50'}`} data-testid={`nav-${link.label.toLowerCase()}`}>
                 <link.icon className="h-4 w-4" />
-                {link.label}
+                <span className="flex-1">{link.label}</span>
+                {showBadge && <InboxBadge />}
               </Link>
             );
           })}

@@ -12,6 +12,7 @@ import { Copy, Palette } from "lucide-react";
 import { Link } from "wouter";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AppStaff } from "./Staff";
+import { AppNotificationsSettings } from "./NotificationsSettings";
 
 export function AppSettings() {
   const { data: tenant, isLoading: tenantLoading } = useGetTenant();
@@ -81,8 +82,10 @@ export function AppSettings() {
         <TabsList className="rounded-none">
           <TabsTrigger value="company" data-testid="tab-company">Company</TabsTrigger>
           <TabsTrigger value="staff" data-testid="tab-staff">Staff</TabsTrigger>
+          <TabsTrigger value="notifications" data-testid="tab-notifications">Notifications</TabsTrigger>
         </TabsList>
         <TabsContent value="staff"><AppStaff /></TabsContent>
+        <TabsContent value="notifications"><AppNotificationsSettings /></TabsContent>
         <TabsContent value="company">
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="rounded-none border-border shadow-sm">

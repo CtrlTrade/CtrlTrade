@@ -1717,6 +1717,169 @@ export interface CustomerMessageInput {
   body: string;
 }
 
+/**
+ * @nullable
+ */
+export type InboxThreadLastDirection = typeof InboxThreadLastDirection[keyof typeof InboxThreadLastDirection] | null;
+
+
+export const InboxThreadLastDirection = {
+  in: 'in',
+  out: 'out',
+} as const;
+
+export interface InboxThread {
+  id: string;
+  /** @nullable */
+  customerId?: string | null;
+  /** @nullable */
+  customerName?: string | null;
+  /** @nullable */
+  customerEmail?: string | null;
+  /** @nullable */
+  customerPhone?: string | null;
+  channel: string;
+  /** @nullable */
+  subject?: string | null;
+  lastMessageAt: string;
+  /** @nullable */
+  lastMessagePreview?: string | null;
+  /** @nullable */
+  lastDirection?: InboxThreadLastDirection;
+  unreadCount: number;
+}
+
+export interface InboxThreadsResponse {
+  threads: InboxThread[];
+}
+
+export type InboxMessageDirection = typeof InboxMessageDirection[keyof typeof InboxMessageDirection];
+
+
+export const InboxMessageDirection = {
+  in: 'in',
+  out: 'out',
+} as const;
+
+export interface InboxMessage {
+  id: string;
+  channel: string;
+  direction: InboxMessageDirection;
+  /** @nullable */
+  fromAddr?: string | null;
+  /** @nullable */
+  toAddr?: string | null;
+  /** @nullable */
+  subject?: string | null;
+  body: string;
+  /** @nullable */
+  authorLabel?: string | null;
+  /** @nullable */
+  readAt?: string | null;
+  createdAt: string;
+}
+
+export interface InboxMessagesResponse {
+  messages: InboxMessage[];
+}
+
+export interface InboxUnreadCount {
+  count: number;
+}
+
+export interface InboxReplyInput {
+  /** @minLength 1 */
+  body: string;
+  subject?: string;
+}
+
+export type InboxComposeInputChannel = typeof InboxComposeInputChannel[keyof typeof InboxComposeInputChannel];
+
+
+export const InboxComposeInputChannel = {
+  email: 'email',
+  sms: 'sms',
+  whatsapp: 'whatsapp',
+} as const;
+
+export interface InboxComposeInput {
+  customerId: string;
+  channel: InboxComposeInputChannel;
+  subject?: string;
+  /** @minLength 1 */
+  body: string;
+}
+
+export interface InboxComposeResponse {
+  threadId: string;
+}
+
+export interface NotificationEvent {
+  kind: string;
+  description: string;
+  defaultChannels?: string[];
+}
+
+export interface NotificationEventsResponse {
+  events: NotificationEvent[];
+  channels: string[];
+}
+
+export interface NotificationPreference {
+  eventKind: string;
+  channel: string;
+  enabled: boolean;
+}
+
+export interface NotificationPreferencesResponse {
+  preferences: NotificationPreference[];
+}
+
+export interface NotificationPreferenceInput {
+  eventKind: string;
+  channel: string;
+  enabled: boolean;
+}
+
+export type NotificationTemplateScope = typeof NotificationTemplateScope[keyof typeof NotificationTemplateScope];
+
+
+export const NotificationTemplateScope = {
+  tenant: 'tenant',
+  global: 'global',
+} as const;
+
+export interface NotificationTemplate {
+  id: string;
+  scope: NotificationTemplateScope;
+  eventKind: string;
+  channel: string;
+  /** @nullable */
+  subject?: string | null;
+  bodyText: string;
+  /** @nullable */
+  bodyHtml?: string | null;
+  version: number;
+  updatedAt: string;
+}
+
+export interface NotificationTemplatesResponse {
+  templates: NotificationTemplate[];
+}
+
+export interface NotificationTemplateInput {
+  eventKind: string;
+  channel: string;
+  subject?: string;
+  /** @minLength 1 */
+  bodyText: string;
+  bodyHtml?: string;
+}
+
+export interface OkResponse {
+  ok: boolean;
+}
+
 export type ListFilesParams = {
 parentKind: string;
 parentId: string;

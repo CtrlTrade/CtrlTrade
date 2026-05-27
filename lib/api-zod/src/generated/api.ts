@@ -3696,3 +3696,147 @@ export const GetAdminTenantAuditLogResponseItem = zod.object({
 export const GetAdminTenantAuditLogResponse = zod.array(GetAdminTenantAuditLogResponseItem)
 
 
+export const ListInboxThreadsResponse = zod.object({
+  "threads": zod.array(zod.object({
+  "id": zod.string(),
+  "customerId": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
+  "customerPhone": zod.string().nullish(),
+  "channel": zod.string(),
+  "subject": zod.string().nullish(),
+  "lastMessageAt": zod.coerce.date(),
+  "lastMessagePreview": zod.string().nullish(),
+  "lastDirection": zod.union([zod.literal('in'),zod.literal('out'),zod.literal(null)]).nullish(),
+  "unreadCount": zod.number()
+}))
+})
+
+
+export const GetInboxUnreadCountResponse = zod.object({
+  "count": zod.number()
+})
+
+
+export const ListInboxMessagesParams = zod.object({
+  "threadId": zod.coerce.string()
+})
+
+export const ListInboxMessagesResponse = zod.object({
+  "messages": zod.array(zod.object({
+  "id": zod.string(),
+  "channel": zod.string(),
+  "direction": zod.enum(['in', 'out']),
+  "fromAddr": zod.string().nullish(),
+  "toAddr": zod.string().nullish(),
+  "subject": zod.string().nullish(),
+  "body": zod.string(),
+  "authorLabel": zod.string().nullish(),
+  "readAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+export const MarkInboxThreadReadParams = zod.object({
+  "threadId": zod.coerce.string()
+})
+
+export const MarkInboxThreadReadResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const ReplyInboxThreadParams = zod.object({
+  "threadId": zod.coerce.string()
+})
+
+
+
+
+export const ReplyInboxThreadBody = zod.object({
+  "body": zod.string().min(1),
+  "subject": zod.string().optional()
+})
+
+export const ReplyInboxThreadResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+
+
+
+export const ComposeInboxThreadBody = zod.object({
+  "customerId": zod.string(),
+  "channel": zod.enum(['email', 'sms', 'whatsapp']),
+  "subject": zod.string().optional(),
+  "body": zod.string().min(1)
+})
+
+export const ComposeInboxThreadResponse = zod.object({
+  "threadId": zod.string()
+})
+
+
+export const ListNotificationEventsResponse = zod.object({
+  "events": zod.array(zod.object({
+  "kind": zod.string(),
+  "description": zod.string(),
+  "defaultChannels": zod.array(zod.string()).optional()
+})),
+  "channels": zod.array(zod.string())
+})
+
+
+export const GetNotificationPreferencesResponse = zod.object({
+  "preferences": zod.array(zod.object({
+  "eventKind": zod.string(),
+  "channel": zod.string(),
+  "enabled": zod.boolean()
+}))
+})
+
+
+export const SetNotificationPreferenceBody = zod.object({
+  "eventKind": zod.string(),
+  "channel": zod.string(),
+  "enabled": zod.boolean()
+})
+
+export const SetNotificationPreferenceResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const ListNotificationTemplatesResponse = zod.object({
+  "templates": zod.array(zod.object({
+  "id": zod.string(),
+  "scope": zod.enum(['tenant', 'global']),
+  "eventKind": zod.string(),
+  "channel": zod.string(),
+  "subject": zod.string().nullish(),
+  "bodyText": zod.string(),
+  "bodyHtml": zod.string().nullish(),
+  "version": zod.number(),
+  "updatedAt": zod.coerce.date()
+}))
+})
+
+
+
+
+
+export const UpsertNotificationTemplateBody = zod.object({
+  "eventKind": zod.string(),
+  "channel": zod.string(),
+  "subject": zod.string().optional(),
+  "bodyText": zod.string().min(1),
+  "bodyHtml": zod.string().optional()
+})
+
+export const UpsertNotificationTemplateResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+

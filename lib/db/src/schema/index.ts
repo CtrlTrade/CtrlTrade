@@ -804,3 +804,93 @@ export type Lead = typeof leadsTable.$inferSelect;
 export type LeadNote = typeof leadNotesTable.$inferSelect;
 export type LeadActivity = typeof leadActivitiesTable.$inferSelect;
 export type LeadFile = typeof leadFilesTable.$inferSelect;
+
+// ---- Notifications: templates, prefs, threads, messages -------------------
+
+export const notificationTemplatesTable = pgTable(
+  "notification_templates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").references(() => tenantsTable.id, { onDelete: "cascade" }),
+    eventKind: varchar("event_kind", { length: 64 }).notNull(),
+    channel: varchar("channel", { length: 16 }).notNull(), // email|sms|whatsapp
+    subject: text("subject"),
+    bodyText: text("body_text").notNull(),
+    bodyHtml: text("body_html"),
+    version: integer("version").notNull().default(1),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    uniqGlobal: uniqueIndex("notif_tpl_global_uniq").on(t.eventKind, t.channel).where(sql`tenant_id IS NULL`),
+    uniqTenant: uniqueIndex("notif_tpl_tenant_uniq").on(t.tenantId, t.eventKind, t.channel).where(sql`tenant_id IS NOT NULL`),
+  }),
+);
+
+export const notificationPreferencesTable = pgTable(
+  "notification_preferences",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+    eventKind: varchar("event_kind", { length: 64 }).notNull(),
+    channel: varchar("channel", { length: 16 }).notNull(),
+    enabled: boolean("enabled").notNull().default(true),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    uniq: uniqueIndex("notif_pref_uniq").on(t.tenantId, t.userId, t.eventKind, t.channel),
+  }),
+);
+
+// Inbox threads — one per (customer, channel-or-portal). Aggregates customer_messages.
+export const inboxThreadsTable = pgTable(
+  "inbox_threads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").references(() => customersTable.id, { onDelete: "cascade" }),
+    channel: varchar("channel", { length: 16 }).notNull().default("portal"), // portal|email|sms|whatsapp
+    subject: text("subject"),
+    lastMessageAt: timestamp("last_message_at", { withTimezone: true }).notNull().defaultNow(),
+    lastMessagePreview: text("last_message_preview"),
+    lastDirection: varchar("last_direction", { length: 8 }), // in|out
+    unreadCount: integer("unread_count").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("inbox_threads_tenant_idx").on(t.tenantId, t.lastMessageAt),
+    custIdx: index("inbox_threads_cust_idx").on(t.tenantId, t.customerId),
+    uniqChannel: uniqueIndex("inbox_threads_uniq").on(t.tenantId, t.customerId, t.channel),
+  }),
+);
+
+export const inboxMessagesTable = pgTable(
+  "inbox_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    threadId: uuid("thread_id").notNull().references(() => inboxThreadsTable.id, { onDelete: "cascade" }),
+    channel: varchar("channel", { length: 16 }).notNull(), // email|sms|whatsapp|portal|note
+    direction: varchar("direction", { length: 8 }).notNull(), // in|out
+    fromAddr: text("from_addr"),
+    toAddr: text("to_addr"),
+    subject: text("subject"),
+    body: text("body").notNull(),
+    deliveryId: uuid("delivery_id").references(() => notificationDeliveriesTable.id, { onDelete: "set null" }),
+    externalRef: text("external_ref"), // provider message id (twilio sid, resend id, etc)
+    authorUserId: uuid("author_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    authorLabel: text("author_label"),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    threadIdx: index("inbox_msgs_thread_idx").on(t.threadId, t.createdAt),
+    tenantIdx: index("inbox_msgs_tenant_idx").on(t.tenantId, t.createdAt),
+  }),
+);
+
+export type NotificationTemplate = typeof notificationTemplatesTable.$inferSelect;
+export type NotificationPreference = typeof notificationPreferencesTable.$inferSelect;
+export type InboxThread = typeof inboxThreadsTable.$inferSelect;
+export type InboxMessage = typeof inboxMessagesTable.$inferSelect;

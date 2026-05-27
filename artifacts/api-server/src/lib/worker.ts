@@ -3,6 +3,7 @@ import { getBoss, type JobKind } from "./queue";
 import { runExpiryDigestOnce } from "./scheduler";
 import { rollupHourly, rollupDaily, recordUsage } from "./usage";
 import { sendEmail } from "./email";
+import { sendSmsViaTwilio, sendWhatsAppViaTwilio } from "./twilio";
 import { reconcileFromStripeSubscription } from "./stripeReconcile";
 import { db, tenantsTable } from "@workspace/db";
 import { inArray } from "drizzle-orm";
@@ -57,14 +58,21 @@ const handlers: Record<JobKind, Handler> = {
     logger.info({ touched, scanned: rows.length }, "Failed-payment recovery sweep complete");
   },
   send_sms: async (p) => {
-    // No SMS provider wired yet; once Twilio/Vonage is integrated, do the send
-    // here. The usage event is still recorded so per-tenant SMS counts
-    // accumulate against included plan limits.
-    logger.info({ payload: p }, "send_sms (no provider configured — logged)");
+    if (!p?.to || !p?.text) {
+      logger.warn({ payload: p }, "send_sms: missing to/text");
+      return;
+    }
+    const sid = await sendSmsViaTwilio(p.to, p.text);
+    logger.info({ to: p.to, sid }, sid ? "send_sms sent" : "send_sms logged (no provider)");
     if (p?.tenantId) await recordUsage(p.tenantId, "sms", 1, { to: p.to });
   },
   send_whatsapp: async (p) => {
-    logger.info({ payload: p }, "send_whatsapp (no provider configured — logged)");
+    if (!p?.to || !p?.text) {
+      logger.warn({ payload: p }, "send_whatsapp: missing to/text");
+      return;
+    }
+    const sid = await sendWhatsAppViaTwilio(p.to, p.text);
+    logger.info({ to: p.to, sid }, sid ? "send_whatsapp sent" : "send_whatsapp logged (no provider)");
     if (p?.tenantId) await recordUsage(p.tenantId, "whatsapp", 1, { to: p.to });
   },
   integration_sync: async (p) => {

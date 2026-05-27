@@ -20,6 +20,30 @@ export function getAppBaseUrl(): string {
   return process.env.APP_BASE_URL ?? "";
 }
 
+async function deliverViaResend(input: SendEmailInput, apiKey: string): Promise<void> {
+  const from = process.env.EMAIL_FROM_ADDRESS;
+  const fromName = process.env.EMAIL_FROM_NAME ?? "CtrlTrade";
+  if (!from) {
+    throw new Error("EMAIL_FROM_ADDRESS is required when RESEND_API_KEY is set");
+  }
+  const body = {
+    from: `${fromName} <${from}>`,
+    to: input.to.map((r) => (r.name ? `${r.name} <${r.email}>` : r.email)),
+    subject: input.subject,
+    text: input.text,
+    ...(input.html ? { html: input.html } : {}),
+  };
+  const resp = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    throw new Error(`Resend responded ${resp.status}: ${text}`);
+  }
+}
+
 async function deliverViaSendGrid(input: SendEmailInput, apiKey: string): Promise<void> {
   const from = process.env.EMAIL_FROM_ADDRESS;
   const fromName = process.env.EMAIL_FROM_NAME ?? "CtrlTrade";
@@ -82,8 +106,10 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
     })
     .returning();
 
+  const resendKey = process.env.RESEND_API_KEY;
   const sendgridKey = process.env.SENDGRID_API_KEY;
-  if (!sendgridKey) {
+  const transport: "resend" | "sendgrid" | null = resendKey ? "resend" : sendgridKey ? "sendgrid" : null;
+  if (!transport) {
     await db
       .update(notificationDeliveriesTable)
       .set({ status: "logged" })
@@ -96,13 +122,14 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
         subject: input.subject,
         deliveryId: row.id,
       },
-      "Email logged (no transport configured — set SENDGRID_API_KEY + EMAIL_FROM_ADDRESS to deliver)",
+      "Email logged (no transport — set RESEND_API_KEY or SENDGRID_API_KEY + EMAIL_FROM_ADDRESS to deliver)",
     );
     return;
   }
 
   try {
-    await deliverViaSendGrid(input, sendgridKey);
+    if (transport === "resend") await deliverViaResend(input, resendKey!);
+    else await deliverViaSendGrid(input, sendgridKey!);
     void recordUsage(input.tenantId, "email", input.to.length, { template: input.template });
     await db
       .update(notificationDeliveriesTable)
@@ -114,8 +141,9 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
         template: input.template,
         recipients: input.to.map((r) => r.email),
         deliveryId: row.id,
+        transport,
       },
-      "Email sent via SendGrid",
+      "Email sent",
     );
   } catch (err) {
     await db

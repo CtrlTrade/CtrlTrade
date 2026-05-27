@@ -53,6 +53,12 @@ import type {
   GdprDeletionState,
   GetScheduleParams,
   HealthStatus,
+  InboxComposeInput,
+  InboxComposeResponse,
+  InboxMessagesResponse,
+  InboxReplyInput,
+  InboxThreadsResponse,
+  InboxUnreadCount,
   InvitationRecord,
   InviteMemberBody,
   Invoice,
@@ -87,6 +93,12 @@ import type {
   ListJobsParams,
   ListLeadsParams,
   LoginCredentials,
+  NotificationEventsResponse,
+  NotificationPreferenceInput,
+  NotificationPreferencesResponse,
+  NotificationTemplateInput,
+  NotificationTemplatesResponse,
+  OkResponse,
   OnboardingState,
   PasswordResetCompleted,
   PasswordResetIssued,
@@ -10162,4 +10174,755 @@ export function useGetAdminTenantAuditLog<TData = Awaited<ReturnType<typeof getA
 
 
 
+
+export const getListInboxThreadsUrl = () => {
+
+
+
+
+  return `/api/v1/inbox/threads`
+}
+
+export const listInboxThreads = async ( options?: RequestInit): Promise<InboxThreadsResponse> => {
+
+  return customFetch<InboxThreadsResponse>(getListInboxThreadsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListInboxThreadsQueryKey = () => {
+    return [
+    `/api/v1/inbox/threads`
+    ] as const;
+    }
+
+
+export const getListInboxThreadsQueryOptions = <TData = Awaited<ReturnType<typeof listInboxThreads>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listInboxThreads>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListInboxThreadsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listInboxThreads>>> = ({ signal }) => listInboxThreads({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listInboxThreads>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListInboxThreadsQueryResult = NonNullable<Awaited<ReturnType<typeof listInboxThreads>>>
+export type ListInboxThreadsQueryError = ErrorType<unknown>
+
+
+
+export function useListInboxThreads<TData = Awaited<ReturnType<typeof listInboxThreads>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listInboxThreads>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListInboxThreadsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetInboxUnreadCountUrl = () => {
+
+
+
+
+  return `/api/v1/inbox/unread-count`
+}
+
+export const getInboxUnreadCount = async ( options?: RequestInit): Promise<InboxUnreadCount> => {
+
+  return customFetch<InboxUnreadCount>(getGetInboxUnreadCountUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetInboxUnreadCountQueryKey = () => {
+    return [
+    `/api/v1/inbox/unread-count`
+    ] as const;
+    }
+
+
+export const getGetInboxUnreadCountQueryOptions = <TData = Awaited<ReturnType<typeof getInboxUnreadCount>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getInboxUnreadCount>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetInboxUnreadCountQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getInboxUnreadCount>>> = ({ signal }) => getInboxUnreadCount({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getInboxUnreadCount>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetInboxUnreadCountQueryResult = NonNullable<Awaited<ReturnType<typeof getInboxUnreadCount>>>
+export type GetInboxUnreadCountQueryError = ErrorType<unknown>
+
+
+
+export function useGetInboxUnreadCount<TData = Awaited<ReturnType<typeof getInboxUnreadCount>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getInboxUnreadCount>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetInboxUnreadCountQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListInboxMessagesUrl = (threadId: string,) => {
+
+
+
+
+  return `/api/v1/inbox/threads/${threadId}/messages`
+}
+
+export const listInboxMessages = async (threadId: string, options?: RequestInit): Promise<InboxMessagesResponse> => {
+
+  return customFetch<InboxMessagesResponse>(getListInboxMessagesUrl(threadId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListInboxMessagesQueryKey = (threadId: string,) => {
+    return [
+    `/api/v1/inbox/threads/${threadId}/messages`
+    ] as const;
+    }
+
+
+export const getListInboxMessagesQueryOptions = <TData = Awaited<ReturnType<typeof listInboxMessages>>, TError = ErrorType<unknown>>(threadId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listInboxMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListInboxMessagesQueryKey(threadId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listInboxMessages>>> = ({ signal }) => listInboxMessages(threadId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(threadId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listInboxMessages>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListInboxMessagesQueryResult = NonNullable<Awaited<ReturnType<typeof listInboxMessages>>>
+export type ListInboxMessagesQueryError = ErrorType<unknown>
+
+
+
+export function useListInboxMessages<TData = Awaited<ReturnType<typeof listInboxMessages>>, TError = ErrorType<unknown>>(
+ threadId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listInboxMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListInboxMessagesQueryOptions(threadId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getMarkInboxThreadReadUrl = (threadId: string,) => {
+
+
+
+
+  return `/api/v1/inbox/threads/${threadId}/read`
+}
+
+export const markInboxThreadRead = async (threadId: string, options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getMarkInboxThreadReadUrl(threadId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getMarkInboxThreadReadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markInboxThreadRead>>, TError,{threadId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof markInboxThreadRead>>, TError,{threadId: string}, TContext> => {
+
+const mutationKey = ['markInboxThreadRead'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markInboxThreadRead>>, {threadId: string}> = (props) => {
+          const {threadId} = props ?? {};
+
+          return  markInboxThreadRead(threadId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarkInboxThreadReadMutationResult = NonNullable<Awaited<ReturnType<typeof markInboxThreadRead>>>
+
+    export type MarkInboxThreadReadMutationError = ErrorType<unknown>
+
+    export const useMarkInboxThreadRead = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markInboxThreadRead>>, TError,{threadId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof markInboxThreadRead>>,
+        TError,
+        {threadId: string},
+        TContext
+      > => {
+      return useMutation(getMarkInboxThreadReadMutationOptions(options));
+    }
+
+export const getReplyInboxThreadUrl = (threadId: string,) => {
+
+
+
+
+  return `/api/v1/inbox/threads/${threadId}/reply`
+}
+
+export const replyInboxThread = async (threadId: string,
+    inboxReplyInput: InboxReplyInput, options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getReplyInboxThreadUrl(threadId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      inboxReplyInput,)
+  }
+);}
+
+
+
+
+export const getReplyInboxThreadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof replyInboxThread>>, TError,{threadId: string;data: BodyType<InboxReplyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof replyInboxThread>>, TError,{threadId: string;data: BodyType<InboxReplyInput>}, TContext> => {
+
+const mutationKey = ['replyInboxThread'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof replyInboxThread>>, {threadId: string;data: BodyType<InboxReplyInput>}> = (props) => {
+          const {threadId,data} = props ?? {};
+
+          return  replyInboxThread(threadId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReplyInboxThreadMutationResult = NonNullable<Awaited<ReturnType<typeof replyInboxThread>>>
+    export type ReplyInboxThreadMutationBody = BodyType<InboxReplyInput>
+    export type ReplyInboxThreadMutationError = ErrorType<unknown>
+
+    export const useReplyInboxThread = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof replyInboxThread>>, TError,{threadId: string;data: BodyType<InboxReplyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof replyInboxThread>>,
+        TError,
+        {threadId: string;data: BodyType<InboxReplyInput>},
+        TContext
+      > => {
+      return useMutation(getReplyInboxThreadMutationOptions(options));
+    }
+
+export const getComposeInboxThreadUrl = () => {
+
+
+
+
+  return `/api/v1/inbox/compose`
+}
+
+export const composeInboxThread = async (inboxComposeInput: InboxComposeInput, options?: RequestInit): Promise<InboxComposeResponse> => {
+
+  return customFetch<InboxComposeResponse>(getComposeInboxThreadUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      inboxComposeInput,)
+  }
+);}
+
+
+
+
+export const getComposeInboxThreadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof composeInboxThread>>, TError,{data: BodyType<InboxComposeInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof composeInboxThread>>, TError,{data: BodyType<InboxComposeInput>}, TContext> => {
+
+const mutationKey = ['composeInboxThread'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof composeInboxThread>>, {data: BodyType<InboxComposeInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  composeInboxThread(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ComposeInboxThreadMutationResult = NonNullable<Awaited<ReturnType<typeof composeInboxThread>>>
+    export type ComposeInboxThreadMutationBody = BodyType<InboxComposeInput>
+    export type ComposeInboxThreadMutationError = ErrorType<unknown>
+
+    export const useComposeInboxThread = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof composeInboxThread>>, TError,{data: BodyType<InboxComposeInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof composeInboxThread>>,
+        TError,
+        {data: BodyType<InboxComposeInput>},
+        TContext
+      > => {
+      return useMutation(getComposeInboxThreadMutationOptions(options));
+    }
+
+export const getListNotificationEventsUrl = () => {
+
+
+
+
+  return `/api/v1/notifications/events`
+}
+
+export const listNotificationEvents = async ( options?: RequestInit): Promise<NotificationEventsResponse> => {
+
+  return customFetch<NotificationEventsResponse>(getListNotificationEventsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListNotificationEventsQueryKey = () => {
+    return [
+    `/api/v1/notifications/events`
+    ] as const;
+    }
+
+
+export const getListNotificationEventsQueryOptions = <TData = Awaited<ReturnType<typeof listNotificationEvents>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listNotificationEvents>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListNotificationEventsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listNotificationEvents>>> = ({ signal }) => listNotificationEvents({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listNotificationEvents>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListNotificationEventsQueryResult = NonNullable<Awaited<ReturnType<typeof listNotificationEvents>>>
+export type ListNotificationEventsQueryError = ErrorType<unknown>
+
+
+
+export function useListNotificationEvents<TData = Awaited<ReturnType<typeof listNotificationEvents>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listNotificationEvents>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListNotificationEventsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetNotificationPreferencesUrl = () => {
+
+
+
+
+  return `/api/v1/notifications/preferences`
+}
+
+export const getNotificationPreferences = async ( options?: RequestInit): Promise<NotificationPreferencesResponse> => {
+
+  return customFetch<NotificationPreferencesResponse>(getGetNotificationPreferencesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetNotificationPreferencesQueryKey = () => {
+    return [
+    `/api/v1/notifications/preferences`
+    ] as const;
+    }
+
+
+export const getGetNotificationPreferencesQueryOptions = <TData = Awaited<ReturnType<typeof getNotificationPreferences>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getNotificationPreferences>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetNotificationPreferencesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getNotificationPreferences>>> = ({ signal }) => getNotificationPreferences({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getNotificationPreferences>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetNotificationPreferencesQueryResult = NonNullable<Awaited<ReturnType<typeof getNotificationPreferences>>>
+export type GetNotificationPreferencesQueryError = ErrorType<unknown>
+
+
+
+export function useGetNotificationPreferences<TData = Awaited<ReturnType<typeof getNotificationPreferences>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getNotificationPreferences>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetNotificationPreferencesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getSetNotificationPreferenceUrl = () => {
+
+
+
+
+  return `/api/v1/notifications/preferences`
+}
+
+export const setNotificationPreference = async (notificationPreferenceInput: NotificationPreferenceInput, options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getSetNotificationPreferenceUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      notificationPreferenceInput,)
+  }
+);}
+
+
+
+
+export const getSetNotificationPreferenceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setNotificationPreference>>, TError,{data: BodyType<NotificationPreferenceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setNotificationPreference>>, TError,{data: BodyType<NotificationPreferenceInput>}, TContext> => {
+
+const mutationKey = ['setNotificationPreference'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setNotificationPreference>>, {data: BodyType<NotificationPreferenceInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  setNotificationPreference(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetNotificationPreferenceMutationResult = NonNullable<Awaited<ReturnType<typeof setNotificationPreference>>>
+    export type SetNotificationPreferenceMutationBody = BodyType<NotificationPreferenceInput>
+    export type SetNotificationPreferenceMutationError = ErrorType<unknown>
+
+    export const useSetNotificationPreference = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setNotificationPreference>>, TError,{data: BodyType<NotificationPreferenceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof setNotificationPreference>>,
+        TError,
+        {data: BodyType<NotificationPreferenceInput>},
+        TContext
+      > => {
+      return useMutation(getSetNotificationPreferenceMutationOptions(options));
+    }
+
+export const getListNotificationTemplatesUrl = () => {
+
+
+
+
+  return `/api/v1/notifications/templates`
+}
+
+export const listNotificationTemplates = async ( options?: RequestInit): Promise<NotificationTemplatesResponse> => {
+
+  return customFetch<NotificationTemplatesResponse>(getListNotificationTemplatesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListNotificationTemplatesQueryKey = () => {
+    return [
+    `/api/v1/notifications/templates`
+    ] as const;
+    }
+
+
+export const getListNotificationTemplatesQueryOptions = <TData = Awaited<ReturnType<typeof listNotificationTemplates>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listNotificationTemplates>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListNotificationTemplatesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listNotificationTemplates>>> = ({ signal }) => listNotificationTemplates({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listNotificationTemplates>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListNotificationTemplatesQueryResult = NonNullable<Awaited<ReturnType<typeof listNotificationTemplates>>>
+export type ListNotificationTemplatesQueryError = ErrorType<unknown>
+
+
+
+export function useListNotificationTemplates<TData = Awaited<ReturnType<typeof listNotificationTemplates>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listNotificationTemplates>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListNotificationTemplatesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpsertNotificationTemplateUrl = () => {
+
+
+
+
+  return `/api/v1/notifications/templates`
+}
+
+export const upsertNotificationTemplate = async (notificationTemplateInput: NotificationTemplateInput, options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getUpsertNotificationTemplateUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      notificationTemplateInput,)
+  }
+);}
+
+
+
+
+export const getUpsertNotificationTemplateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertNotificationTemplate>>, TError,{data: BodyType<NotificationTemplateInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof upsertNotificationTemplate>>, TError,{data: BodyType<NotificationTemplateInput>}, TContext> => {
+
+const mutationKey = ['upsertNotificationTemplate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof upsertNotificationTemplate>>, {data: BodyType<NotificationTemplateInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  upsertNotificationTemplate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpsertNotificationTemplateMutationResult = NonNullable<Awaited<ReturnType<typeof upsertNotificationTemplate>>>
+    export type UpsertNotificationTemplateMutationBody = BodyType<NotificationTemplateInput>
+    export type UpsertNotificationTemplateMutationError = ErrorType<unknown>
+
+    export const useUpsertNotificationTemplate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertNotificationTemplate>>, TError,{data: BodyType<NotificationTemplateInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof upsertNotificationTemplate>>,
+        TError,
+        {data: BodyType<NotificationTemplateInput>},
+        TContext
+      > => {
+      return useMutation(getUpsertNotificationTemplateMutationOptions(options));
+    }
 

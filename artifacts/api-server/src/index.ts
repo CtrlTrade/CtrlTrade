@@ -4,6 +4,7 @@ import { logger } from "./lib/logger";
 import { getStripeSync, isStripeConnected } from "./stripeClient";
 import { ensurePriceIds } from "./lib/stripeSubscription";
 import { getBoss } from "./lib/queue";
+import { seedDefaultTemplates } from "./lib/notifications";
 
 const rawPort = process.env["PORT"];
 if (!rawPort) throw new Error("PORT environment variable is required");
@@ -43,6 +44,8 @@ async function initStripe(): Promise<void> {
 }
 
 initStripe().catch((err) => logger.error({ err }, "initStripe top-level error"));
+
+seedDefaultTemplates().catch((err) => logger.error({ err }, "seedDefaultTemplates failed"));
 
 app.listen(port, (err) => {
   if (err) {

@@ -36,6 +36,7 @@ import { AppInvoiceDetail } from "@/pages/app/InvoiceDetail";
 import { AppInvoiceTemplates } from "@/pages/app/InvoiceTemplates";
 import { AppLeads } from "@/pages/app/Leads";
 import { AppLeadDetail } from "@/pages/app/LeadDetail";
+import { AppInbox } from "@/pages/app/Inbox";
 import { PlaceholderPage } from "@/components/PlaceholderPage";
 
 // Admin
@@ -98,6 +99,7 @@ function App() {
                   <Route path="/invoices" component={AppInvoices} />
                   <Route path="/invoice-templates" component={AppInvoiceTemplates} />
                   <Route path="/invoices/:id" component={AppInvoiceDetail} />
+                  <Route path="/inbox" component={AppInbox} />
                   <Route path="/:id">
                     {() => <PlaceholderPage />}
                   </Route>
