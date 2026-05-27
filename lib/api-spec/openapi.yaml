@@ -3,20 +3,26 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: CtrlTrade SaaS Portal API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: auth
+  - name: tenant
+  - name: subscription
+  - name: payment
+  - name: trade-categories
+  - name: pricing
+  - name: onboarding
+  - name: admin
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +30,702 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /v1/pricing:
+    get:
+      operationId: getPricing
+      tags: [pricing]
+      summary: Public pricing
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pricing"
+
+  /v1/trade-categories:
+    get:
+      operationId: listTradeCategories
+      tags: [trade-categories]
+      summary: List trade categories
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TradeCategory"
+
+  /v1/auth/signup:
+    post:
+      operationId: signup
+      tags: [auth]
+      summary: Create tenant, owner user, and trial subscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupPayload"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+
+  /v1/auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginCredentials"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+
+  /v1/auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      responses:
+        "204":
+          description: Logged out
+
+  /v1/auth/me:
+    get:
+      operationId: getSession
+      tags: [auth]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+
+  /v1/payment/setup-intent:
+    post:
+      operationId: createSetupIntent
+      tags: [payment]
+      summary: Create Stripe SetupIntent for saving a payment method during signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetupIntentInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SetupIntent"
+
+  /v1/tenant:
+    get:
+      operationId: getTenant
+      tags: [tenant]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenant"
+    patch:
+      operationId: updateTenant
+      tags: [tenant]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TenantUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenant"
+
+  /v1/tenant/cancel:
+    post:
+      operationId: cancelTenant
+      tags: [tenant]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancellationRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CancellationReceipt"
+
+  /v1/tenant/sync-stripe:
+    post:
+      operationId: syncTenantFromStripe
+      tags: [tenant]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+
+  /v1/subscription:
+    get:
+      operationId: getSubscription
+      tags: [subscription]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+    patch:
+      operationId: updateSubscriptionQuantities
+      tags: [subscription]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionQuantities"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+
+  /v1/subscription/reactivate:
+    post:
+      operationId: reactivateSubscription
+      tags: [subscription]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+
+  /v1/onboarding:
+    get:
+      operationId: getOnboarding
+      tags: [onboarding]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OnboardingState"
+
+  /v1/admin/dashboard:
+    get:
+      operationId: getAdminDashboard
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminDashboard"
+
+  /v1/admin/activity:
+    get:
+      operationId: getAdminActivity
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityEntry"
+
+  /v1/admin/revenue-breakdown:
+    get:
+      operationId: getRevenueBreakdown
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevenueBreakdown"
+
+  /v1/admin/upcoming-renewals:
+    get:
+      operationId: getUpcomingRenewals
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UpcomingRenewal"
+
+  /v1/admin/tenants:
+    get:
+      operationId: listAdminTenants
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminTenantSummary"
+
+  /v1/admin/tenants/{tenantId}:
+    get:
+      operationId: getAdminTenant
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTenantDetail"
+
+  /v1/admin/tenants/{tenantId}/quantities:
+    patch:
+      operationId: adminUpdateTenantQuantities
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionQuantities"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+
+  /v1/admin/tenants/{tenantId}/cancel:
+    post:
+      operationId: adminCancelTenant
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+
+  /v1/admin/tenants/{tenantId}/reactivate:
+    post:
+      operationId: adminReactivateTenant
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+
+  /v1/admin/tenants/{tenantId}/sync-stripe:
+    post:
+      operationId: adminSyncTenant
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+
+  /v1/admin/tenants/{tenantId}/audit-log:
+    get:
+      operationId: getAdminTenantAuditLog
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuditLogEntry"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
+        status: { type: string }
+
+    Pricing:
+      type: object
+      required: [currency, controlSeat, fieldSeat, till, trialDays]
+      properties:
+        currency: { type: string }
+        controlSeat: { $ref: "#/components/schemas/PricedItem" }
+        fieldSeat: { $ref: "#/components/schemas/PricedItem" }
+        till: { $ref: "#/components/schemas/PricedItem" }
+        trialDays: { type: integer }
+
+    PricedItem:
+      type: object
+      required: [name, amount, currency, interval, features]
+      properties:
+        name: { type: string }
+        amount: { type: number }
+        currency: { type: string }
+        interval: { type: string }
+        features:
+          type: array
+          items: { type: string }
+
+    TradeCategory:
+      type: object
+      required: [id, slug, name, jobTypes]
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        jobTypes:
+          type: array
+          items: { type: string }
+
+    SignupPayload:
+      type: object
+      required: [company, ownerName, ownerEmail, ownerPassword, controlSeats, fieldSeats, tills, tradeCategorySlugs, paymentMethodId]
+      properties:
+        company:
+          type: object
+          required: [name]
+          properties:
+            name: { type: string, minLength: 1 }
+            country: { type: string }
+            companyNumber: { type: ["string", "null"] }
+            phone: { type: ["string", "null"] }
+            addressLine1: { type: ["string", "null"] }
+            city: { type: ["string", "null"] }
+            postcode: { type: ["string", "null"] }
+        ownerName: { type: string, minLength: 1 }
+        ownerEmail: { type: string, format: email }
+        ownerPassword: { type: string, minLength: 8 }
+        controlSeats: { type: integer, minimum: 1 }
+        fieldSeats: { type: integer, minimum: 0 }
+        tills: { type: integer, minimum: 0 }
+        tradeCategorySlugs:
+          type: array
+          items: { type: string }
+        paymentMethodId: { type: string }
+
+    LoginCredentials:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 1 }
+
+    Session:
+      type: object
+      required: [user]
+      properties:
+        user: { $ref: "#/components/schemas/SessionUser" }
+        tenant:
+          oneOf:
+            - $ref: "#/components/schemas/Tenant"
+            - type: "null"
+
+    SessionUser:
+      type: object
+      required: [id, email, name, role, isSuperAdmin]
+      properties:
+        id: { type: string }
+        email: { type: string }
+        name: { type: string }
+        role: { type: string }
+        isSuperAdmin: { type: boolean }
+        seatType:
+          type: ["string", "null"]
+          description: "control | field | null"
+
+    Tenant:
+      type: object
+      required: [id, name, slug, status, createdAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        slug: { type: string }
         status:
           type: string
-      required:
-        - status
+          description: "trial | active | past_due | paused | cancelled"
+        createdAt: { type: string, format: date-time }
+        country: { type: ["string", "null"] }
+        phone: { type: ["string", "null"] }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+        brandColor: { type: ["string", "null"] }
+        logoUrl: { type: ["string", "null"] }
+        tradeCategorySlugs:
+          type: array
+          items: { type: string }
 
+    TenantUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        country: { type: string }
+        phone: { type: string }
+        addressLine1: { type: string }
+        city: { type: string }
+        postcode: { type: string }
+        brandColor: { type: string }
+        logoUrl: { type: string }
+        tradeCategorySlugs:
+          type: array
+          items: { type: string }
+
+    CancellationRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason: { type: string }
+        feedback: { type: string }
+
+    CancellationReceipt:
+      type: object
+      required: [tenantId, cancelledAt, exportUrl]
+      properties:
+        tenantId: { type: string }
+        cancelledAt: { type: string, format: date-time }
+        exportUrl: { type: string }
+
+    SetupIntentInput:
+      type: object
+      required: [email, companyName]
+      properties:
+        email: { type: string, format: email }
+        companyName: { type: string }
+
+    SetupIntent:
+      type: object
+      required: [clientSecret, customerId]
+      properties:
+        clientSecret: { type: string }
+        customerId: { type: string }
+
+    Subscription:
+      type: object
+      required: [id, tenantId, status, controlSeats, fieldSeats, tills, currency, monthlyTotal, currentPeriodEnd, trialEndsAt, stripeCustomerId, stripeSubscriptionId, cancelAtPeriodEnd]
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        status: { type: string }
+        controlSeats: { type: integer }
+        fieldSeats: { type: integer }
+        tills: { type: integer }
+        currency: { type: string }
+        monthlyTotal: { type: number }
+        currentPeriodEnd:
+          type: ["string", "null"]
+          format: date-time
+        trialEndsAt:
+          type: ["string", "null"]
+          format: date-time
+        stripeCustomerId: { type: string }
+        stripeSubscriptionId: { type: string }
+        cancelAtPeriodEnd: { type: boolean }
+
+    SubscriptionQuantities:
+      type: object
+      required: [controlSeats, fieldSeats, tills]
+      properties:
+        controlSeats: { type: integer, minimum: 1 }
+        fieldSeats: { type: integer, minimum: 0 }
+        tills: { type: integer, minimum: 0 }
+
+    OnboardingState:
+      type: object
+      required: [items, percentComplete]
+      properties:
+        percentComplete: { type: integer }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/OnboardingItem" }
+
+    OnboardingItem:
+      type: object
+      required: [key, label, description, complete]
+      properties:
+        key: { type: string }
+        label: { type: string }
+        description: { type: string }
+        complete: { type: boolean }
+        href: { type: ["string", "null"] }
+
+    AdminDashboard:
+      type: object
+      required: [mrr, arr, currency, activeTrials, pastDue, failedPaymentsLast30d, upcomingRenewals7d, activeTenants, totalTenants, activeControlSeats, activeFieldSeats, activeTills, revenueByLine]
+      properties:
+        mrr: { type: number }
+        arr: { type: number }
+        currency: { type: string }
+        activeTrials: { type: integer }
+        pastDue: { type: integer }
+        failedPaymentsLast30d: { type: integer }
+        upcomingRenewals7d: { type: integer }
+        activeTenants: { type: integer }
+        totalTenants: { type: integer }
+        activeControlSeats: { type: integer }
+        activeFieldSeats: { type: integer }
+        activeTills: { type: integer }
+        revenueByLine:
+          type: array
+          items: { $ref: "#/components/schemas/RevenueLine" }
+
+    RevenueLine:
+      type: object
+      required: [label, amount, units]
+      properties:
+        label: { type: string }
+        amount: { type: number }
+        units: { type: integer }
+
+    RevenueBreakdown:
+      type: object
+      required: [currency, lines]
+      properties:
+        currency: { type: string }
+        lines:
+          type: array
+          items: { $ref: "#/components/schemas/RevenueLine" }
+
+    ActivityEntry:
+      type: object
+      required: [id, kind, message, createdAt]
+      properties:
+        id: { type: string }
+        kind: { type: string }
+        message: { type: string }
+        tenantId: { type: ["string", "null"] }
+        tenantName: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    UpcomingRenewal:
+      type: object
+      required: [tenantId, tenantName, renewsAt, amount, currency]
+      properties:
+        tenantId: { type: string }
+        tenantName: { type: string }
+        renewsAt: { type: string, format: date-time }
+        amount: { type: number }
+        currency: { type: string }
+
+    AdminTenantSummary:
+      type: object
+      required: [id, name, status, controlSeats, fieldSeats, tills, monthlyTotal, currency, createdAt, ownerEmail]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        status: { type: string }
+        controlSeats: { type: integer }
+        fieldSeats: { type: integer }
+        tills: { type: integer }
+        monthlyTotal: { type: number }
+        currency: { type: string }
+        createdAt: { type: string, format: date-time }
+        ownerEmail: { type: string }
+        trialEndsAt:
+          type: ["string", "null"]
+          format: date-time
+
+    AdminTenantDetail:
+      type: object
+      required: [tenant, subscription, owner, recentEvents]
+      properties:
+        tenant: { $ref: "#/components/schemas/Tenant" }
+        subscription: { $ref: "#/components/schemas/Subscription" }
+        owner: { $ref: "#/components/schemas/SessionUser" }
+        recentEvents:
+          type: array
+          items: { $ref: "#/components/schemas/AuditLogEntry" }
+
+    AuditLogEntry:
+      type: object
+      required: [id, kind, message, createdAt]
+      properties:
+        id: { type: string }
+        kind: { type: string }
+        message: { type: string }
+        actor: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
