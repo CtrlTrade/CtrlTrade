@@ -284,6 +284,12 @@ export const LoginResponse = zod.object({
   "logoUrl": zod.string().nullish(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "impersonation": zod.union([zod.object({
+  "tenantId": zod.string(),
+  "tenantName": zod.string(),
+  "impersonatorEmail": zod.string(),
+  "startedAt": zod.coerce.date()
 }),zod.null()]).optional()
 })
 
@@ -312,6 +318,12 @@ export const GetSessionResponse = zod.object({
   "logoUrl": zod.string().nullish(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "impersonation": zod.union([zod.object({
+  "tenantId": zod.string(),
+  "tenantName": zod.string(),
+  "impersonatorEmail": zod.string(),
+  "startedAt": zod.coerce.date()
 }),zod.null()]).optional()
 })
 
@@ -779,14 +791,431 @@ export const AdminSyncTenantResponse = zod.object({
 /**
  * @summary List members of current tenant
  */
-export const ListTeamResponseItem = zod.object({
+export const ListTeamResponse = zod.object({
+  "members": zod.array(zod.object({
   "userId": zod.string(),
   "name": zod.string(),
   "email": zod.string(),
   "role": zod.string(),
-  "seatType": zod.string()
+  "seatType": zod.string(),
+  "status": zod.string(),
+  "isYou": zod.boolean(),
+  "invitedAt": zod.coerce.date().nullish(),
+  "disabledAt": zod.coerce.date().nullish(),
+  "lastLoginAt": zod.coerce.date().nullish()
+})),
+  "invitations": zod.array(zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "role": zod.string(),
+  "seatType": zod.string(),
+  "invitedByLabel": zod.string().nullish(),
+  "expiresAt": zod.coerce.date(),
+  "createdAt": zod.coerce.date(),
+  "acceptUrl": zod.string().nullish()
+})),
+  "seatUsage": zod.object({
+  "controlSeatsUsed": zod.number(),
+  "controlSeatsLimit": zod.number(),
+  "fieldSeatsUsed": zod.number(),
+  "fieldSeatsLimit": zod.number(),
+  "tillsLimit": zod.number()
 })
-export const ListTeamResponse = zod.array(ListTeamResponseItem)
+})
+
+
+/**
+ * @summary Seat usage (assigned vs subscribed) for the current tenant
+ */
+export const GetSeatUsageResponse = zod.object({
+  "controlSeatsUsed": zod.number(),
+  "controlSeatsLimit": zod.number(),
+  "fieldSeatsUsed": zod.number(),
+  "fieldSeatsLimit": zod.number(),
+  "tillsLimit": zod.number()
+})
+
+
+/**
+ * @summary Invite a new member by email (magic-link)
+ */
+export const InviteTeamMemberBody = zod.object({
+  "email": zod.string().email(),
+  "name": zod.string().optional(),
+  "role": zod.string().describe('admin | manager | staff'),
+  "seatType": zod.string().describe('control | field')
+})
+
+
+export const ResendInvitationParams = zod.object({
+  "invitationId": zod.coerce.string()
+})
+
+export const ResendInvitationResponse = zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "role": zod.string(),
+  "seatType": zod.string(),
+  "invitedByLabel": zod.string().nullish(),
+  "expiresAt": zod.coerce.date(),
+  "createdAt": zod.coerce.date(),
+  "acceptUrl": zod.string().nullish()
+})
+
+
+export const RevokeInvitationParams = zod.object({
+  "invitationId": zod.coerce.string()
+})
+
+
+export const UpdateMemberParams = zod.object({
+  "userId": zod.coerce.string()
+})
+
+export const UpdateMemberBody = zod.object({
+  "role": zod.string().optional(),
+  "seatType": zod.string().optional(),
+  "status": zod.string().optional().describe('active | disabled')
+})
+
+export const UpdateMemberResponse = zod.object({
+  "userId": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "role": zod.string(),
+  "seatType": zod.string(),
+  "status": zod.string(),
+  "isYou": zod.boolean(),
+  "invitedAt": zod.coerce.date().nullish(),
+  "disabledAt": zod.coerce.date().nullish(),
+  "lastLoginAt": zod.coerce.date().nullish()
+})
+
+
+export const RemoveMemberParams = zod.object({
+  "userId": zod.coerce.string()
+})
+
+
+export const SendMemberPasswordResetParams = zod.object({
+  "userId": zod.coerce.string()
+})
+
+export const SendMemberPasswordResetResponse = zod.object({
+  "ok": zod.boolean(),
+  "devLink": zod.string().nullish()
+})
+
+
+export const GetInvitationParams = zod.object({
+  "token": zod.coerce.string()
+})
+
+export const GetInvitationResponse = zod.object({
+  "tenantName": zod.string(),
+  "email": zod.string(),
+  "role": zod.string(),
+  "seatType": zod.string(),
+  "expiresAt": zod.coerce.date(),
+  "requiresPassword": zod.boolean().describe('True if the email has no existing user — accept must include name+password.')
+})
+
+
+export const AcceptInvitationParams = zod.object({
+  "token": zod.coerce.string()
+})
+
+export const acceptInvitationBodyPasswordMin = 8;
+
+
+
+export const AcceptInvitationBody = zod.object({
+  "name": zod.string().optional(),
+  "password": zod.string().min(acceptInvitationBodyPasswordMin).optional()
+})
+
+export const AcceptInvitationResponse = zod.object({
+  "user": zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "role": zod.string(),
+  "isSuperAdmin": zod.boolean(),
+  "seatType": zod.string().nullish().describe('control | field | null')
+}),
+  "tenant": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string().describe('trial | active | past_due | paused | cancelled'),
+  "createdAt": zod.coerce.date(),
+  "country": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
+  "tradeCategorySlugs": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "impersonation": zod.union([zod.object({
+  "tenantId": zod.string(),
+  "tenantName": zod.string(),
+  "impersonatorEmail": zod.string(),
+  "startedAt": zod.coerce.date()
+}),zod.null()]).optional()
+})
+
+
+export const RequestPasswordResetBody = zod.object({
+  "email": zod.string().email()
+})
+
+export const RequestPasswordResetResponse = zod.object({
+  "ok": zod.boolean(),
+  "devLink": zod.string().nullish()
+})
+
+
+
+export const completePasswordResetBodyPasswordMin = 8;
+
+
+
+export const CompletePasswordResetBody = zod.object({
+  "token": zod.string().min(1),
+  "password": zod.string().min(completePasswordResetBodyPasswordMin)
+})
+
+export const CompletePasswordResetResponse = zod.object({
+  "ok": zod.boolean(),
+  "email": zod.string().optional()
+})
+
+
+export const StartImpersonationParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const StartImpersonationResponse = zod.object({
+  "user": zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "role": zod.string(),
+  "isSuperAdmin": zod.boolean(),
+  "seatType": zod.string().nullish().describe('control | field | null')
+}),
+  "tenant": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string().describe('trial | active | past_due | paused | cancelled'),
+  "createdAt": zod.coerce.date(),
+  "country": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
+  "tradeCategorySlugs": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "impersonation": zod.union([zod.object({
+  "tenantId": zod.string(),
+  "tenantName": zod.string(),
+  "impersonatorEmail": zod.string(),
+  "startedAt": zod.coerce.date()
+}),zod.null()]).optional()
+})
+
+
+export const StopImpersonationResponse = zod.object({
+  "user": zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "role": zod.string(),
+  "isSuperAdmin": zod.boolean(),
+  "seatType": zod.string().nullish().describe('control | field | null')
+}),
+  "tenant": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string().describe('trial | active | past_due | paused | cancelled'),
+  "createdAt": zod.coerce.date(),
+  "country": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
+  "tradeCategorySlugs": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "impersonation": zod.union([zod.object({
+  "tenantId": zod.string(),
+  "tenantName": zod.string(),
+  "impersonatorEmail": zod.string(),
+  "startedAt": zod.coerce.date()
+}),zod.null()]).optional()
+})
+
+
+export const AdminBillingOverrideParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const AdminBillingOverrideBody = zod.object({
+  "status": zod.string().describe('trial | active | past_due | cancelled'),
+  "trialEndsAt": zod.coerce.date().nullish(),
+  "reason": zod.string().optional()
+})
+
+export const AdminBillingOverrideResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "status": zod.string(),
+  "controlSeats": zod.number(),
+  "fieldSeats": zod.number(),
+  "tills": zod.number(),
+  "currency": zod.string(),
+  "monthlyTotal": zod.number(),
+  "currentPeriodEnd": zod.coerce.date().nullable(),
+  "trialEndsAt": zod.coerce.date().nullable(),
+  "stripeCustomerId": zod.string(),
+  "stripeSubscriptionId": zod.string(),
+  "cancelAtPeriodEnd": zod.boolean()
+})
+
+
+export const AdminGdprExportParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+
+export const GetGdprDeletionParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const GetGdprDeletionResponse = zod.object({
+  "status": zod.string().describe('none | pending | cancelled | purged'),
+  "requestedAt": zod.coerce.date().nullish(),
+  "scheduledPurgeAt": zod.coerce.date().nullish(),
+  "cancelledAt": zod.coerce.date().nullish(),
+  "purgedAt": zod.coerce.date().nullish(),
+  "requestedByLabel": zod.string().nullish(),
+  "reason": zod.string().nullish(),
+  "canPurgeNow": zod.boolean().optional()
+})
+
+
+export const ScheduleGdprDeletionParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const ScheduleGdprDeletionBody = zod.object({
+  "reason": zod.string().optional()
+})
+
+export const ScheduleGdprDeletionResponse = zod.object({
+  "status": zod.string().describe('none | pending | cancelled | purged'),
+  "requestedAt": zod.coerce.date().nullish(),
+  "scheduledPurgeAt": zod.coerce.date().nullish(),
+  "cancelledAt": zod.coerce.date().nullish(),
+  "purgedAt": zod.coerce.date().nullish(),
+  "requestedByLabel": zod.string().nullish(),
+  "reason": zod.string().nullish(),
+  "canPurgeNow": zod.boolean().optional()
+})
+
+
+export const CancelGdprDeletionParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const CancelGdprDeletionResponse = zod.object({
+  "status": zod.string().describe('none | pending | cancelled | purged'),
+  "requestedAt": zod.coerce.date().nullish(),
+  "scheduledPurgeAt": zod.coerce.date().nullish(),
+  "cancelledAt": zod.coerce.date().nullish(),
+  "purgedAt": zod.coerce.date().nullish(),
+  "requestedByLabel": zod.string().nullish(),
+  "reason": zod.string().nullish(),
+  "canPurgeNow": zod.boolean().optional()
+})
+
+
+export const PurgeGdprDeletionParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const PurgeGdprDeletionResponse = zod.object({
+  "status": zod.string().describe('none | pending | cancelled | purged'),
+  "requestedAt": zod.coerce.date().nullish(),
+  "scheduledPurgeAt": zod.coerce.date().nullish(),
+  "cancelledAt": zod.coerce.date().nullish(),
+  "purgedAt": zod.coerce.date().nullish(),
+  "requestedByLabel": zod.string().nullish(),
+  "reason": zod.string().nullish(),
+  "canPurgeNow": zod.boolean().optional()
+})
+
+
+export const ListFeatureFlagsQueryParams = zod.object({
+  "tenantId": zod.coerce.string().optional()
+})
+
+export const ListFeatureFlagsResponseItem = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string().nullish(),
+  "tenantName": zod.string().nullish(),
+  "scope": zod.string().describe('global | tenant'),
+  "key": zod.string(),
+  "enabled": zod.boolean(),
+  "rolloutPct": zod.number(),
+  "description": zod.string().nullish(),
+  "updatedByLabel": zod.string().nullish(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListFeatureFlagsResponse = zod.array(ListFeatureFlagsResponseItem)
+
+
+
+export const upsertFeatureFlagBodyRolloutPctMin = 0;
+export const upsertFeatureFlagBodyRolloutPctMax = 100;
+
+
+
+export const UpsertFeatureFlagBody = zod.object({
+  "key": zod.string().min(1),
+  "tenantId": zod.string().nullish(),
+  "enabled": zod.boolean(),
+  "rolloutPct": zod.number().min(upsertFeatureFlagBodyRolloutPctMin).max(upsertFeatureFlagBodyRolloutPctMax),
+  "description": zod.string().optional()
+})
+
+export const UpsertFeatureFlagResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string().nullish(),
+  "tenantName": zod.string().nullish(),
+  "scope": zod.string().describe('global | tenant'),
+  "key": zod.string(),
+  "enabled": zod.boolean(),
+  "rolloutPct": zod.number(),
+  "description": zod.string().nullish(),
+  "updatedByLabel": zod.string().nullish(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const DeleteFeatureFlagParams = zod.object({
+  "flagId": zod.coerce.string()
+})
 
 
 /**

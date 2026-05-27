@@ -62,6 +62,9 @@ export const usersTable = pgTable("users", {
   name: text("name").notNull(),
   passwordHash: text("password_hash").notNull(),
   isSuperAdmin: boolean("is_super_admin").notNull().default(false),
+  status: varchar("status", { length: 16 }).notNull().default("active"), // active|disabled
+  disabledAt: timestamp("disabled_at", { withTimezone: true }),
+  lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
@@ -75,12 +78,75 @@ export const membershipsTable = pgTable(
     userId: uuid("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
     role: varchar("role", { length: 32 }).notNull(), // owner|admin|manager|staff
     seatType: varchar("seat_type", { length: 16 }).notNull(), // control|field
+    status: varchar("status", { length: 16 }).notNull().default("active"), // active|disabled
+    invitedAt: timestamp("invited_at", { withTimezone: true }),
+    disabledAt: timestamp("disabled_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     uniq: unique("memberships_tenant_user_uniq").on(t.tenantId, t.userId),
     tenantIdx: index("memberships_tenant_idx").on(t.tenantId),
     userIdx: index("memberships_user_idx").on(t.userId),
+  }),
+);
+
+// ---- Invitations (magic-link invite to join a tenant) ---------------------
+export const invitationsTable = pgTable(
+  "invitations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    email: varchar("email", { length: 255 }).notNull(),
+    role: varchar("role", { length: 32 }).notNull(),
+    seatType: varchar("seat_type", { length: 16 }).notNull(),
+    tokenHash: varchar("token_hash", { length: 128 }).notNull().unique(),
+    invitedByUserId: uuid("invited_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    acceptedAt: timestamp("accepted_at", { withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("invitations_tenant_idx").on(t.tenantId),
+    emailIdx: index("invitations_email_idx").on(t.tenantId, t.email),
+  }),
+);
+
+// ---- Password reset tokens -------------------------------------------------
+export const passwordResetTokensTable = pgTable(
+  "password_reset_tokens",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+    tokenHash: varchar("token_hash", { length: 128 }).notNull().unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    userIdx: index("password_reset_user_idx").on(t.userId),
+  }),
+);
+
+// ---- Tenant GDPR deletion requests ----------------------------------------
+export const tenantDeletionRequestsTable = pgTable(
+  "tenant_deletion_requests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    requestedByUserId: uuid("requested_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    requestedByLabel: text("requested_by_label"),
+    reason: text("reason"),
+    requestedAt: timestamp("requested_at", { withTimezone: true }).notNull().defaultNow(),
+    scheduledPurgeAt: timestamp("scheduled_purge_at", { withTimezone: true }).notNull(),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+    purgedAt: timestamp("purged_at", { withTimezone: true }),
+    status: varchar("status", { length: 24 }).notNull().default("pending"), // pending|cancelled|purged
+  },
+  (t) => ({
+    tenantIdx: uniqueIndex("tenant_deletion_active_idx")
+      .on(t.tenantId)
+      .where(sql`status = 'pending'`),
   }),
 );
 
@@ -157,9 +223,18 @@ export const featureFlagsTable = pgTable("feature_flags", {
   id: uuid("id").primaryKey().defaultRandom(),
   tenantId: uuid("tenant_id").references(() => tenantsTable.id, { onDelete: "cascade" }),
   key: varchar("key", { length: 64 }).notNull(),
+  enabled: boolean("enabled").notNull().default(false),
+  rolloutPct: integer("rollout_pct").notNull().default(100),
+  description: text("description"),
   value: jsonb("value"),
+  updatedByUserId: uuid("updated_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-}, (t) => ({ tenantIdx: index("ff_tenant_idx").on(t.tenantId) }));
+}, (t) => ({
+  tenantIdx: index("ff_tenant_idx").on(t.tenantId),
+  uniqGlobal: uniqueIndex("ff_global_key_uniq").on(t.key).where(sql`tenant_id IS NULL`),
+  uniqTenant: uniqueIndex("ff_tenant_key_uniq").on(t.tenantId, t.key).where(sql`tenant_id IS NOT NULL`),
+}));
 
 export const notificationDeliveriesTable = pgTable("notification_deliveries", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -471,6 +546,10 @@ export type PosSale = typeof posSalesTable.$inferSelect;
 export type Invoice = typeof invoicesTable.$inferSelect;
 export type InvoiceItem = typeof invoiceItemsTable.$inferSelect;
 export type Payment = typeof paymentsTable.$inferSelect;
+export type Invitation = typeof invitationsTable.$inferSelect;
+export type PasswordResetToken = typeof passwordResetTokensTable.$inferSelect;
+export type TenantDeletionRequest = typeof tenantDeletionRequestsTable.$inferSelect;
+export type FeatureFlag = typeof featureFlagsTable.$inferSelect;
 
 // ---- Customer portal -------------------------------------------------------
 export const portalTokensTable = pgTable(

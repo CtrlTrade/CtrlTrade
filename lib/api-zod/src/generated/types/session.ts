@@ -5,10 +5,12 @@
  * CtrlTrade SaaS Portal API
  * OpenAPI spec version: 0.1.0
  */
+import type { ImpersonationContext } from './impersonationContext';
 import type { SessionUser } from './sessionUser';
 import type { Tenant } from './tenant';
 
 export interface Session {
   user: SessionUser;
   tenant?: Tenant | null;
+  impersonation?: ImpersonationContext | null;
 }

@@ -109,9 +109,17 @@ export interface Tenant {
   tradeCategorySlugs?: string[];
 }
 
+export interface ImpersonationContext {
+  tenantId: string;
+  tenantName: string;
+  impersonatorEmail: string;
+  startedAt: string;
+}
+
 export interface Session {
   user: SessionUser;
   tenant?: Tenant | null;
+  impersonation?: ImpersonationContext | null;
 }
 
 export interface TenantUpdate {
@@ -332,6 +340,157 @@ export interface TeamMember {
   email: string;
   role: string;
   seatType: string;
+  status: string;
+  isYou: boolean;
+  /** @nullable */
+  invitedAt?: string | null;
+  /** @nullable */
+  disabledAt?: string | null;
+  /** @nullable */
+  lastLoginAt?: string | null;
+}
+
+export interface InvitationRecord {
+  id: string;
+  email: string;
+  role: string;
+  seatType: string;
+  /** @nullable */
+  invitedByLabel?: string | null;
+  expiresAt: string;
+  createdAt: string;
+  /** @nullable */
+  acceptUrl?: string | null;
+}
+
+export interface SeatUsage {
+  controlSeatsUsed: number;
+  controlSeatsLimit: number;
+  fieldSeatsUsed: number;
+  fieldSeatsLimit: number;
+  tillsLimit: number;
+}
+
+export interface TeamOverview {
+  members: TeamMember[];
+  invitations: InvitationRecord[];
+  seatUsage: SeatUsage;
+}
+
+export interface InviteMemberBody {
+  email: string;
+  name?: string;
+  /** admin | manager | staff */
+  role: string;
+  /** control | field */
+  seatType: string;
+}
+
+export interface UpdateMemberInput {
+  role?: string;
+  seatType?: string;
+  /** active | disabled */
+  status?: string;
+}
+
+export interface PublicInvitationPreview {
+  tenantName: string;
+  email: string;
+  role: string;
+  seatType: string;
+  expiresAt: string;
+  /** True if the email has no existing user — accept must include name+password. */
+  requiresPassword: boolean;
+}
+
+export interface AcceptInvitationInput {
+  name?: string;
+  /** @minLength 8 */
+  password?: string;
+}
+
+export interface ForgotPasswordBody {
+  email: string;
+}
+
+export interface ResetPasswordBody {
+  /** @minLength 1 */
+  token: string;
+  /** @minLength 8 */
+  password: string;
+}
+
+export interface PasswordResetIssued {
+  ok: boolean;
+  /** @nullable */
+  devLink?: string | null;
+}
+
+export interface PasswordResetCompleted {
+  ok: boolean;
+  email?: string;
+}
+
+export interface BillingOverrideBody {
+  /** trial | active | past_due | cancelled */
+  status: string;
+  /** @nullable */
+  trialEndsAt?: string | null;
+  reason?: string;
+}
+
+export interface ScheduleGdprDeletionInput {
+  reason?: string;
+}
+
+export interface GdprDeletionState {
+  /** none | pending | cancelled | purged */
+  status: string;
+  /** @nullable */
+  requestedAt?: string | null;
+  /** @nullable */
+  scheduledPurgeAt?: string | null;
+  /** @nullable */
+  cancelledAt?: string | null;
+  /** @nullable */
+  purgedAt?: string | null;
+  /** @nullable */
+  requestedByLabel?: string | null;
+  /** @nullable */
+  reason?: string | null;
+  canPurgeNow?: boolean;
+}
+
+export interface FeatureFlagRecord {
+  id: string;
+  /** @nullable */
+  tenantId?: string | null;
+  /** @nullable */
+  tenantName?: string | null;
+  /** global | tenant */
+  scope: string;
+  key: string;
+  enabled: boolean;
+  rolloutPct: number;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  updatedByLabel?: string | null;
+  updatedAt: string;
+}
+
+export interface UpsertFeatureFlagInput {
+  /** @minLength 1 */
+  key: string;
+  /** @nullable */
+  tenantId?: string | null;
+  enabled: boolean;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  rolloutPct: number;
+  description?: string;
 }
 
 export interface Customer {
@@ -1337,6 +1496,10 @@ export interface CustomerMessageInput {
   /** @minLength 1 */
   body: string;
 }
+
+export type ListFeatureFlagsParams = {
+tenantId?: string;
+};
 
 export type ListJobsParams = {
 status?: string;

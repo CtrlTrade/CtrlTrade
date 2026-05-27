@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { useGetSession, useLogout } from "@workspace/api-client-react";
+import { useGetSession, useLogout, useStopImpersonation } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,6 +10,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
   const { data: session, isLoading } = useGetSession();
   const logout = useLogout();
+  const qc = useQueryClient();
+  const stopImp = useStopImpersonation({ mutation: { onSuccess: () => { qc.invalidateQueries(); setLocation("~/admin/tenants"); } } });
   const unauthorized = !isLoading && (!session || !session.tenant);
 
   useEffect(() => {
@@ -64,6 +67,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </nav>
       </aside>
       <div className="flex-1 flex flex-col">
+        {session.impersonation && (
+          <div className="bg-amber-500 text-black px-6 py-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider" data-testid="banner-impersonation">
+            <span>Impersonating {session.impersonation.tenantName} as {session.impersonation.impersonatorEmail}</span>
+            <Button size="sm" variant="outline" className="h-7 rounded-none border-black text-black hover:bg-black hover:text-amber-500" onClick={() => stopImp.mutate()} data-testid="button-stop-impersonation">Stop impersonating</Button>
+          </div>
+        )}
         <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-none" style={{ backgroundColor: tenant.brandColor || 'var(--primary)' }} />

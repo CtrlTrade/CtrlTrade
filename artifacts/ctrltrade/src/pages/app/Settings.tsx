@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Copy } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { AppStaff } from "./Staff";
 
 export function AppSettings() {
   const { data: tenant, isLoading: tenantLoading } = useGetTenant();
@@ -72,9 +74,15 @@ export function AppSettings() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold uppercase tracking-tighter">Workspace Settings</h1>
-      
+      <Tabs defaultValue="company" className="space-y-6">
+        <TabsList className="rounded-none">
+          <TabsTrigger value="company" data-testid="tab-company">Company</TabsTrigger>
+          <TabsTrigger value="staff" data-testid="tab-staff">Staff</TabsTrigger>
+        </TabsList>
+        <TabsContent value="staff"><AppStaff /></TabsContent>
+        <TabsContent value="company">
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="rounded-none border-border shadow-sm">
           <CardHeader>
@@ -188,6 +196,8 @@ export function AppSettings() {
       </Card>
 
       <LeadCaptureSnippetCard />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

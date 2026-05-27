@@ -83,7 +83,7 @@ export function AppCompliance() {
                   <Label>Holder (team member)</Label>
                   <Select value={holderUserId} onValueChange={setHolderUserId}>
                     <SelectTrigger><SelectValue placeholder="No member" /></SelectTrigger>
-                    <SelectContent>{team?.map((m) => <SelectItem key={m.userId} value={m.userId}>{m.name ?? m.email}</SelectItem>)}</SelectContent>
+                    <SelectContent>{team?.members?.map((m: any) => <SelectItem key={m.userId} value={m.userId}>{m.name ?? m.email}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div><Label>Or holder label</Label><Input name="holderLabel" placeholder="Company-wide" /></div>

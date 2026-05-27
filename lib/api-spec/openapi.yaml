@@ -565,9 +565,355 @@ paths:
           description: OK
           content:
             application/json:
+              schema: { $ref: "#/components/schemas/TeamOverview" }
+
+  /v1/team/seat-usage:
+    get:
+      operationId: getSeatUsage
+      tags: [team]
+      summary: Seat usage (assigned vs subscribed) for the current tenant
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SeatUsage" }
+
+  /v1/team/invitations:
+    post:
+      operationId: inviteTeamMember
+      tags: [team]
+      summary: Invite a new member by email (magic-link)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InviteMemberBody" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InvitationRecord" }
+
+  /v1/team/invitations/{invitationId}/resend:
+    post:
+      operationId: resendInvitation
+      tags: [team]
+      parameters:
+        - in: path
+          name: invitationId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InvitationRecord" }
+
+  /v1/team/invitations/{invitationId}:
+    delete:
+      operationId: revokeInvitation
+      tags: [team]
+      parameters:
+        - in: path
+          name: invitationId
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: No Content }
+
+  /v1/team/members/{userId}:
+    patch:
+      operationId: updateMember
+      tags: [team]
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateMemberInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TeamMember" }
+    delete:
+      operationId: removeMember
+      tags: [team]
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: No Content }
+
+  /v1/team/members/{userId}/password-reset:
+    post:
+      operationId: sendMemberPasswordReset
+      tags: [team]
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PasswordResetIssued" }
+
+  /v1/public/invitations/{token}:
+    get:
+      operationId: getInvitation
+      tags: [team]
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublicInvitationPreview" }
+
+  /v1/public/invitations/{token}/accept:
+    post:
+      operationId: acceptInvitation
+      tags: [team]
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AcceptInvitationInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Session" }
+
+  /v1/public/auth/forgot-password:
+    post:
+      operationId: requestPasswordReset
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ForgotPasswordBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PasswordResetIssued" }
+
+  /v1/public/auth/reset-password:
+    post:
+      operationId: completePasswordReset
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ResetPasswordBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PasswordResetCompleted" }
+
+  /v1/admin/tenants/{tenantId}/impersonate:
+    post:
+      operationId: startImpersonation
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Session" }
+
+  /v1/admin/impersonation/stop:
+    post:
+      operationId: stopImpersonation
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Session" }
+
+  /v1/admin/tenants/{tenantId}/billing-override:
+    patch:
+      operationId: adminBillingOverride
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BillingOverrideBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Subscription" }
+
+  /v1/admin/tenants/{tenantId}/gdpr-export:
+    get:
+      operationId: adminGdprExport
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: ZIP archive
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+
+  /v1/admin/tenants/{tenantId}/gdpr-deletion:
+    get:
+      operationId: getGdprDeletion
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GdprDeletionState" }
+    post:
+      operationId: scheduleGdprDeletion
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ScheduleGdprDeletionInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GdprDeletionState" }
+    delete:
+      operationId: cancelGdprDeletion
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GdprDeletionState" }
+
+  /v1/admin/tenants/{tenantId}/gdpr-deletion/purge:
+    post:
+      operationId: purgeGdprDeletion
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GdprDeletionState" }
+
+  /v1/admin/feature-flags:
+    get:
+      operationId: listFeatureFlags
+      tags: [admin]
+      parameters:
+        - in: query
+          name: tenantId
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
               schema:
                 type: array
-                items: { $ref: "#/components/schemas/TeamMember" }
+                items: { $ref: "#/components/schemas/FeatureFlagRecord" }
+    post:
+      operationId: upsertFeatureFlag
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpsertFeatureFlagInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FeatureFlagRecord" }
+
+  /v1/admin/feature-flags/{flagId}:
+    delete:
+      operationId: deleteFeatureFlag
+      tags: [admin]
+      parameters:
+        - in: path
+          name: flagId
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: No Content }
 
   /v1/dashboard/expiry-attention:
     get:
@@ -1878,6 +2224,19 @@ components:
           oneOf:
             - $ref: "#/components/schemas/Tenant"
             - type: "null"
+        impersonation:
+          oneOf:
+            - $ref: "#/components/schemas/ImpersonationContext"
+            - type: "null"
+
+    ImpersonationContext:
+      type: object
+      required: [tenantId, tenantName, impersonatorEmail, startedAt]
+      properties:
+        tenantId: { type: string }
+        tenantName: { type: string }
+        impersonatorEmail: { type: string }
+        startedAt: { type: string, format: date-time }
 
     SessionUser:
       type: object
@@ -2194,13 +2553,178 @@ components:
 
     TeamMember:
       type: object
-      required: [userId, name, email, role, seatType]
+      required: [userId, name, email, role, seatType, status, isYou]
       properties:
         userId: { type: string }
         name: { type: string }
         email: { type: string }
         role: { type: string }
         seatType: { type: string }
+        status: { type: string }
+        isYou: { type: boolean }
+        invitedAt: { type: ["string", "null"], format: date-time }
+        disabledAt: { type: ["string", "null"], format: date-time }
+        lastLoginAt: { type: ["string", "null"], format: date-time }
+
+    InvitationRecord:
+      type: object
+      required: [id, email, role, seatType, expiresAt, createdAt]
+      properties:
+        id: { type: string }
+        email: { type: string }
+        role: { type: string }
+        seatType: { type: string }
+        invitedByLabel: { type: ["string", "null"] }
+        expiresAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        acceptUrl: { type: ["string", "null"] }
+
+    TeamOverview:
+      type: object
+      required: [members, invitations, seatUsage]
+      properties:
+        members:
+          type: array
+          items: { $ref: "#/components/schemas/TeamMember" }
+        invitations:
+          type: array
+          items: { $ref: "#/components/schemas/InvitationRecord" }
+        seatUsage: { $ref: "#/components/schemas/SeatUsage" }
+
+    SeatUsage:
+      type: object
+      required: [controlSeatsUsed, controlSeatsLimit, fieldSeatsUsed, fieldSeatsLimit, tillsLimit]
+      properties:
+        controlSeatsUsed: { type: integer }
+        controlSeatsLimit: { type: integer }
+        fieldSeatsUsed: { type: integer }
+        fieldSeatsLimit: { type: integer }
+        tillsLimit: { type: integer }
+
+    InviteMemberBody:
+      type: object
+      required: [email, role, seatType]
+      properties:
+        email: { type: string, format: email }
+        name: { type: string }
+        role:
+          type: string
+          description: "admin | manager | staff"
+        seatType:
+          type: string
+          description: "control | field"
+
+    UpdateMemberInput:
+      type: object
+      properties:
+        role: { type: string }
+        seatType: { type: string }
+        status:
+          type: string
+          description: "active | disabled"
+
+    PublicInvitationPreview:
+      type: object
+      required: [tenantName, email, role, seatType, expiresAt, requiresPassword]
+      properties:
+        tenantName: { type: string }
+        email: { type: string }
+        role: { type: string }
+        seatType: { type: string }
+        expiresAt: { type: string, format: date-time }
+        requiresPassword:
+          type: boolean
+          description: "True if the email has no existing user — accept must include name+password."
+
+    AcceptInvitationInput:
+      type: object
+      properties:
+        name: { type: string }
+        password: { type: string, minLength: 8 }
+
+    ForgotPasswordBody:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string, format: email }
+
+    ResetPasswordBody:
+      type: object
+      required: [token, password]
+      properties:
+        token: { type: string, minLength: 1 }
+        password: { type: string, minLength: 8 }
+
+    PasswordResetIssued:
+      type: object
+      required: [ok]
+      properties:
+        ok: { type: boolean }
+        devLink: { type: ["string", "null"] }
+
+    PasswordResetCompleted:
+      type: object
+      required: [ok]
+      properties:
+        ok: { type: boolean }
+        email: { type: string }
+
+    BillingOverrideBody:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          description: "trial | active | past_due | cancelled"
+        trialEndsAt: { type: ["string", "null"], format: date-time }
+        reason: { type: string }
+
+    ScheduleGdprDeletionInput:
+      type: object
+      properties:
+        reason: { type: string }
+
+    GdprDeletionState:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          description: "none | pending | cancelled | purged"
+        requestedAt: { type: ["string", "null"], format: date-time }
+        scheduledPurgeAt: { type: ["string", "null"], format: date-time }
+        cancelledAt: { type: ["string", "null"], format: date-time }
+        purgedAt: { type: ["string", "null"], format: date-time }
+        requestedByLabel: { type: ["string", "null"] }
+        reason: { type: ["string", "null"] }
+        canPurgeNow: { type: boolean }
+
+    FeatureFlagRecord:
+      type: object
+      required: [id, key, enabled, rolloutPct, scope, updatedAt]
+      properties:
+        id: { type: string }
+        tenantId: { type: ["string", "null"] }
+        tenantName: { type: ["string", "null"] }
+        scope:
+          type: string
+          description: "global | tenant"
+        key: { type: string }
+        enabled: { type: boolean }
+        rolloutPct: { type: integer }
+        description: { type: ["string", "null"] }
+        updatedByLabel: { type: ["string", "null"] }
+        updatedAt: { type: string, format: date-time }
+
+    UpsertFeatureFlagInput:
+      type: object
+      required: [key, enabled, rolloutPct]
+      properties:
+        key: { type: string, minLength: 1 }
+        tenantId: { type: ["string", "null"] }
+        enabled: { type: boolean }
+        rolloutPct: { type: integer, minimum: 0, maximum: 100 }
+        description: { type: string }
 
     Customer:
       type: object

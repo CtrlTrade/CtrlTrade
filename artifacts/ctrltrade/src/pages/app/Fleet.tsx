@@ -98,7 +98,7 @@ export function AppFleet() {
                 <Label>Assigned driver</Label>
                 <Select value={assignedDriverId} onValueChange={setAssignedDriverId}>
                   <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
-                  <SelectContent>{team?.map((m) => <SelectItem key={m.userId} value={m.userId}>{m.name ?? m.email}</SelectItem>)}</SelectContent>
+                  <SelectContent>{team?.members?.map((m: any) => <SelectItem key={m.userId} value={m.userId}>{m.name ?? m.email}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <DialogFooter>

@@ -19,6 +19,7 @@ import invoicesRouter from "./invoices";
 import invoiceTemplatesRouter from "./invoiceTemplates";
 import leadsRouter from "./leads";
 import portalRouter from "./portal";
+import invitationsRouter from "./invitations";
 
 const router: IRouter = Router();
 
@@ -49,5 +50,6 @@ router.use(posRouter);
 router.use(invoicesRouter);
 router.use(invoiceTemplatesRouter);
 router.use(portalRouter);
+router.use(invitationsRouter);
 
 export default router;

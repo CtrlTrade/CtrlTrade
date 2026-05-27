@@ -1,5 +1,7 @@
-import { Router, type IRouter } from "express";
-import { and, desc, eq, gte, ilike, inArray, lt, sql } from "drizzle-orm";
+import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
+import { and, desc, eq, gte, ilike, inArray, lt, sql, isNull } from "drizzle-orm";
+import * as archiverNS from "archiver";
+const archiver: any = (archiverNS as any).default ?? archiverNS;
 import {
   db,
   tenantsTable,
@@ -7,6 +9,14 @@ import {
   membershipsTable,
   subscriptionsTable,
   auditLogsTable,
+  invitationsTable,
+  tenantDeletionRequestsTable,
+  featureFlagsTable,
+  customersTable,
+  quotesTable,
+  jobsTable,
+  invoicesTable,
+  leadsTable,
 } from "@workspace/db";
 import {
   GetAdminDashboardResponse,
@@ -35,6 +45,39 @@ import { isStripeConnected, getUncachableStripeClient } from "../stripeClient";
 import { reconcileFromStripeSubscription } from "../lib/stripeReconcile";
 
 const router: IRouter = Router();
+
+// Stop-impersonation must work WHILE impersonating, so it bypasses the
+// router-wide guard and validates super admin manually.
+router.post("/v1/admin/impersonation/stop", async (req, res): Promise<void> => {
+  if (!req.auth?.user?.isSuperAdmin) {
+    res.status(403).json({ error: "Super admin only" });
+    return;
+  }
+  const tenantId = req.session?.impersonatedTenantId;
+  req.session.impersonatedTenantId = undefined;
+  req.session.impersonationStartedAt = undefined;
+  if (tenantId) {
+    await logAudit({
+      tenantId,
+      actorUserId: req.auth.user.id,
+      actorLabel: `superadmin:${req.auth.user.email}`,
+      kind: "admin.impersonation_stopped",
+      message: `${req.auth.user.email} stopped impersonating tenant.`,
+    });
+  }
+  res.json({
+    user: {
+      id: req.auth.user.id,
+      email: req.auth.user.email,
+      name: req.auth.user.name,
+      role: "super_admin",
+      isSuperAdmin: true,
+      seatType: null,
+    },
+    tenant: null,
+    impersonation: null,
+  });
+});
 
 router.use(requireSuperAdmin);
 
@@ -435,6 +478,431 @@ router.get("/v1/admin/tenants/:tenantId/audit-log", async (req, res): Promise<vo
       })),
     ),
   );
+});
+
+// ===========================================================================
+// Impersonation
+// ===========================================================================
+router.post("/v1/admin/tenants/:tenantId/impersonate", async (req, res): Promise<void> => {
+  const tenantId = req.params.tenantId;
+  const [tenant] = await db.select().from(tenantsTable).where(eq(tenantsTable.id, tenantId));
+  if (!tenant) {
+    res.status(404).json({ error: "Tenant not found" });
+    return;
+  }
+  req.session.impersonatedTenantId = tenant.id;
+  req.session.impersonationStartedAt = new Date().toISOString();
+  await logAudit({
+    tenantId: tenant.id,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "admin.impersonation_started",
+    message: `${req.auth!.user.email} started impersonating ${tenant.name}.`,
+  });
+  res.json({
+    user: {
+      id: req.auth!.user.id,
+      email: req.auth!.user.email,
+      name: req.auth!.user.name,
+      role: "owner",
+      isSuperAdmin: true,
+      seatType: "control",
+    },
+    tenant: await serializeTenant(tenant),
+    impersonation: {
+      tenantId: tenant.id,
+      tenantName: tenant.name,
+      impersonatorEmail: req.auth!.user.email,
+      startedAt: req.session.impersonationStartedAt,
+    },
+  });
+});
+
+// ===========================================================================
+// Manual billing override
+// ===========================================================================
+router.patch("/v1/admin/tenants/:tenantId/billing-override", async (req, res): Promise<void> => {
+  const tenantId = req.params.tenantId;
+  const status = String(req.body?.status ?? "");
+  const reason = String(req.body?.reason ?? "manual override");
+  const allowedStatuses = ["trial", "active", "past_due", "cancelled"];
+  if (!allowedStatuses.includes(status)) {
+    res.status(400).json({ error: `status must be one of ${allowedStatuses.join("|")}` });
+    return;
+  }
+  const sub = await getTenantSubscription(tenantId);
+  if (!sub) {
+    res.status(404).json({ error: "Subscription not found" });
+    return;
+  }
+  let trialEndsAt: Date | null | undefined = undefined;
+  if ("trialEndsAt" in (req.body ?? {})) {
+    trialEndsAt = req.body.trialEndsAt ? new Date(String(req.body.trialEndsAt)) : null;
+  }
+  const subUpdates: Record<string, unknown> = { status };
+  if (trialEndsAt !== undefined) subUpdates.trialEndsAt = trialEndsAt;
+  await db
+    .update(subscriptionsTable)
+    .set(subUpdates)
+    .where(eq(subscriptionsTable.tenantId, tenantId));
+  const tenantUpdates: Record<string, unknown> = { status: status === "past_due" ? "active" : status };
+  if (status === "cancelled") tenantUpdates.cancelledAt = new Date();
+  if (trialEndsAt !== undefined) tenantUpdates.trialEndsAt = trialEndsAt;
+  await db.update(tenantsTable).set(tenantUpdates).where(eq(tenantsTable.id, tenantId));
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "admin.billing_status_override",
+    message: `Billing status overridden to ${status}. Reason: ${reason}`,
+    metadata: { status, reason, trialEndsAt: trialEndsAt?.toISOString?.() ?? null },
+  });
+  const updated = await getTenantSubscription(tenantId);
+  res.json(serializeSubscription(updated!));
+});
+
+// ===========================================================================
+// GDPR — data export (zip)
+// ===========================================================================
+router.get("/v1/admin/tenants/:tenantId/gdpr-export", async (req, res): Promise<void> => {
+  const tenantId = req.params.tenantId;
+  const [tenant] = await db.select().from(tenantsTable).where(eq(tenantsTable.id, tenantId));
+  if (!tenant) {
+    res.status(404).json({ error: "Tenant not found" });
+    return;
+  }
+  res.setHeader("Content-Type", "application/zip");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="ctrltrade-gdpr-${tenant.slug}-${new Date().toISOString().slice(0, 10)}.zip"`,
+  );
+  const archive = archiver("zip", { zlib: { level: 9 } });
+  archive.on("error", (err: unknown) => {
+    req.log.error({ err }, "GDPR archive error");
+    res.end();
+  });
+  archive.pipe(res);
+
+  async function dumpTable(name: string, rows: unknown[]) {
+    archive.append(JSON.stringify(rows, null, 2), { name: `${name}.json` });
+  }
+
+  const [members, custs, qts, jbs, invs, lds, audits, subs] = await Promise.all([
+    db
+      .select({
+        userId: usersTable.id,
+        email: usersTable.email,
+        name: usersTable.name,
+        role: membershipsTable.role,
+        seatType: membershipsTable.seatType,
+        status: membershipsTable.status,
+        invitedAt: membershipsTable.invitedAt,
+        lastLoginAt: usersTable.lastLoginAt,
+      })
+      .from(membershipsTable)
+      .innerJoin(usersTable, eq(usersTable.id, membershipsTable.userId))
+      .where(eq(membershipsTable.tenantId, tenantId)),
+    db.select().from(customersTable).where(eq(customersTable.tenantId, tenantId)),
+    db.select().from(quotesTable).where(eq(quotesTable.tenantId, tenantId)),
+    db.select().from(jobsTable).where(eq(jobsTable.tenantId, tenantId)),
+    db.select().from(invoicesTable).where(eq(invoicesTable.tenantId, tenantId)),
+    db.select().from(leadsTable).where(eq(leadsTable.tenantId, tenantId)),
+    db
+      .select()
+      .from(auditLogsTable)
+      .where(eq(auditLogsTable.tenantId, tenantId))
+      .orderBy(desc(auditLogsTable.createdAt))
+      .limit(2000),
+    db.select().from(subscriptionsTable).where(eq(subscriptionsTable.tenantId, tenantId)),
+  ]);
+
+  await Promise.all([
+    dumpTable("tenant", [tenant]),
+    dumpTable("members", members),
+    dumpTable("customers", custs),
+    dumpTable("quotes", qts),
+    dumpTable("jobs", jbs),
+    dumpTable("invoices", invs),
+    dumpTable("leads", lds),
+    dumpTable("audit_log", audits),
+    dumpTable("subscription", subs),
+  ]);
+  archive.append(
+    `CtrlTrade® GDPR data export for tenant ${tenant.name} (${tenant.slug})\nGenerated ${new Date().toISOString()} by ${req.auth!.user.email}.\n`,
+    { name: "README.txt" },
+  );
+
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "admin.gdpr_export",
+    message: `Generated GDPR export for tenant ${tenant.name}.`,
+  });
+  await archive.finalize();
+});
+
+// ===========================================================================
+// GDPR — deletion state + scheduling + cancel + purge
+// ===========================================================================
+function serializeDeletion(row: typeof tenantDeletionRequestsTable.$inferSelect | null) {
+  if (!row) {
+    return { status: "none", requestedAt: null, scheduledPurgeAt: null, cancelledAt: null, purgedAt: null, requestedByLabel: null, reason: null, canPurgeNow: false };
+  }
+  const canPurgeNow = row.status === "pending" && row.scheduledPurgeAt.getTime() <= Date.now();
+  return {
+    status: row.status,
+    requestedAt: row.requestedAt.toISOString(),
+    scheduledPurgeAt: row.scheduledPurgeAt.toISOString(),
+    cancelledAt: row.cancelledAt?.toISOString() ?? null,
+    purgedAt: row.purgedAt?.toISOString() ?? null,
+    requestedByLabel: row.requestedByLabel,
+    reason: row.reason,
+    canPurgeNow,
+  };
+}
+
+router.get("/v1/admin/tenants/:tenantId/gdpr-deletion", async (req, res): Promise<void> => {
+  const tenantId = req.params.tenantId;
+  const [latest] = await db
+    .select()
+    .from(tenantDeletionRequestsTable)
+    .where(eq(tenantDeletionRequestsTable.tenantId, tenantId))
+    .orderBy(desc(tenantDeletionRequestsTable.requestedAt))
+    .limit(1);
+  res.json(serializeDeletion(latest ?? null));
+});
+
+router.post("/v1/admin/tenants/:tenantId/gdpr-deletion", async (req, res): Promise<void> => {
+  const tenantId = req.params.tenantId;
+  const reason = req.body?.reason ? String(req.body.reason) : null;
+  const [tenant] = await db.select().from(tenantsTable).where(eq(tenantsTable.id, tenantId));
+  if (!tenant) {
+    res.status(404).json({ error: "Tenant not found" });
+    return;
+  }
+  // Reject if there's already a pending request.
+  const [existing] = await db
+    .select()
+    .from(tenantDeletionRequestsTable)
+    .where(
+      and(
+        eq(tenantDeletionRequestsTable.tenantId, tenantId),
+        eq(tenantDeletionRequestsTable.status, "pending"),
+      ),
+    );
+  if (existing) {
+    res.status(409).json({ error: "A deletion is already scheduled. Cancel it before scheduling another." });
+    return;
+  }
+  const scheduledPurgeAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  const [row] = await db
+    .insert(tenantDeletionRequestsTable)
+    .values({
+      tenantId,
+      requestedByUserId: req.auth!.user.id,
+      requestedByLabel: `superadmin:${req.auth!.user.email}`,
+      reason,
+      scheduledPurgeAt,
+      status: "pending",
+    })
+    .returning();
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "admin.gdpr_deletion_scheduled",
+    message: `Scheduled tenant deletion in 30 days (purge ${scheduledPurgeAt.toISOString()}). Reason: ${reason ?? "n/a"}`,
+    metadata: { scheduledPurgeAt: scheduledPurgeAt.toISOString(), reason },
+  });
+  res.json(serializeDeletion(row));
+});
+
+router.delete("/v1/admin/tenants/:tenantId/gdpr-deletion", async (req, res): Promise<void> => {
+  const tenantId = req.params.tenantId;
+  const [updated] = await db
+    .update(tenantDeletionRequestsTable)
+    .set({ status: "cancelled", cancelledAt: new Date() })
+    .where(
+      and(
+        eq(tenantDeletionRequestsTable.tenantId, tenantId),
+        eq(tenantDeletionRequestsTable.status, "pending"),
+      ),
+    )
+    .returning();
+  if (!updated) {
+    res.status(404).json({ error: "No pending deletion to cancel" });
+    return;
+  }
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "admin.gdpr_deletion_cancelled",
+    message: "Scheduled tenant deletion cancelled.",
+  });
+  res.json(serializeDeletion(updated));
+});
+
+router.post("/v1/admin/tenants/:tenantId/gdpr-deletion/purge", async (req, res): Promise<void> => {
+  const tenantId = req.params.tenantId;
+  const [pending] = await db
+    .select()
+    .from(tenantDeletionRequestsTable)
+    .where(
+      and(
+        eq(tenantDeletionRequestsTable.tenantId, tenantId),
+        eq(tenantDeletionRequestsTable.status, "pending"),
+      ),
+    );
+  if (!pending) {
+    res.status(404).json({ error: "No pending deletion to purge" });
+    return;
+  }
+  if (pending.scheduledPurgeAt.getTime() > Date.now()) {
+    res.status(409).json({
+      error: `Cooldown active until ${pending.scheduledPurgeAt.toISOString()}. Wait or cancel and reschedule.`,
+    });
+    return;
+  }
+  // Atomically delete the tenant and mark the request purged. ON DELETE CASCADE handles the rest.
+  // If tenant deletion fails, the status update is rolled back so the request stays "pending".
+  const updated = await db.transaction(async (tx) => {
+    await tx.delete(tenantsTable).where(eq(tenantsTable.id, tenantId));
+    const [row] = await tx
+      .update(tenantDeletionRequestsTable)
+      .set({ status: "purged", purgedAt: new Date() })
+      .where(eq(tenantDeletionRequestsTable.id, pending.id))
+      .returning();
+    return row;
+  });
+  await logAudit({
+    tenantId: null,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "admin.gdpr_deletion_purged",
+    message: `Purged tenant ${tenantId}.`,
+    metadata: { tenantId },
+  });
+  res.json(serializeDeletion(updated));
+});
+
+// ===========================================================================
+// Feature flags (global + per-tenant)
+// ===========================================================================
+async function serializeFlag(row: typeof featureFlagsTable.$inferSelect) {
+  let tenantName: string | null = null;
+  if (row.tenantId) {
+    const [t] = await db.select({ name: tenantsTable.name }).from(tenantsTable).where(eq(tenantsTable.id, row.tenantId));
+    tenantName = t?.name ?? null;
+  }
+  let updatedByLabel: string | null = null;
+  if (row.updatedByUserId) {
+    const [u] = await db.select({ email: usersTable.email }).from(usersTable).where(eq(usersTable.id, row.updatedByUserId));
+    updatedByLabel = u?.email ?? null;
+  }
+  return {
+    id: row.id,
+    tenantId: row.tenantId,
+    tenantName,
+    scope: row.tenantId ? "tenant" : "global",
+    key: row.key,
+    enabled: row.enabled,
+    rolloutPct: row.rolloutPct,
+    description: row.description,
+    updatedByLabel,
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+router.get("/v1/admin/feature-flags", async (req, res): Promise<void> => {
+  const tenantId = (req.query.tenantId as string | undefined) ?? undefined;
+  let rows;
+  if (tenantId) {
+    rows = await db
+      .select()
+      .from(featureFlagsTable)
+      .where(eq(featureFlagsTable.tenantId, tenantId))
+      .orderBy(featureFlagsTable.key);
+  } else {
+    rows = await db.select().from(featureFlagsTable).orderBy(featureFlagsTable.tenantId, featureFlagsTable.key);
+  }
+  const out = await Promise.all(rows.map(serializeFlag));
+  res.json(out);
+});
+
+router.post("/v1/admin/feature-flags", async (req, res): Promise<void> => {
+  const key = String(req.body?.key ?? "").trim();
+  if (!key) {
+    res.status(400).json({ error: "key is required" });
+    return;
+  }
+  const enabled = Boolean(req.body?.enabled);
+  let rolloutPct = Number(req.body?.rolloutPct ?? 100);
+  if (!Number.isFinite(rolloutPct) || rolloutPct < 0 || rolloutPct > 100) rolloutPct = 100;
+  const description = req.body?.description ? String(req.body.description) : null;
+  const tenantId = req.body?.tenantId ? String(req.body.tenantId) : null;
+
+  const existingFilter = tenantId
+    ? and(eq(featureFlagsTable.key, key), eq(featureFlagsTable.tenantId, tenantId))
+    : and(eq(featureFlagsTable.key, key), isNull(featureFlagsTable.tenantId));
+  const [existing] = await db.select().from(featureFlagsTable).where(existingFilter);
+
+  let row;
+  if (existing) {
+    [row] = await db
+      .update(featureFlagsTable)
+      .set({
+        enabled,
+        rolloutPct,
+        description,
+        updatedByUserId: req.auth!.user.id,
+      })
+      .where(eq(featureFlagsTable.id, existing.id))
+      .returning();
+  } else {
+    [row] = await db
+      .insert(featureFlagsTable)
+      .values({
+        tenantId,
+        key,
+        enabled,
+        rolloutPct,
+        description,
+        updatedByUserId: req.auth!.user.id,
+      })
+      .returning();
+  }
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "admin.feature_flag_changed",
+    message: `Feature flag "${key}" set to enabled=${enabled} rollout=${rolloutPct}% (${tenantId ? "tenant" : "global"}).`,
+    metadata: { key, tenantId, enabled, rolloutPct },
+  });
+  res.json(await serializeFlag(row));
+});
+
+router.delete("/v1/admin/feature-flags/:flagId", async (req, res): Promise<void> => {
+  const [existing] = await db
+    .select()
+    .from(featureFlagsTable)
+    .where(eq(featureFlagsTable.id, req.params.flagId));
+  if (!existing) {
+    res.status(404).json({ error: "Feature flag not found" });
+    return;
+  }
+  await db.delete(featureFlagsTable).where(eq(featureFlagsTable.id, existing.id));
+  await logAudit({
+    tenantId: existing.tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "admin.feature_flag_changed",
+    message: `Feature flag "${existing.key}" removed.`,
+    metadata: { key: existing.key, tenantId: existing.tenantId, deleted: true },
+  });
+  res.status(204).end();
 });
 
 export default router;

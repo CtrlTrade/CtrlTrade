@@ -1,20 +1,28 @@
 import { useState } from "react";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 import { 
   useGetAdminTenant, 
   useAdminUpdateTenantQuantities, 
   useAdminCancelTenant, 
   useAdminReactivateTenant, 
   useAdminSyncTenant,
-  useGetAdminTenantAuditLog 
+  useGetAdminTenantAuditLog,
+  useStartImpersonation,
+  useAdminBillingOverride,
+  useGetGdprDeletion,
+  useScheduleGdprDeletion,
+  useCancelGdprDeletion,
+  usePurgeGdprDeletion,
+  getGetGdprDeletionQueryKey,
 } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, RefreshCw, AlertTriangle, ShieldCheck } from "lucide-react";
+import { ArrowLeft, RefreshCw, AlertTriangle, ShieldCheck, UserCheck, Download, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 export function AdminTenantDetail() {
@@ -185,6 +193,8 @@ export function AdminTenantDetail() {
         </CardContent>
       </Card>
 
+      <AdminTenantTools tenantId={id!} status={tenant.status} />
+
       <Dialog open={showQtyModal} onOpenChange={setShowQtyModal}>
         <DialogContent className="rounded-none border-zinc-800 bg-zinc-950 text-white sm:max-w-[425px]">
           <DialogHeader>
@@ -211,6 +221,79 @@ export function AdminTenantDetail() {
           </form>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function AdminTenantTools({ tenantId, status }: { tenantId: string; status: string }) {
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const { data: deletion } = useGetGdprDeletion(tenantId);
+  const impersonate = useStartImpersonation({
+    mutation: {
+      onSuccess: () => { qc.invalidateQueries(); setLocation("~/app"); },
+      onError: (e: any) => toast({ title: "Could not impersonate", description: e?.message, variant: "destructive" }),
+    },
+  });
+  const billing = useAdminBillingOverride({ mutation: { onSuccess: () => toast({ title: "Billing override applied" }) } });
+  const schedule = useScheduleGdprDeletion({ mutation: { onSuccess: () => { qc.invalidateQueries({ queryKey: getGetGdprDeletionQueryKey(tenantId) }); toast({ title: "Deletion scheduled — 30 day cooldown" }); } } });
+  const cancelDel = useCancelGdprDeletion({ mutation: { onSuccess: () => { qc.invalidateQueries({ queryKey: getGetGdprDeletionQueryKey(tenantId) }); toast({ title: "Deletion cancelled" }); } } });
+  const purge = usePurgeGdprDeletion({ mutation: { onSuccess: () => { toast({ title: "Tenant purged" }); setLocation("~/admin/tenants"); }, onError: (e: any) => toast({ title: "Cannot purge yet", description: e?.message, variant: "destructive" }) } });
+
+  const [billingStatus, setBillingStatus] = useState(status);
+  const [billingReason, setBillingReason] = useState("");
+  const [delReason, setDelReason] = useState("");
+
+  const exportUrl = `${import.meta.env.BASE_URL}api/v1/admin/tenants/${tenantId}/gdpr-export`;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+        <CardHeader><CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Impersonation</CardTitle></CardHeader>
+        <CardContent className="space-y-3 text-sm">
+          <p className="text-xs text-zinc-500">Log into this tenant's workspace as the owner. Audited.</p>
+          <Button onClick={() => impersonate.mutate({ tenantId })} disabled={impersonate.isPending} className="w-full rounded-none bg-amber-600 hover:bg-amber-700 text-black uppercase font-bold tracking-wider" data-testid="button-impersonate">
+            <UserCheck className="h-4 w-4 mr-2" /> Impersonate owner
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+        <CardHeader><CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Billing override</CardTitle></CardHeader>
+        <CardContent className="space-y-3 text-sm">
+          <div className="space-y-1">
+            <Label className="text-zinc-400 text-xs uppercase">Status</Label>
+            <select value={billingStatus} onChange={(e) => setBillingStatus(e.target.value)} className="w-full h-9 rounded-none border border-zinc-700 bg-zinc-900 text-white px-2 text-sm" data-testid="select-billing-override">
+              <option value="trial">Trial</option><option value="active">Active</option><option value="past_due">Past due</option><option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <Input value={billingReason} onChange={(e) => setBillingReason(e.target.value)} placeholder="Reason (audited)" className="rounded-none border-zinc-700 bg-zinc-900 text-white" data-testid="input-billing-reason" />
+          <Button onClick={() => billing.mutate({ tenantId, data: { status: billingStatus, reason: billingReason || undefined } })} disabled={billing.isPending} className="w-full rounded-none bg-red-600 hover:bg-red-700 text-white uppercase font-bold tracking-wider" data-testid="button-billing-override">Apply override</Button>
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+        <CardHeader><CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">GDPR</CardTitle></CardHeader>
+        <CardContent className="space-y-3 text-sm">
+          <a href={exportUrl} className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-none border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800 uppercase font-bold tracking-wider text-xs" data-testid="link-gdpr-export"><Download className="h-4 w-4" /> Export data (.zip)</a>
+          {deletion && deletion.status === "pending" ? (
+            <div className="space-y-2">
+              <div className="text-xs text-amber-400 font-bold uppercase">Deletion scheduled</div>
+              <div className="text-xs text-zinc-400">Purge at {deletion.scheduledPurgeAt ? new Date(deletion.scheduledPurgeAt).toLocaleString() : "—"}</div>
+              <div className="flex gap-2">
+                <Button onClick={() => cancelDel.mutate({ tenantId })} variant="outline" className="flex-1 rounded-none border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800 uppercase font-bold text-xs" data-testid="button-cancel-deletion">Cancel</Button>
+                <Button onClick={() => { if (confirm("PERMANENTLY DELETE this tenant and all data? This cannot be undone.")) purge.mutate({ tenantId }); }} disabled={!deletion.canPurgeNow} className="flex-1 rounded-none bg-red-700 hover:bg-red-800 text-white uppercase font-bold text-xs" data-testid="button-purge">{deletion.canPurgeNow ? "Purge now" : "Cooldown"}</Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <Input value={delReason} onChange={(e) => setDelReason(e.target.value)} placeholder="Reason for deletion" className="rounded-none border-zinc-700 bg-zinc-900 text-white" data-testid="input-deletion-reason" />
+              <Button onClick={() => { if (confirm("Schedule tenant deletion (30 day cooldown)?")) schedule.mutate({ tenantId, data: { reason: delReason || undefined } }); }} className="w-full rounded-none bg-red-700 hover:bg-red-800 text-white uppercase font-bold tracking-wider" data-testid="button-schedule-deletion"><Trash2 className="h-4 w-4 mr-2" /> Schedule deletion</Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

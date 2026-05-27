@@ -15,6 +15,8 @@ import { Industries } from "@/pages/public/Industries";
 // Auth
 import { Login } from "@/pages/auth/Login";
 import { Signup } from "@/pages/auth/Signup";
+import { AcceptInvite } from "@/pages/auth/AcceptInvite";
+import { ForgotPassword, ResetPassword } from "@/pages/auth/PasswordReset";
 
 // App
 import { AppDashboard } from "@/pages/app/Dashboard";
@@ -39,6 +41,7 @@ import { PlaceholderPage } from "@/components/PlaceholderPage";
 import { AdminDashboard } from "@/pages/admin/Dashboard";
 import { AdminTenants } from "@/pages/admin/Tenants";
 import { AdminTenantDetail } from "@/pages/admin/TenantDetail";
+import { AdminFeatureFlags } from "@/pages/admin/FeatureFlags";
 
 // Customer portal
 import { PortalLayout } from "@/components/layout/PortalLayout";
@@ -67,6 +70,9 @@ function App() {
             {/* Auth */}
             <Route path="/login" component={Login} />
             <Route path="/signup" component={Signup} />
+            <Route path="/accept-invite" component={AcceptInvite} />
+            <Route path="/forgot-password" component={ForgotPassword} />
+            <Route path="/reset-password" component={ResetPassword} />
 
             {/* App */}
             <Route path="/app" nest>
@@ -125,6 +131,7 @@ function App() {
                   <Route path="/" component={AdminDashboard} />
                   <Route path="/tenants" component={AdminTenants} />
                   <Route path="/tenants/:id" component={AdminTenantDetail} />
+                  <Route path="/feature-flags" component={AdminFeatureFlags} />
                   <Route component={NotFound} />
                 </Switch>
               </AdminLayout>

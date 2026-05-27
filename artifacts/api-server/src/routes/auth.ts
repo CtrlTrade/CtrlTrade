@@ -214,13 +214,18 @@ router.post("/v1/auth/login", async (req, res): Promise<void> => {
     res.status(401).json({ error: "Invalid email or password" });
     return;
   }
+  if (user.status === "disabled") {
+    res.status(403).json({ error: "Account disabled. Contact your administrator." });
+    return;
+  }
+  await db.update(usersTable).set({ lastLoginAt: new Date() }).where(eq(usersTable.id, user.id));
 
-  // Pick first tenant membership (if any)
+  // Pick first ACTIVE tenant membership (if any)
   const memberships = await db
     .select()
     .from(membershipsTable)
     .where(eq(membershipsTable.userId, user.id));
-  const firstMembership = memberships[0] ?? null;
+  const firstMembership = memberships.find((m) => m.status === "active") ?? null;
   let tenantPayload: unknown = null;
   if (firstMembership) {
     const [tenant] = await db
@@ -256,12 +261,11 @@ router.get("/v1/auth/me", async (req, res): Promise<void> => {
   }
   let tenantPayload: unknown = null;
   if (req.auth.tenant) tenantPayload = await serializeTenant(req.auth.tenant);
-  res.json(
-    GetSessionResponse.parse({
-      user: serializeUser(req.auth.user, req.auth.membership),
-      tenant: tenantPayload,
-    }),
-  );
+  res.json({
+    user: serializeUser(req.auth.user, req.auth.membership),
+    tenant: tenantPayload,
+    impersonation: req.auth.impersonation,
+  });
 });
 
 export default router;

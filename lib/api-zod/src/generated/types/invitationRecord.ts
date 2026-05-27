@@ -6,18 +6,15 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface TeamMember {
-  userId: string;
-  name: string;
+export interface InvitationRecord {
+  id: string;
   email: string;
   role: string;
   seatType: string;
-  status: string;
-  isYou: boolean;
   /** @nullable */
-  invitedAt?: Date | null;
+  invitedByLabel?: string | null;
+  expiresAt: Date;
+  createdAt: Date;
   /** @nullable */
-  disabledAt?: Date | null;
-  /** @nullable */
-  lastLoginAt?: Date | null;
+  acceptUrl?: string | null;
 }

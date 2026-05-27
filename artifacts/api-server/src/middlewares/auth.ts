@@ -14,6 +14,8 @@ declare module "express-session" {
   interface SessionData {
     userId?: string;
     tenantId?: string;
+    impersonatedTenantId?: string;
+    impersonationStartedAt?: string;
   }
 }
 
@@ -21,6 +23,12 @@ export interface AuthContext {
   user: User;
   tenant: Tenant | null;
   membership: Membership | null;
+  impersonation: {
+    tenantId: string;
+    tenantName: string;
+    impersonatorEmail: string;
+    startedAt: string;
+  } | null;
 }
 
 declare module "express-serve-static-core" {
@@ -34,21 +42,51 @@ async function resolveAuth(req: Request): Promise<AuthContext | null> {
   if (!userId) return null;
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId));
   if (!user) return null;
-  const tenantId = req.session?.tenantId;
+  if (user.status === "disabled") return null;
+
+  // Resolve effective tenant. If super admin is impersonating, swap tenant.
+  let effectiveTenantId = req.session?.tenantId ?? null;
+  let impersonation: AuthContext["impersonation"] = null;
+  if (user.isSuperAdmin && req.session?.impersonatedTenantId) {
+    effectiveTenantId = req.session.impersonatedTenantId;
+  }
+
   let tenant: Tenant | null = null;
   let membership: Membership | null = null;
-  if (tenantId) {
-    const [t] = await db.select().from(tenantsTable).where(eq(tenantsTable.id, tenantId));
+  if (effectiveTenantId) {
+    const [t] = await db.select().from(tenantsTable).where(eq(tenantsTable.id, effectiveTenantId));
     tenant = t ?? null;
     if (tenant) {
-      const [m] = await db
-        .select()
-        .from(membershipsTable)
-        .where(and(eq(membershipsTable.tenantId, tenant.id), eq(membershipsTable.userId, user.id)));
-      membership = m ?? null;
+      if (user.isSuperAdmin && req.session?.impersonatedTenantId === tenant.id) {
+        impersonation = {
+          tenantId: tenant.id,
+          tenantName: tenant.name,
+          impersonatorEmail: user.email,
+          startedAt: req.session.impersonationStartedAt ?? new Date().toISOString(),
+        };
+        // Synthesize a virtual owner membership so super admin can use tenant routes.
+        membership = {
+          id: "impersonation",
+          tenantId: tenant.id,
+          userId: user.id,
+          role: "owner",
+          seatType: "control",
+          status: "active",
+          invitedAt: null,
+          disabledAt: null,
+          createdAt: new Date(),
+        } as Membership;
+      } else {
+        const [m] = await db
+          .select()
+          .from(membershipsTable)
+          .where(and(eq(membershipsTable.tenantId, tenant.id), eq(membershipsTable.userId, user.id)));
+        membership = m && m.status === "active" ? m : null;
+        if (!membership) tenant = null;
+      }
     }
   }
-  return { user, tenant, membership };
+  return { user, tenant, membership, impersonation };
 }
 
 export async function attachAuth(req: Request, _res: Response, next: NextFunction): Promise<void> {
@@ -85,5 +123,24 @@ export function requireSuperAdmin(req: Request, res: Response, next: NextFunctio
     res.status(403).json({ error: "Super admin only" });
     return;
   }
+  // Block super-admin only routes while impersonating to avoid accidents.
+  if (req.auth.impersonation) {
+    res.status(403).json({ error: "Stop impersonation before using admin tools" });
+    return;
+  }
   next();
+}
+
+export function requireRole(...roles: string[]) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.auth?.membership) {
+      res.status(403).json({ error: "No tenant context" });
+      return;
+    }
+    if (!roles.includes(req.auth.membership.role)) {
+      res.status(403).json({ error: "Insufficient role" });
+      return;
+    }
+    next();
+  };
 }

@@ -113,7 +113,7 @@ export function AppJobs() {
                   <Label>Assignee</Label>
                   <Select value={assignedUserId} onValueChange={setAssignedUserId}>
                     <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
-                    <SelectContent>{team?.map((m) => <SelectItem key={m.userId} value={m.userId}>{m.name ?? m.email}</SelectItem>)}</SelectContent>
+                    <SelectContent>{team?.members?.map((m: any) => <SelectItem key={m.userId} value={m.userId}>{m.name ?? m.email}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div><Label>Value (pence)</Label><Input name="valuePence" type="number" min={0} defaultValue={0} /></div>

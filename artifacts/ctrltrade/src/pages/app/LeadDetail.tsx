@@ -253,7 +253,7 @@ export function AppLeadDetail() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="__unassigned__">Unassigned</SelectItem>
-                {(team ?? []).map((m) => (
+                {(team?.members ?? []).map((m: any) => (
                   <SelectItem key={m.userId} value={m.userId}>
                     {m.name} ({m.role})
                   </SelectItem>
