@@ -48,5 +48,6 @@ export interface Tenant {
   tradeCategorySlugs?: string[];
   /** @nullable */
   parentTenantId?: string | null;
+  require2fa?: boolean;
   whiteLabelConfig?: null | WhiteLabelConfig;
 }

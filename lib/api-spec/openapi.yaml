@@ -504,6 +504,85 @@ paths:
               schema:
                 $ref: "#/components/schemas/Session"
 
+  /v1/auth/2fa/setup:
+    get:
+      operationId: get2faSetup
+      tags: [auth]
+      summary: Generate a TOTP secret and QR code URI for enrolment
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TotpSetup"
+
+  /v1/auth/2fa/verify-enrol:
+    post:
+      operationId: verifyEnrol2fa
+      tags: [auth]
+      summary: Verify a TOTP code and activate 2FA for the current user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TotpCodeInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TotpEnrolResult"
+
+  /v1/auth/2fa:
+    delete:
+      operationId: disable2fa
+      tags: [auth]
+      summary: Disable 2FA for the current user (requires current TOTP code)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TotpCodeInput"
+      responses:
+        "204":
+          description: Disabled
+
+  /v1/auth/2fa/recovery-codes:
+    get:
+      operationId: get2faRecoveryCodes
+      tags: [auth]
+      summary: Get the current user's recovery codes (shown only once after enrolment)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TotpRecoveryCodes"
+
+  /v1/auth/2fa/challenge:
+    post:
+      operationId: submit2faChallenge
+      tags: [auth]
+      summary: Exchange a 2FA code for a full session after password login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TotpChallengeInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+
   /v1/auth/logout:
     post:
       operationId: logout
@@ -4912,6 +4991,41 @@ components:
         email: { type: string, format: email }
         password: { type: string, minLength: 1 }
 
+    TotpSetup:
+      type: object
+      required: [otpAuthUri, secret]
+      properties:
+        otpAuthUri: { type: string }
+        secret: { type: string }
+
+    TotpCodeInput:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string }
+
+    TotpChallengeInput:
+      type: object
+      properties:
+        code: { type: string }
+        recoveryCode: { type: string }
+
+    TotpEnrolResult:
+      type: object
+      required: [recoveryCodes]
+      properties:
+        recoveryCodes:
+          type: array
+          items: { type: string }
+
+    TotpRecoveryCodes:
+      type: object
+      required: [recoveryCodes]
+      properties:
+        recoveryCodes:
+          type: array
+          items: { type: string }
+
     Session:
       type: object
       required: [user]
@@ -4925,6 +5039,8 @@ components:
           oneOf:
             - $ref: "#/components/schemas/ImpersonationContext"
             - type: "null"
+        twoFactorRequired: { type: boolean }
+        twoFactorSetupRequired: { type: boolean }
 
     ImpersonationContext:
       type: object
@@ -4937,13 +5053,14 @@ components:
 
     SessionUser:
       type: object
-      required: [id, email, name, role, isSuperAdmin]
+      required: [id, email, name, role, isSuperAdmin, totpEnabled]
       properties:
         id: { type: string }
         email: { type: string }
         name: { type: string }
         role: { type: string }
         isSuperAdmin: { type: boolean }
+        totpEnabled: { type: boolean }
         seatType:
           type: ["string", "null"]
           description: "control | field | null"
@@ -4984,6 +5101,7 @@ components:
           type: array
           items: { type: string }
         parentTenantId: { type: ["string", "null"] }
+        require2fa: { type: boolean }
         whiteLabelConfig:
           anyOf:
             - type: "null"

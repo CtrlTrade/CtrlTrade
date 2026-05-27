@@ -47,6 +47,9 @@ router.patch("/v1/tenant", requireTenant, async (req, res): Promise<void> => {
       .map((o) => o.trim())
       .filter((o) => o.length > 0);
   }
+  if ((parsed.data as Record<string, unknown>)["require2fa"] !== undefined) {
+    updates["require2fa"] = (parsed.data as Record<string, unknown>)["require2fa"];
+  }
   if (Object.keys(updates).length > 0) {
     await db.update(tenantsTable).set(updates).where(eq(tenantsTable.id, tenantId));
   }

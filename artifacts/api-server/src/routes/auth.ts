@@ -265,6 +265,16 @@ router.post("/v1/auth/login", async (req, res): Promise<void> => {
     res.status(403).json({ error: "Account disabled. Contact your administrator." });
     return;
   }
+
+  // If 2FA is enabled, start a pending challenge instead of a full session
+  if (user.totpEnabled) {
+    req.session.twoFactorPendingUserId = user.id;
+    delete req.session.userId;
+    delete req.session.tenantId;
+    res.json({ twoFactorRequired: true, user: null, tenant: null, impersonation: null });
+    return;
+  }
+
   await db.update(usersTable).set({ lastLoginAt: new Date() }).where(eq(usersTable.id, user.id));
 
   // Pick first ACTIVE tenant membership (if any)
@@ -282,6 +292,19 @@ router.post("/v1/auth/login", async (req, res): Promise<void> => {
     if (tenant) {
       tenantPayload = await serializeTenant(tenant);
       req.session.tenantId = tenant.id;
+
+      // Check if tenant requires 2FA but user hasn't enrolled
+      if (tenant.require2fa && !user.totpEnabled) {
+        req.session.userId = user.id;
+        res.json(
+          LoginResponse.parse({
+            user: serializeUser(user, firstMembership),
+            tenant: tenantPayload,
+            twoFactorSetupRequired: true,
+          }),
+        );
+        return;
+      }
     }
   }
   req.session.userId = user.id;

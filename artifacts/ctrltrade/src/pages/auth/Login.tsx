@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn } from "lucide-react";
+import { TwoFactorChallenge } from "./TwoFactorChallenge";
 
 export function Login() {
   const [, setLocation] = useLocation();
@@ -14,6 +15,7 @@ export function Login() {
   const login = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,8 +23,16 @@ export function Login() {
 
     login.mutate({ data: { email, password } }, {
       onSuccess: (session) => {
+        if ((session as any).twoFactorRequired) {
+          setShowTwoFactor(true);
+          return;
+        }
         toast({ title: "Login successful", description: "Welcome back." });
-        if (session.user.isSuperAdmin) {
+        if ((session as any).twoFactorSetupRequired) {
+          setLocation("/app/settings?tab=security&setup=required");
+          return;
+        }
+        if (session.user?.isSuperAdmin) {
           setLocation("/admin");
         } else {
           setLocation("/app");
@@ -33,6 +43,24 @@ export function Login() {
       }
     });
   };
+
+  const handle2faSuccess = (session: { user: { isSuperAdmin: boolean } }) => {
+    toast({ title: "Login successful", description: "Welcome back." });
+    if (session.user.isSuperAdmin) {
+      setLocation("/admin");
+    } else {
+      setLocation("/app");
+    }
+  };
+
+  if (showTwoFactor) {
+    return (
+      <TwoFactorChallenge
+        onSuccess={handle2faSuccess}
+        onCancel={() => setShowTwoFactor(false)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -77,9 +105,12 @@ export function Login() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center border-t border-border pt-4">
+        <CardFooter className="flex flex-col gap-2 border-t border-border pt-4">
           <p className="text-sm text-muted-foreground">
             Don't have an account? <Link href="/signup" className="text-primary font-medium hover:underline">Start your free trial</Link>
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <Link href="/forgot-password" className="text-primary font-medium hover:underline">Forgot password?</Link>
           </p>
         </CardFooter>
       </Card>

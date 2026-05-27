@@ -71,12 +71,35 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface TotpSetup {
+  otpAuthUri: string;
+  secret: string;
+}
+
+export interface TotpCodeInput {
+  code: string;
+}
+
+export interface TotpChallengeInput {
+  code?: string;
+  recoveryCode?: string;
+}
+
+export interface TotpEnrolResult {
+  recoveryCodes: string[];
+}
+
+export interface TotpRecoveryCodes {
+  recoveryCodes: string[];
+}
+
 export interface SessionUser {
   id: string;
   email: string;
   name: string;
   role: string;
   isSuperAdmin: boolean;
+  totpEnabled: boolean;
   /**
      * control | field | null
      * @nullable
@@ -165,6 +188,7 @@ export interface Tenant {
   tradeCategorySlugs?: string[];
   /** @nullable */
   parentTenantId?: string | null;
+  require2fa?: boolean;
   whiteLabelConfig?: null | WhiteLabelConfig;
 }
 
@@ -179,6 +203,8 @@ export interface Session {
   user: SessionUser;
   tenant?: Tenant | null;
   impersonation?: ImpersonationContext | null;
+  twoFactorRequired?: boolean;
+  twoFactorSetupRequired?: boolean;
 }
 
 export interface ResellerProfileInput {

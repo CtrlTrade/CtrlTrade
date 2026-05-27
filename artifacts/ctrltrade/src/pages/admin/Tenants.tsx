@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search } from "lucide-react";
+import { Search, ShieldCheck } from "lucide-react";
 
 export function AdminTenants() {
   const [search, setSearch] = useState("");
@@ -84,8 +84,11 @@ export function AdminTenants() {
                 <div className="col-span-3 text-xs text-zinc-400 font-mono">
                   {tenant.controlSeats}C / {tenant.fieldSeats}F / {tenant.tills}T
                 </div>
-                <div className="col-span-2 font-mono text-zinc-300 font-bold">
+                <div className="col-span-2 font-mono text-zinc-300 font-bold flex items-center gap-2">
                   £{tenant.monthlyTotal}
+                  {(tenant as any).require2fa && (
+                    <ShieldCheck className="h-3 w-3 text-green-500" aria-label="2FA enforced" />
+                  )}
                 </div>
                 <div className="col-span-1 text-right">
                   <Link href={`/admin/tenants/${tenant.id}`} className="text-xs uppercase font-bold text-red-500 hover:text-red-400">

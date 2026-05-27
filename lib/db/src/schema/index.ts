@@ -71,6 +71,7 @@ export const tenantsTable = pgTable(
     stripeSubscriptionId: text("stripe_subscription_id"),
     trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
     cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+    require2fa: boolean("require_2fa").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
@@ -131,6 +132,10 @@ export const usersTable = pgTable("users", {
   status: varchar("status", { length: 16 }).notNull().default("active"), // active|disabled
   disabledAt: timestamp("disabled_at", { withTimezone: true }),
   lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+  totpSecretEnc: text("totp_secret_enc"),
+  totpEnabled: boolean("totp_enabled").notNull().default(false),
+  totpRecoveryCodesEnc: text("totp_recovery_codes_enc"),
+  totpEnrolledAt: timestamp("totp_enrolled_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

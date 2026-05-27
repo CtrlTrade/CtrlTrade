@@ -13,4 +13,6 @@ export interface Session {
   user: SessionUser;
   tenant?: Tenant | null;
   impersonation?: ImpersonationContext | null;
+  twoFactorRequired?: boolean;
+  twoFactorSetupRequired?: boolean;
 }

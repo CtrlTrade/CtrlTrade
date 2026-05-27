@@ -12,6 +12,7 @@ export interface SessionUser {
   name: string;
   role: string;
   isSuperAdmin: boolean;
+  totpEnabled: boolean;
   /**
      * control | field | null
      * @nullable

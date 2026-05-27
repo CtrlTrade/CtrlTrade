@@ -50,6 +50,7 @@ export async function serializeTenant(t: Tenant) {
     leadCaptureAllowedOrigins: t.leadCaptureAllowedOrigins ?? [],
     tradeCategorySlugs: slugs,
     parentTenantId: t.parentTenantId ?? null,
+    require2fa: t.require2fa,
     whiteLabelConfig: t.whiteLabelConfig ?? null,
   };
 }
@@ -61,6 +62,7 @@ export function serializeUser(user: User, membership: Membership | null) {
     name: user.name,
     role: membership?.role ?? (user.isSuperAdmin ? "super_admin" : "guest"),
     isSuperAdmin: user.isSuperAdmin,
+    totpEnabled: user.totpEnabled,
     seatType: membership?.seatType ?? null,
   };
 }

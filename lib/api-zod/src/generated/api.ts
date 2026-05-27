@@ -150,6 +150,7 @@ export const PosLoginResponse = zod.object({
   "name": zod.string(),
   "role": zod.string(),
   "isSuperAdmin": zod.boolean(),
+  "totpEnabled": zod.boolean(),
   "seatType": zod.string().nullish().describe('control | field | null')
 }),
   "tenant": zod.object({
@@ -195,6 +196,7 @@ export const PosLoginResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -222,6 +224,7 @@ export const GetPosSessionResponse = zod.object({
   "name": zod.string(),
   "role": zod.string(),
   "isSuperAdmin": zod.boolean(),
+  "totpEnabled": zod.boolean(),
   "seatType": zod.string().nullish().describe('control | field | null')
 }),
   "tenant": zod.object({
@@ -267,6 +270,7 @@ export const GetPosSessionResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -748,6 +752,7 @@ export const LoginResponse = zod.object({
   "name": zod.string(),
   "role": zod.string(),
   "isSuperAdmin": zod.boolean(),
+  "totpEnabled": zod.boolean(),
   "seatType": zod.string().nullish().describe('control | field | null')
 }),
   "tenant": zod.union([zod.object({
@@ -793,6 +798,7 @@ export const LoginResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -810,7 +816,131 @@ export const LoginResponse = zod.object({
   "tenantName": zod.string(),
   "impersonatorEmail": zod.string(),
   "startedAt": zod.coerce.date()
-}),zod.null()]).optional()
+}),zod.null()]).optional(),
+  "twoFactorRequired": zod.boolean().optional(),
+  "twoFactorSetupRequired": zod.boolean().optional()
+})
+
+
+/**
+ * @summary Generate a TOTP secret and QR code URI for enrolment
+ */
+export const Get2faSetupResponse = zod.object({
+  "otpAuthUri": zod.string(),
+  "secret": zod.string()
+})
+
+
+/**
+ * @summary Verify a TOTP code and activate 2FA for the current user
+ */
+export const VerifyEnrol2faBody = zod.object({
+  "code": zod.string()
+})
+
+export const VerifyEnrol2faResponse = zod.object({
+  "recoveryCodes": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Disable 2FA for the current user (requires current TOTP code)
+ */
+export const Disable2faBody = zod.object({
+  "code": zod.string()
+})
+
+
+/**
+ * @summary Get the current user's recovery codes (shown only once after enrolment)
+ */
+export const Get2faRecoveryCodesResponse = zod.object({
+  "recoveryCodes": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Exchange a 2FA code for a full session after password login
+ */
+export const Submit2faChallengeBody = zod.object({
+  "code": zod.string().optional(),
+  "recoveryCode": zod.string().optional()
+})
+
+export const Submit2faChallengeResponse = zod.object({
+  "user": zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "role": zod.string(),
+  "isSuperAdmin": zod.boolean(),
+  "totpEnabled": zod.boolean(),
+  "seatType": zod.string().nullish().describe('control | field | null')
+}),
+  "tenant": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string().describe('trial | active | past_due | paused | cancelled'),
+  "createdAt": zod.coerce.date(),
+  "country": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
+}),zod.null()]).optional(),
+  "impersonation": zod.union([zod.object({
+  "tenantId": zod.string(),
+  "tenantName": zod.string(),
+  "impersonatorEmail": zod.string(),
+  "startedAt": zod.coerce.date()
+}),zod.null()]).optional(),
+  "twoFactorRequired": zod.boolean().optional(),
+  "twoFactorSetupRequired": zod.boolean().optional()
 })
 
 
@@ -821,6 +951,7 @@ export const GetSessionResponse = zod.object({
   "name": zod.string(),
   "role": zod.string(),
   "isSuperAdmin": zod.boolean(),
+  "totpEnabled": zod.boolean(),
   "seatType": zod.string().nullish().describe('control | field | null')
 }),
   "tenant": zod.union([zod.object({
@@ -866,6 +997,7 @@ export const GetSessionResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -883,7 +1015,9 @@ export const GetSessionResponse = zod.object({
   "tenantName": zod.string(),
   "impersonatorEmail": zod.string(),
   "startedAt": zod.coerce.date()
-}),zod.null()]).optional()
+}),zod.null()]).optional(),
+  "twoFactorRequired": zod.boolean().optional(),
+  "twoFactorSetupRequired": zod.boolean().optional()
 })
 
 
@@ -944,6 +1078,7 @@ export const GetTenantResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -1041,6 +1176,7 @@ export const UpdateTenantResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -1349,6 +1485,7 @@ export const GetAdminTenantResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -1382,6 +1519,7 @@ export const GetAdminTenantResponse = zod.object({
   "name": zod.string(),
   "role": zod.string(),
   "isSuperAdmin": zod.boolean(),
+  "totpEnabled": zod.boolean(),
   "seatType": zod.string().nullish().describe('control | field | null')
 }),
   "recentEvents": zod.array(zod.object({
@@ -1644,6 +1782,7 @@ export const AcceptInvitationResponse = zod.object({
   "name": zod.string(),
   "role": zod.string(),
   "isSuperAdmin": zod.boolean(),
+  "totpEnabled": zod.boolean(),
   "seatType": zod.string().nullish().describe('control | field | null')
 }),
   "tenant": zod.union([zod.object({
@@ -1689,6 +1828,7 @@ export const AcceptInvitationResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -1706,7 +1846,9 @@ export const AcceptInvitationResponse = zod.object({
   "tenantName": zod.string(),
   "impersonatorEmail": zod.string(),
   "startedAt": zod.coerce.date()
-}),zod.null()]).optional()
+}),zod.null()]).optional(),
+  "twoFactorRequired": zod.boolean().optional(),
+  "twoFactorSetupRequired": zod.boolean().optional()
 })
 
 
@@ -1747,6 +1889,7 @@ export const StartImpersonationResponse = zod.object({
   "name": zod.string(),
   "role": zod.string(),
   "isSuperAdmin": zod.boolean(),
+  "totpEnabled": zod.boolean(),
   "seatType": zod.string().nullish().describe('control | field | null')
 }),
   "tenant": zod.union([zod.object({
@@ -1792,6 +1935,7 @@ export const StartImpersonationResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -1809,7 +1953,9 @@ export const StartImpersonationResponse = zod.object({
   "tenantName": zod.string(),
   "impersonatorEmail": zod.string(),
   "startedAt": zod.coerce.date()
-}),zod.null()]).optional()
+}),zod.null()]).optional(),
+  "twoFactorRequired": zod.boolean().optional(),
+  "twoFactorSetupRequired": zod.boolean().optional()
 })
 
 
@@ -1820,6 +1966,7 @@ export const StopImpersonationResponse = zod.object({
   "name": zod.string(),
   "role": zod.string(),
   "isSuperAdmin": zod.boolean(),
+  "totpEnabled": zod.boolean(),
   "seatType": zod.string().nullish().describe('control | field | null')
 }),
   "tenant": zod.union([zod.object({
@@ -1865,6 +2012,7 @@ export const StopImpersonationResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -1882,7 +2030,9 @@ export const StopImpersonationResponse = zod.object({
   "tenantName": zod.string(),
   "impersonatorEmail": zod.string(),
   "startedAt": zod.coerce.date()
-}),zod.null()]).optional()
+}),zod.null()]).optional(),
+  "twoFactorRequired": zod.boolean().optional(),
+  "twoFactorSetupRequired": zod.boolean().optional()
 })
 
 
@@ -4253,6 +4403,7 @@ export const GetAdminTenantWhiteLabelResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -4317,6 +4468,7 @@ export const GetAdminTenantWhiteLabelResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),
@@ -4406,6 +4558,7 @@ export const UpdateAdminTenantWhiteLabelResponse = zod.object({
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
   "tradeCategorySlugs": zod.array(zod.string()).optional(),
   "parentTenantId": zod.string().nullish(),
+  "require2fa": zod.boolean().optional(),
   "whiteLabelConfig": zod.union([zod.null(),zod.object({
   "hideCtrlTradeBranding": zod.boolean().optional(),
   "productName": zod.string().optional(),

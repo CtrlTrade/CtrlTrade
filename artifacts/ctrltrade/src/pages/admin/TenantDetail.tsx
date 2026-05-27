@@ -146,6 +146,18 @@ export function AdminTenantDetail() {
               <span className="text-zinc-500 uppercase font-bold text-xs">Owner Email</span>
               <span className="col-span-2 font-mono text-zinc-300">{owner.email}</span>
             </div>
+            <div className="grid grid-cols-3 gap-2 border-b border-zinc-800 pb-2">
+              <span className="text-zinc-500 uppercase font-bold text-xs">2FA Enforced</span>
+              <span className="col-span-2">
+                {(tenant as any).require2fa ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-green-500/10 text-green-500 border border-green-500/20">
+                    <ShieldCheck className="h-3 w-3" /> Enforced
+                  </span>
+                ) : (
+                  <span className="text-xs text-zinc-500 font-mono">Not enforced</span>
+                )}
+              </span>
+            </div>
           </CardContent>
         </Card>
 
