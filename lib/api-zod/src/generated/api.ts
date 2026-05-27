@@ -71,7 +71,19 @@ export const PosLoginResponse = zod.object({
 }).optional()
 })]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
-  "tradeCategorySlugs": zod.array(zod.string()).optional()
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
 })
 })
 
@@ -131,7 +143,19 @@ export const GetPosSessionResponse = zod.object({
 }).optional()
 })]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
-  "tradeCategorySlugs": zod.array(zod.string()).optional()
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
 })
 })
 
@@ -645,7 +669,19 @@ export const LoginResponse = zod.object({
 }).optional()
 })]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
-  "tradeCategorySlugs": zod.array(zod.string()).optional()
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
 }),zod.null()]).optional(),
   "impersonation": zod.union([zod.object({
   "tenantId": zod.string(),
@@ -706,7 +742,19 @@ export const GetSessionResponse = zod.object({
 }).optional()
 })]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
-  "tradeCategorySlugs": zod.array(zod.string()).optional()
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
 }),zod.null()]).optional(),
   "impersonation": zod.union([zod.object({
   "tenantId": zod.string(),
@@ -772,7 +820,19 @@ export const GetTenantResponse = zod.object({
 }).optional()
 })]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
-  "tradeCategorySlugs": zod.array(zod.string()).optional()
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
 })
 
 
@@ -857,7 +917,19 @@ export const UpdateTenantResponse = zod.object({
 }).optional()
 })]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
-  "tradeCategorySlugs": zod.array(zod.string()).optional()
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
 })
 
 
@@ -1153,7 +1225,19 @@ export const GetAdminTenantResponse = zod.object({
 }).optional()
 })]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
-  "tradeCategorySlugs": zod.array(zod.string()).optional()
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
 }),
   "subscription": zod.object({
   "id": zod.string(),
@@ -1481,7 +1565,19 @@ export const AcceptInvitationResponse = zod.object({
 }).optional()
 })]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
-  "tradeCategorySlugs": zod.array(zod.string()).optional()
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
 }),zod.null()]).optional(),
   "impersonation": zod.union([zod.object({
   "tenantId": zod.string(),
@@ -1572,7 +1668,19 @@ export const StartImpersonationResponse = zod.object({
 }).optional()
 })]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
-  "tradeCategorySlugs": zod.array(zod.string()).optional()
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
 }),zod.null()]).optional(),
   "impersonation": zod.union([zod.object({
   "tenantId": zod.string(),
@@ -1633,7 +1741,19 @@ export const StopImpersonationResponse = zod.object({
 }).optional()
 })]).optional(),
   "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
-  "tradeCategorySlugs": zod.array(zod.string()).optional()
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
 }),zod.null()]).optional(),
   "impersonation": zod.union([zod.object({
   "tenantId": zod.string(),
@@ -3348,7 +3468,12 @@ export const GetPortalBrandingResponse = zod.object({
   "tenantName": zod.string(),
   "tenantSlug": zod.string(),
   "brandColor": zod.string().nullish(),
-  "logoUrl": zod.string().nullish()
+  "logoUrl": zod.string().nullish(),
+  "productName": zod.string().nullish(),
+  "supportEmail": zod.string().nullish(),
+  "supportPhone": zod.string().nullish(),
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "legalEntity": zod.string().nullish()
 })
 
 
@@ -3382,7 +3507,12 @@ export const VerifyPortalMagicLinkResponse = zod.object({
   "tenantName": zod.string(),
   "tenantSlug": zod.string(),
   "brandColor": zod.string().nullish(),
-  "logoUrl": zod.string().nullish()
+  "logoUrl": zod.string().nullish(),
+  "productName": zod.string().nullish(),
+  "supportEmail": zod.string().nullish(),
+  "supportPhone": zod.string().nullish(),
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "legalEntity": zod.string().nullish()
 }),
   "customer": zod.object({
   "id": zod.string(),
@@ -3397,7 +3527,12 @@ export const GetPortalSessionResponse = zod.object({
   "tenantName": zod.string(),
   "tenantSlug": zod.string(),
   "brandColor": zod.string().nullish(),
-  "logoUrl": zod.string().nullish()
+  "logoUrl": zod.string().nullish(),
+  "productName": zod.string().nullish(),
+  "supportEmail": zod.string().nullish(),
+  "supportPhone": zod.string().nullish(),
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "legalEntity": zod.string().nullish()
 }),
   "customer": zod.object({
   "id": zod.string(),
@@ -3679,6 +3814,430 @@ export const PostTenantThreadMessageParams = zod.object({
 
 export const PostTenantThreadMessageBody = zod.object({
   "body": zod.string().min(1)
+})
+
+
+export const GetAdminTenantWhiteLabelParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const GetAdminTenantWhiteLabelResponse = zod.object({
+  "tenant": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string().describe('trial | active | past_due | paused | cancelled'),
+  "createdAt": zod.coerce.date(),
+  "country": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
+}),
+  "reseller": zod.union([zod.null(),zod.object({
+  "id": zod.string().optional(),
+  "tenantId": zod.string(),
+  "displayName": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "revenueSharePct": zod.number(),
+  "notes": zod.string().nullish(),
+  "active": zod.boolean()
+})]).optional(),
+  "parent": zod.union([zod.null(),zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string().describe('trial | active | past_due | paused | cancelled'),
+  "createdAt": zod.coerce.date(),
+  "country": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
+})]).optional()
+})
+
+
+export const UpdateAdminTenantWhiteLabelParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const updateAdminTenantWhiteLabelBodyResellerTwoRevenueSharePctMin = 0;
+export const updateAdminTenantWhiteLabelBodyResellerTwoRevenueSharePctMax = 100;
+
+
+
+export const UpdateAdminTenantWhiteLabelBody = zod.object({
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional(),
+  "reseller": zod.union([zod.null(),zod.object({
+  "displayName": zod.string().optional(),
+  "contactEmail": zod.string().optional(),
+  "revenueSharePct": zod.number().min(updateAdminTenantWhiteLabelBodyResellerTwoRevenueSharePctMin).max(updateAdminTenantWhiteLabelBodyResellerTwoRevenueSharePctMax).optional(),
+  "notes": zod.string().optional(),
+  "active": zod.boolean().optional()
+})]).optional()
+})
+
+export const UpdateAdminTenantWhiteLabelResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string().describe('trial | active | past_due | paused | cancelled'),
+  "createdAt": zod.coerce.date(),
+  "country": zod.string().nullish(),
+  "phone": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "logoPortalUrl": zod.string().nullish(),
+  "logoPosUrl": zod.string().nullish(),
+  "faviconUrl": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "surfaceColor": zod.string().nullish(),
+  "fontFamily": zod.string().nullish(),
+  "brandTemplates": zod.union([zod.null(),zod.object({
+  "invoice": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "quote": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional(),
+  "notes": zod.string().optional()
+}).optional(),
+  "email": zod.object({
+  "header": zod.string().optional(),
+  "signature": zod.string().optional()
+}).optional(),
+  "posReceipt": zod.object({
+  "header": zod.string().optional(),
+  "footer": zod.string().optional()
+}).optional()
+})]).optional(),
+  "leadCaptureAllowedOrigins": zod.array(zod.string()).optional(),
+  "tradeCategorySlugs": zod.array(zod.string()).optional(),
+  "parentTenantId": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
+})
+
+
+export const ListAdminCustomDomainsParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const ListAdminCustomDomainsResponseItem = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "hostname": zod.string(),
+  "kind": zod.string().describe('portal | app'),
+  "status": zod.string().describe('pending | verified | failed'),
+  "verificationToken": zod.string(),
+  "verificationRecord": zod.string().optional().describe('TXT record content to publish'),
+  "verifiedAt": zod.coerce.date().nullish(),
+  "lastCheckedAt": zod.coerce.date().nullish(),
+  "lastError": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListAdminCustomDomainsResponse = zod.array(ListAdminCustomDomainsResponseItem)
+
+
+export const AddAdminCustomDomainParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const addAdminCustomDomainBodyHostnameMin = 3;
+
+
+
+export const AddAdminCustomDomainBody = zod.object({
+  "hostname": zod.string().min(addAdminCustomDomainBodyHostnameMin),
+  "kind": zod.enum(['portal', 'app']).optional()
+})
+
+
+export const DeleteAdminCustomDomainParams = zod.object({
+  "tenantId": zod.coerce.string(),
+  "domainId": zod.coerce.string()
+})
+
+
+export const VerifyAdminCustomDomainParams = zod.object({
+  "tenantId": zod.coerce.string(),
+  "domainId": zod.coerce.string()
+})
+
+export const VerifyAdminCustomDomainResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "hostname": zod.string(),
+  "kind": zod.string().describe('portal | app'),
+  "status": zod.string().describe('pending | verified | failed'),
+  "verificationToken": zod.string(),
+  "verificationRecord": zod.string().optional().describe('TXT record content to publish'),
+  "verifiedAt": zod.coerce.date().nullish(),
+  "lastCheckedAt": zod.coerce.date().nullish(),
+  "lastError": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const ListAdminTenantChildrenParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const ListAdminTenantChildrenResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string(),
+  "mrr": zod.number(),
+  "currency": zod.string().optional(),
+  "controlSeats": zod.number().optional(),
+  "fieldSeats": zod.number().optional(),
+  "tills": zod.number().optional(),
+  "jobsCount": zod.number().describe('Total jobs across all time for this child tenant'),
+  "leadsCount": zod.number().describe('Total leads across all time for this child tenant'),
+  "paidRevenuePence": zod.number().describe('Sum of paid invoice totals in minor currency units'),
+  "createdAt": zod.coerce.date()
+})
+export const ListAdminTenantChildrenResponse = zod.array(ListAdminTenantChildrenResponseItem)
+
+
+export const GetResellerDashboardResponse = zod.object({
+  "tenantId": zod.string(),
+  "displayName": zod.string().nullish(),
+  "totalMrr": zod.number(),
+  "revenueSharePct": zod.number(),
+  "expectedPayoutMrr": zod.number(),
+  "currency": zod.string(),
+  "children": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string(),
+  "mrr": zod.number(),
+  "currency": zod.string().optional(),
+  "controlSeats": zod.number().optional(),
+  "fieldSeats": zod.number().optional(),
+  "tills": zod.number().optional(),
+  "jobsCount": zod.number().describe('Total jobs across all time for this child tenant'),
+  "leadsCount": zod.number().describe('Total leads across all time for this child tenant'),
+  "paidRevenuePence": zod.number().describe('Sum of paid invoice totals in minor currency units'),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+export const GetFranchiseRollupResponse = zod.object({
+  "parentTenantId": zod.string(),
+  "totalMrr": zod.number(),
+  "currency": zod.string(),
+  "totalJobsCount": zod.number(),
+  "totalLeadsCount": zod.number(),
+  "totalPaidRevenuePence": zod.number(),
+  "children": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string(),
+  "mrr": zod.number(),
+  "currency": zod.string().optional(),
+  "controlSeats": zod.number().optional(),
+  "fieldSeats": zod.number().optional(),
+  "tills": zod.number().optional(),
+  "jobsCount": zod.number().describe('Total jobs across all time for this child tenant'),
+  "leadsCount": zod.number().describe('Total leads across all time for this child tenant'),
+  "paidRevenuePence": zod.number().describe('Sum of paid invoice totals in minor currency units'),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+export const GetHostInfoQueryParams = zod.object({
+  "host": zod.coerce.string().optional()
+})
+
+export const GetHostInfoResponse = zod.object({
+  "hostname": zod.string(),
+  "matched": zod.boolean(),
+  "tenantId": zod.string().nullish(),
+  "tenantSlug": zod.string().nullish(),
+  "tenantName": zod.string().nullish(),
+  "kind": zod.string().nullish(),
+  "whiteLabelConfig": zod.union([zod.null(),zod.object({
+  "hideCtrlTradeBranding": zod.boolean().optional(),
+  "productName": zod.string().optional(),
+  "supportEmail": zod.string().optional(),
+  "supportPhone": zod.string().optional(),
+  "outboundEmailDomain": zod.string().optional(),
+  "outboundFromName": zod.string().optional(),
+  "outboundFromEmail": zod.string().optional(),
+  "dkimVerified": zod.boolean().optional(),
+  "legalEntity": zod.string().optional()
+})]).optional()
+})
+
+
+/**
+ * Tenant-scoped: list custom domains for the authenticated user's tenant. Tenants self-register domains; super admin verifies them.
+ */
+export const ListAppCustomDomainsResponseItem = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "hostname": zod.string(),
+  "kind": zod.string().describe('portal | app'),
+  "status": zod.string().describe('pending | verified | failed'),
+  "verificationToken": zod.string(),
+  "verificationRecord": zod.string().optional().describe('TXT record content to publish'),
+  "verifiedAt": zod.coerce.date().nullish(),
+  "lastCheckedAt": zod.coerce.date().nullish(),
+  "lastError": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListAppCustomDomainsResponse = zod.array(ListAppCustomDomainsResponseItem)
+
+
+/**
+ * Tenant self-service: register a new custom domain. Returns the TXT record to publish; verification is performed by super admin.
+ */
+export const addAppCustomDomainBodyHostnameMin = 3;
+
+
+
+export const AddAppCustomDomainBody = zod.object({
+  "hostname": zod.string().min(addAppCustomDomainBodyHostnameMin),
+  "kind": zod.enum(['portal', 'app']).optional()
+})
+
+
+export const DeleteAppCustomDomainParams = zod.object({
+  "domainId": zod.coerce.string()
+})
+
+
+/**
+ * Reseller-only: provision a new child tenant under the reseller's parent tenant.
+ */
+export const createResellerChildTenantBodyNameMin = 2;
+
+
+
+export const CreateResellerChildTenantBody = zod.object({
+  "name": zod.string().min(createResellerChildTenantBodyNameMin),
+  "slug": zod.string().optional().describe('Optional — auto-generated from name if omitted'),
+  "country": zod.string().optional(),
+  "inheritWhiteLabel": zod.boolean().optional().describe('Copy parent whiteLabelConfig and brand colors onto the new child')
 })
 
 

@@ -44,6 +44,10 @@ import type {
   CancellationRequest,
   Certificate,
   CertificateInput,
+  ChildTenantSummary,
+  CreateChildTenantInput,
+  CustomDomain,
+  CustomDomainInput,
   Customer,
   CustomerInput,
   CustomerMessage,
@@ -54,9 +58,13 @@ import type {
   FileInput,
   FileMeta,
   ForgotPasswordBody,
+  FranchiseRollup,
   GdprDeletionState,
+  GetAdminTenantWhiteLabel200,
+  GetHostInfoParams,
   GetScheduleParams,
   HealthStatus,
+  HostInfo,
   InboxComposeInput,
   InboxComposeResponse,
   InboxMessagesResponse,
@@ -162,6 +170,7 @@ import type {
   ReferralCampaignInput,
   ReferralConversionRecord,
   ReferralTrackInput,
+  ResellerDashboard,
   ResetPasswordBody,
   RevenueBreakdown,
   ScheduleEntry,
@@ -189,7 +198,8 @@ import type {
   Vehicle,
   VehicleInput,
   VehicleLocation,
-  VehicleLocationInput
+  VehicleLocationInput,
+  WhiteLabelUpdate
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -10134,6 +10144,977 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getPostTenantThreadMessageMutationOptions(options));
+    }
+
+export const getGetAdminTenantWhiteLabelUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/v1/admin/tenants/${tenantId}/white-label`
+}
+
+export const getAdminTenantWhiteLabel = async (tenantId: string, options?: RequestInit): Promise<GetAdminTenantWhiteLabel200> => {
+
+  return customFetch<GetAdminTenantWhiteLabel200>(getGetAdminTenantWhiteLabelUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminTenantWhiteLabelQueryKey = (tenantId: string,) => {
+    return [
+    `/api/v1/admin/tenants/${tenantId}/white-label`
+    ] as const;
+    }
+
+
+export const getGetAdminTenantWhiteLabelQueryOptions = <TData = Awaited<ReturnType<typeof getAdminTenantWhiteLabel>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminTenantWhiteLabel>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminTenantWhiteLabelQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminTenantWhiteLabel>>> = ({ signal }) => getAdminTenantWhiteLabel(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(tenantId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminTenantWhiteLabel>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminTenantWhiteLabelQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminTenantWhiteLabel>>>
+export type GetAdminTenantWhiteLabelQueryError = ErrorType<unknown>
+
+
+
+export function useGetAdminTenantWhiteLabel<TData = Awaited<ReturnType<typeof getAdminTenantWhiteLabel>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminTenantWhiteLabel>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminTenantWhiteLabelQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateAdminTenantWhiteLabelUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/v1/admin/tenants/${tenantId}/white-label`
+}
+
+export const updateAdminTenantWhiteLabel = async (tenantId: string,
+    whiteLabelUpdate: WhiteLabelUpdate, options?: RequestInit): Promise<Tenant> => {
+
+  return customFetch<Tenant>(getUpdateAdminTenantWhiteLabelUrl(tenantId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      whiteLabelUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateAdminTenantWhiteLabelMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminTenantWhiteLabel>>, TError,{tenantId: string;data: BodyType<WhiteLabelUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminTenantWhiteLabel>>, TError,{tenantId: string;data: BodyType<WhiteLabelUpdate>}, TContext> => {
+
+const mutationKey = ['updateAdminTenantWhiteLabel'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminTenantWhiteLabel>>, {tenantId: string;data: BodyType<WhiteLabelUpdate>}> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  updateAdminTenantWhiteLabel(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminTenantWhiteLabelMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminTenantWhiteLabel>>>
+    export type UpdateAdminTenantWhiteLabelMutationBody = BodyType<WhiteLabelUpdate>
+    export type UpdateAdminTenantWhiteLabelMutationError = ErrorType<unknown>
+
+    export const useUpdateAdminTenantWhiteLabel = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminTenantWhiteLabel>>, TError,{tenantId: string;data: BodyType<WhiteLabelUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminTenantWhiteLabel>>,
+        TError,
+        {tenantId: string;data: BodyType<WhiteLabelUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateAdminTenantWhiteLabelMutationOptions(options));
+    }
+
+export const getListAdminCustomDomainsUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/v1/admin/tenants/${tenantId}/custom-domains`
+}
+
+export const listAdminCustomDomains = async (tenantId: string, options?: RequestInit): Promise<CustomDomain[]> => {
+
+  return customFetch<CustomDomain[]>(getListAdminCustomDomainsUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminCustomDomainsQueryKey = (tenantId: string,) => {
+    return [
+    `/api/v1/admin/tenants/${tenantId}/custom-domains`
+    ] as const;
+    }
+
+
+export const getListAdminCustomDomainsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminCustomDomains>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminCustomDomains>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminCustomDomainsQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminCustomDomains>>> = ({ signal }) => listAdminCustomDomains(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(tenantId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminCustomDomains>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminCustomDomainsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminCustomDomains>>>
+export type ListAdminCustomDomainsQueryError = ErrorType<unknown>
+
+
+
+export function useListAdminCustomDomains<TData = Awaited<ReturnType<typeof listAdminCustomDomains>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminCustomDomains>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminCustomDomainsQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAddAdminCustomDomainUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/v1/admin/tenants/${tenantId}/custom-domains`
+}
+
+export const addAdminCustomDomain = async (tenantId: string,
+    customDomainInput: CustomDomainInput, options?: RequestInit): Promise<CustomDomain> => {
+
+  return customFetch<CustomDomain>(getAddAdminCustomDomainUrl(tenantId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      customDomainInput,)
+  }
+);}
+
+
+
+
+export const getAddAdminCustomDomainMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addAdminCustomDomain>>, TError,{tenantId: string;data: BodyType<CustomDomainInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addAdminCustomDomain>>, TError,{tenantId: string;data: BodyType<CustomDomainInput>}, TContext> => {
+
+const mutationKey = ['addAdminCustomDomain'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addAdminCustomDomain>>, {tenantId: string;data: BodyType<CustomDomainInput>}> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  addAdminCustomDomain(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddAdminCustomDomainMutationResult = NonNullable<Awaited<ReturnType<typeof addAdminCustomDomain>>>
+    export type AddAdminCustomDomainMutationBody = BodyType<CustomDomainInput>
+    export type AddAdminCustomDomainMutationError = ErrorType<unknown>
+
+    export const useAddAdminCustomDomain = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addAdminCustomDomain>>, TError,{tenantId: string;data: BodyType<CustomDomainInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addAdminCustomDomain>>,
+        TError,
+        {tenantId: string;data: BodyType<CustomDomainInput>},
+        TContext
+      > => {
+      return useMutation(getAddAdminCustomDomainMutationOptions(options));
+    }
+
+export const getDeleteAdminCustomDomainUrl = (tenantId: string,
+    domainId: string,) => {
+
+
+
+
+  return `/api/v1/admin/tenants/${tenantId}/custom-domains/${domainId}`
+}
+
+export const deleteAdminCustomDomain = async (tenantId: string,
+    domainId: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteAdminCustomDomainUrl(tenantId,domainId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteAdminCustomDomainMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminCustomDomain>>, TError,{tenantId: string;domainId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdminCustomDomain>>, TError,{tenantId: string;domainId: string}, TContext> => {
+
+const mutationKey = ['deleteAdminCustomDomain'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdminCustomDomain>>, {tenantId: string;domainId: string}> = (props) => {
+          const {tenantId,domainId} = props ?? {};
+
+          return  deleteAdminCustomDomain(tenantId,domainId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdminCustomDomainMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdminCustomDomain>>>
+
+    export type DeleteAdminCustomDomainMutationError = ErrorType<unknown>
+
+    export const useDeleteAdminCustomDomain = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminCustomDomain>>, TError,{tenantId: string;domainId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdminCustomDomain>>,
+        TError,
+        {tenantId: string;domainId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteAdminCustomDomainMutationOptions(options));
+    }
+
+export const getVerifyAdminCustomDomainUrl = (tenantId: string,
+    domainId: string,) => {
+
+
+
+
+  return `/api/v1/admin/tenants/${tenantId}/custom-domains/${domainId}/verify`
+}
+
+export const verifyAdminCustomDomain = async (tenantId: string,
+    domainId: string, options?: RequestInit): Promise<CustomDomain> => {
+
+  return customFetch<CustomDomain>(getVerifyAdminCustomDomainUrl(tenantId,domainId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getVerifyAdminCustomDomainMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyAdminCustomDomain>>, TError,{tenantId: string;domainId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifyAdminCustomDomain>>, TError,{tenantId: string;domainId: string}, TContext> => {
+
+const mutationKey = ['verifyAdminCustomDomain'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyAdminCustomDomain>>, {tenantId: string;domainId: string}> = (props) => {
+          const {tenantId,domainId} = props ?? {};
+
+          return  verifyAdminCustomDomain(tenantId,domainId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifyAdminCustomDomainMutationResult = NonNullable<Awaited<ReturnType<typeof verifyAdminCustomDomain>>>
+
+    export type VerifyAdminCustomDomainMutationError = ErrorType<unknown>
+
+    export const useVerifyAdminCustomDomain = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyAdminCustomDomain>>, TError,{tenantId: string;domainId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof verifyAdminCustomDomain>>,
+        TError,
+        {tenantId: string;domainId: string},
+        TContext
+      > => {
+      return useMutation(getVerifyAdminCustomDomainMutationOptions(options));
+    }
+
+export const getListAdminTenantChildrenUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/v1/admin/tenants/${tenantId}/children`
+}
+
+export const listAdminTenantChildren = async (tenantId: string, options?: RequestInit): Promise<ChildTenantSummary[]> => {
+
+  return customFetch<ChildTenantSummary[]>(getListAdminTenantChildrenUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminTenantChildrenQueryKey = (tenantId: string,) => {
+    return [
+    `/api/v1/admin/tenants/${tenantId}/children`
+    ] as const;
+    }
+
+
+export const getListAdminTenantChildrenQueryOptions = <TData = Awaited<ReturnType<typeof listAdminTenantChildren>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminTenantChildren>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminTenantChildrenQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminTenantChildren>>> = ({ signal }) => listAdminTenantChildren(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(tenantId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminTenantChildren>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminTenantChildrenQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminTenantChildren>>>
+export type ListAdminTenantChildrenQueryError = ErrorType<unknown>
+
+
+
+export function useListAdminTenantChildren<TData = Awaited<ReturnType<typeof listAdminTenantChildren>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminTenantChildren>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminTenantChildrenQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetResellerDashboardUrl = () => {
+
+
+
+
+  return `/api/v1/reseller/dashboard`
+}
+
+export const getResellerDashboard = async ( options?: RequestInit): Promise<ResellerDashboard> => {
+
+  return customFetch<ResellerDashboard>(getGetResellerDashboardUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetResellerDashboardQueryKey = () => {
+    return [
+    `/api/v1/reseller/dashboard`
+    ] as const;
+    }
+
+
+export const getGetResellerDashboardQueryOptions = <TData = Awaited<ReturnType<typeof getResellerDashboard>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getResellerDashboard>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetResellerDashboardQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getResellerDashboard>>> = ({ signal }) => getResellerDashboard({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getResellerDashboard>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetResellerDashboardQueryResult = NonNullable<Awaited<ReturnType<typeof getResellerDashboard>>>
+export type GetResellerDashboardQueryError = ErrorType<unknown>
+
+
+
+export function useGetResellerDashboard<TData = Awaited<ReturnType<typeof getResellerDashboard>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getResellerDashboard>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetResellerDashboardQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetFranchiseRollupUrl = () => {
+
+
+
+
+  return `/api/v1/franchise/rollup`
+}
+
+export const getFranchiseRollup = async ( options?: RequestInit): Promise<FranchiseRollup> => {
+
+  return customFetch<FranchiseRollup>(getGetFranchiseRollupUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetFranchiseRollupQueryKey = () => {
+    return [
+    `/api/v1/franchise/rollup`
+    ] as const;
+    }
+
+
+export const getGetFranchiseRollupQueryOptions = <TData = Awaited<ReturnType<typeof getFranchiseRollup>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFranchiseRollup>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFranchiseRollupQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFranchiseRollup>>> = ({ signal }) => getFranchiseRollup({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFranchiseRollup>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetFranchiseRollupQueryResult = NonNullable<Awaited<ReturnType<typeof getFranchiseRollup>>>
+export type GetFranchiseRollupQueryError = ErrorType<unknown>
+
+
+
+export function useGetFranchiseRollup<TData = Awaited<ReturnType<typeof getFranchiseRollup>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFranchiseRollup>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetFranchiseRollupQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetHostInfoUrl = (params?: GetHostInfoParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/public/host-info?${stringifiedParams}` : `/api/v1/public/host-info`
+}
+
+export const getHostInfo = async (params?: GetHostInfoParams, options?: RequestInit): Promise<HostInfo> => {
+
+  return customFetch<HostInfo>(getGetHostInfoUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetHostInfoQueryKey = (params?: GetHostInfoParams,) => {
+    return [
+    `/api/v1/public/host-info`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetHostInfoQueryOptions = <TData = Awaited<ReturnType<typeof getHostInfo>>, TError = ErrorType<unknown>>(params?: GetHostInfoParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHostInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHostInfoQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHostInfo>>> = ({ signal }) => getHostInfo(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHostInfo>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetHostInfoQueryResult = NonNullable<Awaited<ReturnType<typeof getHostInfo>>>
+export type GetHostInfoQueryError = ErrorType<unknown>
+
+
+
+export function useGetHostInfo<TData = Awaited<ReturnType<typeof getHostInfo>>, TError = ErrorType<unknown>>(
+ params?: GetHostInfoParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHostInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetHostInfoQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListAppCustomDomainsUrl = () => {
+
+
+
+
+  return `/api/v1/app/custom-domains`
+}
+
+/**
+ * Tenant-scoped: list custom domains for the authenticated user's tenant. Tenants self-register domains; super admin verifies them.
+ */
+export const listAppCustomDomains = async ( options?: RequestInit): Promise<CustomDomain[]> => {
+
+  return customFetch<CustomDomain[]>(getListAppCustomDomainsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAppCustomDomainsQueryKey = () => {
+    return [
+    `/api/v1/app/custom-domains`
+    ] as const;
+    }
+
+
+export const getListAppCustomDomainsQueryOptions = <TData = Awaited<ReturnType<typeof listAppCustomDomains>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAppCustomDomains>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAppCustomDomainsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAppCustomDomains>>> = ({ signal }) => listAppCustomDomains({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAppCustomDomains>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAppCustomDomainsQueryResult = NonNullable<Awaited<ReturnType<typeof listAppCustomDomains>>>
+export type ListAppCustomDomainsQueryError = ErrorType<unknown>
+
+
+
+export function useListAppCustomDomains<TData = Awaited<ReturnType<typeof listAppCustomDomains>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAppCustomDomains>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAppCustomDomainsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAddAppCustomDomainUrl = () => {
+
+
+
+
+  return `/api/v1/app/custom-domains`
+}
+
+/**
+ * Tenant self-service: register a new custom domain. Returns the TXT record to publish; verification is performed by super admin.
+ */
+export const addAppCustomDomain = async (customDomainInput: CustomDomainInput, options?: RequestInit): Promise<CustomDomain> => {
+
+  return customFetch<CustomDomain>(getAddAppCustomDomainUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      customDomainInput,)
+  }
+);}
+
+
+
+
+export const getAddAppCustomDomainMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addAppCustomDomain>>, TError,{data: BodyType<CustomDomainInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addAppCustomDomain>>, TError,{data: BodyType<CustomDomainInput>}, TContext> => {
+
+const mutationKey = ['addAppCustomDomain'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addAppCustomDomain>>, {data: BodyType<CustomDomainInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  addAppCustomDomain(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddAppCustomDomainMutationResult = NonNullable<Awaited<ReturnType<typeof addAppCustomDomain>>>
+    export type AddAppCustomDomainMutationBody = BodyType<CustomDomainInput>
+    export type AddAppCustomDomainMutationError = ErrorType<unknown>
+
+    export const useAddAppCustomDomain = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addAppCustomDomain>>, TError,{data: BodyType<CustomDomainInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addAppCustomDomain>>,
+        TError,
+        {data: BodyType<CustomDomainInput>},
+        TContext
+      > => {
+      return useMutation(getAddAppCustomDomainMutationOptions(options));
+    }
+
+export const getDeleteAppCustomDomainUrl = (domainId: string,) => {
+
+
+
+
+  return `/api/v1/app/custom-domains/${domainId}`
+}
+
+export const deleteAppCustomDomain = async (domainId: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteAppCustomDomainUrl(domainId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteAppCustomDomainMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAppCustomDomain>>, TError,{domainId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAppCustomDomain>>, TError,{domainId: string}, TContext> => {
+
+const mutationKey = ['deleteAppCustomDomain'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAppCustomDomain>>, {domainId: string}> = (props) => {
+          const {domainId} = props ?? {};
+
+          return  deleteAppCustomDomain(domainId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAppCustomDomainMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAppCustomDomain>>>
+
+    export type DeleteAppCustomDomainMutationError = ErrorType<unknown>
+
+    export const useDeleteAppCustomDomain = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAppCustomDomain>>, TError,{domainId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAppCustomDomain>>,
+        TError,
+        {domainId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteAppCustomDomainMutationOptions(options));
+    }
+
+export const getCreateResellerChildTenantUrl = () => {
+
+
+
+
+  return `/api/v1/reseller/children`
+}
+
+/**
+ * Reseller-only: provision a new child tenant under the reseller's parent tenant.
+ */
+export const createResellerChildTenant = async (createChildTenantInput: CreateChildTenantInput, options?: RequestInit): Promise<Tenant> => {
+
+  return customFetch<Tenant>(getCreateResellerChildTenantUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createChildTenantInput,)
+  }
+);}
+
+
+
+
+export const getCreateResellerChildTenantMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createResellerChildTenant>>, TError,{data: BodyType<CreateChildTenantInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createResellerChildTenant>>, TError,{data: BodyType<CreateChildTenantInput>}, TContext> => {
+
+const mutationKey = ['createResellerChildTenant'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createResellerChildTenant>>, {data: BodyType<CreateChildTenantInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createResellerChildTenant(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateResellerChildTenantMutationResult = NonNullable<Awaited<ReturnType<typeof createResellerChildTenant>>>
+    export type CreateResellerChildTenantMutationBody = BodyType<CreateChildTenantInput>
+    export type CreateResellerChildTenantMutationError = ErrorType<unknown>
+
+    export const useCreateResellerChildTenant = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createResellerChildTenant>>, TError,{data: BodyType<CreateChildTenantInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createResellerChildTenant>>,
+        TError,
+        {data: BodyType<CreateChildTenantInput>},
+        TContext
+      > => {
+      return useMutation(getCreateResellerChildTenantMutationOptions(options));
     }
 
 export const getGetAdminTenantAuditLogUrl = (tenantId: string,) => {

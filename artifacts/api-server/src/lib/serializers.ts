@@ -49,6 +49,8 @@ export async function serializeTenant(t: Tenant) {
     brandTemplates: t.brandTemplates ?? null,
     leadCaptureAllowedOrigins: t.leadCaptureAllowedOrigins ?? [],
     tradeCategorySlugs: slugs,
+    parentTenantId: t.parentTenantId ?? null,
+    whiteLabelConfig: t.whiteLabelConfig ?? null,
   };
 }
 

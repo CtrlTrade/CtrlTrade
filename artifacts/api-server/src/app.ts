@@ -7,6 +7,7 @@ import router from "./routes";
 import { logger } from "./lib/logger";
 import { WebhookHandlers } from "./webhookHandlers";
 import { attachAuth } from "./middlewares/auth";
+import { resolveCustomDomain } from "./middlewares/hostResolver";
 import { meterApiUsage } from "./middlewares/usageMeter";
 import { handleTwilioInbound } from "./webhooks/twilio";
 import { handleResendEvent } from "./webhooks/resend";
@@ -127,6 +128,7 @@ app.use(
 );
 
 app.use(attachAuth);
+app.use("/api", resolveCustomDomain);
 app.use("/api", meterApiUsage);
 
 app.use("/api", router);

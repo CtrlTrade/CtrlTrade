@@ -31,6 +31,7 @@ import partnerRouter from "./partner";
 import adminReferralsRouter from "./adminReferrals";
 import tenantReferralsRouter from "./tenantReferrals";
 import marketplaceRouter from "./marketplace";
+import whiteLabelRouter from "./whiteLabel";
 
 const router: IRouter = Router();
 
@@ -73,5 +74,6 @@ router.use(partnerRouter);
 router.use(adminReferralsRouter);
 router.use(tenantReferralsRouter);
 router.use(marketplaceRouter);
+router.use(whiteLabelRouter);
 
 export default router;

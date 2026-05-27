@@ -52,6 +52,18 @@ export const tenantsTable = pgTable(
       email?: { signature?: string; header?: string };
       posReceipt?: { header?: string; footer?: string };
     }>(),
+    parentTenantId: uuid("parent_tenant_id"),
+    whiteLabelConfig: jsonb("white_label_config").$type<{
+      hideCtrlTradeBranding?: boolean;
+      productName?: string;
+      supportEmail?: string;
+      supportPhone?: string;
+      outboundEmailDomain?: string;
+      outboundFromName?: string;
+      outboundFromEmail?: string;
+      dkimVerified?: boolean;
+      legalEntity?: string;
+    }>(),
     leadCaptureAllowedOrigins: text("lead_capture_allowed_origins").array().notNull().default(sql`'{}'::text[]`),
     vatRatePct: integer("vat_rate_pct").notNull().default(20),
     invoiceNumberSeq: integer("invoice_number_seq").notNull().default(0),
@@ -65,8 +77,49 @@ export const tenantsTable = pgTable(
   (t) => ({
     statusIdx: index("tenants_status_idx").on(t.status),
     stripeCustIdx: index("tenants_stripe_customer_idx").on(t.stripeCustomerId),
+    parentIdx: index("tenants_parent_idx").on(t.parentTenantId),
   }),
 );
+
+// ---- Custom domains (Host header routing) ---------------------------------
+export const customDomainsTable = pgTable(
+  "custom_domains",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    hostname: varchar("hostname", { length: 255 }).notNull(),
+    kind: varchar("kind", { length: 16 }).notNull().default("portal"), // portal|app
+    status: varchar("status", { length: 16 }).notNull().default("pending"), // pending|verified|failed
+    verificationToken: varchar("verification_token", { length: 128 }).notNull(),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    lastCheckedAt: timestamp("last_checked_at", { withTimezone: true }),
+    lastError: text("last_error"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    uniqHost: uniqueIndex("custom_domains_hostname_uniq").on(t.hostname),
+    tenantIdx: index("custom_domains_tenant_idx").on(t.tenantId),
+  }),
+);
+
+// ---- Reseller profiles (a tenant flagged as a reseller / franchise parent)
+export const resellerProfilesTable = pgTable(
+  "reseller_profiles",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }).unique(),
+    displayName: text("display_name"),
+    contactEmail: varchar("contact_email", { length: 255 }),
+    revenueSharePct: integer("revenue_share_pct").notNull().default(0),
+    notes: text("notes"),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+);
+
+export type CustomDomain = typeof customDomainsTable.$inferSelect;
+export type ResellerProfile = typeof resellerProfilesTable.$inferSelect;
 
 // ---- Users (global; can belong to multiple tenants) -----------------------
 export const usersTable = pgTable("users", {

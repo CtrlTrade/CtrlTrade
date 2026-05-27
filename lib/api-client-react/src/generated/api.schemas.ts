@@ -113,6 +113,18 @@ export interface BrandTemplates {
   posReceipt?: BrandTemplatesPosReceipt;
 }
 
+export interface WhiteLabelConfig {
+  hideCtrlTradeBranding?: boolean;
+  productName?: string;
+  supportEmail?: string;
+  supportPhone?: string;
+  outboundEmailDomain?: string;
+  outboundFromName?: string;
+  outboundFromEmail?: string;
+  dkimVerified?: boolean;
+  legalEntity?: string;
+}
+
 export interface Tenant {
   id: string;
   name: string;
@@ -151,6 +163,9 @@ export interface Tenant {
   brandTemplates?: null | BrandTemplates;
   leadCaptureAllowedOrigins?: string[];
   tradeCategorySlugs?: string[];
+  /** @nullable */
+  parentTenantId?: string | null;
+  whiteLabelConfig?: null | WhiteLabelConfig;
 }
 
 export interface ImpersonationContext {
@@ -164,6 +179,136 @@ export interface Session {
   user: SessionUser;
   tenant?: Tenant | null;
   impersonation?: ImpersonationContext | null;
+}
+
+export interface ResellerProfileInput {
+  displayName?: string;
+  contactEmail?: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  revenueSharePct?: number;
+  notes?: string;
+  active?: boolean;
+}
+
+export interface WhiteLabelUpdate {
+  /** @nullable */
+  parentTenantId?: string | null;
+  whiteLabelConfig?: null | WhiteLabelConfig;
+  reseller?: null | ResellerProfileInput;
+}
+
+export interface CustomDomain {
+  id: string;
+  tenantId: string;
+  hostname: string;
+  /** portal | app */
+  kind: string;
+  /** pending | verified | failed */
+  status: string;
+  verificationToken: string;
+  /** TXT record content to publish */
+  verificationRecord?: string;
+  /** @nullable */
+  verifiedAt?: string | null;
+  /** @nullable */
+  lastCheckedAt?: string | null;
+  /** @nullable */
+  lastError?: string | null;
+  createdAt: string;
+}
+
+export type CustomDomainInputKind = typeof CustomDomainInputKind[keyof typeof CustomDomainInputKind];
+
+
+export const CustomDomainInputKind = {
+  portal: 'portal',
+  app: 'app',
+} as const;
+
+export interface CustomDomainInput {
+  /** @minLength 3 */
+  hostname: string;
+  kind?: CustomDomainInputKind;
+}
+
+export interface ResellerProfile {
+  id?: string;
+  tenantId: string;
+  /** @nullable */
+  displayName?: string | null;
+  /** @nullable */
+  contactEmail?: string | null;
+  revenueSharePct: number;
+  /** @nullable */
+  notes?: string | null;
+  active: boolean;
+}
+
+export interface ChildTenantSummary {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+  mrr: number;
+  currency?: string;
+  controlSeats?: number;
+  fieldSeats?: number;
+  tills?: number;
+  /** Total jobs across all time for this child tenant */
+  jobsCount: number;
+  /** Total leads across all time for this child tenant */
+  leadsCount: number;
+  /** Sum of paid invoice totals in minor currency units */
+  paidRevenuePence: number;
+  createdAt: string;
+}
+
+export interface ResellerDashboard {
+  tenantId: string;
+  /** @nullable */
+  displayName?: string | null;
+  totalMrr: number;
+  revenueSharePct: number;
+  expectedPayoutMrr: number;
+  currency: string;
+  children: ChildTenantSummary[];
+}
+
+export interface FranchiseRollup {
+  parentTenantId: string;
+  totalMrr: number;
+  currency: string;
+  totalJobsCount: number;
+  totalLeadsCount: number;
+  totalPaidRevenuePence: number;
+  children: ChildTenantSummary[];
+}
+
+export interface CreateChildTenantInput {
+  /** @minLength 2 */
+  name: string;
+  /** Optional — auto-generated from name if omitted */
+  slug?: string;
+  country?: string;
+  /** Copy parent whiteLabelConfig and brand colors onto the new child */
+  inheritWhiteLabel?: boolean;
+}
+
+export interface HostInfo {
+  hostname: string;
+  matched: boolean;
+  /** @nullable */
+  tenantId?: string | null;
+  /** @nullable */
+  tenantSlug?: string | null;
+  /** @nullable */
+  tenantName?: string | null;
+  /** @nullable */
+  kind?: string | null;
+  whiteLabelConfig?: null | WhiteLabelConfig;
 }
 
 export interface TenantUpdate {
@@ -1535,6 +1680,15 @@ export interface PortalBranding {
   brandColor?: string | null;
   /** @nullable */
   logoUrl?: string | null;
+  /** @nullable */
+  productName?: string | null;
+  /** @nullable */
+  supportEmail?: string | null;
+  /** @nullable */
+  supportPhone?: string | null;
+  hideCtrlTradeBranding?: boolean;
+  /** @nullable */
+  legalEntity?: string | null;
 }
 
 export interface PortalMagicLinkRequest {
@@ -2387,6 +2541,16 @@ to: string;
 export type ListLeadsParams = {
 status?: string;
 source?: string;
+};
+
+export type GetAdminTenantWhiteLabel200 = {
+  tenant: Tenant;
+  reseller?: null | ResellerProfile;
+  parent?: null | Tenant;
+};
+
+export type GetHostInfoParams = {
+host?: string;
 };
 
 export type SearchMarketplaceParams = {

@@ -1,4 +1,4 @@
-import { db, notificationDeliveriesTable } from "@workspace/db";
+import { db, notificationDeliveriesTable, tenantsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "./logger";
 import { recordUsage } from "./usage";
@@ -15,6 +15,38 @@ export interface SendEmailInput {
   jobId?: string | null;
   /** Internal: when set, update this delivery row instead of inserting a new one (retry path). */
   _retryDeliveryId?: string;
+}
+
+/**
+ * Resolve the "from" address/name for a tenant. White-labelled tenants
+ * with `outboundFromEmail` configured send from their own brand; everyone
+ * else falls back to the platform-wide EMAIL_FROM_ADDRESS / EMAIL_FROM_NAME.
+ */
+async function resolveFromIdentity(tenantId: string): Promise<{ email: string | null; name: string }> {
+  const platformFrom = process.env.EMAIL_FROM_ADDRESS ?? null;
+  const platformName = process.env.EMAIL_FROM_NAME ?? "CtrlTrade";
+  try {
+    const [t] = await db
+      .select({ wl: tenantsTable.whiteLabelConfig, name: tenantsTable.name })
+      .from(tenantsTable)
+      .where(eq(tenantsTable.id, tenantId));
+    if (!t) return { email: platformFrom, name: platformName };
+    const wl = (t.wl ?? {}) as Record<string, unknown>;
+    const wlFrom = typeof wl.outboundFromEmail === "string" ? wl.outboundFromEmail.trim() : "";
+    const wlFromName = typeof wl.outboundFromName === "string" ? wl.outboundFromName.trim() : "";
+    const hideBranding = wl.hideCtrlTradeBranding === true;
+    if (wlFrom) {
+      return { email: wlFrom, name: wlFromName || t.name };
+    }
+    if (hideBranding) {
+      // Strip CtrlTrade branding from the sender name even if no custom address
+      // is configured yet (still uses platform from-address).
+      return { email: platformFrom, name: wlFromName || t.name };
+    }
+    return { email: platformFrom, name: platformName };
+  } catch {
+    return { email: platformFrom, name: platformName };
+  }
 }
 
 export function getAppBaseUrl(): string {
@@ -49,8 +81,9 @@ async function deliverViaResend(input: SendEmailInput, apiKey: string): Promise<
 }
 
 async function deliverViaSendGrid(input: SendEmailInput, apiKey: string): Promise<{ id: string | null }> {
-  const from = process.env.EMAIL_FROM_ADDRESS;
-  const fromName = process.env.EMAIL_FROM_NAME ?? "CtrlTrade";
+  const identity = await resolveFromIdentity(input.tenantId);
+  const from = identity.email;
+  const fromName = identity.name;
   if (!from) throw new Error("EMAIL_FROM_ADDRESS is required when SENDGRID_API_KEY is set");
   const body = {
     personalizations: [

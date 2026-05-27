@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { BrandTemplates } from './brandTemplates';
+import type { WhiteLabelConfig } from './whiteLabelConfig';
 
 export interface Tenant {
   id: string;
@@ -45,4 +46,7 @@ export interface Tenant {
   brandTemplates?: null | BrandTemplates;
   leadCaptureAllowedOrigins?: string[];
   tradeCategorySlugs?: string[];
+  /** @nullable */
+  parentTenantId?: string | null;
+  whiteLabelConfig?: null | WhiteLabelConfig;
 }

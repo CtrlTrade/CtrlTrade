@@ -2272,6 +2272,230 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/CustomerMessage" }
 
+  /v1/admin/tenants/{tenantId}/white-label:
+    parameters:
+      - in: path
+        name: tenantId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getAdminTenantWhiteLabel
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [tenant]
+                properties:
+                  tenant: { $ref: "#/components/schemas/Tenant" }
+                  reseller:
+                    anyOf:
+                      - type: "null"
+                      - $ref: "#/components/schemas/ResellerProfile"
+                  parent:
+                    anyOf:
+                      - type: "null"
+                      - $ref: "#/components/schemas/Tenant"
+    patch:
+      operationId: updateAdminTenantWhiteLabel
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WhiteLabelUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Tenant" }
+
+  /v1/admin/tenants/{tenantId}/custom-domains:
+    parameters:
+      - in: path
+        name: tenantId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: listAdminCustomDomains
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/CustomDomain" }
+    post:
+      operationId: addAdminCustomDomain
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomDomainInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomDomain" }
+
+  /v1/admin/tenants/{tenantId}/custom-domains/{domainId}:
+    parameters:
+      - in: path
+        name: tenantId
+        required: true
+        schema: { type: string }
+      - in: path
+        name: domainId
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: deleteAdminCustomDomain
+      tags: [admin]
+      responses:
+        "204": { description: No Content }
+
+  /v1/admin/tenants/{tenantId}/custom-domains/{domainId}/verify:
+    parameters:
+      - in: path
+        name: tenantId
+        required: true
+        schema: { type: string }
+      - in: path
+        name: domainId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: verifyAdminCustomDomain
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomDomain" }
+
+  /v1/admin/tenants/{tenantId}/children:
+    parameters:
+      - in: path
+        name: tenantId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: listAdminTenantChildren
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ChildTenantSummary" }
+
+  /v1/reseller/dashboard:
+    get:
+      operationId: getResellerDashboard
+      tags: [reseller]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ResellerDashboard" }
+
+  /v1/franchise/rollup:
+    get:
+      operationId: getFranchiseRollup
+      tags: [reseller]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FranchiseRollup" }
+
+  /v1/public/host-info:
+    get:
+      operationId: getHostInfo
+      tags: [public]
+      parameters:
+        - in: query
+          name: host
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HostInfo" }
+
+  /v1/app/custom-domains:
+    get:
+      operationId: listAppCustomDomains
+      tags: [app]
+      description: "Tenant-scoped: list custom domains for the authenticated user's tenant. Tenants self-register domains; super admin verifies them."
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/CustomDomain" }
+    post:
+      operationId: addAppCustomDomain
+      tags: [app]
+      description: "Tenant self-service: register a new custom domain. Returns the TXT record to publish; verification is performed by super admin."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomDomainInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomDomain" }
+
+  /v1/app/custom-domains/{domainId}:
+    parameters:
+      - in: path
+        name: domainId
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: deleteAppCustomDomain
+      tags: [app]
+      responses:
+        "204": { description: No Content }
+
+  /v1/reseller/children:
+    post:
+      operationId: createResellerChildTenant
+      tags: [reseller]
+      description: "Reseller-only: provision a new child tenant under the reseller's parent tenant."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateChildTenantInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Tenant" }
+
   /v1/admin/tenants/{tenantId}/audit-log:
     get:
       operationId: getAdminTenantAuditLog
@@ -3102,6 +3326,151 @@ components:
         tradeCategorySlugs:
           type: array
           items: { type: string }
+        parentTenantId: { type: ["string", "null"] }
+        whiteLabelConfig:
+          anyOf:
+            - type: "null"
+            - $ref: "#/components/schemas/WhiteLabelConfig"
+
+    WhiteLabelConfig:
+      type: object
+      properties:
+        hideCtrlTradeBranding: { type: boolean }
+        productName: { type: string }
+        supportEmail: { type: string }
+        supportPhone: { type: string }
+        outboundEmailDomain: { type: string }
+        outboundFromName: { type: string }
+        outboundFromEmail: { type: string }
+        dkimVerified: { type: boolean }
+        legalEntity: { type: string }
+
+    WhiteLabelUpdate:
+      type: object
+      properties:
+        parentTenantId: { type: ["string", "null"] }
+        whiteLabelConfig:
+          anyOf:
+            - type: "null"
+            - $ref: "#/components/schemas/WhiteLabelConfig"
+        reseller:
+          anyOf:
+            - type: "null"
+            - $ref: "#/components/schemas/ResellerProfileInput"
+
+    CustomDomain:
+      type: object
+      required: [id, tenantId, hostname, kind, status, verificationToken, createdAt]
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        hostname: { type: string }
+        kind: { type: string, description: "portal | app" }
+        status: { type: string, description: "pending | verified | failed" }
+        verificationToken: { type: string }
+        verificationRecord: { type: string, description: "TXT record content to publish" }
+        verifiedAt: { type: ["string", "null"], format: date-time }
+        lastCheckedAt: { type: ["string", "null"], format: date-time }
+        lastError: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    CustomDomainInput:
+      type: object
+      required: [hostname]
+      properties:
+        hostname: { type: string, minLength: 3 }
+        kind: { type: string, enum: [portal, app] }
+
+    ResellerProfile:
+      type: object
+      required: [tenantId, revenueSharePct, active]
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        displayName: { type: ["string", "null"] }
+        contactEmail: { type: ["string", "null"] }
+        revenueSharePct: { type: integer }
+        notes: { type: ["string", "null"] }
+        active: { type: boolean }
+
+    ResellerProfileInput:
+      type: object
+      properties:
+        displayName: { type: string }
+        contactEmail: { type: string }
+        revenueSharePct: { type: integer, minimum: 0, maximum: 100 }
+        notes: { type: string }
+        active: { type: boolean }
+
+    ChildTenantSummary:
+      type: object
+      required: [id, name, slug, status, mrr, createdAt, jobsCount, leadsCount, paidRevenuePence]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        slug: { type: string }
+        status: { type: string }
+        mrr: { type: number }
+        currency: { type: string }
+        controlSeats: { type: integer }
+        fieldSeats: { type: integer }
+        tills: { type: integer }
+        jobsCount: { type: integer, description: "Total jobs across all time for this child tenant" }
+        leadsCount: { type: integer, description: "Total leads across all time for this child tenant" }
+        paidRevenuePence: { type: integer, description: "Sum of paid invoice totals in minor currency units" }
+        createdAt: { type: string, format: date-time }
+
+    ResellerDashboard:
+      type: object
+      required: [tenantId, totalMrr, revenueSharePct, expectedPayoutMrr, currency, children]
+      properties:
+        tenantId: { type: string }
+        displayName: { type: ["string", "null"] }
+        totalMrr: { type: number }
+        revenueSharePct: { type: integer }
+        expectedPayoutMrr: { type: number }
+        currency: { type: string }
+        children:
+          type: array
+          items: { $ref: "#/components/schemas/ChildTenantSummary" }
+
+    FranchiseRollup:
+      type: object
+      required: [parentTenantId, totalMrr, currency, children, totalJobsCount, totalLeadsCount, totalPaidRevenuePence]
+      properties:
+        parentTenantId: { type: string }
+        totalMrr: { type: number }
+        currency: { type: string }
+        totalJobsCount: { type: integer }
+        totalLeadsCount: { type: integer }
+        totalPaidRevenuePence: { type: integer }
+        children:
+          type: array
+          items: { $ref: "#/components/schemas/ChildTenantSummary" }
+
+    CreateChildTenantInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 2 }
+        slug: { type: string, description: "Optional — auto-generated from name if omitted" }
+        country: { type: string }
+        inheritWhiteLabel: { type: boolean, description: "Copy parent whiteLabelConfig and brand colors onto the new child" }
+
+    HostInfo:
+      type: object
+      required: [hostname, matched]
+      properties:
+        hostname: { type: string }
+        matched: { type: boolean }
+        tenantId: { type: ["string", "null"] }
+        tenantSlug: { type: ["string", "null"] }
+        tenantName: { type: ["string", "null"] }
+        kind: { type: ["string", "null"] }
+        whiteLabelConfig:
+          anyOf:
+            - type: "null"
+            - $ref: "#/components/schemas/WhiteLabelConfig"
 
     TenantUpdate:
       type: object
@@ -4543,6 +4912,11 @@ components:
         tenantSlug: { type: string }
         brandColor: { type: ["string", "null"] }
         logoUrl: { type: ["string", "null"] }
+        productName: { type: ["string", "null"] }
+        supportEmail: { type: ["string", "null"] }
+        supportPhone: { type: ["string", "null"] }
+        hideCtrlTradeBranding: { type: boolean }
+        legalEntity: { type: ["string", "null"] }
 
     PortalMagicLinkRequest:
       type: object

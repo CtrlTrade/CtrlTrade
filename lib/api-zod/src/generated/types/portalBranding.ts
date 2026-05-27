@@ -13,4 +13,13 @@ export interface PortalBranding {
   brandColor?: string | null;
   /** @nullable */
   logoUrl?: string | null;
+  /** @nullable */
+  productName?: string | null;
+  /** @nullable */
+  supportEmail?: string | null;
+  /** @nullable */
+  supportPhone?: string | null;
+  hideCtrlTradeBranding?: boolean;
+  /** @nullable */
+  legalEntity?: string | null;
 }

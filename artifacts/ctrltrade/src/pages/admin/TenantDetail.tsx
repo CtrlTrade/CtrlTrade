@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, RefreshCw, AlertTriangle, ShieldCheck, UserCheck, Download, Trash2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, AlertTriangle, ShieldCheck, UserCheck, Download, Trash2, Globe } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 export function AdminTenantDetail() {
@@ -249,6 +249,18 @@ function AdminTenantTools({ tenantId, status }: { tenantId: string; status: stri
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+        <CardHeader><CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">White Label & Franchise</CardTitle></CardHeader>
+        <CardContent className="space-y-3 text-sm">
+          <p className="text-xs text-zinc-500">Configure branding overrides, custom domains, parent tenant, and reseller programme.</p>
+          <Link href={`/tenants/${tenantId}/white-label`}>
+            <Button className="w-full rounded-none bg-red-600 hover:bg-red-700 text-white uppercase font-bold tracking-wider" data-testid="button-white-label">
+              <Globe className="h-4 w-4 mr-2" /> Manage white label
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
+
       <Card className="rounded-none border-zinc-800 bg-black shadow-none">
         <CardHeader><CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Impersonation</CardTitle></CardHeader>
         <CardContent className="space-y-3 text-sm">

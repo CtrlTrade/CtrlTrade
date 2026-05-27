@@ -22,7 +22,9 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
     }
   }, [branding?.brandColor]);
 
-  const tenantName = branding?.tenantName ?? "Customer Portal";
+  const tenantName = branding?.productName ?? branding?.tenantName ?? "Customer Portal";
+  const hideCtrlTrade = branding?.hideCtrlTradeBranding === true;
+  const legalEntity = branding?.legalEntity ?? branding?.tenantName ?? tenantName;
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
@@ -60,8 +62,19 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 container mx-auto px-4 py-8">{children}</main>
 
       <footer className="border-t border-border bg-card py-6 mt-12">
-        <div className="container mx-auto px-4 text-xs text-muted-foreground text-center">
-          Powered by CtrlTrade®
+        <div className="container mx-auto px-4 text-xs text-muted-foreground text-center space-y-1">
+          {branding?.supportEmail || branding?.supportPhone ? (
+            <div className="font-mono">
+              {branding.supportEmail ? <a href={`mailto:${branding.supportEmail}`} className="hover:underline">{branding.supportEmail}</a> : null}
+              {branding.supportEmail && branding.supportPhone ? <span className="mx-2">·</span> : null}
+              {branding.supportPhone ? <span>{branding.supportPhone}</span> : null}
+            </div>
+          ) : null}
+          <div>
+            {hideCtrlTrade
+              ? `© ${new Date().getFullYear()} ${legalEntity}`
+              : "Powered by CtrlTrade®"}
+          </div>
         </div>
       </footer>
     </div>

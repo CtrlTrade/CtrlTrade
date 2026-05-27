@@ -60,11 +60,17 @@ function hashToken(token: string): string {
 }
 
 function brandingOf(t: Tenant) {
+  const wl = (t.whiteLabelConfig ?? {}) as Record<string, unknown>;
   return {
     tenantName: t.name,
     tenantSlug: t.slug,
     brandColor: t.brandColor,
-    logoUrl: t.logoUrl,
+    logoUrl: t.logoPortalUrl ?? t.logoUrl,
+    productName: typeof wl.productName === "string" ? wl.productName : null,
+    supportEmail: typeof wl.supportEmail === "string" ? wl.supportEmail : null,
+    supportPhone: typeof wl.supportPhone === "string" ? wl.supportPhone : null,
+    hideCtrlTradeBranding: wl.hideCtrlTradeBranding === true,
+    legalEntity: typeof wl.legalEntity === "string" ? wl.legalEntity : null,
   };
 }
 
@@ -73,14 +79,42 @@ async function loadTenantBySlug(slug: string): Promise<Tenant | null> {
   return t ?? null;
 }
 
+/**
+ * Host-aware tenant resolver. If the request arrives on a verified portal
+ * custom domain, use that tenant — even if the URL has no /portal/:slug.
+ * Otherwise fall back to looking the slug up. This is what makes "requests
+ * routed by Host header to that tenant's portal" actually work end to end.
+ */
+async function loadPortalTenant(req: Request, fallbackSlug?: string): Promise<Tenant | null> {
+  if (req.customDomain && req.customDomain.domain.kind === "portal") {
+    return req.customDomain.tenant;
+  }
+  if (fallbackSlug) return loadTenantBySlug(fallbackSlug);
+  return null;
+}
+
 // ---- Public branding / magic link ------------------------------------------
 
 router.get(
   "/v1/public/portal/:tenantSlug/branding",
   async (req: Request, res: Response): Promise<void> => {
-    const tenant = await loadTenantBySlug(req.params.tenantSlug as string);
+    const tenant = await loadPortalTenant(req, req.params.tenantSlug as string);
     if (!tenant) {
       res.status(404).json({ error: "Tenant not found" });
+      return;
+    }
+    res.json(GetPortalBrandingResponse.parse(brandingOf(tenant)));
+  },
+);
+
+// Host-based portal branding — used by white-labelled frontends at the
+// custom domain root (no /portal/:slug in the URL).
+router.get(
+  "/v1/public/portal-by-host/branding",
+  async (req: Request, res: Response): Promise<void> => {
+    const tenant = await loadPortalTenant(req);
+    if (!tenant) {
+      res.status(404).json({ error: "Host not bound to a verified portal" });
       return;
     }
     res.json(GetPortalBrandingResponse.parse(brandingOf(tenant)));
@@ -95,7 +129,7 @@ router.post(
       res.status(400).json({ error: parsed.error.message });
       return;
     }
-    const tenant = await loadTenantBySlug(req.params.tenantSlug as string);
+    const tenant = await loadPortalTenant(req, req.params.tenantSlug as string);
     if (!tenant) {
       // Do not disclose tenant existence
       res.json(RequestPortalMagicLinkResponse.parse({ ok: true, devLink: null }));
@@ -155,7 +189,7 @@ router.post(
       res.status(400).json({ error: parsed.error.message });
       return;
     }
-    const tenant = await loadTenantBySlug(req.params.tenantSlug as string);
+    const tenant = await loadPortalTenant(req, req.params.tenantSlug as string);
     if (!tenant) {
       res.status(404).json({ error: "Tenant not found" });
       return;

@@ -43,6 +43,7 @@ import { PlaceholderPage } from "@/components/PlaceholderPage";
 import { AdminDashboard } from "@/pages/admin/Dashboard";
 import { AdminTenants } from "@/pages/admin/Tenants";
 import { AdminTenantDetail } from "@/pages/admin/TenantDetail";
+import { AdminTenantWhiteLabel } from "@/pages/admin/TenantWhiteLabel";
 import { AdminFeatureFlags } from "@/pages/admin/FeatureFlags";
 import { AdminWorkers } from "@/pages/admin/Workers";
 import { AdminUsage } from "@/pages/admin/Usage";
@@ -75,6 +76,9 @@ import { AdminReferrals } from "@/pages/admin/Referrals";
 
 // Tracking
 import { ReferralTracker } from "@/components/ReferralTracker";
+
+// Reseller
+import { ResellerDashboard } from "@/pages/reseller/ResellerDashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -178,6 +182,7 @@ function App() {
                   <Route path="/" component={AdminDashboard} />
                   <Route path="/tenants" component={AdminTenants} />
                   <Route path="/tenants/:id" component={AdminTenantDetail} />
+                  <Route path="/tenants/:id/white-label" component={AdminTenantWhiteLabel} />
                   <Route path="/feature-flags" component={AdminFeatureFlags} />
                   <Route path="/workers" component={AdminWorkers} />
                   <Route path="/usage" component={AdminUsage} />
@@ -186,6 +191,9 @@ function App() {
                 </Switch>
               </AdminLayout>
             </Route>
+
+            {/* Reseller console */}
+            <Route path="/reseller" component={ResellerDashboard} />
 
             {/* Public */}
             <Route>
