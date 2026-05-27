@@ -1738,6 +1738,8 @@ export interface InboxThread {
   customerEmail?: string | null;
   /** @nullable */
   customerPhone?: string | null;
+  /** @nullable */
+  jobId?: string | null;
   channel: string;
   /** @nullable */
   subject?: string | null;
@@ -1825,20 +1827,40 @@ export interface NotificationEventsResponse {
   channels: string[];
 }
 
+export type NotificationPreferenceFrequency = typeof NotificationPreferenceFrequency[keyof typeof NotificationPreferenceFrequency];
+
+
+export const NotificationPreferenceFrequency = {
+  immediate: 'immediate',
+  digest_daily: 'digest_daily',
+  digest_weekly: 'digest_weekly',
+} as const;
+
 export interface NotificationPreference {
   eventKind: string;
   channel: string;
   enabled: boolean;
+  frequency: NotificationPreferenceFrequency;
 }
 
 export interface NotificationPreferencesResponse {
   preferences: NotificationPreference[];
 }
 
+export type NotificationPreferenceInputFrequency = typeof NotificationPreferenceInputFrequency[keyof typeof NotificationPreferenceInputFrequency];
+
+
+export const NotificationPreferenceInputFrequency = {
+  immediate: 'immediate',
+  digest_daily: 'digest_daily',
+  digest_weekly: 'digest_weekly',
+} as const;
+
 export interface NotificationPreferenceInput {
   eventKind: string;
   channel: string;
   enabled: boolean;
+  frequency?: NotificationPreferenceInputFrequency;
 }
 
 export type NotificationTemplateScope = typeof NotificationTemplateScope[keyof typeof NotificationTemplateScope];

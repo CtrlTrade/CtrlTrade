@@ -133,7 +133,11 @@ async function getUserPrefs(
     );
   const out: Record<Channel, boolean> = { email: true, sms: false, whatsapp: false };
   for (const r of rows) {
-    if ((CHANNELS as string[]).includes(r.channel)) out[r.channel as Channel] = r.enabled;
+    if (!(CHANNELS as string[]).includes(r.channel)) continue;
+    // Suppress channel if disabled, OR if user opted for a digest (deferred
+    // to scheduled digest job — not an immediate send) for this event/channel.
+    const freq = ((r as any).frequency ?? "immediate") as "immediate" | "digest_daily" | "digest_weekly";
+    out[r.channel as Channel] = r.enabled && freq === "immediate";
   }
   return out;
 }

@@ -28,6 +28,7 @@ router.get("/v1/inbox/threads", requireTenant, async (req, res, next) => {
         customerName: r.customerName ?? null,
         customerEmail: r.customerEmail ?? null,
         customerPhone: r.customerPhone ?? null,
+        jobId: r.jobId ?? null,
         channel: r.channel,
         subject: r.subject ?? null,
         lastMessageAt: (r.lastMessageAt as Date).toISOString(),

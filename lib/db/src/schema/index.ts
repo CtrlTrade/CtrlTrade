@@ -853,6 +853,7 @@ export const notificationPreferencesTable = pgTable(
     eventKind: varchar("event_kind", { length: 64 }).notNull(),
     channel: varchar("channel", { length: 16 }).notNull(),
     enabled: boolean("enabled").notNull().default(true),
+    frequency: varchar("frequency", { length: 16 }).notNull().default("immediate"), // immediate|digest_daily|digest_weekly
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
   (t) => ({

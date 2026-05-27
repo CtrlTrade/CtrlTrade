@@ -17,6 +17,8 @@ export interface InboxThread {
   customerEmail?: string | null;
   /** @nullable */
   customerPhone?: string | null;
+  /** @nullable */
+  jobId?: string | null;
   channel: string;
   /** @nullable */
   subject?: string | null;

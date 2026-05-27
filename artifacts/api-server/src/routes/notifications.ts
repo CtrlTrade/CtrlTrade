@@ -48,6 +48,7 @@ router.get("/v1/notifications/preferences", requireTenant, async (req, res, next
         eventKind: r.eventKind,
         channel: r.channel,
         enabled: r.enabled,
+        frequency: (r as any).frequency ?? "immediate",
       })),
     });
   } catch (err) {
@@ -59,8 +60,11 @@ router.put("/v1/notifications/preferences", requireTenant, async (req, res, next
   try {
     const tenantId = req.auth!.tenant!.id;
     const userId = req.auth!.user.id;
-    const { eventKind, channel, enabled } = req.body ?? {};
+    const { eventKind, channel, enabled, frequency } = req.body ?? {};
     if (!eventKind || !channel) { res.status(400).json({ error: "eventKind and channel required" }); return; }
+    const freq = (["immediate", "digest_daily", "digest_weekly"] as const).includes(frequency)
+      ? (frequency as "immediate" | "digest_daily" | "digest_weekly")
+      : "immediate";
     // Use select-then-update/insert instead of onConflictDoUpdate so we don't
     // depend on a specific named unique index (the partial unique indexes
     // confuse Postgres' conflict inference when targeting columns directly).
@@ -79,7 +83,7 @@ router.put("/v1/notifications/preferences", requireTenant, async (req, res, next
     if (existing[0]) {
       await db
         .update(notificationPreferencesTable)
-        .set({ enabled: Boolean(enabled), updatedAt: new Date() })
+        .set({ enabled: Boolean(enabled), frequency: freq, updatedAt: new Date() })
         .where(eq(notificationPreferencesTable.id, existing[0].id));
     } else {
       await db.insert(notificationPreferencesTable).values({
@@ -88,14 +92,15 @@ router.put("/v1/notifications/preferences", requireTenant, async (req, res, next
         eventKind: String(eventKind),
         channel: String(channel),
         enabled: Boolean(enabled),
+        frequency: freq,
       });
     }
     await logAudit({
       tenantId,
       actorUserId: userId,
       kind: "notification.preference.updated",
-      message: `${eventKind}:${channel} → ${enabled ? "on" : "off"}`,
-      metadata: { eventKind, channel, enabled: Boolean(enabled) },
+      message: `${eventKind}:${channel} → ${enabled ? "on" : "off"} (${freq})`,
+      metadata: { eventKind, channel, enabled: Boolean(enabled), frequency: freq },
     });
     res.json({ ok: true });
   } catch (err) {

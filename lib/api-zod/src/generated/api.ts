@@ -3703,6 +3703,7 @@ export const ListInboxThreadsResponse = zod.object({
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
   "customerPhone": zod.string().nullish(),
+  "jobId": zod.string().nullish(),
   "channel": zod.string(),
   "subject": zod.string().nullish(),
   "lastMessageAt": zod.coerce.date(),
@@ -3793,7 +3794,8 @@ export const GetNotificationPreferencesResponse = zod.object({
   "preferences": zod.array(zod.object({
   "eventKind": zod.string(),
   "channel": zod.string(),
-  "enabled": zod.boolean()
+  "enabled": zod.boolean(),
+  "frequency": zod.enum(['immediate', 'digest_daily', 'digest_weekly'])
 }))
 })
 
@@ -3801,7 +3803,8 @@ export const GetNotificationPreferencesResponse = zod.object({
 export const SetNotificationPreferenceBody = zod.object({
   "eventKind": zod.string(),
   "channel": zod.string(),
-  "enabled": zod.boolean()
+  "enabled": zod.boolean(),
+  "frequency": zod.enum(['immediate', 'digest_daily', 'digest_weekly']).optional()
 })
 
 export const SetNotificationPreferenceResponse = zod.object({

@@ -5,9 +5,11 @@
  * CtrlTrade SaaS Portal API
  * OpenAPI spec version: 0.1.0
  */
+import type { NotificationPreferenceInputFrequency } from './notificationPreferenceInputFrequency';
 
 export interface NotificationPreferenceInput {
   eventKind: string;
   channel: string;
   enabled: boolean;
+  frequency?: NotificationPreferenceInputFrequency;
 }

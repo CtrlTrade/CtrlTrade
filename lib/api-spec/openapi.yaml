@@ -4244,6 +4244,7 @@ components:
         customerName: { type: ["string", "null"] }
         customerEmail: { type: ["string", "null"] }
         customerPhone: { type: ["string", "null"] }
+        jobId: { type: ["string", "null"] }
         channel: { type: string }
         subject: { type: ["string", "null"] }
         lastMessageAt: { type: string, format: date-time }
@@ -4333,11 +4334,12 @@ components:
 
     NotificationPreference:
       type: object
-      required: [eventKind, channel, enabled]
+      required: [eventKind, channel, enabled, frequency]
       properties:
         eventKind: { type: string }
         channel: { type: string }
         enabled: { type: boolean }
+        frequency: { type: string, enum: [immediate, digest_daily, digest_weekly] }
 
     NotificationPreferencesResponse:
       type: object
@@ -4354,6 +4356,7 @@ components:
         eventKind: { type: string }
         channel: { type: string }
         enabled: { type: boolean }
+        frequency: { type: string, enum: [immediate, digest_daily, digest_weekly] }
 
     NotificationTemplate:
       type: object

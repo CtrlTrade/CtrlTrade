@@ -16,8 +16,10 @@ export function AppNotificationsSettings() {
   const setPref = useSetNotificationPreference();
 
   const prefMap = useMemo(() => {
-    const m = new Map<string, boolean>();
-    (prefs?.preferences ?? []).forEach((p) => m.set(`${p.eventKind}:${p.channel}`, p.enabled));
+    const m = new Map<string, { enabled: boolean; frequency: string }>();
+    (prefs?.preferences ?? []).forEach((p) =>
+      m.set(`${p.eventKind}:${p.channel}`, { enabled: p.enabled, frequency: (p as any).frequency ?? "immediate" }),
+    );
     return m;
   }, [prefs]);
 
@@ -30,9 +32,11 @@ export function AppNotificationsSettings() {
 
   const isEnabled = (eventKind: string, channel: string, defaults: string[] | undefined) => {
     const k = `${eventKind}:${channel}`;
-    if (prefMap.has(k)) return prefMap.get(k)!;
+    if (prefMap.has(k)) return prefMap.get(k)!.enabled;
     return (defaults ?? []).includes(channel);
   };
+  const freqFor = (eventKind: string, channel: string) =>
+    prefMap.get(`${eventKind}:${channel}`)?.frequency ?? "immediate";
 
   return (
     <div className="space-y-6">
@@ -64,20 +68,42 @@ export function AppNotificationsSettings() {
                       <div className="font-bold text-sm">{e.kind}</div>
                       <div className="text-xs text-muted-foreground">{e.description}</div>
                     </td>
-                    {channels.map((c) => (
-                      <td key={c} className="p-2 text-center">
-                        <Switch
-                          checked={isEnabled(e.kind, c, e.defaultChannels)}
-                          onCheckedChange={(checked) =>
-                            setPref.mutate(
-                              { data: { eventKind: e.kind, channel: c, enabled: checked } },
-                              { onSuccess: () => qc.invalidateQueries() },
-                            )
-                          }
-                          data-testid={`pref-${e.kind}-${c}`}
-                        />
-                      </td>
-                    ))}
+                    {channels.map((c) => {
+                      const enabled = isEnabled(e.kind, c, e.defaultChannels);
+                      const freq = freqFor(e.kind, c);
+                      return (
+                        <td key={c} className="p-2 text-center">
+                          <div className="flex flex-col items-center gap-1">
+                            <Switch
+                              checked={enabled}
+                              onCheckedChange={(checked) =>
+                                setPref.mutate(
+                                  { data: { eventKind: e.kind, channel: c, enabled: checked, frequency: freq as any } },
+                                  { onSuccess: () => qc.invalidateQueries() },
+                                )
+                              }
+                              data-testid={`pref-${e.kind}-${c}`}
+                            />
+                            <select
+                              className="text-[10px] uppercase border border-border rounded-none px-1 py-0.5 bg-transparent"
+                              disabled={!enabled}
+                              value={freq}
+                              onChange={(ev) =>
+                                setPref.mutate(
+                                  { data: { eventKind: e.kind, channel: c, enabled, frequency: ev.target.value as any } },
+                                  { onSuccess: () => qc.invalidateQueries() },
+                                )
+                              }
+                              data-testid={`freq-${e.kind}-${c}`}
+                            >
+                              <option value="immediate">Instant</option>
+                              <option value="digest_daily">Daily</option>
+                              <option value="digest_weekly">Weekly</option>
+                            </select>
+                          </div>
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>
