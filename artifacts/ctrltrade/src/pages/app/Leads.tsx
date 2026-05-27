@@ -195,6 +195,7 @@ export function AppLeads() {
                   <TableHead>Source</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Score</TableHead>
+                  <TableHead>Owner</TableHead>
                   <TableHead className="text-right">Value</TableHead>
                   <TableHead>Follow-up</TableHead>
                 </TableRow>
@@ -218,6 +219,7 @@ export function AppLeads() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right font-mono font-bold">{l.score}</TableCell>
+                    <TableCell className="text-sm">{l.ownerUserName ?? <span className="text-muted-foreground">Unassigned</span>}</TableCell>
                     <TableCell className="text-right font-mono">{l.valuePence > 0 ? fmtGbp(l.valuePence) : "—"}</TableCell>
                     <TableCell>
                       {l.followUpOverdue ? (

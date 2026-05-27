@@ -10,6 +10,7 @@ import {
   useDeleteLead,
   useAddLeadFile,
   useDeleteLeadFile,
+  useListTeam,
   getGetLeadQueryKey,
   getListLeadsQueryKey,
 } from "@workspace/api-client-react";
@@ -61,6 +62,7 @@ export function AppLeadDetail() {
   const [, setLocation] = useLocation();
   const leadId = params?.id ?? "";
   const { data: lead, isLoading } = useGetLead(leadId);
+  const { data: team } = useListTeam();
   const qc = useQueryClient();
   const { toast } = useToast();
   const [noteBody, setNoteBody] = useState("");
@@ -234,6 +236,31 @@ export function AppLeadDetail() {
               ))}
             </div>
           )}
+
+          <div className="flex items-center gap-3 pt-2 border-t border-border">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Assignee:</Label>
+            <Select
+              value={lead.ownerUserId ?? "__unassigned__"}
+              onValueChange={(v) =>
+                update.mutate({
+                  leadId,
+                  data: { ownerUserId: v === "__unassigned__" ? null : v },
+                })
+              }
+            >
+              <SelectTrigger className="rounded-none w-64" data-testid="select-lead-owner">
+                <SelectValue placeholder="Unassigned" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__unassigned__">Unassigned</SelectItem>
+                {(team ?? []).map((m) => (
+                  <SelectItem key={m.userId} value={m.userId}>
+                    {m.name} ({m.role})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardContent>
       </Card>
 
