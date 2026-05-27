@@ -7523,6 +7523,159 @@ export const GetAdminReportInsightsResponse = zod.object({
 })
 
 
+/**
+ * @summary Submit a platform sales lead (public — marketing site form).
+ */
+export const CreatePlatformLeadBody = zod.object({
+  "name": zod.string(),
+  "email": zod.string().email(),
+  "phone": zod.string().optional(),
+  "company": zod.string().optional(),
+  "trade": zod.string().optional(),
+  "source": zod.string().optional(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary List all platform sales leads (super admin).
+ */
+export const ListAdminLeadsQueryParams = zod.object({
+  "search": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional()
+})
+
+export const ListAdminLeadsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "trade": zod.string().nullish(),
+  "source": zod.string(),
+  "status": zod.string(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListAdminLeadsResponse = zod.array(ListAdminLeadsResponseItem)
+
+
+/**
+ * @summary Pipeline stage counts and sparkline (super admin).
+ */
+export const GetAdminLeadsPipelineSummaryResponse = zod.object({
+  "byStatus": zod.record(zod.string(), zod.number()),
+  "wonThisMonth": zod.number(),
+  "inProgress": zod.number(),
+  "total": zod.number(),
+  "sparkline": zod.array(zod.object({
+  "date": zod.string(),
+  "count": zod.number()
+}))
+})
+
+
+/**
+ * @summary Bulk import leads from CSV text (super admin).
+ */
+export const ImportAdminLeadsBody = zod.object({
+  "csv": zod.string()
+})
+
+export const ImportAdminLeadsResponse = zod.object({
+  "imported": zod.number(),
+  "skipped": zod.number(),
+  "errors": zod.array(zod.string())
+})
+
+
+export const GetAdminLeadParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+export const GetAdminLeadResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "trade": zod.string().nullish(),
+  "source": zod.string(),
+  "status": zod.string(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}).and(zod.object({
+  "messages": zod.array(zod.object({
+  "id": zod.string(),
+  "leadId": zod.string(),
+  "channel": zod.string(),
+  "direction": zod.string(),
+  "body": zod.string(),
+  "authorName": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+}))
+
+
+export const UpdateAdminLeadParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+export const UpdateAdminLeadBody = zod.object({
+  "name": zod.string().optional(),
+  "email": zod.string().optional(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "trade": zod.string().nullish(),
+  "source": zod.string().optional(),
+  "status": zod.string().optional(),
+  "notes": zod.string().nullish()
+})
+
+export const UpdateAdminLeadResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "trade": zod.string().nullish(),
+  "source": zod.string(),
+  "status": zod.string(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const ListAdminLeadMessagesParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+export const ListAdminLeadMessagesResponseItem = zod.object({
+  "id": zod.string(),
+  "leadId": zod.string(),
+  "channel": zod.string(),
+  "direction": zod.string(),
+  "body": zod.string(),
+  "authorName": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListAdminLeadMessagesResponse = zod.array(ListAdminLeadMessagesResponseItem)
+
+
+export const CreateAdminLeadMessageParams = zod.object({
+  "leadId": zod.coerce.string()
+})
+
+export const CreateAdminLeadMessageBody = zod.object({
+  "body": zod.string(),
+  "channel": zod.string().optional(),
+  "direction": zod.string().optional()
+})
+
+
 export const ListAutomationEventsResponse = zod.object({
   "events": zod.array(zod.object({
   "event": zod.string(),

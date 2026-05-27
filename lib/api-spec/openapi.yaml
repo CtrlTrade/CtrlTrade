@@ -4955,6 +4955,152 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ReportInsights" }
 
+  # ---- Platform Sales Leads --------------------------------------------------
+
+  /v1/platform/leads:
+    post:
+      operationId: createPlatformLead
+      tags: [admin]
+      summary: Submit a platform sales lead (public — marketing site form).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatePlatformLeadInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, status]
+                properties:
+                  id: { type: string }
+                  status: { type: string }
+
+  /v1/admin/leads:
+    get:
+      operationId: listAdminLeads
+      tags: [admin]
+      summary: List all platform sales leads (super admin).
+      parameters:
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: status
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PlatformSalesLead" }
+
+  /v1/admin/leads/pipeline-summary:
+    get:
+      operationId: getAdminLeadsPipelineSummary
+      tags: [admin]
+      summary: Pipeline stage counts and sparkline (super admin).
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PlatformLeadsPipelineSummary" }
+
+  /v1/admin/leads/import:
+    post:
+      operationId: importAdminLeads
+      tags: [admin]
+      summary: Bulk import leads from CSV text (super admin).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminLeadsCsvImportInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PlatformLeadsImportResult" }
+
+  /v1/admin/leads/{leadId}:
+    get:
+      operationId: getAdminLead
+      tags: [admin]
+      parameters:
+        - in: path
+          name: leadId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PlatformSalesLeadDetail" }
+    put:
+      operationId: updateAdminLead
+      tags: [admin]
+      parameters:
+        - in: path
+          name: leadId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdatePlatformLeadInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PlatformSalesLead" }
+
+  /v1/admin/leads/{leadId}/messages:
+    get:
+      operationId: listAdminLeadMessages
+      tags: [admin]
+      parameters:
+        - in: path
+          name: leadId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PlatformSalesLeadMessage" }
+    post:
+      operationId: createAdminLeadMessage
+      tags: [admin]
+      parameters:
+        - in: path
+          name: leadId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatePlatformLeadMessageInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PlatformSalesLeadMessage" }
+
   # ---- CtrlWorkflow ----------------------------------------------------------
 
   /v1/automation/events:
@@ -9464,3 +9610,108 @@ components:
         branchIds:
           type: array
           items: { type: string }
+
+    PlatformSalesLead:
+      type: object
+      required: [id, name, email, source, status, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: string }
+        phone: { type: ["string", "null"] }
+        company: { type: ["string", "null"] }
+        trade: { type: ["string", "null"] }
+        source: { type: string }
+        status: { type: string }
+        notes: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    PlatformSalesLeadMessage:
+      type: object
+      required: [id, leadId, channel, direction, body, createdAt]
+      properties:
+        id: { type: string }
+        leadId: { type: string }
+        channel: { type: string }
+        direction: { type: string }
+        body: { type: string }
+        authorName: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    PlatformSalesLeadDetail:
+      allOf:
+        - { $ref: "#/components/schemas/PlatformSalesLead" }
+        - type: object
+          required: [messages]
+          properties:
+            messages:
+              type: array
+              items: { $ref: "#/components/schemas/PlatformSalesLeadMessage" }
+
+    PlatformLeadsPipelineSummary:
+      type: object
+      required: [byStatus, wonThisMonth, inProgress, total, sparkline]
+      properties:
+        byStatus:
+          type: object
+          additionalProperties: { type: integer }
+        wonThisMonth: { type: integer }
+        inProgress: { type: integer }
+        total: { type: integer }
+        sparkline:
+          type: array
+          items:
+            type: object
+            required: [date, count]
+            properties:
+              date: { type: string }
+              count: { type: integer }
+
+    PlatformLeadsImportResult:
+      type: object
+      required: [imported, skipped, errors]
+      properties:
+        imported: { type: integer }
+        skipped: { type: integer }
+        errors:
+          type: array
+          items: { type: string }
+
+    CreatePlatformLeadInput:
+      type: object
+      required: [name, email]
+      properties:
+        name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        company: { type: string }
+        trade: { type: string }
+        source: { type: string }
+        message: { type: string }
+
+    UpdatePlatformLeadInput:
+      type: object
+      properties:
+        name: { type: string }
+        email: { type: string }
+        phone: { type: ["string", "null"] }
+        company: { type: ["string", "null"] }
+        trade: { type: ["string", "null"] }
+        source: { type: string }
+        status: { type: string }
+        notes: { type: ["string", "null"] }
+
+    CreatePlatformLeadMessageInput:
+      type: object
+      required: [body]
+      properties:
+        body: { type: string }
+        channel: { type: string }
+        direction: { type: string }
+
+    AdminLeadsCsvImportInput:
+      type: object
+      required: [csv]
+      properties:
+        csv: { type: string }

@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useCreatePlatformLead } from "@workspace/api-client-react";
 import { ArrowRight, Shield, Zap, CheckCircle2, HardHat, CalendarCheck, FileText, Truck, ShieldCheck, Mail, MapPin } from "lucide-react";
 
 export function Home() {
@@ -229,6 +231,34 @@ export function Security() {
 }
 
 export function Contact() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [company, setCompany] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const createLead = useCreatePlatformLead({
+    mutation: {
+      onSuccess: () => setSubmitted(true),
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !email.trim()) return;
+    createLead.mutate({
+      data: {
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim() || undefined,
+        company: company.trim() || undefined,
+        message: message.trim() || undefined,
+        source: "contact_form",
+      },
+    });
+  };
+
   return (
     <div className="container mx-auto px-4 py-20 max-w-5xl">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
@@ -260,22 +290,82 @@ export function Contact() {
           </div>
         </div>
         
-        <form className="space-y-6 border border-border p-8 bg-card" onSubmit={(e) => e.preventDefault()}>
-          <h3 className="text-2xl font-bold uppercase tracking-tight mb-6">Direct Transmission</h3>
-          <div>
-            <label className="block text-sm font-bold uppercase tracking-wider mb-2">Name</label>
-            <input type="text" className="w-full border border-border bg-background p-3 rounded-none focus:outline-none focus:border-primary transition-colors" data-testid="input-contact-name" />
+        {submitted ? (
+          <div className="border border-border p-8 bg-card flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-12 h-12 border border-primary flex items-center justify-center bg-background">
+              <CheckCircle2 className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="text-2xl font-bold uppercase tracking-tight">Transmission Received</h3>
+            <p className="text-muted-foreground">We'll be in touch shortly.</p>
           </div>
-          <div>
-            <label className="block text-sm font-bold uppercase tracking-wider mb-2">Email</label>
-            <input type="email" className="w-full border border-border bg-background p-3 rounded-none focus:outline-none focus:border-primary transition-colors" data-testid="input-contact-email" />
-          </div>
-          <div>
-            <label className="block text-sm font-bold uppercase tracking-wider mb-2">Message</label>
-            <textarea rows={5} className="w-full border border-border bg-background p-3 rounded-none focus:outline-none focus:border-primary transition-colors resize-none" data-testid="input-contact-message"></textarea>
-          </div>
-          <Button className="w-full rounded-none h-12 font-bold uppercase tracking-wider text-sm" data-testid="button-contact-submit">Send Transmission</Button>
-        </form>
+        ) : (
+          <form className="space-y-5 border border-border p-8 bg-card" onSubmit={handleSubmit}>
+            <h3 className="text-2xl font-bold uppercase tracking-tight mb-6">Direct Transmission</h3>
+            <div>
+              <label className="block text-sm font-bold uppercase tracking-wider mb-2">Name *</label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full border border-border bg-background p-3 rounded-none focus:outline-none focus:border-primary transition-colors"
+                data-testid="input-contact-name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold uppercase tracking-wider mb-2">Email *</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full border border-border bg-background p-3 rounded-none focus:outline-none focus:border-primary transition-colors"
+                data-testid="input-contact-email"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold uppercase tracking-wider mb-2">Phone</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full border border-border bg-background p-3 rounded-none focus:outline-none focus:border-primary transition-colors"
+                data-testid="input-contact-phone"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold uppercase tracking-wider mb-2">Company</label>
+              <input
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                className="w-full border border-border bg-background p-3 rounded-none focus:outline-none focus:border-primary transition-colors"
+                data-testid="input-contact-company"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold uppercase tracking-wider mb-2">Message</label>
+              <textarea
+                rows={4}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="w-full border border-border bg-background p-3 rounded-none focus:outline-none focus:border-primary transition-colors resize-none"
+                data-testid="input-contact-message"
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={createLead.isPending || !name.trim() || !email.trim()}
+              className="w-full rounded-none h-12 font-bold uppercase tracking-wider text-sm"
+              data-testid="button-contact-submit"
+            >
+              {createLead.isPending ? "Sending…" : "Send Transmission"}
+            </Button>
+            {createLead.isError && (
+              <p className="text-sm text-red-500 font-mono text-center">Failed to send. Please try again.</p>
+            )}
+          </form>
+        )}
       </div>
     </div>
   );

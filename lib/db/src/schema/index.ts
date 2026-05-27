@@ -2127,3 +2127,43 @@ export const staffAvailabilityTable = pgTable(
   }),
 );
 export type StaffAvailability = typeof staffAvailabilityTable.$inferSelect;
+
+// ---- Platform Sales Leads (super-admin sales pipeline) --------------------
+export const platformSalesLeadsTable = pgTable(
+  "platform_sales_leads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    phone: text("phone"),
+    company: text("company"),
+    trade: text("trade"),
+    source: varchar("source", { length: 64 }).notNull().default("contact_form"),
+    status: varchar("status", { length: 32 }).notNull().default("new"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    emailIdx: index("platform_sales_leads_email_idx").on(t.email),
+    statusIdx: index("platform_sales_leads_status_idx").on(t.status, t.createdAt),
+  }),
+);
+export type PlatformSalesLead = typeof platformSalesLeadsTable.$inferSelect;
+
+export const platformSalesLeadMessagesTable = pgTable(
+  "platform_sales_lead_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    leadId: uuid("lead_id").notNull().references(() => platformSalesLeadsTable.id, { onDelete: "cascade" }),
+    channel: varchar("channel", { length: 16 }).notNull().default("note"),
+    direction: varchar("direction", { length: 8 }).notNull().default("out"),
+    body: text("body").notNull(),
+    authorName: text("author_name"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    leadIdx: index("platform_sales_lead_msgs_lead_idx").on(t.leadId, t.createdAt),
+  }),
+);
+export type PlatformSalesLeadMessage = typeof platformSalesLeadMessagesTable.$inferSelect;

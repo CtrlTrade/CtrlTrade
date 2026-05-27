@@ -75,6 +75,8 @@ import { AdminRevenueReport } from "@/pages/admin/reports/AdminRevenue";
 import { AdminTenantActivityReport } from "@/pages/admin/reports/AdminTenantActivity";
 import { AdminUsageReport } from "@/pages/admin/reports/AdminUsageReport";
 import { AdminReferralsReport } from "@/pages/admin/reports/AdminReferralsReport";
+import { AdminLeads } from "@/pages/admin/Leads";
+import { AdminLeadDetail } from "@/pages/admin/LeadDetail";
 
 // Customer portal
 import { PortalLayout } from "@/components/layout/PortalLayout";
@@ -241,6 +243,8 @@ function App() {
                   <Route path="/workers" component={AdminWorkers} />
                   <Route path="/usage" component={AdminUsage} />
                   <Route path="/compliance" component={AdminCompliance} />
+                  <Route path="/leads" component={AdminLeads} />
+                  <Route path="/leads/:id" component={AdminLeadDetail} />
                   <Route path="/referrals" component={AdminReferrals} />
                   <Route path="/reports" component={AdminReportsIndex} />
                   <Route path="/reports/revenue">{() => <AdminRevenueReport />}</Route>

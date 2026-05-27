@@ -4187,6 +4187,95 @@ export interface AreaManagerInput {
   branchIds: string[];
 }
 
+export interface PlatformSalesLead {
+  id: string;
+  name: string;
+  email: string;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  company?: string | null;
+  /** @nullable */
+  trade?: string | null;
+  source: string;
+  status: string;
+  /** @nullable */
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PlatformSalesLeadMessage {
+  id: string;
+  leadId: string;
+  channel: string;
+  direction: string;
+  body: string;
+  /** @nullable */
+  authorName?: string | null;
+  createdAt: string;
+}
+
+export type PlatformSalesLeadDetail = PlatformSalesLead & {
+  messages: PlatformSalesLeadMessage[];
+};
+
+export type PlatformLeadsPipelineSummaryByStatus = {[key: string]: number};
+
+export type PlatformLeadsPipelineSummarySparklineItem = {
+  date: string;
+  count: number;
+};
+
+export interface PlatformLeadsPipelineSummary {
+  byStatus: PlatformLeadsPipelineSummaryByStatus;
+  wonThisMonth: number;
+  inProgress: number;
+  total: number;
+  sparkline: PlatformLeadsPipelineSummarySparklineItem[];
+}
+
+export interface PlatformLeadsImportResult {
+  imported: number;
+  skipped: number;
+  errors: string[];
+}
+
+export interface CreatePlatformLeadInput {
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  trade?: string;
+  source?: string;
+  message?: string;
+}
+
+export interface UpdatePlatformLeadInput {
+  name?: string;
+  email?: string;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  company?: string | null;
+  /** @nullable */
+  trade?: string | null;
+  source?: string;
+  status?: string;
+  /** @nullable */
+  notes?: string | null;
+}
+
+export interface CreatePlatformLeadMessageInput {
+  body: string;
+  channel?: string;
+  direction?: string;
+}
+
+export interface AdminLeadsCsvImportInput {
+  csv: string;
+}
+
 export type ConnectIntegration200 = {
   authUrl: string;
 };
@@ -4392,6 +4481,16 @@ to?: string;
 export type GetAdminReportInsightsParams = {
 from?: string;
 to?: string;
+};
+
+export type CreatePlatformLead201 = {
+  id: string;
+  status: string;
+};
+
+export type ListAdminLeadsParams = {
+search?: string;
+status?: string;
 };
 
 export type ListAutomationRunsParams = {

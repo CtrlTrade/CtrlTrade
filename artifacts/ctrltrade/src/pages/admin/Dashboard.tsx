@@ -1,7 +1,7 @@
-import { useGetAdminDashboard, useGetRevenueBreakdown, useGetAdminActivity, useGetUpcomingRenewals, useGetAdminUsage } from "@workspace/api-client-react";
+import { useGetAdminDashboard, useGetRevenueBreakdown, useGetAdminActivity, useGetUpcomingRenewals, useGetAdminUsage, useGetAdminLeadsPipelineSummary } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, CreditCard, AlertCircle, RefreshCw, Activity, Gauge } from "lucide-react";
+import { Users, CreditCard, AlertCircle, RefreshCw, Activity, Gauge, Funnel } from "lucide-react";
 import { Link } from "wouter";
 
 const USAGE_KIND_LABELS: Record<string, string> = {
@@ -21,6 +21,7 @@ export function AdminDashboard() {
   const { data: activity, isLoading: actLoading } = useGetAdminActivity();
   const { data: renewals, isLoading: renLoading } = useGetUpcomingRenewals();
   const { data: usage } = useGetAdminUsage();
+  const { data: pipeline } = useGetAdminLeadsPipelineSummary();
 
   if (dashLoading || revLoading || actLoading || renLoading) {
     return <div className="p-8 space-y-6"><Skeleton className="h-32" /><Skeleton className="h-96" /></div>;
@@ -40,6 +41,36 @@ export function AdminDashboard() {
         <KpiCard title="Active Tenants" value={dashboard.activeTenants} icon={Users} />
         <KpiCard title="Active Trials" value={dashboard.activeTrials} icon={Activity} />
       </div>
+
+      {pipeline && (
+        <Link href="/leads" className="block">
+          <Card className="rounded-none border-zinc-800 bg-black shadow-none hover:border-zinc-600 transition-colors cursor-pointer">
+            <CardHeader className="pb-2">
+              <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2 text-sm">
+                <Funnel className="h-4 w-4 text-red-500" /> Pipeline
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-5 gap-2 mb-3">
+                {(["new", "contacted", "demo_booked", "won", "lost"] as const).map((s) => {
+                  const labels: Record<string, string> = { new: "New", contacted: "Contacted", demo_booked: "Demo Booked", won: "Won", lost: "Lost" };
+                  const colours: Record<string, string> = { new: "text-blue-400", contacted: "text-yellow-400", demo_booked: "text-purple-400", won: "text-green-400", lost: "text-zinc-500" };
+                  return (
+                    <div key={s} className="text-center">
+                      <div className={`text-2xl font-mono font-bold ${colours[s]}`}>{pipeline.byStatus?.[s] ?? 0}</div>
+                      <div className="text-[10px] font-bold uppercase text-zinc-600 mt-0.5">{labels[s]}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex items-center gap-4 border-t border-zinc-900 pt-2 mt-2">
+                <div className="text-xs text-zinc-500">Won this month: <span className="text-green-400 font-mono font-bold">{pipeline.wonThisMonth}</span></div>
+                <div className="text-xs text-zinc-500">Total: <span className="text-zinc-300 font-mono font-bold">{pipeline.total}</span></div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard title="Control Seats" value={dashboard.activeControlSeats} icon={Users} />

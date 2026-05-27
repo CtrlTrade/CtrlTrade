@@ -47,6 +47,8 @@ import bookingWidgetRouter from "./bookingWidget";
 import branchesRouter from "./branches";
 import areaManagersRouter from "./areaManagers";
 import jobCostsRouter from "./jobCosts";
+import adminLeadsRouter from "./adminLeads";
+import publicLeadsRouter from "./publicLeads";
 
 const router: IRouter = Router();
 
@@ -57,6 +59,7 @@ router.get("/healthz", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+router.use(publicLeadsRouter);
 router.use(pricingRouter);
 router.use(authRouter);
 router.use(paymentRouter);
@@ -105,5 +108,6 @@ router.use(adminComplianceRouter);
 router.use(branchesRouter);
 router.use(areaManagersRouter);
 router.use(jobCostsRouter);
+router.use(adminLeadsRouter);
 
 export default router;
