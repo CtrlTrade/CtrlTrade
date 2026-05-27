@@ -48,7 +48,7 @@ export function AppStaff() {
         <p className="text-sm text-muted-foreground">Invite teammates, manage roles, and toggle access.</p>
       </div>
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight text-base">Seat usage</CardTitle>
         </CardHeader>
@@ -59,7 +59,7 @@ export function AppStaff() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight text-base">Invite teammate</CardTitle>
           <CardDescription>They'll get a magic link to set up their account.</CardDescription>
@@ -108,7 +108,7 @@ export function AppStaff() {
       </Card>
 
       {data.invitations.length > 0 && (
-        <Card className="rounded-none border-border">
+        <Card className=" border-border">
           <CardHeader>
             <CardTitle className="uppercase tracking-tight text-base">Pending invitations</CardTitle>
           </CardHeader>
@@ -136,7 +136,7 @@ export function AppStaff() {
         </Card>
       )}
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight text-base">Members</CardTitle>
         </CardHeader>

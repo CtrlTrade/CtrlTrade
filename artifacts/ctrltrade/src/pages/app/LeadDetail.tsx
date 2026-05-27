@@ -189,7 +189,7 @@ export function AppLeadDetail() {
         </div>
       </div>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
@@ -265,7 +265,7 @@ export function AppLeadDetail() {
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardHeader>
             <CardTitle className="uppercase tracking-tight flex items-center gap-2"><StickyNote className="h-5 w-5" /> Notes</CardTitle>
           </CardHeader>
@@ -291,7 +291,7 @@ export function AppLeadDetail() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardHeader>
             <CardTitle className="uppercase tracking-tight flex items-center gap-2"><CheckCircle2 className="h-5 w-5" /> Activity</CardTitle>
           </CardHeader>
@@ -308,7 +308,7 @@ export function AppLeadDetail() {
                   </SelectContent>
                 </Select>
               </div>
-              <Input value={actSubject} onChange={(e) => setActSubject(e.target.value)} placeholder="Brief summary" className="flex-1 rounded-none" />
+              <Input value={actSubject} onChange={(e) => setActSubject(e.target.value)} placeholder="Brief summary" className="flex-1" />
               <Button onClick={() => logAct.mutate({ leadId, data: { kind: actKind as any, subject: actSubject || undefined } })} disabled={!actSubject.trim() || logAct.isPending} className="rounded-none uppercase tracking-wider text-xs font-bold">
                 Log
               </Button>
@@ -333,7 +333,7 @@ export function AppLeadDetail() {
         </Card>
       </div>
 
-      <Card className="rounded-none border-border shadow-sm" data-testid="card-lead-files">
+      <Card className=" border-border shadow-sm" data-testid="card-lead-files">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight flex items-center gap-2"><Paperclip className="h-5 w-5" /> Files</CardTitle>
         </CardHeader>

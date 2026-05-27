@@ -29,7 +29,7 @@ export function PartnerLinks() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold uppercase tracking-tighter">Your Referral Links</h1>
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">Create new link</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={(e) => { e.preventDefault(); create.mutate({ data: { label: label || undefined, landingPath } }); }} className="grid md:grid-cols-3 gap-4 items-end">
@@ -40,7 +40,7 @@ export function PartnerLinks() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">Active links</CardTitle></CardHeader>
         <CardContent>
           {!data || data.length === 0 ? (

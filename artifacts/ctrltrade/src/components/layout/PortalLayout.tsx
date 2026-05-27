@@ -48,7 +48,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-none uppercase tracking-wider font-bold text-xs"
+                className="uppercase tracking-wider font-bold text-xs"
                 onClick={() => logout.mutate()}
                 data-testid="button-portal-logout"
               >

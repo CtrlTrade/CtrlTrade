@@ -35,7 +35,7 @@ export function UsageTile() {
   const kinds = Object.keys(INCLUDED_LIMITS);
 
   return (
-    <Card className="rounded-none border-border shadow-sm" data-testid="card-usage">
+    <Card className=" border-border shadow-sm" data-testid="card-usage">
       <CardHeader>
         <CardTitle className="uppercase tracking-tight flex items-center gap-2">
           <Activity className="h-5 w-5" /> Usage this month

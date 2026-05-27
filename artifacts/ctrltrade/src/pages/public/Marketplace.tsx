@@ -35,7 +35,7 @@ export function Marketplace() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {(data ?? []).map((l) => (
             <Link key={l.id} href={`/marketplace/${l.slug}`}>
-              <Card className="rounded-none border-border hover:border-foreground transition-colors cursor-pointer h-full" data-testid={`card-listing-${l.slug}`}>
+              <Card className=" border-border hover:border-foreground transition-colors cursor-pointer h-full" data-testid={`card-listing-${l.slug}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="uppercase tracking-tight text-lg">{l.tenantName}</CardTitle>

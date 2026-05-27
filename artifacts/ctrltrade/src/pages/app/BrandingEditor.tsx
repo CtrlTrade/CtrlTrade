@@ -94,7 +94,7 @@ function LogoUpload({
             const url = (result.successful?.[0] as { uploadURL?: string } | undefined)?.uploadURL;
             if (url) onChange(url);
           }}
-          buttonClassName="inline-flex items-center gap-2 rounded-none uppercase tracking-wider font-bold bg-secondary text-secondary-foreground px-3 py-2 text-xs hover:opacity-90"
+          buttonClassName="inline-flex items-center gap-2 uppercase tracking-wider font-bold bg-secondary text-secondary-foreground px-3 py-2 text-xs hover:opacity-90"
         >
           <Upload className="h-3 w-3" /> Upload
         </ObjectUploader>
@@ -232,7 +232,7 @@ export function AppBrandingEditor() {
         </TabsList>
 
         <TabsContent value="visual">
-          <Card className="rounded-none border-border shadow-sm">
+          <Card className=" border-border shadow-sm">
             <CardHeader>
               <CardTitle className="uppercase tracking-tight">Colours & Typography</CardTitle>
               <CardDescription>All values are GBP-priced, ® branding preserved.</CardDescription>
@@ -252,7 +252,7 @@ export function AppBrandingEditor() {
                     type="color"
                     value={form[k] || "#000000"}
                     onChange={(e) => set(k, e.target.value)}
-                    className="h-9 p-1 rounded-none"
+                    className="h-9 p-1"
                   />
                 </div>
               ))}
@@ -270,7 +270,7 @@ export function AppBrandingEditor() {
         </TabsContent>
 
         <TabsContent value="logos">
-          <Card className="rounded-none border-border shadow-sm">
+          <Card className=" border-border shadow-sm">
             <CardHeader>
               <CardTitle className="uppercase tracking-tight">Logos & Favicon</CardTitle>
             </CardHeader>
@@ -290,7 +290,7 @@ export function AppBrandingEditor() {
             { k: "email", title: "Email template", fields: ["Header", "Signature"] as const },
             { k: "posReceipt", title: "POS receipt", fields: ["Header", "Footer"] as const },
           ] as const).map((block) => (
-            <Card key={block.k} className="rounded-none border-border shadow-sm">
+            <Card key={block.k} className=" border-border shadow-sm">
               <CardHeader>
                 <CardTitle className="uppercase tracking-tight">{block.title}</CardTitle>
               </CardHeader>

@@ -1,38 +1,40 @@
 const palette = {
-  text: "#F4F4F2",
-  tint: "#F26B1F",
+  text: "#FFFFFF",
+  tint: "#FDC50F",
 
-  background: "#14181F",
-  foreground: "#F4F4F2",
+  background: "#010C1E",
+  foreground: "#FFFFFF",
 
-  card: "#1B2029",
-  cardForeground: "#F4F4F2",
+  card: "#04152E",
+  cardForeground: "#FFFFFF",
 
-  primary: "#F26B1F",
-  primaryForeground: "#14181F",
+  primary: "#FDC50F",
+  primaryForeground: "#010C1E",
 
-  secondary: "#222832",
-  secondaryForeground: "#F4F4F2",
+  secondary: "#04152E",
+  secondaryForeground: "#FFFFFF",
 
-  muted: "#222832",
-  mutedForeground: "#9098A4",
+  muted: "#0A2247",
+  mutedForeground: "#7A92B5",
 
-  accent: "#F26B1F",
-  accentForeground: "#14181F",
+  accent: "#FDC50F",
+  accentForeground: "#010C1E",
 
   destructive: "#E53935",
-  destructiveForeground: "#F4F4F2",
+  destructiveForeground: "#FFFFFF",
 
-  border: "#2A313C",
-  input: "#2A313C",
+  border: "#0A2247",
+  input: "#0A2247",
 };
 
 const colors = {
   light: palette,
   dark: palette,
-  radius: 10,
+  radius: 14,
 };
 
-export const MONO_FONT = "Courier";
+export const MONO_FONT = "Inter_400Regular";
+export const BRAND_FONT = "Inter_400Regular";
+export const BRAND_FONT_BOLD = "Inter_700Bold";
 
 export default colors;

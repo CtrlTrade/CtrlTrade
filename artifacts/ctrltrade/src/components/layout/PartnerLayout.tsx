@@ -44,8 +44,9 @@ export function PartnerLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background flex font-sans">
       <aside className="w-64 border-r border-border bg-sidebar flex flex-col hidden md:flex">
-        <div className="h-16 flex items-center px-4 border-b border-sidebar-border bg-sidebar-primary text-sidebar-primary-foreground">
-          <span className="font-bold text-lg tracking-tighter uppercase">CTRLTRADE® Partners</span>
+        <div className="h-16 flex items-center gap-3 px-4 border-b border-sidebar-border bg-sidebar">
+          <img src="/assets/ctrltrade-logo.png" alt="CtrlTrade" className="h-7 w-auto object-contain" />
+          <span className="text-xs font-bold uppercase tracking-widest text-sidebar-foreground/60 border border-sidebar-foreground/20 rounded px-1.5 py-0.5">Partners</span>
         </div>
         <nav className="flex-1 overflow-y-auto p-4 space-y-1">
           {links.map((link) => {

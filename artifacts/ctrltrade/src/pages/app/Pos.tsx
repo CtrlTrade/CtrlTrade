@@ -41,7 +41,7 @@ export function AppPos() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {tiles.map((t) => (
           <Link key={t.href} href={t.href} data-testid={`pos-tile-${t.label.toLowerCase().replace(/\s/g, "-")}`}>
-            <Card className="rounded-none border-border shadow-sm hover:bg-muted/30 cursor-pointer transition-colors">
+            <Card className=" border-border shadow-sm hover:bg-muted/30 cursor-pointer transition-colors">
               <CardHeader className="flex flex-row items-center gap-3 pb-2">
                 <t.icon className="h-5 w-5 text-primary" />
                 <CardTitle className="uppercase tracking-tight text-base">{t.label}</CardTitle>

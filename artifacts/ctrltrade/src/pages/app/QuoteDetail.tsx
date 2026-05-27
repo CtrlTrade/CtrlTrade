@@ -94,7 +94,7 @@ export function AppQuoteDetail() {
           <p className="text-sm mt-1">Customer: <span className="font-medium">{data.customerName}</span></p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge className="uppercase rounded-none" data-testid="badge-quote-status">{data.status}</Badge>
+          <Badge className="uppercase" data-testid="badge-quote-status">{data.status}</Badge>
         </div>
       </div>
 
@@ -126,7 +126,7 @@ export function AppQuoteDetail() {
         )}
       </div>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader><CardTitle className="uppercase tracking-tight">Line items</CardTitle></CardHeader>
         <CardContent>
           <Table>

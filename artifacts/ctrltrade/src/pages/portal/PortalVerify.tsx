@@ -29,7 +29,7 @@ export function PortalVerify() {
 
   return (
     <div className="max-w-md mx-auto">
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardContent className="py-12 text-center text-sm">
           {error ? (
             <div className="space-y-2">

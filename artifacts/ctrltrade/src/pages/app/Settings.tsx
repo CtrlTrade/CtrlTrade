@@ -97,7 +97,7 @@ export function AppSettings() {
         <TabsContent value="integrations"><IntegrationsPanel /></TabsContent>
         <TabsContent value="company">
       <form onSubmit={handleSubmit} className="space-y-8">
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardHeader>
             <CardTitle className="uppercase tracking-tight">Company Profile</CardTitle>
             <CardDescription>Core business details and contact information.</CardDescription>
@@ -134,7 +134,7 @@ export function AppSettings() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardHeader>
             <CardTitle className="uppercase tracking-tight">Brand Identity</CardTitle>
             <CardDescription>
@@ -144,7 +144,7 @@ export function AppSettings() {
           <CardContent>
             <Link
               href="/app/settings/branding"
-              className="inline-flex items-center gap-2 rounded-none uppercase tracking-wider font-bold bg-primary text-primary-foreground px-4 py-2 text-sm hover:opacity-90"
+              className="inline-flex items-center gap-2 uppercase tracking-wider font-bold bg-primary text-primary-foreground px-4 py-2 text-sm hover:opacity-90"
               data-testid="link-branding-editor"
             >
               <Palette className="h-4 w-4" /> Open branding editor
@@ -152,7 +152,7 @@ export function AppSettings() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardHeader>
             <CardTitle className="uppercase tracking-tight">Trade Categories</CardTitle>
             <CardDescription>Select the specific industries your company operates in.</CardDescription>
@@ -186,7 +186,7 @@ export function AppSettings() {
         </div>
       </form>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Lead Capture — Allowed Domains</CardTitle>
           <CardDescription>
@@ -225,7 +225,7 @@ function LeadCaptureSnippetCard() {
     );
   };
   return (
-    <Card className="rounded-none border-border shadow-sm" data-testid="card-lead-snippet">
+    <Card className=" border-border shadow-sm" data-testid="card-lead-snippet">
       <CardHeader>
         <CardTitle className="uppercase tracking-tight">Website Lead Capture</CardTitle>
         <CardDescription>

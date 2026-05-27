@@ -95,7 +95,7 @@ export function AppJobDetail() {
             Customer: <span className="font-medium">{data.customerName}</span> · Value: <span className="font-mono">{formatGBP(data.valuePence)}</span>
           </p>
         </div>
-        <Badge className="uppercase rounded-none">{data.status.replace("_", " ")}</Badge>
+        <Badge className="uppercase">{data.status.replace("_", " ")}</Badge>
       </div>
 
       {data.status === "completed" && (
@@ -110,7 +110,7 @@ export function AppJobDetail() {
         </Button>
       )}
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader><CardTitle className="uppercase tracking-tight">Schedule & Assignment</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
@@ -152,7 +152,7 @@ export function AppJobDetail() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader><CardTitle className="uppercase tracking-tight">Details</CardTitle></CardHeader>
         <CardContent className="space-y-2 text-sm">
           {data.description && <p>{data.description}</p>}

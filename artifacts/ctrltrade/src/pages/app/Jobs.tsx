@@ -128,7 +128,7 @@ export function AppJobs() {
         </Dialog>
       </div>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight flex items-center gap-2"><Briefcase className="h-5 w-5" /> All jobs</CardTitle>
         </CardHeader>
@@ -153,7 +153,7 @@ export function AppJobs() {
                     <TableCell>{j.customerName}</TableCell>
                     <TableCell className="font-mono text-sm">{j.scheduledStart ? new Date(j.scheduledStart).toLocaleString() : "—"}</TableCell>
                     <TableCell>{j.assignedUserName ?? "—"}</TableCell>
-                    <TableCell><Badge variant={STATUS_VARIANT[j.status] ?? "outline"} className="uppercase rounded-none">{j.status.replace("_", " ")}</Badge></TableCell>
+                    <TableCell><Badge variant={STATUS_VARIANT[j.status] ?? "outline"} className="uppercase">{j.status.replace("_", " ")}</Badge></TableCell>
                     <TableCell className="text-right font-mono">{formatGBP(j.valuePence)}</TableCell>
                   </TableRow>
                 ))}

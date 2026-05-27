@@ -40,7 +40,7 @@ export function AcceptInvite() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-      <Card className="w-full max-w-md rounded-none border-border">
+      <Card className="w-full max-w-md  border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tighter">Join {data.tenantName}</CardTitle>
           <CardDescription>You've been invited as <strong>{data.role}</strong> ({data.seatType} seat) on CtrlTrade®.</CardDescription>
@@ -72,7 +72,7 @@ export function AcceptInvite() {
                 </div>
               </>
             )}
-            <Button type="submit" disabled={accept.isPending} className="w-full rounded-none uppercase font-bold tracking-wider" data-testid="button-accept-invite">
+            <Button type="submit" disabled={accept.isPending} className="w-full uppercase font-bold tracking-wider" data-testid="button-accept-invite">
               {accept.isPending ? "Joining..." : "Accept & join"}
             </Button>
           </form>

@@ -40,7 +40,7 @@ export function AppNotificationsSettings() {
 
   return (
     <div className="space-y-6">
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Notification Preferences</CardTitle>
           <CardDescription>
@@ -85,7 +85,7 @@ export function AppNotificationsSettings() {
                               data-testid={`pref-${e.kind}-${c}`}
                             />
                             <select
-                              className="text-[10px] uppercase border border-border rounded-none px-1 py-0.5 bg-transparent"
+                              className="text-[10px] uppercase border border-border px-1 py-0.5 bg-transparent"
                               disabled={!enabled}
                               value={freq}
                               onChange={(ev) =>

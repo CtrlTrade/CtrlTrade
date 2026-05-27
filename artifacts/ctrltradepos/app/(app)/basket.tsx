@@ -204,7 +204,7 @@ export default function BasketScreen() {
           <Row label="SUBTOTAL" value={`£${(totals.subtotal / 100).toFixed(2)}`} colors={colors} />
           {totals.discount > 0 && <Row label="TRADE DISCOUNT" value={`-£${(totals.discount / 100).toFixed(2)}`} colors={colors} />}
           <Row label="VAT" value={`£${(totals.tax / 100).toFixed(2)}`} colors={colors} />
-          <View style={[styles.totalsRow, { marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#2A313C" }]}>
+          <View style={[styles.totalsRow, { marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#0A2247" }]}>
             <Text style={[styles.totalsLabel, { color: colors.foreground, fontWeight: "700" }]}>TOTAL</Text>
             <Text style={[styles.totalsValue, { color: colors.primary, fontSize: 22 }]}>£{(totals.total / 100).toFixed(2)}</Text>
           </View>

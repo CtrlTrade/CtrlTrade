@@ -77,7 +77,7 @@ export function FileAttachments({
   });
 
   return (
-    <Card className="rounded-none border-border shadow-sm">
+    <Card className=" border-border shadow-sm">
       <CardHeader>
         <CardTitle className="uppercase tracking-tight flex items-center gap-2">
           <Paperclip className="h-5 w-5" /> {title}

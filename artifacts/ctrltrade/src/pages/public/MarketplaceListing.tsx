@@ -28,13 +28,13 @@ export function MarketplaceListing() {
       </header>
 
       {data.bio && (
-        <Card className="rounded-none border-border">
+        <Card className=" border-border">
           <CardHeader><CardTitle className="uppercase tracking-tight">About</CardTitle></CardHeader>
           <CardContent className="whitespace-pre-wrap text-sm">{data.bio}</CardContent>
         </Card>
       )}
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">Service details</CardTitle></CardHeader>
         <CardContent className="grid sm:grid-cols-2 gap-3 text-sm">
           {data.serviceArea && <div><div className="text-xs uppercase tracking-wider text-muted-foreground">Service area</div>{data.serviceArea}</div>}
@@ -48,7 +48,7 @@ export function MarketplaceListing() {
       </Card>
 
       {data.galleryUrls && data.galleryUrls.length > 0 && (
-        <Card className="rounded-none border-border">
+        <Card className=" border-border">
           <CardHeader><CardTitle className="uppercase tracking-tight">Gallery</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {data.galleryUrls.map((url) => <img key={url} src={url} alt="" className="w-full h-40 object-cover" />)}
@@ -56,7 +56,7 @@ export function MarketplaceListing() {
         </Card>
       )}
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">Reviews</CardTitle></CardHeader>
         <CardContent>
           {!data.reviews || data.reviews.length === 0 ? (

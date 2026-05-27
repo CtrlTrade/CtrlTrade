@@ -38,7 +38,7 @@ export function PortalRefer() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">{data.campaignName ?? "Refer a friend"}</CardTitle>
           <CardDescription>{data.rewardSummary}</CardDescription>
@@ -60,7 +60,7 @@ export function PortalRefer() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Tell us who to contact</CardTitle>
           <CardDescription>We'll reach out to your referral on your behalf.</CardDescription>

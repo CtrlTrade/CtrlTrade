@@ -31,7 +31,7 @@ export function AppDashboard() {
           <LeadSourceRoiCard />
           <UsageTile />
           {onboarding && (
-            <Card className="rounded-none border-border shadow-sm">
+            <Card className=" border-border shadow-sm">
               <CardHeader>
                 <CardTitle className="uppercase tracking-tight">Onboarding Protocol</CardTitle>
                 <CardDescription>Complete these steps to fully activate your tenant workspace.</CardDescription>
@@ -41,7 +41,7 @@ export function AppDashboard() {
                   <div className="flex justify-between text-sm font-bold font-mono">
                     <span>{onboarding.percentComplete}% Complete</span>
                   </div>
-                  <Progress value={onboarding.percentComplete} className="h-2 rounded-none bg-muted [&>div]:bg-primary" />
+                  <Progress value={onboarding.percentComplete} className="h-2 bg-muted [&>div]:bg-primary" />
                 </div>
                 
                 <div className="space-y-4">
@@ -86,7 +86,7 @@ function InboxTile() {
   if (isLoading && threads.length === 0) return null;
   const unreadCount = unread?.count ?? 0;
   return (
-    <Card className="rounded-none border-border shadow-sm" data-testid="card-inbox">
+    <Card className=" border-border shadow-sm" data-testid="card-inbox">
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -113,7 +113,7 @@ function InboxTile() {
                       <span className="uppercase tracking-wider text-xs text-muted-foreground">{t.channel}</span>
                       <span className="truncate">{t.customerName ?? t.customerEmail ?? "(unknown)"}</span>
                       {t.unreadCount > 0 && (
-                        <span className="ml-auto inline-flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground px-1.5 py-0.5 rounded-none">
+                        <span className="ml-auto inline-flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground px-1.5 py-0.5">
                           {t.unreadCount}
                         </span>
                       )}
@@ -139,7 +139,7 @@ function LeadSourceRoiCard() {
   if (data.totalLeads === 0) return null;
   const fmt = (p: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: data.currency, maximumFractionDigits: 0 }).format(p / 100);
   return (
-    <Card className="rounded-none border-border shadow-sm" data-testid="card-lead-source-roi">
+    <Card className=" border-border shadow-sm" data-testid="card-lead-source-roi">
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -252,7 +252,7 @@ function SubscriptionCard({ subscription }: { subscription: any }) {
   
   return (
     <>
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <div className="flex justify-between items-start">
             <CardTitle className="uppercase tracking-tight">Subscription</CardTitle>
@@ -296,10 +296,10 @@ function SubscriptionCard({ subscription }: { subscription: any }) {
           </div>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button className="w-full rounded-none uppercase font-bold tracking-wider text-xs" onClick={() => setShowUpdate(true)}>
+          <Button className="w-full uppercase font-bold tracking-wider text-xs" onClick={() => setShowUpdate(true)}>
             Update Quantities
           </Button>
-          <Button variant="ghost" className="w-full rounded-none uppercase font-bold tracking-wider text-xs text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setShowCancel(true)}>
+          <Button variant="ghost" className="w-full uppercase font-bold tracking-wider text-xs text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setShowCancel(true)}>
             Cancel Subscription
           </Button>
         </CardFooter>
@@ -333,7 +333,7 @@ function UpdateQuantitiesDialog({ subscription, open, onOpenChange }: { subscrip
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-none border-border sm:max-w-[425px]">
+      <DialogContent className=" border-border sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="uppercase tracking-tight">Update Quantities</DialogTitle>
           <DialogDescription>Adjust the number of seats and tills for your tenant.</DialogDescription>
@@ -341,15 +341,15 @@ function UpdateQuantitiesDialog({ subscription, open, onOpenChange }: { subscrip
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="controlSeats" className="col-span-2">Control Seats</Label>
-            <Input id="controlSeats" type="number" min="1" value={controlSeats} onChange={e => setControlSeats(parseInt(e.target.value))} className="col-span-2 rounded-none" />
+            <Input id="controlSeats" type="number" min="1" value={controlSeats} onChange={e => setControlSeats(parseInt(e.target.value))} className="col-span-2" />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="fieldSeats" className="col-span-2">Field Seats</Label>
-            <Input id="fieldSeats" type="number" min="0" value={fieldSeats} onChange={e => setFieldSeats(parseInt(e.target.value))} className="col-span-2 rounded-none" />
+            <Input id="fieldSeats" type="number" min="0" value={fieldSeats} onChange={e => setFieldSeats(parseInt(e.target.value))} className="col-span-2" />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="tills" className="col-span-2">POS Tills</Label>
-            <Input id="tills" type="number" min="0" value={tills} onChange={e => setTills(parseInt(e.target.value))} className="col-span-2 rounded-none" />
+            <Input id="tills" type="number" min="0" value={tills} onChange={e => setTills(parseInt(e.target.value))} className="col-span-2" />
           </div>
           <DialogFooter>
             <Button type="submit" disabled={update.isPending} className="rounded-none uppercase font-bold tracking-wider">

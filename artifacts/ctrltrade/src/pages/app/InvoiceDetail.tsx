@@ -115,9 +115,9 @@ export function AppInvoiceDetail() {
           <h1 className="text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
           <p className="text-muted-foreground">{data.title}</p>
           <p className="text-sm mt-1">Customer: <span className="font-medium">{data.customerName}</span></p>
-          {data.isDeposit && <Badge variant="secondary" className="uppercase rounded-none mt-2">Deposit invoice</Badge>}
+          {data.isDeposit && <Badge variant="secondary" className="uppercase mt-2">Deposit invoice</Badge>}
         </div>
-        <Badge variant={STATUS_VARIANT[data.status] ?? "outline"} className="uppercase rounded-none" data-testid="badge-invoice-status">{data.status}</Badge>
+        <Badge variant={STATUS_VARIANT[data.status] ?? "outline"} className="uppercase" data-testid="badge-invoice-status">{data.status}</Badge>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -143,7 +143,7 @@ export function AppInvoiceDetail() {
         </Button>
       </div>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="uppercase tracking-tight">Line items</CardTitle>
@@ -233,7 +233,7 @@ export function AppInvoiceDetail() {
       </Card>
 
       {data.payments.length > 0 && (
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardHeader><CardTitle className="uppercase tracking-tight">Payments</CardTitle></CardHeader>
           <CardContent>
             <Table>

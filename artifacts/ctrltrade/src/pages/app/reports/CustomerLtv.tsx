@@ -31,7 +31,7 @@ export function CustomerLtvReport({ admin = false }: { admin?: boolean }) {
       {isLoading || !data ? (
         <Skeleton className="h-64" />
       ) : (
-        <Card className="rounded-none border-border">
+        <Card className=" border-border">
           <CardContent className="p-0">
             <table className="w-full text-sm">
               <thead className="bg-muted">

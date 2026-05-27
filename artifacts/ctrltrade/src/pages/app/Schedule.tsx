@@ -55,7 +55,7 @@ export function AppSchedule() {
           {days.map((d) => {
             const events = (byDay[d.toDateString()] as unknown as Array<NonNullable<typeof data>[number]>) ?? [];
             return (
-              <Card key={d.toISOString()} className="rounded-none border-border shadow-sm min-h-[200px]">
+              <Card key={d.toISOString()} className=" border-border shadow-sm min-h-[200px]">
                 <CardHeader className="pb-2">
                   <CardTitle className="uppercase tracking-tight text-xs">
                     {d.toLocaleDateString(undefined, { weekday: "short" })} {d.getDate()}

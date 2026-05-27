@@ -4,21 +4,21 @@
     "slug": "ctrltradepos",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/ctrltrade-icon.png",
     "scheme": "ctrltradepos",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/icon.png",
+      "image": "./assets/ctrltrade-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#14181F"
+      "backgroundColor": "#010C1E"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {},
     "web": {
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/ctrltrade-icon.png"
     },
     "plugins": [
       [

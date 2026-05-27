@@ -11,7 +11,7 @@ export function PartnerCommissions() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold uppercase tracking-tighter">Commissions</h1>
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">Earnings</CardTitle></CardHeader>
         <CardContent>
           {!data || data.length === 0 ? (

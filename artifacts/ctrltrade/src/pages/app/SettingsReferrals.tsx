@@ -52,7 +52,7 @@ export function SettingsReferrals() {
 
   return (
     <div className="space-y-6">
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">{editing ? "Edit campaign" : "New campaign"}</CardTitle>
           <CardDescription>Reward your existing customers for referring new ones.</CardDescription>
@@ -86,7 +86,7 @@ export function SettingsReferrals() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">Active campaigns</CardTitle></CardHeader>
         <CardContent>
           {!campaigns || campaigns.length === 0 ? (
@@ -115,7 +115,7 @@ export function SettingsReferrals() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">Referrals received</CardTitle></CardHeader>
         <CardContent>
           {!conversions || conversions.length === 0 ? (

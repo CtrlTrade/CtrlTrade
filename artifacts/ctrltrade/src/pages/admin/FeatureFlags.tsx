@@ -39,7 +39,7 @@ export function AdminFeatureFlags() {
         <p className="text-sm text-muted-foreground">Toggle features globally or per tenant. Rollout % controls progressive enablement.</p>
       </div>
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight text-base">Create or update flag</CardTitle>
           <CardDescription>Using an existing key updates that flag.</CardDescription>
@@ -55,7 +55,7 @@ export function AdminFeatureFlags() {
             <div className="col-span-2"><Label>Key</Label><Input value={newKey} onChange={(e) => setNewKey(e.target.value)} required className="rounded-none" data-testid="input-flag-key" /></div>
             <div className="col-span-2"><Label>Description</Label><Input value={newDesc} onChange={(e) => setNewDesc(e.target.value)} className="rounded-none" /></div>
             <div><Label>Scope</Label>
-              <select value={newScope} onChange={(e) => setNewScope(e.target.value as any)} className="w-full h-10 rounded-none border border-border bg-background px-2 text-sm"><option value="global">Global</option><option value="tenant">Tenant</option></select>
+              <select value={newScope} onChange={(e) => setNewScope(e.target.value as any)} className="w-full h-10  border border-border bg-background px-2 text-sm"><option value="global">Global</option><option value="tenant">Tenant</option></select>
             </div>
             <div><Label>Rollout %</Label><Input type="number" min={0} max={100} value={newPct} onChange={(e) => setNewPct(Number(e.target.value))} className="rounded-none" /></div>
             {newScope === "tenant" && <div className="col-span-3"><Label>Tenant ID</Label><Input value={newTenantId} onChange={(e) => setNewTenantId(e.target.value)} required className="rounded-none font-mono text-xs" /></div>}
@@ -65,7 +65,7 @@ export function AdminFeatureFlags() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight text-base">All flags</CardTitle></CardHeader>
         <CardContent>
           <table className="w-full text-sm">

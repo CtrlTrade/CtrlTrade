@@ -42,7 +42,7 @@ export function ReportsIndex() {
         {CARDS.map((c) => (
           <Link key={c.href} href={c.href}>
             <Card
-              className="rounded-none border-border hover:border-primary cursor-pointer transition-colors h-full"
+              className=" border-border hover:border-primary cursor-pointer transition-colors h-full"
               data-testid={`report-card-${c.href.split("/").pop()}`}
             >
               <CardHeader>

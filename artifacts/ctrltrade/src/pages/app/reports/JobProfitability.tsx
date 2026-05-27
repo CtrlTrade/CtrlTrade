@@ -41,7 +41,7 @@ export function JobProfitabilityReport({ admin = false }: { admin?: boolean }) {
               { label: "Margin %", value: `${data.marginPct}%` },
             ]}
           />
-          <Card className="rounded-none border-border">
+          <Card className=" border-border">
             <CardContent className="p-0">
               <table className="w-full text-sm">
                 <thead className="bg-muted">

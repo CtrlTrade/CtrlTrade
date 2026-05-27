@@ -32,7 +32,7 @@ export function PortalDashboard() {
         <Link href={`/portal/${tenantSlug}/refer`} className="text-xs uppercase tracking-wider font-bold underline" data-testid="link-portal-refer">Refer a friend →</Link>
       </div>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Quotes</CardTitle>
         </CardHeader>
@@ -60,7 +60,7 @@ export function PortalDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Jobs</CardTitle>
         </CardHeader>
@@ -92,7 +92,7 @@ export function PortalDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Invoices</CardTitle>
         </CardHeader>

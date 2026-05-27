@@ -41,7 +41,7 @@ export function AgedDebtorsReport({ admin = false }: { admin?: boolean }) {
               })),
             ].slice(0, 4)}
           />
-          <Card className="rounded-none border-border">
+          <Card className=" border-border">
             <CardHeader>
               <CardTitle className="uppercase tracking-tight text-sm">Outstanding by bucket</CardTitle>
             </CardHeader>
@@ -64,7 +64,7 @@ export function AgedDebtorsReport({ admin = false }: { admin?: boolean }) {
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-none border-border">
+          <Card className=" border-border">
             <CardContent className="p-0">
               <table className="w-full text-sm">
                 <thead className="bg-muted">

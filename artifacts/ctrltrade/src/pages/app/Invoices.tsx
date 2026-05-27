@@ -49,7 +49,7 @@ export function AppInvoices() {
       </div>
 
       {debtors && (
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardHeader>
             <CardTitle className="uppercase tracking-tight">Aged debtors</CardTitle>
           </CardHeader>
@@ -89,7 +89,7 @@ export function AppInvoices() {
         </Card>
       )}
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="uppercase tracking-tight">All invoices</CardTitle>
@@ -130,7 +130,7 @@ export function AppInvoices() {
                     <TableCell><Link href={`/invoices/${inv.id}`} className="underline font-mono">{inv.number}</Link></TableCell>
                     <TableCell>{inv.customerName}</TableCell>
                     <TableCell className="truncate max-w-xs">{inv.title}</TableCell>
-                    <TableCell><Badge variant={STATUS_VARIANT[inv.status] ?? "outline"} className="uppercase rounded-none">{inv.status}</Badge></TableCell>
+                    <TableCell><Badge variant={STATUS_VARIANT[inv.status] ?? "outline"} className="uppercase">{inv.status}</Badge></TableCell>
                     <TableCell className="text-right font-mono">{formatGBP(inv.totalPence)}</TableCell>
                     <TableCell className="text-right text-sm text-muted-foreground">{inv.dueAt ? new Date(inv.dueAt).toLocaleDateString("en-GB") : "—"}</TableCell>
                   </TableRow>

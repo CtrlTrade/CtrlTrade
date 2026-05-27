@@ -159,7 +159,7 @@ export function ReportShell({
 }) {
   return (
     <div className="space-y-6">
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
@@ -190,7 +190,7 @@ export function KpiRow({ items }: { items: Array<{ label: string; value: string 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {items.map((it) => (
-        <Card key={it.label} className="rounded-none border-border">
+        <Card key={it.label} className=" border-border">
           <CardContent className="p-4">
             <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1">
               {it.label}

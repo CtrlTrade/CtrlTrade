@@ -36,7 +36,7 @@ export function CustomerInbox({ customerId, jobId, title = "Messages" }: Props) 
   });
 
   return (
-    <Card className="rounded-none border-border shadow-sm" data-testid="card-customer-inbox">
+    <Card className=" border-border shadow-sm" data-testid="card-customer-inbox">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="uppercase tracking-tight">{title}</CardTitle>
         <Link href="/app/inbox" className="text-xs underline uppercase tracking-wider">Open inbox</Link>

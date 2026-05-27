@@ -1,9 +1,8 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useColors } from "@/hooks/useColors";
-import { MONO_FONT } from "@/constants/colors";
 
 export function Header({ title, subtitle, right }: { title: string; subtitle?: string; right?: React.ReactNode }) {
   const colors = useColors();
@@ -14,9 +13,11 @@ export function Header({ title, subtitle, right }: { title: string; subtitle?: s
   return (
     <View style={[styles.bar, { borderColor: colors.border, backgroundColor: colors.card }]}>
       <View style={styles.left}>
-        <View style={[styles.mark, { backgroundColor: colors.primary }]}>
-          <Text style={[styles.markText, { color: colors.primaryForeground }]}>CT</Text>
-        </View>
+        <Image
+          source={require("@/assets/ctrltrade-icon.png")}
+          style={[styles.icon, { borderRadius: colors.radius }]}
+          resizeMode="contain"
+        />
         <View>
           <Text style={[styles.title, { color: colors.foreground }]}>{title}</Text>
           {subtitle ? (
@@ -36,9 +37,9 @@ export function Header({ title, subtitle, right }: { title: string; subtitle?: s
         </View>
         <Pressable
           onPress={() => signOut()}
-          style={({ pressed }) => [styles.signOut, { borderColor: colors.border, opacity: pressed ? 0.6 : 1 }]}
+          style={({ pressed }) => [styles.signOut, { borderColor: colors.primary, opacity: pressed ? 0.6 : 1 }]}
         >
-          <Text style={[styles.signOutText, { color: colors.foreground }]}>SIGN OUT</Text>
+          <Text style={[styles.signOutText, { color: colors.primary }]}>SIGN OUT</Text>
         </Pressable>
       </View>
     </View>
@@ -56,14 +57,13 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   left: { flexDirection: "row", alignItems: "center", gap: 12, flexShrink: 1 },
-  mark: { width: 40, height: 40, borderRadius: 8, alignItems: "center", justifyContent: "center" },
-  markText: { fontFamily: MONO_FONT, fontWeight: "700", fontSize: 14, letterSpacing: 1 },
-  title: { fontFamily: MONO_FONT, fontSize: 16, fontWeight: "700", letterSpacing: 2 },
-  subtitle: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 1, marginTop: 2 },
+  icon: { width: 40, height: 40 },
+  title: { fontFamily: "Inter_700Bold", fontSize: 16, fontWeight: "700", letterSpacing: 0.5 },
+  subtitle: { fontFamily: "Inter_400Regular", fontSize: 11, marginTop: 2, opacity: 0.8 },
   right: { flexDirection: "row", alignItems: "center", gap: 12 },
   userBlock: { alignItems: "flex-end", maxWidth: 180 },
-  tenant: { fontFamily: MONO_FONT, fontSize: 10, letterSpacing: 1 },
-  user: { fontFamily: MONO_FONT, fontSize: 13, marginTop: 2 },
-  signOut: { borderWidth: 1, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6 },
-  signOutText: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 2, fontWeight: "700" },
+  tenant: { fontFamily: "Inter_400Regular", fontSize: 10, letterSpacing: 0.5 },
+  user: { fontFamily: "Inter_600SemiBold", fontSize: 13, marginTop: 2 },
+  signOut: { borderWidth: 1, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
+  signOutText: { fontFamily: "Inter_700Bold", fontSize: 11, letterSpacing: 1.5, fontWeight: "700" },
 });

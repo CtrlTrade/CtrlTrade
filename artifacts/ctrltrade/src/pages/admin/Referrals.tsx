@@ -33,7 +33,7 @@ export function AdminReferrals() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold uppercase tracking-tighter">Referral Partners</h1>
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">Partners</CardTitle></CardHeader>
         <CardContent>
           {pLoad ? <Skeleton className="h-32 w-full" /> : !partners || partners.length === 0 ? (
@@ -63,7 +63,7 @@ export function AdminReferrals() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">Payout requests</CardTitle></CardHeader>
         <CardContent>
           {payLoad ? <Skeleton className="h-32 w-full" /> : !payouts || payouts.length === 0 ? (

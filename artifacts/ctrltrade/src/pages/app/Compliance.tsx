@@ -127,7 +127,7 @@ export function AppCompliance() {
                       const url = (result.successful?.[0] as { uploadURL?: string } | undefined)?.uploadURL;
                       if (url) setDocumentUrl(url);
                     }}
-                    buttonClassName="inline-flex items-center gap-2 rounded-none uppercase tracking-wider font-bold bg-secondary text-secondary-foreground px-3 py-2 text-xs hover:opacity-90"
+                    buttonClassName="inline-flex items-center gap-2 uppercase tracking-wider font-bold bg-secondary text-secondary-foreground px-3 py-2 text-xs hover:opacity-90"
                   >
                     <Upload className="h-3 w-3" /> Upload document
                   </ObjectUploader>
@@ -152,7 +152,7 @@ export function AppCompliance() {
         </Dialog>
       </div>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight flex items-center gap-2"><ShieldCheck className="h-5 w-5" /> Certificates</CardTitle>
         </CardHeader>

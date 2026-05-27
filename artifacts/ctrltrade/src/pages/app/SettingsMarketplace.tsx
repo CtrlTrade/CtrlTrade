@@ -93,7 +93,7 @@ export function SettingsMarketplace() {
 
   return (
     <div className="space-y-6">
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Marketplace Listing</CardTitle>
           <CardDescription>Get discovered by other CtrlTrade® businesses looking for contractors or suppliers.</CardDescription>

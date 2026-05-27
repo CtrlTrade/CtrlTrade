@@ -62,7 +62,7 @@ export function PortalJob() {
         <Badge className="uppercase rounded-none">{data.status.replace("_", " ")}</Badge>
       </div>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Details</CardTitle>
         </CardHeader>
@@ -84,7 +84,7 @@ export function PortalJob() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Progress</CardTitle>
         </CardHeader>
@@ -103,7 +103,7 @@ export function PortalJob() {
       </Card>
 
       {data.status === "completed" ? (
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardHeader>
             <CardTitle className="uppercase tracking-tight">Leave a review</CardTitle>
           </CardHeader>
@@ -170,7 +170,7 @@ export function PortalJob() {
         </Card>
       ) : null}
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Messages</CardTitle>
         </CardHeader>

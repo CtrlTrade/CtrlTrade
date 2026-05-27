@@ -36,7 +36,7 @@ export function Login() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md rounded-none border-border shadow-xl">
+      <Card className="w-full max-w-md  border-border shadow-xl">
         <CardHeader className="space-y-2">
           <CardTitle className="text-2xl font-bold uppercase tracking-tighter">Login</CardTitle>
           <CardDescription>Enter your credentials to access your CTRLTRADE® command center.</CardDescription>
@@ -69,7 +69,7 @@ export function Login() {
             </div>
             <Button 
               type="submit" 
-              className="w-full rounded-none font-bold uppercase tracking-wider mt-4" 
+              className="w-full font-bold uppercase tracking-wider mt-4" 
               disabled={login.isPending}
               data-testid="button-login-submit"
             >

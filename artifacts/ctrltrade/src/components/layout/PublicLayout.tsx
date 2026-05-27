@@ -6,8 +6,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-background flex flex-col font-sans">
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="font-bold text-xl tracking-tighter uppercase text-foreground">
-            CTRLTRADE®
+          <Link href="/" className="flex items-center">
+            <img src="/assets/ctrltrade-logo.png" alt="CtrlTrade" className="h-7 w-auto object-contain" />
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
             <Link href="/pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
@@ -19,7 +19,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground">Log in</Link>
             <Link href="/signup">
-              <Button className="rounded-none uppercase tracking-wider font-bold text-xs" data-testid="link-signup">Start 1 month free trial</Button>
+              <Button className="uppercase tracking-wider font-bold text-xs" data-testid="link-signup">Start 1 month free trial</Button>
             </Link>
           </div>
         </div>
@@ -32,7 +32,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <footer className="border-t border-border bg-card py-12 mt-20">
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <div className="font-bold text-lg tracking-tighter uppercase mb-4 text-foreground">CTRLTRADE®</div>
+            <div className="mb-4">
+              <img src="/assets/ctrltrade-logo.png" alt="CtrlTrade" className="h-6 w-auto object-contain" />
+            </div>
             <p className="text-sm text-muted-foreground">The operating system a serious trade business runs on.</p>
           </div>
           <div>

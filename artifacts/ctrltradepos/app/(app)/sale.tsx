@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   tenderText: { fontFamily: MONO_FONT, fontSize: 13, letterSpacing: 2, fontWeight: "700" },
   totals: { borderWidth: 1, borderRadius: 10, padding: 16, gap: 8 },
   totalsRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
-  totalsGrand: { marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#2A313C" },
+  totalsGrand: { marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#0A2247" },
   totalsLabel: { fontFamily: MONO_FONT, fontSize: 12, letterSpacing: 2 },
   totalsValue: { fontFamily: MONO_FONT, fontSize: 16, fontWeight: "700" },
   submit: { borderRadius: 8, paddingVertical: 18, alignItems: "center" },

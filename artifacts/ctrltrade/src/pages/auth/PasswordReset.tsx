@@ -13,7 +13,7 @@ export function ForgotPassword() {
   const req = useRequestPasswordReset({ mutation: { onSuccess: () => setSent(true) } });
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-      <Card className="w-full max-w-md rounded-none border-border">
+      <Card className="w-full max-w-md  border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tighter">Reset your password</CardTitle>
           <CardDescription>Enter your email and we'll send a reset link.</CardDescription>
@@ -30,7 +30,7 @@ export function ForgotPassword() {
                 <Label>Email</Label>
                 <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required className="rounded-none" data-testid="input-forgot-email" />
               </div>
-              <Button type="submit" disabled={req.isPending} className="w-full rounded-none uppercase font-bold tracking-wider" data-testid="button-forgot-submit">
+              <Button type="submit" disabled={req.isPending} className="w-full uppercase font-bold tracking-wider" data-testid="button-forgot-submit">
                 {req.isPending ? "Sending..." : "Send reset link"}
               </Button>
             </form>
@@ -55,7 +55,7 @@ export function ResetPassword() {
   if (!token) return <div className="p-8">Missing reset token.</div>;
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-      <Card className="w-full max-w-md rounded-none border-border">
+      <Card className="w-full max-w-md  border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tighter">Set new password</CardTitle>
         </CardHeader>
@@ -68,7 +68,7 @@ export function ResetPassword() {
               <Label>New password (min 8 chars)</Label>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} className="rounded-none" data-testid="input-reset-password" />
             </div>
-            <Button type="submit" disabled={complete.isPending} className="w-full rounded-none uppercase font-bold tracking-wider" data-testid="button-reset-submit">
+            <Button type="submit" disabled={complete.isPending} className="w-full uppercase font-bold tracking-wider" data-testid="button-reset-submit">
               {complete.isPending ? "Saving..." : "Set password"}
             </Button>
           </form>

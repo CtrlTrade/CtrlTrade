@@ -123,7 +123,7 @@ export function Signup() {
           <div className="text-sm font-mono text-muted-foreground">STEP {step}/6</div>
         </div>
 
-        <Card className="rounded-none border-border shadow-xl">
+        <Card className=" border-border shadow-xl">
           <CardHeader>
             {step === 1 && <CardTitle className="uppercase tracking-tight">Company Details</CardTitle>}
             {step === 2 && <CardTitle className="uppercase tracking-tight">Industries</CardTitle>}
@@ -340,7 +340,7 @@ function StripePaymentForm({ onSuccess, onBack, isSignupPending }: { onSuccess: 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <PaymentElement />
-      <Button type="submit" disabled={!stripe || loading || isSignupPending} className="w-full rounded-none font-bold uppercase tracking-wider h-12" data-testid="button-signup-submit-stripe">
+      <Button type="submit" disabled={!stripe || loading || isSignupPending} className="w-full font-bold uppercase tracking-wider h-12" data-testid="button-signup-submit-stripe">
         {loading || isSignupPending ? "Processing Setup..." : "Save Payment Method & Deploy Workspace"}
       </Button>
     </form>

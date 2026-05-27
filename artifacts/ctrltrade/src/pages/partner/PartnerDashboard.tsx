@@ -22,14 +22,14 @@ export function PartnerDashboard() {
       <h1 className="text-3xl font-bold uppercase tracking-tighter">Partner Dashboard</h1>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {stats.map((s) => (
-          <Card key={s.label} className="rounded-none border-border">
+          <Card key={s.label} className=" border-border">
             <CardHeader className="pb-2"><CardTitle className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</CardTitle></CardHeader>
             <CardContent><div className="text-2xl font-bold" data-testid={`stat-${s.label.toLowerCase().replace(/\s/g, '-')}`}>{s.value}</div></CardContent>
           </Card>
         ))}
       </div>
 
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">Recent Conversions</CardTitle></CardHeader>
         <CardContent>
           {data.conversions.length === 0 ? (

@@ -12,7 +12,7 @@ function InboxBadge() {
   const { data } = useGetInboxUnreadCount({ query: { refetchInterval: 30000 } as any });
   if (!data || data.count <= 0) return null;
   return (
-    <Badge className="rounded-none bg-primary text-primary-foreground text-[10px] px-1.5" data-testid="badge-inbox-unread">
+    <Badge className="bg-primary text-primary-foreground text-[10px] px-1.5" data-testid="badge-inbox-unread">
       {data.count}
     </Badge>
   );
@@ -70,8 +70,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background flex font-sans">
       <aside className="w-64 border-r border-border bg-sidebar flex flex-col hidden md:flex">
-        <div className="h-16 flex items-center px-4 border-b border-sidebar-border bg-sidebar-primary text-sidebar-primary-foreground">
-          <span className="font-bold text-lg tracking-tighter uppercase">CTRLTRADE®</span>
+        <div className="h-16 flex items-center px-4 border-b border-sidebar-border bg-sidebar">
+          <img
+            src="/assets/ctrltrade-logo.png"
+            alt="CtrlTrade"
+            className="h-8 w-auto object-contain"
+          />
         </div>
         <nav className="flex-1 overflow-y-auto p-4 space-y-1">
           {links.map((link) => {
@@ -97,12 +101,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         {session.impersonation && (
           <div className="bg-amber-500 text-black px-6 py-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider" data-testid="banner-impersonation">
             <span>Impersonating {session.impersonation.tenantName} as {session.impersonation.impersonatorEmail}</span>
-            <Button size="sm" variant="outline" className="h-7 rounded-none border-black text-black hover:bg-black hover:text-amber-500" onClick={() => stopImp.mutate()} data-testid="button-stop-impersonation">Stop impersonating</Button>
+            <Button size="sm" variant="outline" className="h-7 border-black text-black hover:bg-black hover:text-amber-500" onClick={() => stopImp.mutate()} data-testid="button-stop-impersonation">Stop impersonating</Button>
           </div>
         )}
         <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-none" style={{ backgroundColor: tenant.brandColor || 'var(--primary)' }} />
+            <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: tenant.brandColor || 'var(--primary)' }} />
             <span className="font-bold text-lg uppercase tracking-tight" data-testid="text-tenant-name">{tenant.name}</span>
           </div>
           <div className="flex items-center gap-4">

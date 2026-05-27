@@ -3,7 +3,7 @@ import React from "react";
 
 export default function AppLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#14181F" } }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#010C1E" } }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="sales" />
       <Stack.Screen name="sale" options={{ presentation: "modal" }} />

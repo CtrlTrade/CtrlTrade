@@ -41,7 +41,7 @@ export function LeadRoiReport({ admin = false }: { admin?: boolean }) {
               { label: "Pipeline value", value: fmtGbp(data.pipelineValuePence) },
             ]}
           />
-          <Card className="rounded-none border-border">
+          <Card className=" border-border">
             <CardHeader>
               <CardTitle className="uppercase tracking-tight text-sm">Revenue won by source</CardTitle>
             </CardHeader>
@@ -67,7 +67,7 @@ export function LeadRoiReport({ admin = false }: { admin?: boolean }) {
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-none border-border">
+          <Card className=" border-border">
             <CardContent className="p-0">
               <table className="w-full text-sm">
                 <thead className="bg-muted">

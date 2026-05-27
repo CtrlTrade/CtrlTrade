@@ -65,7 +65,7 @@ export function PortalInvoice() {
         <Badge className="uppercase rounded-none">{data.status}</Badge>
       </div>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Items</CardTitle>
         </CardHeader>
@@ -106,7 +106,7 @@ export function PortalInvoice() {
           {pay.isPending ? "Preparing…" : "Pay by card"}
         </Button>
       ) : data.status === "paid" ? (
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardContent className="py-4 text-sm">
             Paid{data.paidAt ? ` on ${new Date(data.paidAt).toLocaleString("en-GB")}` : ""}.
           </CardContent>

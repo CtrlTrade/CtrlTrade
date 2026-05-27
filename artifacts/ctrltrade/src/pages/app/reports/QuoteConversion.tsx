@@ -42,7 +42,7 @@ export function QuoteConversionReport({ admin = false }: { admin?: boolean }) {
               { label: "Declined", value: String(data.declined) },
             ]}
           />
-          <Card className="rounded-none border-border">
+          <Card className=" border-border">
             <CardHeader>
               <CardTitle className="uppercase tracking-tight text-sm">Funnel over time</CardTitle>
             </CardHeader>

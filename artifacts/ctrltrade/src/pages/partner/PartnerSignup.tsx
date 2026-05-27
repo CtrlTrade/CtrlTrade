@@ -23,7 +23,7 @@ export function PartnerSignup() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md rounded-none border-border">
+      <Card className="w-full max-w-md  border-border">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Become a Partner</CardTitle>
           <CardDescription>Earn recurring commission for every trades business you refer to CtrlTrade®.</CardDescription>

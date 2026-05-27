@@ -123,7 +123,7 @@ export function AppQuotes() {
         </Dialog>
       </div>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight flex items-center gap-2"><FileText className="h-5 w-5" /> All quotes</CardTitle>
         </CardHeader>
@@ -147,7 +147,7 @@ export function AppQuotes() {
                     </TableCell>
                     <TableCell>{q.title}</TableCell>
                     <TableCell>{q.customerName}</TableCell>
-                    <TableCell><Badge variant={STATUS_VARIANT[q.status] ?? "outline"} className="uppercase rounded-none">{q.status}</Badge></TableCell>
+                    <TableCell><Badge variant={STATUS_VARIANT[q.status] ?? "outline"} className="uppercase">{q.status}</Badge></TableCell>
                     <TableCell className="text-right font-mono">{formatGBP(q.totalPence)}</TableCell>
                   </TableRow>
                 ))}

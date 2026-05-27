@@ -29,7 +29,7 @@ export function PartnerPayouts() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold uppercase tracking-tighter">Payouts</h1>
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">Request a payout</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={(e) => { e.preventDefault(); request.mutate({ data: { notes: notes || undefined } }); }} className="space-y-3">
@@ -38,7 +38,7 @@ export function PartnerPayouts() {
           </form>
         </CardContent>
       </Card>
-      <Card className="rounded-none border-border">
+      <Card className=" border-border">
         <CardHeader><CardTitle className="uppercase tracking-tight">History</CardTitle></CardHeader>
         <CardContent>
           {!data || data.length === 0 ? (

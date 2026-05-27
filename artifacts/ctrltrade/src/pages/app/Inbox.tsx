@@ -45,7 +45,7 @@ export function AppInbox() {
         <p className="text-sm text-muted-foreground">All customer conversations across email, SMS &amp; WhatsApp.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-4 min-h-[600px]">
-        <Card className="rounded-none border-border">
+        <Card className=" border-border">
           <CardHeader className="py-3">
             <CardTitle className="text-sm uppercase tracking-wider">Conversations</CardTitle>
           </CardHeader>
@@ -124,7 +124,7 @@ function ThreadView({ threadId }: { threadId: string | null }) {
 
   if (!threadId) {
     return (
-      <Card className="rounded-none border-border flex items-center justify-center">
+      <Card className=" border-border flex items-center justify-center">
         <p className="text-sm text-muted-foreground">Select a conversation</p>
       </Card>
     );
@@ -146,7 +146,7 @@ function ThreadView({ threadId }: { threadId: string | null }) {
   };
 
   return (
-    <Card className="rounded-none border-border flex flex-col">
+    <Card className=" border-border flex flex-col">
       <CardHeader className="py-3 border-b border-border">
         <CardTitle className="text-sm uppercase tracking-wider">Conversation</CardTitle>
       </CardHeader>

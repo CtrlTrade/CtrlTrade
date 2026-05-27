@@ -176,7 +176,7 @@ export function AppLeads() {
         </div>
       </div>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight flex items-center gap-2">
             <Target className="h-5 w-5" /> Pipeline

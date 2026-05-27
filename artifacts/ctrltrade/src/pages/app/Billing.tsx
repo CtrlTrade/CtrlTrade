@@ -146,7 +146,7 @@ export function AppBilling() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-8">
-          <Card className="rounded-none border-border shadow-sm">
+          <Card className=" border-border shadow-sm">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
@@ -234,7 +234,7 @@ export function AppBilling() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-none border-border shadow-sm">
+          <Card className=" border-border shadow-sm">
             <CardHeader>
               <CardTitle className="uppercase tracking-tight flex items-center gap-2">
                 <Receipt className="h-5 w-5" /> Invoices
@@ -309,7 +309,7 @@ export function AppBilling() {
         </div>
 
         <div className="space-y-8">
-          <Card className="rounded-none border-border shadow-sm">
+          <Card className=" border-border shadow-sm">
             <CardHeader>
               <CardTitle className="uppercase tracking-tight flex items-center gap-2">
                 <Receipt className="h-5 w-5" /> Next Invoice
@@ -337,7 +337,7 @@ export function AppBilling() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-none border-border shadow-sm">
+          <Card className=" border-border shadow-sm">
             <CardHeader>
               <CardTitle className="uppercase tracking-tight flex items-center gap-2">
                 <CreditCard className="h-5 w-5" /> Payment Method
@@ -370,7 +370,7 @@ export function AppBilling() {
               <Button
                 onClick={handleOpenUpdatePm}
                 disabled={createSetupIntent.isPending || !stripePromise}
-                className="w-full rounded-none uppercase tracking-wider font-bold text-xs"
+                className="w-full uppercase tracking-wider font-bold text-xs"
                 data-testid="button-update-payment-method"
               >
                 {createSetupIntent.isPending
@@ -447,7 +447,7 @@ function UpdatePaymentMethodForm({ onSuccess }: { onSuccess: () => void }) {
       <Button
         type="submit"
         disabled={!stripe || loading}
-        className="w-full rounded-none font-bold uppercase tracking-wider"
+        className="w-full font-bold uppercase tracking-wider"
         data-testid="button-confirm-update-payment-method"
       >
         {loading ? "Saving…" : "Save Card"}

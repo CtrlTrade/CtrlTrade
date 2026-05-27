@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -48,11 +49,17 @@ export default function LoginScreen() {
       >
         <View style={styles.container}>
           <View style={styles.brandRow}>
-            <View style={[styles.brandMark, { backgroundColor: colors.primary }]}>
-              <Text style={[styles.brandMarkText, { color: colors.primaryForeground }]}>CT</Text>
-            </View>
+            <Image
+              source={require("@/assets/ctrltrade-icon.png")}
+              style={styles.brandIcon}
+              resizeMode="contain"
+            />
             <View>
-              <Text style={[styles.brandTitle, { color: colors.foreground }]}>CTRLTRADE</Text>
+              <Image
+                source={require("@/assets/ctrltrade-logo.png")}
+                style={styles.brandLogo}
+                resizeMode="contain"
+              />
               <Text style={[styles.brandSubtitle, { color: colors.mutedForeground }]}>
                 POS · Field Console
               </Text>
@@ -129,12 +136,8 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   container: { flex: 1, paddingHorizontal: 32, justifyContent: "center", maxWidth: 560, width: "100%", alignSelf: "center" },
   brandRow: { flexDirection: "row", alignItems: "center", gap: 16, marginBottom: 40 },
-  brandMark: {
-    width: 56, height: 56, borderRadius: 10,
-    alignItems: "center", justifyContent: "center",
-  },
-  brandMarkText: { fontFamily: MONO_FONT, fontWeight: "700", fontSize: 22, letterSpacing: 1 },
-  brandTitle: { fontFamily: MONO_FONT, fontSize: 22, letterSpacing: 3, fontWeight: "700" },
+  brandIcon: { width: 56, height: 56, borderRadius: 10 },
+  brandLogo: { width: 160, height: 32 },
   brandSubtitle: { fontFamily: MONO_FONT, fontSize: 12, letterSpacing: 2, marginTop: 4 },
   card: { borderWidth: 1, borderRadius: 12, padding: 24 },
   label: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 2, marginBottom: 8 },

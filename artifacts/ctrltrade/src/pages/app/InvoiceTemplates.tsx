@@ -167,13 +167,13 @@ export function AppInvoiceTemplates() {
       </div>
 
       {showForm && (
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardHeader><CardTitle className="uppercase tracking-tight">{editingId ? "Edit template" : "New template"}</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs uppercase text-muted-foreground">Customer</label>
-                <select className="w-full border rounded-none p-2 bg-background"
+                <select className="w-full border p-2 bg-background"
                   value={customerId} onChange={(e) => setCustomerId(e.target.value)}
                   disabled={!!editingId}
                   data-testid="select-template-customer">
@@ -183,7 +183,7 @@ export function AppInvoiceTemplates() {
               </div>
               <div>
                 <label className="text-xs uppercase text-muted-foreground">Frequency</label>
-                <select className="w-full border rounded-none p-2 bg-background"
+                <select className="w-full border p-2 bg-background"
                   value={frequency} onChange={(e) => setFrequency(e.target.value as typeof frequency)}>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
@@ -250,7 +250,7 @@ export function AppInvoiceTemplates() {
         </Card>
       )}
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader><CardTitle className="uppercase tracking-tight">Templates</CardTitle></CardHeader>
         <CardContent>
           {isLoading ? (

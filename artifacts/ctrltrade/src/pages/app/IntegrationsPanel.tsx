@@ -59,7 +59,7 @@ export function IntegrationsPanel() {
           const conn = byProvider.get(p.id);
           const status = conn?.status ?? "disconnected";
           return (
-            <Card key={p.id} className="rounded-none border-border" data-testid={`integration-card-${p.id}`}>
+            <Card key={p.id} className=" border-border" data-testid={`integration-card-${p.id}`}>
               <CardHeader>
                 <div className="flex items-center justify-between gap-2">
                   <CardTitle className="uppercase tracking-tight text-base">{p.label}</CardTitle>
@@ -75,12 +75,12 @@ export function IntegrationsPanel() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {!p.configured && (
-                  <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-none">
+                  <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2">
                     OAuth credentials not yet configured for this provider.
                   </div>
                 )}
                 {!p.enabled && (
-                  <div className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded-none">
+                  <div className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2">
                     Disabled by administrator.
                   </div>
                 )}
@@ -95,7 +95,7 @@ export function IntegrationsPanel() {
                   </div>
                 )}
                 {conn?.lastError && (
-                  <div className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded-none flex items-start gap-2">
+                  <div className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2 flex items-start gap-2">
                     <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
                     <span>{conn.lastError}</span>
                   </div>

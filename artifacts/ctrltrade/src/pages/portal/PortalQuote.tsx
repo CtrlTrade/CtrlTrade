@@ -83,7 +83,7 @@ export function PortalQuote() {
         <Badge className="uppercase rounded-none">{data.status}</Badge>
       </div>
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Line items</CardTitle>
         </CardHeader>
@@ -116,7 +116,7 @@ export function PortalQuote() {
       </Card>
 
       {canRespond ? (
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardHeader>
             <CardTitle className="uppercase tracking-tight">Accept this quote</CardTitle>
           </CardHeader>
@@ -166,7 +166,7 @@ export function PortalQuote() {
           </CardContent>
         </Card>
       ) : decided ? (
-        <Card className="rounded-none border-border shadow-sm">
+        <Card className=" border-border shadow-sm">
           <CardContent className="py-4 text-sm">
             {data.status === "converted"
               ? `Accepted${data.acceptedAt ? ` on ${new Date(data.acceptedAt).toLocaleString("en-GB")}` : ""}.`
@@ -175,7 +175,7 @@ export function PortalQuote() {
         </Card>
       ) : null}
 
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight">Messages</CardTitle>
         </CardHeader>

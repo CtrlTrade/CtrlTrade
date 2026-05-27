@@ -8,6 +8,13 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Constants from "expo-constants";
 import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  useFonts,
+} from "@expo-google-fonts/inter";
+import {
   setAuthTokenGetter,
   setBaseUrl,
 } from "@workspace/api-client-react";
@@ -54,7 +61,7 @@ function AuthGate() {
   }, [state.status, segments, router]);
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#14181F" } }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#010C1E" } }}>
       <Stack.Screen name="login" />
       <Stack.Screen name="(app)" />
       <Stack.Screen name="+not-found" />
@@ -64,9 +71,6 @@ function AuthGate() {
 
 function ThemedRoot() {
   const colors = useColors();
-  useEffect(() => {
-    SplashScreen.hideAsync().catch(() => {});
-  }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
       <KeyboardProvider>
@@ -78,6 +82,21 @@ function ThemedRoot() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null;
+
   return (
     <SafeAreaProvider>
       <ErrorBoundary>

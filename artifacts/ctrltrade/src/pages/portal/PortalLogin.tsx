@@ -22,7 +22,7 @@ export function PortalLogin() {
 
   return (
     <div className="max-w-md mx-auto">
-      <Card className="rounded-none border-border shadow-sm">
+      <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tighter">Customer sign-in</CardTitle>
         </CardHeader>

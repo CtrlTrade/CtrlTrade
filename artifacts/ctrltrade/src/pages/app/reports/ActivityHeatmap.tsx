@@ -35,7 +35,7 @@ export function ActivityHeatmapReport({ admin = false }: { admin?: boolean }) {
       {isLoading || !data ? (
         <Skeleton className="h-64" />
       ) : (
-        <Card className="rounded-none border-border">
+        <Card className=" border-border">
           <CardHeader>
             <CardTitle className="uppercase tracking-tight text-sm">Jobs scheduled (total: {data.totalJobs})</CardTitle>
           </CardHeader>

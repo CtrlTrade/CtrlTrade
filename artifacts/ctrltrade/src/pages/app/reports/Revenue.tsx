@@ -55,7 +55,7 @@ export function RevenueReport({ admin = false }: { admin?: boolean }) {
               },
             ]}
           />
-          <Card className="rounded-none border-border">
+          <Card className=" border-border">
             <CardHeader>
               <CardTitle className="uppercase tracking-tight text-sm">Daily timeline</CardTitle>
             </CardHeader>
@@ -81,7 +81,7 @@ export function RevenueReport({ admin = false }: { admin?: boolean }) {
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-none border-border">
+          <Card className=" border-border">
             <CardHeader>
               <CardTitle className="uppercase tracking-tight text-sm">By month</CardTitle>
             </CardHeader>
