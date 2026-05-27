@@ -2,8 +2,16 @@ import type { ProviderId, ProviderModule } from "./types";
 import { xeroProvider } from "./xero";
 import { googleCalendarProvider } from "./google";
 import { outlookProvider } from "./outlook";
+import { myJobQuoteProvider } from "./myjobquote";
+import { checkatradeProvider } from "./checkatrade";
 
-const ALL: ProviderModule[] = [xeroProvider, googleCalendarProvider, outlookProvider];
+const ALL: ProviderModule[] = [
+  xeroProvider,
+  googleCalendarProvider,
+  outlookProvider,
+  myJobQuoteProvider,
+  checkatradeProvider,
+];
 
 export function listProviders(): ProviderModule[] {
   return ALL;

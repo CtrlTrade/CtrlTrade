@@ -17,6 +17,7 @@ export const outlookProvider: ProviderModule = {
   label: "Outlook (Microsoft 365)",
   description: "Two-way calendar sync with Outlook via Microsoft Graph.",
   category: "calendar",
+  authKind: "oauth",
 
   isConfigured(): boolean {
     return Boolean(clientId() && clientSecret());

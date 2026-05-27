@@ -20,7 +20,9 @@ import { getAppBaseUrl } from "../lib/email";
 
 const router: IRouter = Router();
 
-const VALID_PROVIDERS: ProviderId[] = ["xero", "google_calendar", "outlook"];
+const OAUTH_PROVIDERS: ProviderId[] = ["xero", "google_calendar", "outlook"];
+const APIKEY_PROVIDERS: ProviderId[] = ["myjobquote", "checkatrade"];
+const VALID_PROVIDERS: ProviderId[] = [...OAUTH_PROVIDERS, ...APIKEY_PROVIDERS];
 
 function callbackUrl(): string {
   return `${getAppBaseUrl().replace(/\/$/, "")}/api/v1/integrations/callback`;
@@ -67,6 +69,7 @@ router.get("/v1/integrations/providers", requireTenant, async (_req, res): Promi
       label: p.label,
       description: p.description,
       category: p.category,
+      authKind: p.authKind,
       configured: p.isConfigured(),
       enabled: await isProviderEnabled(p.id),
     })),
@@ -82,10 +85,12 @@ router.get("/v1/integrations", requireTenant, async (req, res): Promise<void> =>
   res.json(rows.map(serializeIntegration));
 });
 
+// ---- OAuth connect (Xero, Google, Outlook) ---------------------------------
+
 router.post("/v1/integrations/:provider/connect", requireTenant, async (req, res): Promise<void> => {
   const provider = String(req.params.provider) as ProviderId;
-  if (!VALID_PROVIDERS.includes(provider)) {
-    res.status(404).json({ error: "Unknown provider" });
+  if (!OAUTH_PROVIDERS.includes(provider)) {
+    res.status(404).json({ error: "Unknown OAuth provider" });
     return;
   }
   if (!(await isProviderEnabled(provider))) {
@@ -105,7 +110,6 @@ router.post("/v1/integrations/:provider/connect", requireTenant, async (req, res
   }
   const tenantId = req.auth!.tenant!.id;
   const state = randomBytes(24).toString("hex");
-  // Stash state→{tenantId, provider, returnTo} in session for callback validation.
   req.session.integrationOAuth ??= {};
   req.session.integrationOAuth[state] = {
     tenantId,
@@ -113,7 +117,6 @@ router.post("/v1/integrations/:provider/connect", requireTenant, async (req, res
     userId: req.auth!.user.id,
     createdAt: Date.now(),
   };
-  // Upsert a "connecting" row so the UI reflects in-flight handshake.
   const [existing] = await db
     .select()
     .from(tenantIntegrationsTable)
@@ -131,9 +134,113 @@ router.post("/v1/integrations/:provider/connect", requireTenant, async (req, res
       connectedByUserId: req.auth!.user.id,
     });
   }
-  const authUrl = mod.buildAuthUrl(state, callbackUrl());
+  const authUrl = mod.buildAuthUrl!(state, callbackUrl());
   res.json({ authUrl });
 });
+
+// ---- API-key connect (MyJobQuote, Checkatrade) ------------------------------
+
+router.post("/v1/integrations/:provider/apikey", requireTenant, async (req, res): Promise<void> => {
+  const provider = String(req.params.provider) as ProviderId;
+  if (!APIKEY_PROVIDERS.includes(provider)) {
+    res.status(404).json({ error: "Unknown API-key provider" });
+    return;
+  }
+  if (!(await isProviderEnabled(provider))) {
+    res.status(403).json({ error: "Provider disabled by administrator" });
+    return;
+  }
+  const mod = getProvider(provider);
+  if (!mod) {
+    res.status(404).json({ error: "Unknown provider" });
+    return;
+  }
+  const apiKey = typeof req.body?.apiKey === "string" ? req.body.apiKey.trim() : "";
+  if (!apiKey) {
+    res.status(400).json({ error: "apiKey is required" });
+    return;
+  }
+  const syncIntervalMinutes = Number(req.body?.syncIntervalMinutes ?? 15);
+
+  // Test the API key before storing it.
+  if (mod.testApiKey) {
+    const testError = await mod.testApiKey(apiKey).catch((e: unknown) =>
+      e instanceof Error ? e.message : String(e),
+    );
+    if (testError) {
+      res.status(422).json({ error: `API key validation failed: ${testError}` });
+      return;
+    }
+  }
+
+  const tenantId = req.auth!.tenant!.id;
+  const now = new Date();
+
+  const [existing] = await db
+    .select()
+    .from(tenantIntegrationsTable)
+    .where(and(eq(tenantIntegrationsTable.tenantId, tenantId), eq(tenantIntegrationsTable.provider, provider)));
+
+  let row: TenantIntegration;
+  if (existing) {
+    const [updated] = await db
+      .update(tenantIntegrationsTable)
+      .set({
+        status: "connected",
+        accessTokenEnc: encryptToken(apiKey),
+        refreshTokenEnc: null,
+        tokenExpiresAt: null,
+        settings: { syncIntervalMinutes },
+        connectedAt: existing.connectedAt ?? now,
+        disconnectedAt: null,
+        lastError: null,
+        lastErrorAt: null,
+        connectedByUserId: req.auth!.user.id,
+      })
+      .where(eq(tenantIntegrationsTable.id, existing.id))
+      .returning();
+    row = updated!;
+  } else {
+    const [inserted] = await db
+      .insert(tenantIntegrationsTable)
+      .values({
+        tenantId,
+        provider,
+        status: "connected",
+        accessTokenEnc: encryptToken(apiKey),
+        settings: { syncIntervalMinutes },
+        connectedAt: now,
+        connectedByUserId: req.auth!.user.id,
+      })
+      .returning();
+    row = inserted!;
+  }
+
+  await recordSync({
+    tenantId,
+    provider,
+    direction: "connect",
+    status: "ok",
+    message: `Connected ${mod.label} via API key`,
+  });
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    kind: "integration.connected",
+    message: `${mod.label} connected via API key`,
+  });
+
+  // Kick off an immediate sync to verify the key and import initial leads.
+  await enqueueJob({
+    kind: "integration_sync",
+    payload: { tenantId, provider, kind: "leads.pull" },
+    singletonKey: `leads.pull.${tenantId}.${provider}`,
+  }).catch((err: unknown) => logger.warn({ err }, "Failed to enqueue initial leads.pull"));
+
+  res.json(serializeIntegration(row));
+});
+
+// ---- OAuth callback --------------------------------------------------------
 
 router.get("/v1/integrations/callback", async (req, res): Promise<void> => {
   const state = String(req.query.state ?? "");
@@ -160,7 +267,7 @@ router.get("/v1/integrations/callback", async (req, res): Promise<void> => {
     return;
   }
   try {
-    const tokens = await mod.exchangeCode(code, callbackUrl());
+    const tokens = await mod.exchangeCode!(code, callbackUrl());
     await db
       .update(tenantIntegrationsTable)
       .set({
@@ -179,7 +286,7 @@ router.get("/v1/integrations/callback", async (req, res): Promise<void> => {
       .where(and(eq(tenantIntegrationsTable.tenantId, session.tenantId), eq(tenantIntegrationsTable.provider, session.provider)));
     await recordSync({
       tenantId: session.tenantId,
-      provider: session.provider,
+      provider: session.provider as ProviderId,
       direction: "connect",
       status: "ok",
       message: `Connected ${mod.label}`,
@@ -200,7 +307,7 @@ router.get("/v1/integrations/callback", async (req, res): Promise<void> => {
       .where(and(eq(tenantIntegrationsTable.tenantId, session.tenantId), eq(tenantIntegrationsTable.provider, session.provider)));
     await recordSync({
       tenantId: session.tenantId,
-      provider: session.provider,
+      provider: session.provider as ProviderId,
       direction: "connect",
       status: "error",
       message: msg.slice(0, 500),
@@ -259,9 +366,20 @@ router.post("/v1/integrations/:provider/sync", requireTenant, async (req, res): 
     return;
   }
   const tenantId = req.auth!.tenant!.id;
+
+  let syncKind: string;
+  if (APIKEY_PROVIDERS.includes(provider)) {
+    syncKind = "leads.pull";
+  } else if (provider === "xero") {
+    syncKind = "invoice.payment_pull";
+  } else {
+    syncKind = "calendar.pull";
+  }
+
   await enqueueJob({
     kind: "integration_sync",
-    payload: { tenantId, provider, kind: provider === "xero" ? "invoice.payment_pull" : "calendar.pull" },
+    payload: { tenantId, provider, kind: syncKind },
+    singletonKey: `${syncKind}.${tenantId}.${provider}`,
   });
   res.json({ enqueued: true });
 });

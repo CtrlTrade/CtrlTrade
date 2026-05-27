@@ -5,6 +5,7 @@
  * CtrlTrade SaaS Portal API
  * OpenAPI spec version: 0.1.0
  */
+import type { IntegrationProviderAuthKind } from './integrationProviderAuthKind';
 
 export interface IntegrationProvider {
   id: string;
@@ -13,4 +14,5 @@ export interface IntegrationProvider {
   category: string;
   configured: boolean;
   enabled: boolean;
+  authKind: IntegrationProviderAuthKind;
 }

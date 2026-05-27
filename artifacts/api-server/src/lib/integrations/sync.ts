@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import {
   db,
   tenantIntegrationsTable,
@@ -7,6 +7,7 @@ import {
   invoiceItemsTable,
   customersTable,
   jobsTable,
+  leadsTable,
   paymentsTable,
   type TenantIntegration,
 } from "@workspace/db";
@@ -17,6 +18,8 @@ import { getProvider } from "./registry";
 import { xeroPushContact, xeroPushInvoice, xeroPullInvoiceStatus } from "./xero";
 import { googleUpsertEvent, googleDeleteEvent, googlePullCalendarChanges } from "./google";
 import { outlookUpsertEvent, outlookDeleteEvent, outlookPullCalendarChanges } from "./outlook";
+import { fetchMyJobQuoteLeads } from "./myjobquote";
+import { fetchCheckatradeLeads } from "./checkatrade";
 import { recordInvoicePayment } from "../../routes/invoices";
 import type { DispatchPayload, ProviderId } from "./types";
 
@@ -53,6 +56,7 @@ export async function ensureAccessToken(integ: TenantIntegration): Promise<strin
   const stillValid = access && expiresAt && expiresAt.getTime() > Date.now() + 30_000;
   if (stillValid) return access;
   if (!refresh) return access; // best effort with whatever we have
+  if (!provider.refresh) return access; // api-key providers don't refresh
   try {
     const fresh = await provider.refresh(refresh);
     await db
@@ -537,7 +541,134 @@ async function applyCalendarChanges(opts: {
   logger.info({ tenantId, provider, updated, warned }, "calendar.pull: finished applying changes");
 }
 
+// ----- Lead import handlers (MyJobQuote & Checkatrade) ----------------------
+
+async function pullLeadsFromProvider(
+  tenantId: string,
+  provider: "myjobquote" | "checkatrade",
+): Promise<void> {
+  const [integ] = await db
+    .select()
+    .from(tenantIntegrationsTable)
+    .where(and(eq(tenantIntegrationsTable.tenantId, tenantId), eq(tenantIntegrationsTable.provider, provider)));
+
+  if (!integ || integ.status !== "connected") {
+    logger.debug({ tenantId, provider }, "leads.pull: integration not connected — skipping");
+    return;
+  }
+
+  const apiKey = decryptToken(integ.accessTokenEnc);
+  if (!apiKey) {
+    await recordSync({ tenantId, provider, direction: "pull", status: "error", message: "No API key stored" });
+    return;
+  }
+
+  const since = integ.lastSyncAt ?? null;
+
+  try {
+    const externalLeads =
+      provider === "myjobquote"
+        ? await fetchMyJobQuoteLeads(apiKey, since)
+        : await fetchCheckatradeLeads(apiKey, since);
+
+    let imported = 0;
+    let skipped = 0;
+
+    for (const ext of externalLeads) {
+      if (!ext.externalId) continue;
+
+      // Dedup check — if this externalId already exists for this tenant+source, skip.
+      const [existing] = await db
+        .select({ id: leadsTable.id })
+        .from(leadsTable)
+        .where(
+          and(
+            eq(leadsTable.tenantId, tenantId),
+            eq(leadsTable.source, provider),
+            eq(leadsTable.externalId, ext.externalId),
+          ),
+        );
+
+      if (existing) {
+        skipped++;
+        continue;
+      }
+
+      await db.insert(leadsTable).values({
+        tenantId,
+        name: ext.name,
+        email: ext.email,
+        phone: ext.phone,
+        source: provider,
+        externalId: ext.externalId,
+        title: ext.description ? ext.description.slice(0, 120) : `${provider === "myjobquote" ? "MyJobQuote" : "Checkatrade"} enquiry`,
+        message: ext.description,
+        valuePence: ext.budgetPence,
+        score: 0,
+        status: "new",
+        followUpDueAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      });
+      imported++;
+    }
+
+    // Update lastSyncAt
+    await db
+      .update(tenantIntegrationsTable)
+      .set({
+        status: "connected",
+        lastSyncAt: new Date(),
+        lastError: null,
+        lastErrorAt: null,
+      })
+      .where(eq(tenantIntegrationsTable.id, integ.id));
+
+    await recordSync({
+      tenantId,
+      provider,
+      direction: "pull",
+      entityKind: "lead",
+      status: "ok",
+      message: `Imported ${imported} new lead(s); ${skipped} duplicate(s) skipped`,
+      metadata: { imported, skipped, since: since?.toISOString() ?? null },
+    });
+
+    logger.info({ tenantId, provider, imported, skipped }, "leads.pull: finished");
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    logger.warn({ err, tenantId, provider }, "leads.pull failed");
+    await db
+      .update(tenantIntegrationsTable)
+      .set({ status: "error", lastError: msg.slice(0, 500), lastErrorAt: new Date() })
+      .where(eq(tenantIntegrationsTable.id, integ.id));
+    await recordSync({ tenantId, provider, direction: "pull", status: "error", message: msg.slice(0, 500) });
+  }
+}
+
+async function nightlyLeadImportAll(): Promise<void> {
+  for (const provider of ["myjobquote", "checkatrade"] as const) {
+    const rows = await db
+      .select()
+      .from(tenantIntegrationsTable)
+      .where(eq(tenantIntegrationsTable.provider, provider));
+    for (const integ of rows) {
+      if (integ.status !== "connected") continue;
+      const settings = (integ.settings ?? {}) as Record<string, unknown>;
+      const intervalMinutes = Number(settings["syncIntervalMinutes"] ?? 15);
+      const dueAt = new Date((integ.lastSyncAt?.getTime() ?? 0) + intervalMinutes * 60 * 1000);
+      if (dueAt > new Date()) continue; // not due yet
+      await pullLeadsFromProvider(integ.tenantId, provider).catch((err) =>
+        logger.warn({ err, provider, tenantId: integ.tenantId }, "nightly lead import failed"),
+      );
+    }
+  }
+}
+
 async function nightlyReconcileAll(): Promise<void> {
+  // Pull new leads from MyJobQuote and Checkatrade for all connected tenants.
+  await nightlyLeadImportAll().catch((err) =>
+    logger.warn({ err }, "nightly reconcile: lead import sweep failed"),
+  );
+
   // Pull payment status for every unpaid invoice in tenants connected to Xero.
   const integs = await db
     .select()
@@ -609,6 +740,19 @@ export async function handleIntegrationSync(payload: DispatchPayload): Promise<v
       for (const cp of calProviders) {
         await pullCalendarChanges(payload.tenantId, cp).catch((err) =>
           logger.warn({ err, provider: cp, tenantId: payload.tenantId }, "calendar.pull failed"),
+        );
+      }
+      break;
+    }
+    case "leads.pull": {
+      // Pull new leads from MyJobQuote and/or Checkatrade.
+      const leadProviders: Array<"myjobquote" | "checkatrade"> =
+        payload.provider === "myjobquote" || payload.provider === "checkatrade"
+          ? [payload.provider]
+          : ["myjobquote", "checkatrade"];
+      for (const lp of leadProviders) {
+        await pullLeadsFromProvider(payload.tenantId, lp).catch((err) =>
+          logger.warn({ err, provider: lp, tenantId: payload.tenantId }, "leads.pull failed"),
         );
       }
       break;

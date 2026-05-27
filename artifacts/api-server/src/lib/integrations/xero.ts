@@ -42,6 +42,7 @@ export const xeroProvider: ProviderModule = {
   label: "Xero",
   description: "Two-way accounting sync — push invoices and contacts, pull payment status.",
   category: "accounting",
+  authKind: "oauth",
 
   isConfigured(): boolean {
     return Boolean(clientId() && clientSecret());

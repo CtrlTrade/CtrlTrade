@@ -11,6 +11,7 @@ export type JobKind =
   | "stripe_reconcile"
   | "expiry_digest"
   | "integration_sync"
+  | "leads_import_poll"
   | "generate_pdf"
   | "usage_rollup"
   | "usage_daily_rollup"
@@ -30,6 +31,7 @@ export const ALL_JOB_KINDS: JobKind[] = [
   "stripe_reconcile",
   "expiry_digest",
   "integration_sync",
+  "leads_import_poll",
   "generate_pdf",
   "usage_rollup",
   "usage_daily_rollup",

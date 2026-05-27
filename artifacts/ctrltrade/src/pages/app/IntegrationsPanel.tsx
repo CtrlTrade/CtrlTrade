@@ -3,6 +3,7 @@ import {
   useListIntegrations,
   useListIntegrationProviders,
   useConnectIntegration,
+  useConnectIntegrationApiKey,
   useDisconnectIntegration,
   useTriggerIntegrationSync,
   useGetIntegrationLogs,
@@ -14,8 +15,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Plug, RefreshCw, Unplug, AlertTriangle, CheckCircle2, FileClock } from "lucide-react";
+import { Plug, RefreshCw, Unplug, AlertTriangle, CheckCircle2, FileClock, Key } from "lucide-react";
 
 export function IntegrationsPanel() {
   const { data: providers, isLoading: lp } = useListIntegrationProviders();
@@ -32,6 +35,12 @@ export function IntegrationsPanel() {
       onError: (e: any) => toast({ title: "Connect failed", description: e?.message, variant: "destructive" }),
     },
   });
+  const connectApiKey = useConnectIntegrationApiKey({
+    mutation: {
+      onSuccess: () => { invalidate(); toast({ title: "Connected", description: "API key saved and initial sync queued." }); },
+      onError: (e: any) => toast({ title: "Connect failed", description: e?.message, variant: "destructive" }),
+    },
+  });
   const disconnect = useDisconnectIntegration({
     mutation: { onSuccess: () => { invalidate(); toast({ title: "Disconnected" }); } },
   });
@@ -40,6 +49,7 @@ export function IntegrationsPanel() {
   });
 
   const [logsFor, setLogsFor] = useState<string | null>(null);
+  const [apiKeyInputs, setApiKeyInputs] = useState<Record<string, string>>({});
 
   if (lp || lc) return <Skeleton className="h-64" />;
 
@@ -50,7 +60,7 @@ export function IntegrationsPanel() {
       <div>
         <h2 className="text-xl font-bold uppercase tracking-tight">Integrations</h2>
         <p className="text-sm text-muted-foreground">
-          Connect Xero for two-way accounting sync, and Google or Outlook for calendar sync.
+          Connect accounting, calendar, and lead platforms to automate your workflow.
         </p>
       </div>
 
@@ -58,11 +68,15 @@ export function IntegrationsPanel() {
         {(providers ?? []).map((p) => {
           const conn = byProvider.get(p.id);
           const status = conn?.status ?? "disconnected";
+          const isApiKey = p.authKind === "apikey";
           return (
-            <Card key={p.id} className=" border-border" data-testid={`integration-card-${p.id}`}>
+            <Card key={p.id} className="border-border" data-testid={`integration-card-${p.id}`}>
               <CardHeader>
                 <div className="flex items-center justify-between gap-2">
-                  <CardTitle className="uppercase tracking-tight text-base">{p.label}</CardTitle>
+                  <div className="flex items-center gap-2">
+                    {isApiKey && <Key className="h-4 w-4 text-muted-foreground" />}
+                    <CardTitle className="uppercase tracking-tight text-base">{p.label}</CardTitle>
+                  </div>
                   <Badge
                     variant="outline"
                     className={`rounded-none uppercase text-xs ${status === "connected" ? "border-green-600 text-green-700" : status === "error" ? "border-red-600 text-red-700" : "border-border text-muted-foreground"}`}
@@ -74,14 +88,14 @@ export function IntegrationsPanel() {
                 <CardDescription>{p.description}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {!p.configured && (
-                  <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2">
-                    OAuth credentials not yet configured for this provider.
-                  </div>
-                )}
                 {!p.enabled && (
                   <div className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2">
                     Disabled by administrator.
+                  </div>
+                )}
+                {!isApiKey && !p.configured && (
+                  <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2">
+                    OAuth credentials not yet configured for this provider.
                   </div>
                 )}
                 {conn?.externalAccountLabel && (
@@ -101,13 +115,44 @@ export function IntegrationsPanel() {
                   </div>
                 )}
 
+                {isApiKey && status !== "connected" && (
+                  <div className="space-y-2">
+                    <Label className="text-xs uppercase font-bold tracking-wider">API Key</Label>
+                    <Input
+                      type="password"
+                      placeholder="Paste your API key..."
+                      className="rounded-none text-xs font-mono h-8"
+                      value={apiKeyInputs[p.id] ?? ""}
+                      onChange={(e) => setApiKeyInputs((prev) => ({ ...prev, [p.id]: e.target.value }))}
+                      data-testid={`apikey-input-${p.id}`}
+                    />
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-2 pt-2">
-                  {status !== "connected" && (
+                  {!isApiKey && status !== "connected" && (
                     <Button
                       size="sm"
                       className="rounded-none uppercase font-bold tracking-wider"
                       disabled={!p.enabled || !p.configured || connect.isPending}
                       onClick={() => connect.mutate({ provider: p.id })}
+                      data-testid={`button-connect-${p.id}`}
+                    >
+                      <Plug className="h-3 w-3 mr-1" />
+                      {status === "error" ? "Reconnect" : "Connect"}
+                    </Button>
+                  )}
+                  {isApiKey && status !== "connected" && (
+                    <Button
+                      size="sm"
+                      className="rounded-none uppercase font-bold tracking-wider"
+                      disabled={!p.enabled || !apiKeyInputs[p.id]?.trim() || connectApiKey.isPending}
+                      onClick={() =>
+                        connectApiKey.mutate({
+                          provider: p.id,
+                          data: { apiKey: apiKeyInputs[p.id]?.trim() ?? "" },
+                        })
+                      }
                       data-testid={`button-connect-${p.id}`}
                     >
                       <Plug className="h-3 w-3 mr-1" />

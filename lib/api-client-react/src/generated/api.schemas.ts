@@ -3521,6 +3521,24 @@ export interface ReportInsights {
   items: ReportInsightItem[];
 }
 
+export interface ConnectApiKeyBody {
+  /** @minLength 1 */
+  apiKey: string;
+  /**
+     * @minimum 5
+     * @maximum 1440
+     */
+  syncIntervalMinutes?: number;
+}
+
+export type IntegrationProviderAuthKind = typeof IntegrationProviderAuthKind[keyof typeof IntegrationProviderAuthKind];
+
+
+export const IntegrationProviderAuthKind = {
+  oauth: 'oauth',
+  apikey: 'apikey',
+} as const;
+
 export interface IntegrationProvider {
   id: string;
   label: string;
@@ -3528,6 +3546,7 @@ export interface IntegrationProvider {
   category: string;
   configured: boolean;
   enabled: boolean;
+  authKind: IntegrationProviderAuthKind;
 }
 
 export interface TenantIntegration {

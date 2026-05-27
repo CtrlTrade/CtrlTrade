@@ -16,6 +16,7 @@ export const googleCalendarProvider: ProviderModule = {
   label: "Google Calendar",
   description: "Two-way calendar sync — scheduled jobs flow to and from your Google calendar.",
   category: "calendar",
+  authKind: "oauth",
 
   isConfigured(): boolean {
     return Boolean(clientId() && clientSecret());

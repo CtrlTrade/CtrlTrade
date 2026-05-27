@@ -247,6 +247,28 @@ paths:
       responses:
         "204": { description: No content }
 
+  /v1/integrations/{provider}/apikey:
+    post:
+      operationId: connectIntegrationApiKey
+      tags: [integrations]
+      summary: Connect an API-key-based integration (MyJobQuote, Checkatrade).
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ConnectApiKeyBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TenantIntegration" }
+
   /v1/integrations/{provider}/sync:
     post:
       operationId: triggerIntegrationSync
@@ -8698,9 +8720,16 @@ components:
           type: array
           items: { $ref: "#/components/schemas/ReportInsightItem" }
 
+    ConnectApiKeyBody:
+      type: object
+      required: [apiKey]
+      properties:
+        apiKey: { type: string, minLength: 1 }
+        syncIntervalMinutes: { type: integer, minimum: 5, maximum: 1440 }
+
     IntegrationProvider:
       type: object
-      required: [id, label, description, category, configured, enabled]
+      required: [id, label, description, category, configured, enabled, authKind]
       properties:
         id: { type: string }
         label: { type: string }
@@ -8708,6 +8737,7 @@ components:
         category: { type: string }
         configured: { type: boolean }
         enabled: { type: boolean }
+        authKind: { type: string, enum: [oauth, apikey] }
 
     TenantIntegration:
       type: object

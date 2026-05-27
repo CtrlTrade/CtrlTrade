@@ -81,6 +81,11 @@ const handlers: Record<JobKind, Handler> = {
     const { handleIntegrationSync } = await import("./integrations/sync");
     await handleIntegrationSync(p);
   },
+  leads_import_poll: async (p) => {
+    // Triggered by the */15 cron schedule. Sweeps all connected MJQ/Checkatrade tenants.
+    const { handleIntegrationSync } = await import("./integrations/sync");
+    await handleIntegrationSync({ kind: "leads.pull", ...(p ?? {}) });
+  },
   generate_pdf: async (p) => {
     logger.info({ payload: p }, "generate_pdf (no renderer wired — logged)");
     if (p?.tenantId) await recordUsage(p.tenantId, "pdf_generated", 1);
@@ -206,8 +211,11 @@ export async function registerSchedules(): Promise<void> {
   // Daily digest at 08:00 UTC; weekly digest Monday 08:00 UTC.
   await boss.schedule("notification_digest_daily", "0 8 * * *", {}, { tz: "UTC" } as any);
   await boss.schedule("notification_digest_weekly", "0 8 * * 1", {}, { tz: "UTC" } as any);
-  // Nightly integration reconciliation (pulls invoice payment status from Xero).
+  // Nightly integration reconciliation (pulls invoice payment status from Xero + lead imports).
   await boss.schedule("integration_sync", "30 3 * * *", { kind: "nightly_reconcile" }, { tz: "UTC" } as any);
+  // Lead import polling every 15 minutes for MyJobQuote and Checkatrade.
+  // Uses a separate queue name so it does not overwrite the nightly_reconcile schedule above.
+  await boss.schedule("leads_import_poll", "*/15 * * * *", { kind: "leads.pull" }, { tz: "UTC" } as any);
   // Daily contract job generation + expiry warnings at 06:00 UTC.
   await boss.schedule("contract_job_generation", "0 6 * * *", {}, { tz: "UTC" } as any);
   logger.info("Worker schedules registered (hourly expiry+rollup, daily summary+dunning+integrations+contracts, 5-min notify retry, daily+weekly digests)");

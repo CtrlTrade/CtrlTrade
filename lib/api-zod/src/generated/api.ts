@@ -209,7 +209,8 @@ export const ListIntegrationProvidersResponseItem = zod.object({
   "description": zod.string(),
   "category": zod.string(),
   "configured": zod.boolean(),
-  "enabled": zod.boolean()
+  "enabled": zod.boolean(),
+  "authKind": zod.enum(['oauth', 'apikey'])
 })
 export const ListIntegrationProvidersResponse = zod.array(ListIntegrationProvidersResponseItem)
 
@@ -252,6 +253,41 @@ export const ConnectIntegrationResponse = zod.object({
  */
 export const DisconnectIntegrationParams = zod.object({
   "provider": zod.coerce.string()
+})
+
+
+/**
+ * @summary Connect an API-key-based integration (MyJobQuote, Checkatrade).
+ */
+export const ConnectIntegrationApiKeyParams = zod.object({
+  "provider": zod.coerce.string()
+})
+
+
+export const connectIntegrationApiKeyBodySyncIntervalMinutesMin = 5;
+export const connectIntegrationApiKeyBodySyncIntervalMinutesMax = 1440;
+
+
+
+export const ConnectIntegrationApiKeyBody = zod.object({
+  "apiKey": zod.string().min(1),
+  "syncIntervalMinutes": zod.number().min(connectIntegrationApiKeyBodySyncIntervalMinutesMin).max(connectIntegrationApiKeyBodySyncIntervalMinutesMax).optional()
+})
+
+export const ConnectIntegrationApiKeyResponse = zod.object({
+  "id": zod.string(),
+  "provider": zod.string(),
+  "status": zod.string(),
+  "externalAccountId": zod.string().nullish(),
+  "externalAccountLabel": zod.string().nullish(),
+  "scopes": zod.string().nullish(),
+  "lastSyncAt": zod.coerce.date().nullish(),
+  "lastError": zod.string().nullish(),
+  "lastErrorAt": zod.coerce.date().nullish(),
+  "connectedAt": zod.coerce.date().nullish(),
+  "disconnectedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
 })
 
 

@@ -884,8 +884,9 @@ export const leadsTable = pgTable(
     email: varchar("email", { length: 255 }),
     phone: text("phone"),
     company: text("company"),
-    source: varchar("source", { length: 32 }).notNull().default("manual"), // website|manual|referral|marketplace
+    source: varchar("source", { length: 32 }).notNull().default("manual"), // website|manual|referral|marketplace|myjobquote|checkatrade
     sourceDetail: text("source_detail"),
+    externalId: varchar("external_id", { length: 128 }), // ID from external platform (for dedup)
     status: varchar("status", { length: 16 }).notNull().default("new"), // new|contacted|qualified|won|lost
     title: text("title"),
     message: text("message"),
@@ -906,6 +907,7 @@ export const leadsTable = pgTable(
     statusIdx: index("leads_status_idx").on(t.tenantId, t.status),
     sourceIdx: index("leads_source_idx").on(t.tenantId, t.source),
     followUpIdx: index("leads_follow_up_idx").on(t.tenantId, t.followUpDueAt),
+    externalIdIdx: uniqueIndex("leads_external_id_uniq").on(t.tenantId, t.source, t.externalId).where(sql`external_id IS NOT NULL`),
   }),
 );
 

@@ -73,6 +73,7 @@ import type {
   CheckoutInput,
   ChildTenantSummary,
   CloseTillSessionInput,
+  ConnectApiKeyBody,
   ConnectIntegration200,
   CreateChildTenantInput,
   CrmSearchInput,
@@ -1379,6 +1380,78 @@ export const useDisconnectIntegration = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getDisconnectIntegrationMutationOptions(options));
+    }
+
+export const getConnectIntegrationApiKeyUrl = (provider: string,) => {
+
+
+
+
+  return `/api/v1/integrations/${provider}/apikey`
+}
+
+/**
+ * @summary Connect an API-key-based integration (MyJobQuote, Checkatrade).
+ */
+export const connectIntegrationApiKey = async (provider: string,
+    connectApiKeyBody: ConnectApiKeyBody, options?: RequestInit): Promise<TenantIntegration> => {
+
+  return customFetch<TenantIntegration>(getConnectIntegrationApiKeyUrl(provider),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      connectApiKeyBody,)
+  }
+);}
+
+
+
+
+export const getConnectIntegrationApiKeyMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof connectIntegrationApiKey>>, TError,{provider: string;data: BodyType<ConnectApiKeyBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof connectIntegrationApiKey>>, TError,{provider: string;data: BodyType<ConnectApiKeyBody>}, TContext> => {
+
+const mutationKey = ['connectIntegrationApiKey'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof connectIntegrationApiKey>>, {provider: string;data: BodyType<ConnectApiKeyBody>}> = (props) => {
+          const {provider,data} = props ?? {};
+
+          return  connectIntegrationApiKey(provider,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConnectIntegrationApiKeyMutationResult = NonNullable<Awaited<ReturnType<typeof connectIntegrationApiKey>>>
+    export type ConnectIntegrationApiKeyMutationBody = BodyType<ConnectApiKeyBody>
+    export type ConnectIntegrationApiKeyMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Connect an API-key-based integration (MyJobQuote, Checkatrade).
+ */
+export const useConnectIntegrationApiKey = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof connectIntegrationApiKey>>, TError,{provider: string;data: BodyType<ConnectApiKeyBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof connectIntegrationApiKey>>,
+        TError,
+        {provider: string;data: BodyType<ConnectApiKeyBody>},
+        TContext
+      > => {
+      return useMutation(getConnectIntegrationApiKeyMutationOptions(options));
     }
 
 export const getTriggerIntegrationSyncUrl = (provider: string,) => {
