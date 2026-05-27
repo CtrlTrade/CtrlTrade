@@ -281,6 +281,109 @@ Generate a short, warm, professional response to acknowledge their call and let 
   return chat([{ role: "user", content: prompt }], { tenantId: input.tenantId });
 }
 
+export interface ReceiptLineItem {
+  description: string;
+  quantity: number;
+  unitCostPence: number;
+  confidence: number;
+}
+
+export interface ReceiptScanResult {
+  supplierName: string | null;
+  supplierNameConfidence: number;
+  date: string | null;
+  dateConfidence: number;
+  lineItems: ReceiptLineItem[];
+  totalPence: number | null;
+  totalConfidence: number;
+  rawText: string;
+}
+
+export async function scanReceiptWithAI(
+  base64Image: string,
+  mimeType: string,
+  opts?: { tenantId?: string },
+): Promise<ReceiptScanResult> {
+  const key = apiKey();
+  if (!key) throw new Error("OPENAI_API_KEY not configured");
+
+  const prompt = `You are a receipt OCR assistant. Extract structured data from this receipt image.
+
+Respond ONLY with valid JSON matching this exact shape (no markdown fences):
+{
+  "supplierName": "string or null",
+  "supplierNameConfidence": 0.0-1.0,
+  "date": "YYYY-MM-DD or null",
+  "dateConfidence": 0.0-1.0,
+  "lineItems": [
+    {
+      "description": "item description",
+      "quantity": 1,
+      "unitCostPence": 1000,
+      "confidence": 0.0-1.0
+    }
+  ],
+  "totalPence": 10000 or null,
+  "totalConfidence": 0.0-1.0,
+  "rawText": "brief summary of key text on receipt"
+}
+
+Rules:
+- All monetary values must be in pence (integer). £1.00 = 100.
+- Confidence 1.0 = clearly visible and unambiguous. 0.0 = guessed.
+- If a field is not visible, set it to null and confidence to 0.
+- lineItems should represent individual products/services on the receipt.
+- If quantity is not shown, default to 1.`;
+
+  const messages = [
+    {
+      role: "user",
+      content: [
+        {
+          type: "image_url",
+          image_url: { url: `data:${mimeType};base64,${base64Image}`, detail: "high" },
+        },
+        { type: "text", text: prompt },
+      ],
+    },
+  ];
+
+  const resp = await fetch(`${OPENAI_BASE}/chat/completions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_completion_tokens: 4096,
+      messages,
+    }),
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    throw new Error(`OpenAI vision error ${resp.status}: ${text}`);
+  }
+
+  const data = (await resp.json()) as any;
+  const content: string = data?.choices?.[0]?.message?.content ?? "{}";
+  const tokensUsed: number = data?.usage?.total_tokens ?? 1;
+
+  if (opts?.tenantId) {
+    await recordUsage(opts.tenantId, "ai_call", tokensUsed, { model: MODEL, feature: "receipt_scan" }).catch(() => {});
+  }
+
+  let parsed: ReceiptScanResult;
+  try {
+    parsed = JSON.parse(content.trim());
+  } catch {
+    throw new Error("AI returned invalid JSON for receipt scan");
+  }
+
+  return parsed;
+}
+
 export { transcribeAudio };
 export const isAIAvailable = () => !!apiKey();
 

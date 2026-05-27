@@ -261,6 +261,8 @@ import type {
   ResellerDashboard,
   ResetPasswordBody,
   RevenueBreakdown,
+  ScanReceiptInput,
+  ScanReceiptResult,
   ScheduleEntry,
   ScheduleGdprDeletionInput,
   SearchMarketplaceParams,
@@ -14465,6 +14467,77 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getReceiveSupplierOrderMutationOptions(options));
+    }
+
+export const getScanReceiptUrl = () => {
+
+
+
+
+  return `/api/v1/pos-catalog/supplier-orders/scan-receipt`
+}
+
+/**
+ * @summary OCR scan a receipt image and extract purchase order data
+ */
+export const scanReceipt = async (scanReceiptInput: ScanReceiptInput, options?: RequestInit): Promise<ScanReceiptResult> => {
+
+  return customFetch<ScanReceiptResult>(getScanReceiptUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      scanReceiptInput,)
+  }
+);}
+
+
+
+
+export const getScanReceiptMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scanReceipt>>, TError,{data: BodyType<ScanReceiptInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof scanReceipt>>, TError,{data: BodyType<ScanReceiptInput>}, TContext> => {
+
+const mutationKey = ['scanReceipt'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scanReceipt>>, {data: BodyType<ScanReceiptInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  scanReceipt(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScanReceiptMutationResult = NonNullable<Awaited<ReturnType<typeof scanReceipt>>>
+    export type ScanReceiptMutationBody = BodyType<ScanReceiptInput>
+    export type ScanReceiptMutationError = ErrorType<void>
+
+    /**
+ * @summary OCR scan a receipt image and extract purchase order data
+ */
+export const useScanReceipt = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scanReceipt>>, TError,{data: BodyType<ScanReceiptInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof scanReceipt>>,
+        TError,
+        {data: BodyType<ScanReceiptInput>},
+        TContext
+      > => {
+      return useMutation(getScanReceiptMutationOptions(options));
     }
 
 export const getListTradeAccountsUrl = () => {

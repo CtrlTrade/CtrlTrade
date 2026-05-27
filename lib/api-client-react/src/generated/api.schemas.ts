@@ -2814,6 +2814,57 @@ export interface SupplierDeliveryInput {
   items: SupplierDeliveryInputItemsItem[];
 }
 
+export interface ScanReceiptInput {
+  /** Base64-encoded image data (with or without data URL prefix) */
+  fileData: string;
+  /** MIME type of the image, e.g. image/jpeg */
+  mimeType: string;
+  /** @nullable */
+  fileName?: string | null;
+}
+
+export type ScanReceiptResultLineItemsItem = {
+  description: string;
+  quantity: number;
+  unitCostPence: number;
+  /**
+     * @minimum 0
+     * @maximum 1
+     */
+  confidence: number;
+};
+
+export interface ScanReceiptResult {
+  /** @nullable */
+  supplierName: string | null;
+  /**
+     * @minimum 0
+     * @maximum 1
+     */
+  supplierNameConfidence: number;
+  /**
+     * ISO date YYYY-MM-DD or null
+     * @nullable
+     */
+  date: string | null;
+  /**
+     * @minimum 0
+     * @maximum 1
+     */
+  dateConfidence: number;
+  lineItems: ScanReceiptResultLineItemsItem[];
+  /** @nullable */
+  totalPence: number | null;
+  /**
+     * @minimum 0
+     * @maximum 1
+     */
+  totalConfidence: number;
+  rawText: string;
+  /** @nullable */
+  fileName?: string | null;
+}
+
 export interface TradeAccount {
   id: string;
   /** @nullable */

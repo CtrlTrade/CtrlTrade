@@ -5149,6 +5149,47 @@ export const ReceiveSupplierOrderResponse = zod.object({
 })
 
 
+/**
+ * @summary OCR scan a receipt image and extract purchase order data
+ */
+export const ScanReceiptBody = zod.object({
+  "fileData": zod.string().describe('Base64-encoded image data (with or without data URL prefix)'),
+  "mimeType": zod.string().describe('MIME type of the image, e.g. image\/jpeg'),
+  "fileName": zod.string().nullish()
+})
+
+export const scanReceiptResponseSupplierNameConfidenceMin = 0;
+export const scanReceiptResponseSupplierNameConfidenceMax = 1;
+
+export const scanReceiptResponseDateConfidenceMin = 0;
+export const scanReceiptResponseDateConfidenceMax = 1;
+
+export const scanReceiptResponseLineItemsItemConfidenceMin = 0;
+export const scanReceiptResponseLineItemsItemConfidenceMax = 1;
+
+export const scanReceiptResponseTotalConfidenceMin = 0;
+export const scanReceiptResponseTotalConfidenceMax = 1;
+
+
+
+export const ScanReceiptResponse = zod.object({
+  "supplierName": zod.string().nullable(),
+  "supplierNameConfidence": zod.number().min(scanReceiptResponseSupplierNameConfidenceMin).max(scanReceiptResponseSupplierNameConfidenceMax),
+  "date": zod.string().nullable().describe('ISO date YYYY-MM-DD or null'),
+  "dateConfidence": zod.number().min(scanReceiptResponseDateConfidenceMin).max(scanReceiptResponseDateConfidenceMax),
+  "lineItems": zod.array(zod.object({
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitCostPence": zod.number(),
+  "confidence": zod.number().min(scanReceiptResponseLineItemsItemConfidenceMin).max(scanReceiptResponseLineItemsItemConfidenceMax)
+})),
+  "totalPence": zod.number().nullable(),
+  "totalConfidence": zod.number().min(scanReceiptResponseTotalConfidenceMin).max(scanReceiptResponseTotalConfidenceMax),
+  "rawText": zod.string(),
+  "fileName": zod.string().nullish()
+})
+
+
 export const ListTradeAccountsResponseItem = zod.object({
   "id": zod.string(),
   "customerId": zod.string().nullish(),

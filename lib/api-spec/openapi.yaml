@@ -3259,6 +3259,27 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/SupplierOrder" }
 
+  /v1/pos-catalog/supplier-orders/scan-receipt:
+    post:
+      operationId: scanReceipt
+      tags: [pos-catalog]
+      summary: OCR scan a receipt image and extract purchase order data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ScanReceiptInput" }
+      responses:
+        "200":
+          description: Extracted receipt data with confidence scores
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ScanReceiptResult" }
+        "400":
+          description: Validation error
+        "503":
+          description: AI not configured
+
   /v1/pos-catalog/trade-accounts:
     get:
       operationId: listTradeAccounts
@@ -7538,6 +7559,37 @@ components:
               productId: { type: string }
               variantId: { type: ["string", "null"] }
               quantity: { type: integer, minimum: 1 }
+
+    ScanReceiptInput:
+      type: object
+      required: [fileData, mimeType]
+      properties:
+        fileData: { type: string, description: "Base64-encoded image data (with or without data URL prefix)" }
+        mimeType: { type: string, description: "MIME type of the image, e.g. image/jpeg" }
+        fileName: { type: ["string", "null"] }
+
+    ScanReceiptResult:
+      type: object
+      required: [supplierName, supplierNameConfidence, date, dateConfidence, lineItems, totalPence, totalConfidence, rawText]
+      properties:
+        supplierName: { type: ["string", "null"] }
+        supplierNameConfidence: { type: number, minimum: 0, maximum: 1 }
+        date: { type: ["string", "null"], description: "ISO date YYYY-MM-DD or null" }
+        dateConfidence: { type: number, minimum: 0, maximum: 1 }
+        lineItems:
+          type: array
+          items:
+            type: object
+            required: [description, quantity, unitCostPence, confidence]
+            properties:
+              description: { type: string }
+              quantity: { type: number }
+              unitCostPence: { type: integer }
+              confidence: { type: number, minimum: 0, maximum: 1 }
+        totalPence: { type: ["integer", "null"] }
+        totalConfidence: { type: number, minimum: 0, maximum: 1 }
+        rawText: { type: string }
+        fileName: { type: ["string", "null"] }
 
     TradeAccount:
       type: object

@@ -36,6 +36,7 @@ import {
 import { requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
 import { applyStockDelta, totalStock } from "../lib/posStock";
+import { scanReceiptWithAI, isAIAvailable } from "../lib/ai";
 
 const router: IRouter = Router();
 
@@ -631,6 +632,57 @@ router.post("/v1/pos-catalog/supplier-orders/:orderId/receive", requireTenant, a
     message: `Supplier order ${updated.number} received`,
   });
   res.json(serializeSupplierOrder(updated, supplier?.name ?? ""));
+});
+
+// ============================================================================
+// Receipt scanning (OCR)
+// ============================================================================
+const ALLOWED_SCAN_MIME = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/heic",
+  "image/heif",
+]);
+const MAX_SCAN_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB (base64 encoded ≈ 15 MB raw)
+
+router.post("/v1/pos-catalog/supplier-orders/scan-receipt", requireTenant, async (req, res): Promise<void> => {
+  if (!isAIAvailable()) {
+    res.status(503).json({ error: "AI not configured — add OPENAI_API_KEY to enable receipt scanning." });
+    return;
+  }
+
+  const { fileData, mimeType, fileName } = req.body ?? {};
+  if (typeof fileData !== "string" || typeof mimeType !== "string") {
+    res.status(400).json({ error: "fileData (base64 string) and mimeType are required" });
+    return;
+  }
+
+  if (!ALLOWED_SCAN_MIME.has(mimeType)) {
+    res.status(400).json({ error: `Unsupported file type: ${mimeType}. Please upload a JPEG, PNG, or WebP image.` });
+    return;
+  }
+
+  // Strip data URL prefix if present
+  const base64 = fileData.startsWith("data:") ? fileData.split(",")[1] ?? "" : fileData;
+  const sizeBytes = Math.ceil(base64.length * 0.75);
+  if (sizeBytes > MAX_SCAN_SIZE_BYTES) {
+    res.status(400).json({ error: "File too large. Maximum size is 15 MB." });
+    return;
+  }
+
+  const tenantId = req.auth!.tenant!.id;
+  try {
+    const result = await scanReceiptWithAI(base64, mimeType, { tenantId });
+    res.json({
+      ...result,
+      fileName: fileName ?? null,
+    });
+  } catch (err: any) {
+    req.log.warn({ err }, "Receipt scan failed");
+    res.status(502).json({ error: err?.message ?? "Receipt scan failed" });
+  }
 });
 
 // ============================================================================

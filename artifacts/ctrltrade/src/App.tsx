@@ -41,6 +41,7 @@ import { AppPos } from "@/pages/app/Pos";
 import { AppProducts } from "@/pages/app/Products";
 import { AppStock } from "@/pages/app/Stock";
 import { AppSuppliers } from "@/pages/app/Suppliers";
+import { AppSupplierOrders } from "@/pages/app/SupplierOrders";
 import { AppTradeAccounts } from "@/pages/app/TradeAccounts";
 import { ReportsIndex } from "@/pages/app/reports/Index";
 import { RevenueReport } from "@/pages/app/reports/Revenue";
@@ -148,6 +149,7 @@ function App() {
                   <Route path="/products" component={AppProducts} />
                   <Route path="/stock" component={AppStock} />
                   <Route path="/suppliers" component={AppSuppliers} />
+                  <Route path="/supplier-orders" component={AppSupplierOrders} />
                   <Route path="/trade-accounts" component={AppTradeAccounts} />
                   <Route path="/reports" component={ReportsIndex} />
                   <Route path="/reports/revenue">{() => <RevenueReport />}</Route>
