@@ -152,7 +152,7 @@ function EntryRow({ entry, canManage, onApprove, onRejectClick, onSubmit, isProc
       </div>
       <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
         <span className="font-mono font-bold text-sm">{fmtHours(entry.hoursWorked)}</span>
-        {entry.status === "draft" && !canManage && (
+        {(entry.status === "draft" || entry.status === "rejected") && (
           <Button
             variant="outline"
             size="sm"
@@ -268,8 +268,8 @@ export function AppTimesheets() {
 
   const entries = data ?? [];
 
-  // Assume manager if they can see multiple users' data (team.members > 1 check is soft)
-  const canManage = true; // server enforces role; UI shows buttons, server rejects if unauthorised
+  const myMember = team?.members?.find((m) => m.isYou);
+  const canManage = ["owner", "admin", "manager"].includes(myMember?.role ?? "");
 
   // Group by date
   const grouped = new Map<string, TimesheetEntry[]>();
