@@ -1,0 +1,2 @@
+- [Orval schema naming convention](orval-schema-naming.md) — component schema names must differ from operationId-derived names to avoid TS2308 duplicate export errors in api-zod.
+- [Drizzle TTY migrations](drizzle-tty.md) — drizzle-kit push requires interactive TTY; always apply schema changes via raw psql SQL instead.

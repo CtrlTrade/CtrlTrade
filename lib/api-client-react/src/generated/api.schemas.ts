@@ -3706,12 +3706,60 @@ export interface JobCheckin {
 }
 
 export interface TimesheetEntry {
+  id: string;
   userId: string;
   /** @nullable */
   userName: string | null;
+  /** @nullable */
+  jobId?: string | null;
+  /** @nullable */
+  jobNumber?: string | null;
+  /** @nullable */
+  checkinId?: string | null;
   date: string;
-  totalMinutes: number;
-  entries: JobCheckin[];
+  hoursWorked: number;
+  travelMinutes: number;
+  mileageMiles: number;
+  /** @nullable */
+  notes?: string | null;
+  /** draft|submitted|approved|rejected */
+  status: string;
+  /** @nullable */
+  approvedBy?: string | null;
+  /** @nullable */
+  approvedByName?: string | null;
+  /** @nullable */
+  approvedAt?: string | null;
+  /** @nullable */
+  rejectionReason?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface TimesheetEntryInput {
+  /** @nullable */
+  jobId?: string | null;
+  /** @nullable */
+  checkinId?: string | null;
+  date: string;
+  hoursWorked: number;
+  travelMinutes?: number;
+  mileageMiles?: number;
+  /** @nullable */
+  notes?: string | null;
+}
+
+export interface UpdateTimesheetEntryInput {
+  hoursWorked?: number;
+  travelMinutes?: number;
+  mileageMiles?: number;
+  /** @nullable */
+  notes?: string | null;
+}
+
+export interface RejectTimesheetEntryInput {
+  /** @minLength 1 */
+  reason: string;
 }
 
 export type ConnectIntegration200 = {
@@ -3747,6 +3795,7 @@ export type ListTimesheetsParams = {
 userId?: string;
 from?: string;
 to?: string;
+status?: string;
 };
 
 export type ListInvoicesParams = {

@@ -9,6 +9,7 @@ import {
   quotesTable,
   customersTable,
   usersTable,
+  timesheetEntriesTable,
 } from "@workspace/db";
 import {
   GetReportRevenueResponse,
@@ -160,35 +161,59 @@ async function buildLeadRoi(scope: Scope, from: Date, to: Date) {
 
 // ---- Engineer performance --------------------------------------------------
 async function buildEngineerPerformance(scope: Scope, from: Date, to: Date) {
-  const where = and(
+  const jobWhere = and(
     tenantFilter(scope, jobsTable.tenantId),
     gte(jobsTable.createdAt, from),
     lte(jobsTable.createdAt, to),
   );
-  const rows = await db
+  const jobRows = await db
     .select({
       userId: jobsTable.assignedUserId,
       userName: usersTable.name,
       jobsTotal: sql<number>`count(*)::int`,
       jobsCompleted: sql<number>`sum(case when ${jobsTable.status} = 'completed' then 1 else 0 end)::int`,
-      hours: sql<number>`coalesce(sum(extract(epoch from (${jobsTable.scheduledEnd} - ${jobsTable.scheduledStart}))/3600.0),0)::float`,
       value: sql<number>`coalesce(sum(${jobsTable.valuePence}),0)::int`,
       onTime: sql<number>`sum(case when ${jobsTable.status} = 'completed' and ${jobsTable.scheduledEnd} >= ${jobsTable.updatedAt} then 1 else 0 end)::int`,
     })
     .from(jobsTable)
     .leftJoin(usersTable, eq(usersTable.id, jobsTable.assignedUserId))
-    .where(where)
+    .where(jobWhere)
     .groupBy(jobsTable.assignedUserId, usersTable.name);
 
-  const out = rows.map((r) => ({
-    userId: r.userId,
-    name: r.userName || "Unassigned",
-    jobsCompleted: r.jobsCompleted,
-    jobsTotal: r.jobsTotal,
-    hours: Math.round(r.hours * 10) / 10,
-    totalValuePence: r.value,
-    onTimePct: r.jobsCompleted > 0 ? Math.round((r.onTime / r.jobsCompleted) * 100) : 0,
-  }));
+  // Pull approved timesheet hours for the period
+  const fromDateStr = from.toISOString().slice(0, 10);
+  const toDateStr = to.toISOString().slice(0, 10);
+  const tsWhere = and(
+    tenantFilter(scope, timesheetEntriesTable.tenantId),
+    eq(timesheetEntriesTable.status, "approved"),
+    gte(timesheetEntriesTable.date, fromDateStr),
+    lte(timesheetEntriesTable.date, toDateStr),
+  );
+  const tsRows = await db
+    .select({
+      userId: timesheetEntriesTable.userId,
+      approvedHours: sql<number>`coalesce(sum(${timesheetEntriesTable.hoursWorked}::float),0)::float`,
+      mileage: sql<number>`coalesce(sum(${timesheetEntriesTable.mileageMiles}),0)::int`,
+    })
+    .from(timesheetEntriesTable)
+    .where(tsWhere)
+    .groupBy(timesheetEntriesTable.userId);
+
+  const tsMap = new Map(tsRows.map((r) => [r.userId, { hours: r.approvedHours, mileage: r.mileage }]));
+
+  const out = jobRows.map((r) => {
+    const ts = tsMap.get(r.userId ?? "") ?? { hours: 0, mileage: 0 };
+    return {
+      userId: r.userId,
+      name: r.userName || "Unassigned",
+      jobsCompleted: r.jobsCompleted,
+      jobsTotal: r.jobsTotal,
+      hours: Math.round(ts.hours * 10) / 10,
+      approvedMileage: ts.mileage,
+      totalValuePence: r.value,
+      onTimePct: r.jobsCompleted > 0 ? Math.round((r.onTime / r.jobsCompleted) * 100) : 0,
+    };
+  });
   out.sort((a, b) => b.totalValuePence - a.totalValuePence);
   return {
     currency: "GBP",

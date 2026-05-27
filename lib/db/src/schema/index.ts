@@ -1887,7 +1887,37 @@ export type TenantPhoneNumber = typeof tenantPhoneNumbersTable.$inferSelect;
 export type CallRecord = typeof callRecordsTable.$inferSelect;
 export type Voicemail = typeof voicemailsTable.$inferSelect;
 
-// ---- Job Checkins (timesheets) ---------------------------------------------
+// ---- Timesheet entries (approval lifecycle) --------------------------------
+export const timesheetEntriesTable = pgTable(
+  "timesheet_entries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    jobId: uuid("job_id").references(() => jobsTable.id, { onDelete: "set null" }),
+    checkinId: uuid("checkin_id"),
+    userId: uuid("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+    date: text("date").notNull(),
+    hoursWorked: text("hours_worked").notNull().default("0"),
+    travelMinutes: integer("travel_minutes").notNull().default(0),
+    mileageMiles: integer("mileage_miles").notNull().default(0),
+    notes: text("notes"),
+    status: varchar("status", { length: 24 }).notNull().default("draft"),
+    approvedBy: uuid("approved_by").references(() => usersTable.id, { onDelete: "set null" }),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    rejectionReason: text("rejection_reason"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("ts_entries_tenant_idx").on(t.tenantId),
+    userIdx: index("ts_entries_user_idx").on(t.userId, t.date),
+    jobIdx: index("ts_entries_job_idx").on(t.jobId),
+    statusIdx: index("ts_entries_status_idx").on(t.tenantId, t.status),
+  }),
+);
+export type TimesheetEntry = typeof timesheetEntriesTable.$inferSelect;
+
+// ---- Job Checkins (GPS tracking) -------------------------------------------
 export const jobCheckinsTable = pgTable(
   "job_checkins",
   {

@@ -244,6 +244,7 @@ import type {
   ReferralCampaignInput,
   ReferralConversionRecord,
   ReferralTrackInput,
+  RejectTimesheetEntryInput,
   ReplyDraftInput,
   ReplyDraftResult,
   ReportActivityHeatmap,
@@ -289,6 +290,7 @@ import type {
   TillSession,
   TillSessionReport,
   TimesheetEntry,
+  TimesheetEntryInput,
   TradeAccount,
   TradeAccountInput,
   TradeCategory,
@@ -297,6 +299,7 @@ import type {
   UpdateAdminIntegrationCatalogue200,
   UpdateInvoiceTemplateInput,
   UpdateMemberInput,
+  UpdateTimesheetEntryInput,
   UploadUrlRequest,
   UploadUrlResponse,
   UpsertFeatureFlagInput,
@@ -7188,6 +7191,331 @@ export function useListTimesheets<TData = Awaited<ReturnType<typeof listTimeshee
 
 
 
+
+export const getCreateTimesheetEntryUrl = () => {
+
+
+
+
+  return `/api/v1/timesheets`
+}
+
+export const createTimesheetEntry = async (timesheetEntryInput: TimesheetEntryInput, options?: RequestInit): Promise<TimesheetEntry> => {
+
+  return customFetch<TimesheetEntry>(getCreateTimesheetEntryUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      timesheetEntryInput,)
+  }
+);}
+
+
+
+
+export const getCreateTimesheetEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTimesheetEntry>>, TError,{data: BodyType<TimesheetEntryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createTimesheetEntry>>, TError,{data: BodyType<TimesheetEntryInput>}, TContext> => {
+
+const mutationKey = ['createTimesheetEntry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTimesheetEntry>>, {data: BodyType<TimesheetEntryInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createTimesheetEntry(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateTimesheetEntryMutationResult = NonNullable<Awaited<ReturnType<typeof createTimesheetEntry>>>
+    export type CreateTimesheetEntryMutationBody = BodyType<TimesheetEntryInput>
+    export type CreateTimesheetEntryMutationError = ErrorType<unknown>
+
+    export const useCreateTimesheetEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTimesheetEntry>>, TError,{data: BodyType<TimesheetEntryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createTimesheetEntry>>,
+        TError,
+        {data: BodyType<TimesheetEntryInput>},
+        TContext
+      > => {
+      return useMutation(getCreateTimesheetEntryMutationOptions(options));
+    }
+
+export const getUpdateTimesheetEntryUrl = (entryId: string,) => {
+
+
+
+
+  return `/api/v1/timesheets/${entryId}`
+}
+
+export const updateTimesheetEntry = async (entryId: string,
+    updateTimesheetEntryInput: UpdateTimesheetEntryInput, options?: RequestInit): Promise<TimesheetEntry> => {
+
+  return customFetch<TimesheetEntry>(getUpdateTimesheetEntryUrl(entryId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateTimesheetEntryInput,)
+  }
+);}
+
+
+
+
+export const getUpdateTimesheetEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTimesheetEntry>>, TError,{entryId: string;data: BodyType<UpdateTimesheetEntryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTimesheetEntry>>, TError,{entryId: string;data: BodyType<UpdateTimesheetEntryInput>}, TContext> => {
+
+const mutationKey = ['updateTimesheetEntry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTimesheetEntry>>, {entryId: string;data: BodyType<UpdateTimesheetEntryInput>}> = (props) => {
+          const {entryId,data} = props ?? {};
+
+          return  updateTimesheetEntry(entryId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTimesheetEntryMutationResult = NonNullable<Awaited<ReturnType<typeof updateTimesheetEntry>>>
+    export type UpdateTimesheetEntryMutationBody = BodyType<UpdateTimesheetEntryInput>
+    export type UpdateTimesheetEntryMutationError = ErrorType<unknown>
+
+    export const useUpdateTimesheetEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTimesheetEntry>>, TError,{entryId: string;data: BodyType<UpdateTimesheetEntryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateTimesheetEntry>>,
+        TError,
+        {entryId: string;data: BodyType<UpdateTimesheetEntryInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateTimesheetEntryMutationOptions(options));
+    }
+
+export const getSubmitTimesheetEntryUrl = (entryId: string,) => {
+
+
+
+
+  return `/api/v1/timesheets/${entryId}/submit`
+}
+
+export const submitTimesheetEntry = async (entryId: string, options?: RequestInit): Promise<TimesheetEntry> => {
+
+  return customFetch<TimesheetEntry>(getSubmitTimesheetEntryUrl(entryId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getSubmitTimesheetEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitTimesheetEntry>>, TError,{entryId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitTimesheetEntry>>, TError,{entryId: string}, TContext> => {
+
+const mutationKey = ['submitTimesheetEntry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitTimesheetEntry>>, {entryId: string}> = (props) => {
+          const {entryId} = props ?? {};
+
+          return  submitTimesheetEntry(entryId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitTimesheetEntryMutationResult = NonNullable<Awaited<ReturnType<typeof submitTimesheetEntry>>>
+
+    export type SubmitTimesheetEntryMutationError = ErrorType<unknown>
+
+    export const useSubmitTimesheetEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitTimesheetEntry>>, TError,{entryId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitTimesheetEntry>>,
+        TError,
+        {entryId: string},
+        TContext
+      > => {
+      return useMutation(getSubmitTimesheetEntryMutationOptions(options));
+    }
+
+export const getApproveTimesheetEntryUrl = (entryId: string,) => {
+
+
+
+
+  return `/api/v1/timesheets/${entryId}/approve`
+}
+
+export const approveTimesheetEntry = async (entryId: string, options?: RequestInit): Promise<TimesheetEntry> => {
+
+  return customFetch<TimesheetEntry>(getApproveTimesheetEntryUrl(entryId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getApproveTimesheetEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveTimesheetEntry>>, TError,{entryId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof approveTimesheetEntry>>, TError,{entryId: string}, TContext> => {
+
+const mutationKey = ['approveTimesheetEntry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof approveTimesheetEntry>>, {entryId: string}> = (props) => {
+          const {entryId} = props ?? {};
+
+          return  approveTimesheetEntry(entryId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ApproveTimesheetEntryMutationResult = NonNullable<Awaited<ReturnType<typeof approveTimesheetEntry>>>
+
+    export type ApproveTimesheetEntryMutationError = ErrorType<unknown>
+
+    export const useApproveTimesheetEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveTimesheetEntry>>, TError,{entryId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof approveTimesheetEntry>>,
+        TError,
+        {entryId: string},
+        TContext
+      > => {
+      return useMutation(getApproveTimesheetEntryMutationOptions(options));
+    }
+
+export const getRejectTimesheetEntryUrl = (entryId: string,) => {
+
+
+
+
+  return `/api/v1/timesheets/${entryId}/reject`
+}
+
+export const rejectTimesheetEntry = async (entryId: string,
+    rejectTimesheetEntryInput: RejectTimesheetEntryInput, options?: RequestInit): Promise<TimesheetEntry> => {
+
+  return customFetch<TimesheetEntry>(getRejectTimesheetEntryUrl(entryId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      rejectTimesheetEntryInput,)
+  }
+);}
+
+
+
+
+export const getRejectTimesheetEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectTimesheetEntry>>, TError,{entryId: string;data: BodyType<RejectTimesheetEntryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rejectTimesheetEntry>>, TError,{entryId: string;data: BodyType<RejectTimesheetEntryInput>}, TContext> => {
+
+const mutationKey = ['rejectTimesheetEntry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rejectTimesheetEntry>>, {entryId: string;data: BodyType<RejectTimesheetEntryInput>}> = (props) => {
+          const {entryId,data} = props ?? {};
+
+          return  rejectTimesheetEntry(entryId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RejectTimesheetEntryMutationResult = NonNullable<Awaited<ReturnType<typeof rejectTimesheetEntry>>>
+    export type RejectTimesheetEntryMutationBody = BodyType<RejectTimesheetEntryInput>
+    export type RejectTimesheetEntryMutationError = ErrorType<unknown>
+
+    export const useRejectTimesheetEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectTimesheetEntry>>, TError,{entryId: string;data: BodyType<RejectTimesheetEntryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof rejectTimesheetEntry>>,
+        TError,
+        {entryId: string;data: BodyType<RejectTimesheetEntryInput>},
+        TContext
+      > => {
+      return useMutation(getRejectTimesheetEntryMutationOptions(options));
+    }
 
 export const getListInvoicesUrl = (params?: ListInvoicesParams,) => {
   const normalizedParams = new URLSearchParams();

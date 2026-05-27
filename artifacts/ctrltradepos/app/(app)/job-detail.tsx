@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,7 +17,9 @@ import {
   useJobCheckin,
   useJobCheckout,
   useListJobCheckins,
+  useCreateTimesheetEntry,
   getListJobCheckinsQueryKey,
+  getListTimesheetsQueryKey,
 } from "@workspace/api-client-react";
 import type { JobCheckin } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -41,6 +45,138 @@ function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" });
 }
 
+interface TimesheetModalProps {
+  visible: boolean;
+  jobId: string;
+  checkinId: string | null;
+  checkinDate: string;
+  durationMinutes: number;
+  onClose: () => void;
+  colors: ReturnType<typeof useColors>;
+}
+
+function TimesheetModal({
+  visible,
+  jobId,
+  checkinId,
+  checkinDate,
+  durationMinutes,
+  onClose,
+  colors,
+}: TimesheetModalProps) {
+  const hours = parseFloat((durationMinutes / 60).toFixed(2));
+  const [hoursVal, setHoursVal] = useState(String(hours));
+  const [travel, setTravel] = useState("0");
+  const [mileage, setMileage] = useState("0");
+  const [notes, setNotes] = useState("");
+  const createEntry = useCreateTimesheetEntry();
+  const qc = useQueryClient();
+
+  function handleSave() {
+    createEntry.mutate(
+      {
+        data: {
+          jobId,
+          checkinId: checkinId ?? null,
+          date: checkinDate.slice(0, 10),
+          hoursWorked: parseFloat(hoursVal) || 0,
+          travelMinutes: parseInt(travel) || 0,
+          mileageMiles: parseInt(mileage) || 0,
+          notes: notes.trim() || null,
+        },
+      },
+      {
+        onSuccess: () => {
+          qc.invalidateQueries({ queryKey: getListTimesheetsQueryKey() });
+          onClose();
+          Alert.alert("Timesheet saved", "Your entry has been saved as a draft. Submit it for manager approval when ready.");
+        },
+        onError: (e: any) => {
+          Alert.alert("Failed to save", e?.message ?? "Could not create timesheet entry");
+        },
+      },
+    );
+  }
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.modalOverlay}>
+        <View style={[styles.modalContent, { backgroundColor: colors.background, borderColor: colors.border }]}>
+          <Text style={[styles.modalTitle, { color: colors.foreground }]}>LOG TIMESHEET ENTRY</Text>
+          <Text style={[styles.modalSubtitle, { color: colors.mutedForeground }]}>
+            Checked out at {fmtTime(new Date().toISOString())} · {fmtDuration(durationMinutes)} on site
+          </Text>
+
+          <View style={styles.modalFields}>
+            <View style={styles.fieldRow}>
+              <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>HOURS WORKED</Text>
+              <TextInput
+                style={[styles.fieldInput, { color: colors.foreground, borderColor: colors.border }]}
+                value={hoursVal}
+                onChangeText={setHoursVal}
+                keyboardType="decimal-pad"
+                placeholderTextColor={colors.mutedForeground}
+              />
+            </View>
+            <View style={styles.fieldRow}>
+              <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>TRAVEL (MINS)</Text>
+              <TextInput
+                style={[styles.fieldInput, { color: colors.foreground, borderColor: colors.border }]}
+                value={travel}
+                onChangeText={setTravel}
+                keyboardType="number-pad"
+                placeholderTextColor={colors.mutedForeground}
+              />
+            </View>
+            <View style={styles.fieldRow}>
+              <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>MILEAGE</Text>
+              <TextInput
+                style={[styles.fieldInput, { color: colors.foreground, borderColor: colors.border }]}
+                value={mileage}
+                onChangeText={setMileage}
+                keyboardType="number-pad"
+                placeholderTextColor={colors.mutedForeground}
+              />
+            </View>
+            <View style={[styles.fieldRow, { alignItems: "flex-start" }]}>
+              <Text style={[styles.fieldLabel, { color: colors.mutedForeground, marginTop: 12 }]}>NOTES</Text>
+              <TextInput
+                style={[styles.fieldInput, styles.notesInput, { color: colors.foreground, borderColor: colors.border }]}
+                value={notes}
+                onChangeText={setNotes}
+                multiline
+                numberOfLines={3}
+                placeholderTextColor={colors.mutedForeground}
+                placeholder="Optional notes..."
+              />
+            </View>
+          </View>
+
+          <View style={styles.modalActions}>
+            <Pressable
+              style={({ pressed }) => [styles.modalBtn, styles.cancelBtn, { borderColor: colors.border, opacity: pressed ? 0.7 : 1 }]}
+              onPress={onClose}
+            >
+              <Text style={[styles.modalBtnText, { color: colors.mutedForeground }]}>SKIP</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.modalBtn, { backgroundColor: colors.primary, opacity: pressed || createEntry.isPending ? 0.7 : 1 }]}
+              onPress={handleSave}
+              disabled={createEntry.isPending}
+            >
+              {createEntry.isPending ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Text style={[styles.modalBtnText, { color: "#fff" }]}>SAVE ENTRY</Text>
+              )}
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 interface CheckinCardProps {
   item: JobCheckin;
   colors: ReturnType<typeof useColors>;
@@ -56,7 +192,8 @@ function CheckinCard({ item, colors }: CheckinCardProps) {
             {fmtDate(item.checkedInAt)}
           </Text>
           <Text style={[styles.checkinTime, { color: colors.foreground }]}>
-            {fmtTime(item.checkedInAt)} → {isActive ? <Text style={{ color: colors.primary }}>ACTIVE</Text> : fmtTime(item.checkedOutAt)}
+            {fmtTime(item.checkedInAt)}{" → "}
+            {isActive ? <Text style={{ color: colors.primary }}>ACTIVE</Text> : fmtTime(item.checkedOutAt)}
           </Text>
           {item.notes ? (
             <Text style={[styles.notesText, { color: colors.mutedForeground }]} numberOfLines={2}>
@@ -92,6 +229,11 @@ export default function JobDetailScreen() {
 
   const qc = useQueryClient();
   const [isLocating, setIsLocating] = useState(false);
+  const [timesheetModal, setTimesheetModal] = useState<{
+    checkinId: string;
+    checkinDate: string;
+    durationMinutes: number;
+  } | null>(null);
 
   const checkinsQuery = useListJobCheckins(params.jobId ?? "");
 
@@ -128,18 +270,11 @@ export default function JobDetailScreen() {
     checkinMutation.mutate(
       {
         jobId: params.jobId,
-        data: {
-          lat: gps?.lat ?? null,
-          lng: gps?.lng ?? null,
-        },
+        data: { lat: gps?.lat ?? null, lng: gps?.lng ?? null },
       },
       {
-        onSuccess: () => {
-          invalidate();
-        },
-        onError: (e: any) => {
-          Alert.alert("Check-in failed", e?.message ?? "Unable to check in");
-        },
+        onSuccess: () => invalidate(),
+        onError: (e: any) => Alert.alert("Check-in failed", e?.message ?? "Unable to check in"),
       },
     );
   };
@@ -152,18 +287,20 @@ export default function JobDetailScreen() {
     checkoutMutation.mutate(
       {
         jobId: params.jobId,
-        data: {
-          lat: gps?.lat ?? null,
-          lng: gps?.lng ?? null,
-        },
+        data: { lat: gps?.lat ?? null, lng: gps?.lng ?? null },
       },
       {
-        onSuccess: () => {
+        onSuccess: (result: any) => {
           invalidate();
+          // Prompt timesheet entry after checkout
+          const dur = result?.durationMinutes ?? 0;
+          setTimesheetModal({
+            checkinId: result?.id ?? activeCheckin?.id ?? "",
+            checkinDate: result?.checkedOutAt ?? new Date().toISOString(),
+            durationMinutes: dur,
+          });
         },
-        onError: (e: any) => {
-          Alert.alert("Check-out failed", e?.message ?? "Unable to check out");
-        },
+        onError: (e: any) => Alert.alert("Check-out failed", e?.message ?? "Unable to check out"),
       },
     );
   };
@@ -260,6 +397,18 @@ export default function JobDetailScreen() {
           <Text style={[styles.empty, { color: colors.mutedForeground }]}>No check-ins yet for this job.</Text>
         )}
       </ScrollView>
+
+      {timesheetModal && (
+        <TimesheetModal
+          visible={true}
+          jobId={params.jobId ?? ""}
+          checkinId={timesheetModal.checkinId}
+          checkinDate={timesheetModal.checkinDate}
+          durationMinutes={timesheetModal.durationMinutes}
+          onClose={() => setTimesheetModal(null)}
+          colors={colors}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -270,39 +419,15 @@ const styles = StyleSheet.create({
   backBtn: { paddingHorizontal: 4 },
   backText: { fontFamily: MONO_FONT, fontSize: 12, letterSpacing: 1, fontWeight: "700" },
   address: { fontFamily: MONO_FONT, fontSize: 12, marginBottom: 16 },
-  checkinPanel: {
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 24,
-  },
+  checkinPanel: { borderWidth: 1, borderRadius: 10, padding: 16, marginBottom: 24 },
   checkinStatus: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 16 },
   statusDot: { width: 10, height: 10, borderRadius: 5 },
   statusLabel: { fontFamily: MONO_FONT, fontSize: 13, fontWeight: "700", letterSpacing: 2 },
   statusSince: { fontFamily: MONO_FONT, fontSize: 11 },
   actionRow: { flexDirection: "row", gap: 12 },
-  checkinBtn: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  checkinBtnText: {
-    fontFamily: MONO_FONT,
-    fontWeight: "700",
-    fontSize: 13,
-    letterSpacing: 2,
-    color: "#fff",
-  },
-  saleBtn: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  checkinBtn: { flex: 1, paddingVertical: 14, borderRadius: 8, alignItems: "center", justifyContent: "center" },
+  checkinBtnText: { fontFamily: MONO_FONT, fontWeight: "700", fontSize: 13, letterSpacing: 2, color: "#fff" },
+  saleBtn: { flex: 1, paddingVertical: 14, borderRadius: 8, borderWidth: 1, alignItems: "center", justifyContent: "center" },
   saleBtnText: { fontFamily: MONO_FONT, fontWeight: "700", fontSize: 11, letterSpacing: 2 },
   historySection: { marginTop: 8 },
   sectionTitle: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 3, fontWeight: "700", marginBottom: 12 },
@@ -315,4 +440,18 @@ const styles = StyleSheet.create({
   duration: { fontFamily: MONO_FONT, fontSize: 14, fontWeight: "700" },
   gpsLabel: { fontFamily: MONO_FONT, fontSize: 9, letterSpacing: 2, marginTop: 2 },
   empty: { fontFamily: MONO_FONT, fontSize: 12, textAlign: "center", marginTop: 32 },
+  // Modal
+  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" },
+  modalContent: { borderTopWidth: 1, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 24, gap: 16 },
+  modalTitle: { fontFamily: MONO_FONT, fontSize: 16, fontWeight: "700", letterSpacing: 2 },
+  modalSubtitle: { fontFamily: MONO_FONT, fontSize: 11, marginTop: -8 },
+  modalFields: { gap: 12 },
+  fieldRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+  fieldLabel: { fontFamily: MONO_FONT, fontSize: 10, letterSpacing: 2, width: 110 },
+  fieldInput: { flex: 1, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 8, fontFamily: MONO_FONT, fontSize: 14, borderRadius: 6 },
+  notesInput: { textAlignVertical: "top", minHeight: 72 },
+  modalActions: { flexDirection: "row", gap: 12, marginTop: 4 },
+  modalBtn: { flex: 1, paddingVertical: 14, borderRadius: 8, alignItems: "center", justifyContent: "center" },
+  cancelBtn: { borderWidth: 1 },
+  modalBtnText: { fontFamily: MONO_FONT, fontWeight: "700", fontSize: 12, letterSpacing: 2 },
 });

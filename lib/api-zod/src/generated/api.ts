@@ -2548,34 +2548,161 @@ export const ListJobCheckinsResponse = zod.array(ListJobCheckinsResponseItem)
 
 export const ListTimesheetsQueryParams = zod.object({
   "userId": zod.coerce.string().optional(),
-  "from": zod.date().optional(),
-  "to": zod.date().optional()
+  "from": zod.coerce.string().optional(),
+  "to": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional()
 })
 
 export const ListTimesheetsResponseItem = zod.object({
-  "userId": zod.string(),
-  "userName": zod.string().nullable(),
-  "date": zod.coerce.date(),
-  "totalMinutes": zod.number(),
-  "entries": zod.array(zod.object({
   "id": zod.string(),
-  "jobId": zod.string(),
-  "jobNumber": zod.string().nullish(),
-  "jobTitle": zod.string().nullish(),
   "userId": zod.string(),
   "userName": zod.string().nullable(),
-  "checkedInAt": zod.coerce.date(),
-  "checkedOutAt": zod.coerce.date().nullish(),
-  "checkInLat": zod.string().nullish(),
-  "checkInLng": zod.string().nullish(),
-  "checkOutLat": zod.string().nullish(),
-  "checkOutLng": zod.string().nullish(),
+  "jobId": zod.string().nullish(),
+  "jobNumber": zod.string().nullish(),
+  "checkinId": zod.string().nullish(),
+  "date": zod.string(),
+  "hoursWorked": zod.number(),
+  "travelMinutes": zod.number(),
+  "mileageMiles": zod.number(),
   "notes": zod.string().nullish(),
-  "durationMinutes": zod.number().nullish(),
-  "createdAt": zod.coerce.date()
-}))
+  "status": zod.string().describe('draft|submitted|approved|rejected'),
+  "approvedBy": zod.string().nullish(),
+  "approvedByName": zod.string().nullish(),
+  "approvedAt": zod.coerce.date().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
 })
 export const ListTimesheetsResponse = zod.array(ListTimesheetsResponseItem)
+
+
+export const CreateTimesheetEntryBody = zod.object({
+  "jobId": zod.string().nullish(),
+  "checkinId": zod.string().nullish(),
+  "date": zod.string(),
+  "hoursWorked": zod.number(),
+  "travelMinutes": zod.number().optional(),
+  "mileageMiles": zod.number().optional(),
+  "notes": zod.string().nullish()
+})
+
+
+export const UpdateTimesheetEntryParams = zod.object({
+  "entryId": zod.coerce.string()
+})
+
+export const UpdateTimesheetEntryBody = zod.object({
+  "hoursWorked": zod.number().optional(),
+  "travelMinutes": zod.number().optional(),
+  "mileageMiles": zod.number().optional(),
+  "notes": zod.string().nullish()
+})
+
+export const UpdateTimesheetEntryResponse = zod.object({
+  "id": zod.string(),
+  "userId": zod.string(),
+  "userName": zod.string().nullable(),
+  "jobId": zod.string().nullish(),
+  "jobNumber": zod.string().nullish(),
+  "checkinId": zod.string().nullish(),
+  "date": zod.string(),
+  "hoursWorked": zod.number(),
+  "travelMinutes": zod.number(),
+  "mileageMiles": zod.number(),
+  "notes": zod.string().nullish(),
+  "status": zod.string().describe('draft|submitted|approved|rejected'),
+  "approvedBy": zod.string().nullish(),
+  "approvedByName": zod.string().nullish(),
+  "approvedAt": zod.coerce.date().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
+})
+
+
+export const SubmitTimesheetEntryParams = zod.object({
+  "entryId": zod.coerce.string()
+})
+
+export const SubmitTimesheetEntryResponse = zod.object({
+  "id": zod.string(),
+  "userId": zod.string(),
+  "userName": zod.string().nullable(),
+  "jobId": zod.string().nullish(),
+  "jobNumber": zod.string().nullish(),
+  "checkinId": zod.string().nullish(),
+  "date": zod.string(),
+  "hoursWorked": zod.number(),
+  "travelMinutes": zod.number(),
+  "mileageMiles": zod.number(),
+  "notes": zod.string().nullish(),
+  "status": zod.string().describe('draft|submitted|approved|rejected'),
+  "approvedBy": zod.string().nullish(),
+  "approvedByName": zod.string().nullish(),
+  "approvedAt": zod.coerce.date().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
+})
+
+
+export const ApproveTimesheetEntryParams = zod.object({
+  "entryId": zod.coerce.string()
+})
+
+export const ApproveTimesheetEntryResponse = zod.object({
+  "id": zod.string(),
+  "userId": zod.string(),
+  "userName": zod.string().nullable(),
+  "jobId": zod.string().nullish(),
+  "jobNumber": zod.string().nullish(),
+  "checkinId": zod.string().nullish(),
+  "date": zod.string(),
+  "hoursWorked": zod.number(),
+  "travelMinutes": zod.number(),
+  "mileageMiles": zod.number(),
+  "notes": zod.string().nullish(),
+  "status": zod.string().describe('draft|submitted|approved|rejected'),
+  "approvedBy": zod.string().nullish(),
+  "approvedByName": zod.string().nullish(),
+  "approvedAt": zod.coerce.date().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
+})
+
+
+export const RejectTimesheetEntryParams = zod.object({
+  "entryId": zod.coerce.string()
+})
+
+
+
+
+export const RejectTimesheetEntryBody = zod.object({
+  "reason": zod.string().min(1)
+})
+
+export const RejectTimesheetEntryResponse = zod.object({
+  "id": zod.string(),
+  "userId": zod.string(),
+  "userName": zod.string().nullable(),
+  "jobId": zod.string().nullish(),
+  "jobNumber": zod.string().nullish(),
+  "checkinId": zod.string().nullish(),
+  "date": zod.string(),
+  "hoursWorked": zod.number(),
+  "travelMinutes": zod.number(),
+  "mileageMiles": zod.number(),
+  "notes": zod.string().nullish(),
+  "status": zod.string().describe('draft|submitted|approved|rejected'),
+  "approvedBy": zod.string().nullish(),
+  "approvedByName": zod.string().nullish(),
+  "approvedAt": zod.coerce.date().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
+})
 
 
 export const ListInvoicesQueryParams = zod.object({

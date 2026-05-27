@@ -1550,11 +1550,15 @@ paths:
         - in: query
           name: from
           required: false
-          schema: { type: string, format: date }
+          schema: { type: string }
         - in: query
           name: to
           required: false
-          schema: { type: string, format: date }
+          schema: { type: string }
+        - in: query
+          name: status
+          required: false
+          schema: { type: string }
       responses:
         "200":
           description: OK
@@ -1563,6 +1567,94 @@ paths:
               schema:
                 type: array
                 items: { $ref: "#/components/schemas/TimesheetEntry" }
+    post:
+      operationId: createTimesheetEntry
+      tags: [timesheets]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TimesheetEntryInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimesheetEntry" }
+
+  /v1/timesheets/{entryId}:
+    parameters:
+      - in: path
+        name: entryId
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateTimesheetEntry
+      tags: [timesheets]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateTimesheetEntryInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimesheetEntry" }
+
+  /v1/timesheets/{entryId}/submit:
+    parameters:
+      - in: path
+        name: entryId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: submitTimesheetEntry
+      tags: [timesheets]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimesheetEntry" }
+
+  /v1/timesheets/{entryId}/approve:
+    parameters:
+      - in: path
+        name: entryId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: approveTimesheetEntry
+      tags: [timesheets]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimesheetEntry" }
+
+  /v1/timesheets/{entryId}/reject:
+    parameters:
+      - in: path
+        name: entryId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: rejectTimesheetEntry
+      tags: [timesheets]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RejectTimesheetEntryInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimesheetEntry" }
 
   /v1/invoices:
     get:
@@ -8363,12 +8455,49 @@ components:
 
     TimesheetEntry:
       type: object
-      required: [userId, userName, date, totalMinutes, entries]
+      required: [id, userId, userName, date, hoursWorked, travelMinutes, mileageMiles, status, createdAt]
       properties:
+        id: { type: string }
         userId: { type: string }
         userName: { type: ["string", "null"] }
-        date: { type: string, format: date }
-        totalMinutes: { type: integer }
-        entries:
-          type: array
-          items: { $ref: "#/components/schemas/JobCheckin" }
+        jobId: { type: ["string", "null"] }
+        jobNumber: { type: ["string", "null"] }
+        checkinId: { type: ["string", "null"] }
+        date: { type: string }
+        hoursWorked: { type: number }
+        travelMinutes: { type: integer }
+        mileageMiles: { type: integer }
+        notes: { type: ["string", "null"] }
+        status: { type: string, description: "draft|submitted|approved|rejected" }
+        approvedBy: { type: ["string", "null"] }
+        approvedByName: { type: ["string", "null"] }
+        approvedAt: { type: ["string", "null"], format: date-time }
+        rejectionReason: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    TimesheetEntryInput:
+      type: object
+      required: [date, hoursWorked]
+      properties:
+        jobId: { type: ["string", "null"] }
+        checkinId: { type: ["string", "null"] }
+        date: { type: string }
+        hoursWorked: { type: number }
+        travelMinutes: { type: integer }
+        mileageMiles: { type: integer }
+        notes: { type: ["string", "null"] }
+
+    UpdateTimesheetEntryInput:
+      type: object
+      properties:
+        hoursWorked: { type: number }
+        travelMinutes: { type: integer }
+        mileageMiles: { type: integer }
+        notes: { type: ["string", "null"] }
+
+    RejectTimesheetEntryInput:
+      type: object
+      required: [reason]
+      properties:
+        reason: { type: string, minLength: 1 }
