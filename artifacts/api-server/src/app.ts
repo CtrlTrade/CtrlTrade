@@ -8,6 +8,8 @@ import { logger } from "./lib/logger";
 import { WebhookHandlers } from "./webhookHandlers";
 import { attachAuth } from "./middlewares/auth";
 import { meterApiUsage } from "./middlewares/usageMeter";
+import { handleTwilioInbound } from "./webhooks/twilio";
+import { handleResendEvent } from "./webhooks/resend";
 
 const app: Express = express();
 app.set("trust proxy", 1);
@@ -73,28 +75,26 @@ app.post(
 );
 
 // Twilio inbound (SMS + WhatsApp) — Twilio posts urlencoded form data and signs
-// the request using the exact public URL. We parse the body ourselves so the
-// shared urlencoded middleware doesn't consume it first and so we can verify
-// the signature against the raw form fields.
-import("./webhooks/twilio").then(({ handleTwilioInbound }) => {
-  app.post(
-    "/api/webhooks/twilio/inbound",
-    express.urlencoded({ extended: false }),
-    handleTwilioInbound,
-  );
-});
-import("./webhooks/resend").then(({ handleResendEvent }) => {
-  app.post(
-    "/api/webhooks/resend/events",
-    express.json({
-      limit: "1mb",
-      verify: (req: any, _res, buf) => {
-        req.rawBody = buf.toString("utf8");
-      },
-    }),
-    handleResendEvent,
-  );
-});
+// the request using the exact public URL. Registered SYNCHRONOUSLY before the
+// shared body parsers so the route-local parser consumes the body first and
+// the signature verifies against the raw form fields.
+app.post(
+  "/api/webhooks/twilio/inbound",
+  express.urlencoded({ extended: false }),
+  handleTwilioInbound,
+);
+// Resend events — route-local express.json with `verify` captures rawBody for
+// signature checking. Must register BEFORE the global JSON parser below.
+app.post(
+  "/api/webhooks/resend/events",
+  express.json({
+    limit: "1mb",
+    verify: (req: any, _res, buf) => {
+      req.rawBody = buf.toString("utf8");
+    },
+  }),
+  handleResendEvent,
+);
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
