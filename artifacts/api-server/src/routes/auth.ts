@@ -21,6 +21,17 @@ import { getUncachableStripeClient, isStripeConnected } from "../stripeClient";
 import { ensurePriceIds, buildLineItems } from "../lib/stripeSubscription";
 import { PRICING } from "../lib/pricing";
 import { logAudit } from "../lib/audit";
+import { platformReferralLinksTable, platformReferralConversionsTable } from "@workspace/db";
+
+function readRefCookie(req: { headers: { cookie?: string } }): string | null {
+  const header = req.headers.cookie;
+  if (!header) return null;
+  for (const part of header.split(";")) {
+    const [k, v] = part.trim().split("=");
+    if (k === "ctrltrade_ref" && v) return decodeURIComponent(v).toUpperCase();
+  }
+  return null;
+}
 
 const router: IRouter = Router();
 
@@ -212,6 +223,25 @@ router.post("/v1/auth/signup", async (req, res): Promise<void> => {
 
   req.session.userId = result.user.id;
   req.session.tenantId = result.tenant.id;
+
+  // Capture platform referral if present
+  const refCode = readRefCookie(req);
+  if (refCode) {
+    try {
+      const [link] = await db.select().from(platformReferralLinksTable).where(eq(platformReferralLinksTable.code, refCode));
+      if (link) {
+        await db.insert(platformReferralConversionsTable).values({
+          partnerId: link.partnerId,
+          linkId: link.id,
+          tenantId: result.tenant.id,
+          status: "signed_up",
+        }).onConflictDoNothing();
+        res.clearCookie("ctrltrade_ref");
+      }
+    } catch (err) {
+      req.log.warn({ err }, "Failed to record platform referral conversion");
+    }
+  }
 
   const tenantPayload = await serializeTenant(result.tenant);
   res.status(201).json({

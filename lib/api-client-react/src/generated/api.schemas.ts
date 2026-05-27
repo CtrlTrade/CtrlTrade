@@ -1902,6 +1902,466 @@ export interface OkResponse {
   ok: boolean;
 }
 
+export interface OkResult {
+  ok: boolean;
+}
+
+export interface PartnerSignupInput {
+  email: string;
+  /** @minLength 8 */
+  password: string;
+  /** @minLength 1 */
+  name: string;
+  company?: string;
+}
+
+export interface PartnerLoginInput {
+  email: string;
+  /** @minLength 1 */
+  password: string;
+}
+
+export interface PartnerProfile {
+  id: string;
+  email: string;
+  name: string;
+  /** @nullable */
+  company?: string | null;
+  status: string;
+  commissionType: string;
+  commissionPct: number;
+  commissionFixedPence: number;
+  /** @nullable */
+  payoutMethod?: string | null;
+}
+
+export interface PartnerSession {
+  partner: PartnerProfile;
+}
+
+export interface PartnerLinkInput {
+  label?: string;
+  landingPath?: string;
+}
+
+export interface PartnerLink {
+  id: string;
+  code: string;
+  /** @nullable */
+  label?: string | null;
+  landingPath: string;
+  shareUrl: string;
+  clicks: number;
+  createdAt: string;
+}
+
+export type PartnerDashboardTotals = {
+  clicks: number;
+  leads: number;
+  signups: number;
+  paying: number;
+  accruedPence: number;
+  paidPence: number;
+  currency: string;
+};
+
+export interface PartnerConversion {
+  id: string;
+  tenantName: string;
+  status: string;
+  /** @nullable */
+  firstPaidAt?: string | null;
+  createdAt: string;
+}
+
+export interface PartnerDashboard {
+  totals: PartnerDashboardTotals;
+  recentClicks: number;
+  recentLeads: number;
+  conversions: PartnerConversion[];
+}
+
+export interface PartnerCommission {
+  id: string;
+  tenantName: string;
+  periodStart: string;
+  periodEnd: string;
+  invoiceTotalPence?: number;
+  commissionPence: number;
+  currency: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface PartnerPayoutRequest {
+  notes?: string;
+}
+
+export interface PartnerPayout {
+  id: string;
+  amountPence: number;
+  currency: string;
+  status: string;
+  /** @nullable */
+  method?: string | null;
+  /** @nullable */
+  reference?: string | null;
+  /** @nullable */
+  notes?: string | null;
+  requestedAt: string;
+  /** @nullable */
+  decidedAt?: string | null;
+}
+
+export interface ReferralTrackInput {
+  /** @minLength 1 */
+  code: string;
+  landingPath?: string;
+}
+
+export type AdminPartnerTotals = {
+  clicks: number;
+  signups: number;
+  paying: number;
+  accruedPence: number;
+  currency: string;
+};
+
+export interface AdminPartner {
+  id: string;
+  email: string;
+  name: string;
+  /** @nullable */
+  company?: string | null;
+  status: string;
+  commissionType: string;
+  commissionPct: number;
+  commissionFixedPence: number;
+  /** @nullable */
+  payoutMethod?: string | null;
+  createdAt: string;
+  totals: AdminPartnerTotals;
+}
+
+export type AdminPartnerUpdateStatus = typeof AdminPartnerUpdateStatus[keyof typeof AdminPartnerUpdateStatus];
+
+
+export const AdminPartnerUpdateStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  disabled: 'disabled',
+} as const;
+
+export type AdminPartnerUpdateCommissionType = typeof AdminPartnerUpdateCommissionType[keyof typeof AdminPartnerUpdateCommissionType];
+
+
+export const AdminPartnerUpdateCommissionType = {
+  recurring: 'recurring',
+  fixed: 'fixed',
+} as const;
+
+export interface AdminPartnerUpdate {
+  status?: AdminPartnerUpdateStatus;
+  commissionType?: AdminPartnerUpdateCommissionType;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  commissionPct?: number;
+  /** @minimum 0 */
+  commissionFixedPence?: number;
+  payoutMethod?: string;
+}
+
+export interface AdminPayout {
+  id: string;
+  partnerId: string;
+  partnerName: string;
+  partnerEmail?: string;
+  amountPence: number;
+  currency: string;
+  status: string;
+  /** @nullable */
+  method?: string | null;
+  /** @nullable */
+  reference?: string | null;
+  /** @nullable */
+  notes?: string | null;
+  requestedAt: string;
+  /** @nullable */
+  decidedAt?: string | null;
+}
+
+export type AdminPayoutDecisionStatus = typeof AdminPayoutDecisionStatus[keyof typeof AdminPayoutDecisionStatus];
+
+
+export const AdminPayoutDecisionStatus = {
+  approved: 'approved',
+  paid: 'paid',
+  rejected: 'rejected',
+} as const;
+
+export interface AdminPayoutDecision {
+  status: AdminPayoutDecisionStatus;
+  reference?: string;
+  notes?: string;
+}
+
+export type ReferralCampaignInputRewardType = typeof ReferralCampaignInputRewardType[keyof typeof ReferralCampaignInputRewardType];
+
+
+export const ReferralCampaignInputRewardType = {
+  percent: 'percent',
+  fixed: 'fixed',
+  cash: 'cash',
+} as const;
+
+export interface ReferralCampaignInput {
+  /** @minLength 1 */
+  name: string;
+  rewardType: ReferralCampaignInputRewardType;
+  /** @minimum 0 */
+  rewardValuePence: number;
+  rewardForReferrer?: boolean;
+  rewardForReferee?: boolean;
+  description?: string;
+  active?: boolean;
+}
+
+export interface ReferralCampaign {
+  id: string;
+  name: string;
+  rewardType: string;
+  rewardValuePence: number;
+  rewardForReferrer: boolean;
+  rewardForReferee: boolean;
+  /** @nullable */
+  description?: string | null;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface ReferralConversionRecord {
+  id: string;
+  campaignName: string;
+  /** @nullable */
+  referrerName?: string | null;
+  /** @nullable */
+  refereeName?: string | null;
+  /** @nullable */
+  refereeEmail?: string | null;
+  status: string;
+  rewardPence: number;
+  createdAt: string;
+  /** @nullable */
+  rewardedAt?: string | null;
+}
+
+export interface PortalReferProgram {
+  enabled: boolean;
+  /** @nullable */
+  campaignName?: string | null;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  rewardSummary?: string | null;
+  /** @nullable */
+  myCode?: string | null;
+  /** @nullable */
+  shareUrl?: string | null;
+}
+
+export interface PortalReferralInput {
+  /** @minLength 1 */
+  name: string;
+  email?: string;
+  phone?: string;
+  message?: string;
+}
+
+export type MarketplaceListingInputListingType = typeof MarketplaceListingInputListingType[keyof typeof MarketplaceListingInputListingType];
+
+
+export const MarketplaceListingInputListingType = {
+  contractor: 'contractor',
+  supplier: 'supplier',
+  both: 'both',
+} as const;
+
+export type MarketplaceListingInputStatus = typeof MarketplaceListingInputStatus[keyof typeof MarketplaceListingInputStatus];
+
+
+export const MarketplaceListingInputStatus = {
+  draft: 'draft',
+  published: 'published',
+  paused: 'paused',
+} as const;
+
+export interface MarketplaceListingInput {
+  /** @minLength 1 */
+  headline: string;
+  bio?: string;
+  listingType: MarketplaceListingInputListingType;
+  categorySlugs?: string[];
+  serviceArea?: string;
+  regions?: string[];
+  /** @minimum 0 */
+  hourlyRatePence?: number;
+  /** @minimum 0 */
+  minJobValuePence?: number;
+  contactEmail?: string;
+  contactPhone?: string;
+  websiteUrl?: string;
+  galleryUrls?: string[];
+  status: MarketplaceListingInputStatus;
+}
+
+export interface MarketplaceListingSummary {
+  id: string;
+  tenantId?: string;
+  slug: string;
+  headline: string;
+  listingType: string;
+  categorySlugs: string[];
+  regions: string[];
+  /** @nullable */
+  serviceArea?: string | null;
+  /** @nullable */
+  hourlyRatePence?: number | null;
+  verified: boolean;
+  status: string;
+  /** @nullable */
+  ratingAverage: number | null;
+  reviewCount: number;
+  tenantName?: string;
+  /** @nullable */
+  brandColor?: string | null;
+  /** @nullable */
+  logoUrl?: string | null;
+}
+
+export interface MarketplaceReview {
+  id: string;
+  reviewerTenantId?: string;
+  reviewerTenantName: string;
+  rating: number;
+  /** @nullable */
+  comment?: string | null;
+  createdAt: string;
+}
+
+export type MarketplaceListingDetail = MarketplaceListingSummary & ({
+  /** @nullable */
+  bio: string | null;
+  /** @nullable */
+  minJobValuePence?: number | null;
+  /** @nullable */
+  contactEmail?: string | null;
+  /** @nullable */
+  contactPhone?: string | null;
+  /** @nullable */
+  websiteUrl?: string | null;
+  galleryUrls?: string[];
+  createdAt?: string;
+  reviews: MarketplaceReview[];
+});
+
+export type MarketplacePostInputKind = typeof MarketplacePostInputKind[keyof typeof MarketplacePostInputKind];
+
+
+export const MarketplacePostInputKind = {
+  job: 'job',
+  supplier_request: 'supplier_request',
+} as const;
+
+export type MarketplacePostInputStatus = typeof MarketplacePostInputStatus[keyof typeof MarketplacePostInputStatus];
+
+
+export const MarketplacePostInputStatus = {
+  open: 'open',
+  closed: 'closed',
+  fulfilled: 'fulfilled',
+} as const;
+
+export interface MarketplacePostInput {
+  kind: MarketplacePostInputKind;
+  /** @minLength 1 */
+  title: string;
+  /** @minLength 1 */
+  description: string;
+  categorySlugs?: string[];
+  region?: string;
+  /** @minimum 0 */
+  budgetPence?: number;
+  status?: MarketplacePostInputStatus;
+  closesAt?: string;
+}
+
+export interface MarketplacePost {
+  id: string;
+  tenantId: string;
+  tenantName: string;
+  kind: string;
+  title: string;
+  description: string;
+  categorySlugs: string[];
+  /** @nullable */
+  region?: string | null;
+  /** @nullable */
+  budgetPence?: number | null;
+  status: string;
+  /** @nullable */
+  closesAt?: string | null;
+  applicationCount: number;
+  createdAt: string;
+}
+
+export interface MarketplaceApplicationInput {
+  /** @minLength 1 */
+  message: string;
+  /** @minimum 0 */
+  bidPence?: number;
+}
+
+export interface MarketplaceApplication {
+  id: string;
+  /** @nullable */
+  postId: string | null;
+  applicantTenantId: string;
+  applicantTenantName: string;
+  ownerTenantId?: string;
+  /** @nullable */
+  listingId?: string | null;
+  message: string;
+  /** @nullable */
+  bidPence?: number | null;
+  status: string;
+  /** @nullable */
+  decidedAt?: string | null;
+  createdAt: string;
+}
+
+export type MarketplaceApplicationDecisionStatus = typeof MarketplaceApplicationDecisionStatus[keyof typeof MarketplaceApplicationDecisionStatus];
+
+
+export const MarketplaceApplicationDecisionStatus = {
+  accepted: 'accepted',
+  declined: 'declined',
+} as const;
+
+export interface MarketplaceApplicationDecision {
+  status: MarketplaceApplicationDecisionStatus;
+}
+
+export interface MarketplaceReviewInput {
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  rating: number;
+  comment?: string;
+}
+
 export type ListFilesParams = {
 parentKind: string;
 parentId: string;
@@ -1928,4 +2388,23 @@ export type ListLeadsParams = {
 status?: string;
 source?: string;
 };
+
+export type SearchMarketplaceParams = {
+q?: string;
+category?: string;
+region?: string;
+type?: string;
+};
+
+export type ListMarketplacePostsParams = {
+scope?: ListMarketplacePostsScope;
+};
+
+export type ListMarketplacePostsScope = typeof ListMarketplacePostsScope[keyof typeof ListMarketplacePostsScope];
+
+
+export const ListMarketplacePostsScope = {
+  mine: 'mine',
+  all: 'all',
+} as const;
 

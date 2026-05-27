@@ -27,7 +27,10 @@ export function PortalDashboard() {
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold uppercase tracking-tighter">Your account</h1>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <h1 className="text-3xl font-bold uppercase tracking-tighter">Your account</h1>
+        <Link href={`/portal/${tenantSlug}/refer`} className="text-xs uppercase tracking-wider font-bold underline" data-testid="link-portal-refer">Refer a friend →</Link>
+      </div>
 
       <Card className="rounded-none border-border shadow-sm">
         <CardHeader>

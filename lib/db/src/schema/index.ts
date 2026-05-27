@@ -915,3 +915,331 @@ export type NotificationTemplate = typeof notificationTemplatesTable.$inferSelec
 export type NotificationPreference = typeof notificationPreferencesTable.$inferSelect;
 export type InboxThread = typeof inboxThreadsTable.$inferSelect;
 export type InboxMessage = typeof inboxMessagesTable.$inferSelect;
+
+// ============================================================================
+// Platform referrals — CtrlTrade grows via affiliate partners
+// ============================================================================
+
+export const platformReferralPartnersTable = pgTable(
+  "platform_referral_partners",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    name: text("name").notNull(),
+    company: text("company"),
+    passwordHash: text("password_hash").notNull(),
+    status: varchar("status", { length: 16 }).notNull().default("pending"), // pending|approved|disabled
+    commissionType: varchar("commission_type", { length: 16 }).notNull().default("recurring"), // recurring|fixed
+    commissionPct: integer("commission_pct").notNull().default(20), // % of MRR for recurring
+    commissionFixedPence: integer("commission_fixed_pence").notNull().default(0), // for fixed
+    payoutMethod: varchar("payout_method", { length: 24 }),
+    payoutDetails: jsonb("payout_details"),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    approvedByUserId: uuid("approved_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    statusIdx: index("platform_partners_status_idx").on(t.status),
+  }),
+);
+
+export const platformReferralLinksTable = pgTable(
+  "platform_referral_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    partnerId: uuid("partner_id").notNull().references(() => platformReferralPartnersTable.id, { onDelete: "cascade" }),
+    code: varchar("code", { length: 32 }).notNull().unique(),
+    label: text("label"),
+    landingPath: text("landing_path").notNull().default("/"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    partnerIdx: index("platform_links_partner_idx").on(t.partnerId),
+  }),
+);
+
+export const platformReferralClicksTable = pgTable(
+  "platform_referral_clicks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    linkId: uuid("link_id").notNull().references(() => platformReferralLinksTable.id, { onDelete: "cascade" }),
+    partnerId: uuid("partner_id").notNull().references(() => platformReferralPartnersTable.id, { onDelete: "cascade" }),
+    ip: text("ip"),
+    userAgent: text("user_agent"),
+    landingPath: text("landing_path"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    linkIdx: index("platform_clicks_link_idx").on(t.linkId, t.createdAt),
+  }),
+);
+
+export const platformReferralLeadsTable = pgTable(
+  "platform_referral_leads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    linkId: uuid("link_id").references(() => platformReferralLinksTable.id, { onDelete: "set null" }),
+    partnerId: uuid("partner_id").notNull().references(() => platformReferralPartnersTable.id, { onDelete: "cascade" }),
+    email: varchar("email", { length: 255 }),
+    company: text("company"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    partnerIdx: index("platform_leads_partner_idx").on(t.partnerId, t.createdAt),
+  }),
+);
+
+export const platformReferralConversionsTable = pgTable(
+  "platform_referral_conversions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    partnerId: uuid("partner_id").notNull().references(() => platformReferralPartnersTable.id, { onDelete: "cascade" }),
+    linkId: uuid("link_id").references(() => platformReferralLinksTable.id, { onDelete: "set null" }),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }).unique(),
+    firstPaidAt: timestamp("first_paid_at", { withTimezone: true }),
+    status: varchar("status", { length: 16 }).notNull().default("signed_up"), // signed_up|paying|churned
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    partnerIdx: index("platform_conv_partner_idx").on(t.partnerId),
+  }),
+);
+
+export const platformReferralCommissionsTable = pgTable(
+  "platform_referral_commissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    partnerId: uuid("partner_id").notNull().references(() => platformReferralPartnersTable.id, { onDelete: "cascade" }),
+    conversionId: uuid("conversion_id").notNull().references(() => platformReferralConversionsTable.id, { onDelete: "cascade" }),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
+    periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
+    invoiceTotalPence: integer("invoice_total_pence").notNull().default(0),
+    commissionPence: integer("commission_pence").notNull().default(0),
+    currency: varchar("currency", { length: 8 }).notNull().default("gbp"),
+    status: varchar("status", { length: 16 }).notNull().default("accrued"), // accrued|approved|paid|void
+    stripeInvoiceId: text("stripe_invoice_id"),
+    payoutId: uuid("payout_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    partnerIdx: index("platform_comm_partner_idx").on(t.partnerId, t.status),
+    invoiceIdx: uniqueIndex("platform_comm_invoice_uniq")
+      .on(t.stripeInvoiceId)
+      .where(sql`stripe_invoice_id IS NOT NULL`),
+  }),
+);
+
+export const platformReferralPayoutsTable = pgTable(
+  "platform_referral_payouts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    partnerId: uuid("partner_id").notNull().references(() => platformReferralPartnersTable.id, { onDelete: "cascade" }),
+    amountPence: integer("amount_pence").notNull().default(0),
+    currency: varchar("currency", { length: 8 }).notNull().default("gbp"),
+    status: varchar("status", { length: 16 }).notNull().default("requested"), // requested|approved|paid|rejected
+    method: varchar("method", { length: 24 }),
+    reference: text("reference"),
+    notes: text("notes"),
+    requestedAt: timestamp("requested_at", { withTimezone: true }).notNull().defaultNow(),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    decidedByUserId: uuid("decided_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+  },
+  (t) => ({
+    partnerIdx: index("platform_payouts_partner_idx").on(t.partnerId, t.status),
+  }),
+);
+
+// ============================================================================
+// Tenant referrals — tenants reward their customers for referring friends
+// ============================================================================
+
+export const tenantReferralCampaignsTable = pgTable(
+  "tenant_referral_campaigns",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    rewardType: varchar("reward_type", { length: 16 }).notNull(), // percent|fixed|cash
+    rewardValuePence: integer("reward_value_pence").notNull().default(0), // pence for fixed/cash, % for percent
+    rewardForReferrer: boolean("reward_for_referrer").notNull().default(true),
+    rewardForReferee: boolean("reward_for_referee").notNull().default(false),
+    description: text("description"),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("tenant_campaigns_tenant_idx").on(t.tenantId),
+  }),
+);
+
+export const tenantReferralCodesTable = pgTable(
+  "tenant_referral_codes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    campaignId: uuid("campaign_id").notNull().references(() => tenantReferralCampaignsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").references(() => customersTable.id, { onDelete: "cascade" }),
+    code: varchar("code", { length: 32 }).notNull(),
+    shareUrl: text("share_url"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("tenant_codes_tenant_idx").on(t.tenantId),
+    uniqCode: unique("tenant_codes_tenant_code_uniq").on(t.tenantId, t.code),
+  }),
+);
+
+export const tenantReferralConversionsTable = pgTable(
+  "tenant_referral_conversions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    campaignId: uuid("campaign_id").notNull().references(() => tenantReferralCampaignsTable.id, { onDelete: "cascade" }),
+    codeId: uuid("code_id").notNull().references(() => tenantReferralCodesTable.id, { onDelete: "cascade" }),
+    referrerCustomerId: uuid("referrer_customer_id").references(() => customersTable.id, { onDelete: "set null" }),
+    refereeCustomerId: uuid("referee_customer_id").references(() => customersTable.id, { onDelete: "set null" }),
+    refereeName: text("referee_name"),
+    refereeEmail: varchar("referee_email", { length: 255 }),
+    status: varchar("status", { length: 16 }).notNull().default("pending"), // pending|qualified|rewarded|void
+    completedJobId: uuid("completed_job_id").references(() => jobsTable.id, { onDelete: "set null" }),
+    rewardPence: integer("reward_pence").notNull().default(0),
+    rewardedAt: timestamp("rewarded_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("tenant_conv_tenant_idx").on(t.tenantId, t.status),
+    referrerIdx: index("tenant_conv_referrer_idx").on(t.referrerCustomerId),
+  }),
+);
+
+export const tenantReferralRewardsTable = pgTable(
+  "tenant_referral_rewards",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    conversionId: uuid("conversion_id").notNull().references(() => tenantReferralConversionsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").notNull().references(() => customersTable.id, { onDelete: "cascade" }),
+    kind: varchar("kind", { length: 16 }).notNull(), // credit|cash|discount
+    amountPence: integer("amount_pence").notNull().default(0),
+    currency: varchar("currency", { length: 8 }).notNull().default("gbp"),
+    status: varchar("status", { length: 16 }).notNull().default("issued"), // issued|redeemed|void
+    redeemedAt: timestamp("redeemed_at", { withTimezone: true }),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("tenant_rewards_tenant_idx").on(t.tenantId),
+    customerIdx: index("tenant_rewards_customer_idx").on(t.customerId),
+  }),
+);
+
+// ============================================================================
+// Marketplace — contractor & supplier directory + applications + B2B reviews
+// ============================================================================
+
+export const marketplaceListingsTable = pgTable(
+  "marketplace_listings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }).unique(),
+    slug: varchar("slug", { length: 96 }).notNull().unique(),
+    listingType: varchar("listing_type", { length: 16 }).notNull().default("contractor"), // contractor|supplier|both
+    headline: text("headline").notNull(),
+    bio: text("bio"),
+    categorySlugs: text("category_slugs").array().notNull().default(sql`'{}'::text[]`),
+    serviceArea: text("service_area"),
+    regions: text("regions").array().notNull().default(sql`'{}'::text[]`),
+    hourlyRatePence: integer("hourly_rate_pence"),
+    minJobValuePence: integer("min_job_value_pence"),
+    contactEmail: varchar("contact_email", { length: 255 }),
+    contactPhone: text("contact_phone"),
+    websiteUrl: text("website_url"),
+    galleryUrls: text("gallery_urls").array().notNull().default(sql`'{}'::text[]`),
+    verified: boolean("verified").notNull().default(false),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    status: varchar("status", { length: 16 }).notNull().default("draft"), // draft|published|paused
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    statusIdx: index("marketplace_listings_status_idx").on(t.status),
+    typeIdx: index("marketplace_listings_type_idx").on(t.listingType),
+  }),
+);
+
+export const marketplacePostsTable = pgTable(
+  "marketplace_posts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    kind: varchar("kind", { length: 16 }).notNull(), // job|supplier_request
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    categorySlugs: text("category_slugs").array().notNull().default(sql`'{}'::text[]`),
+    region: text("region"),
+    budgetPence: integer("budget_pence"),
+    status: varchar("status", { length: 16 }).notNull().default("open"), // open|closed|fulfilled
+    closesAt: timestamp("closes_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    statusIdx: index("marketplace_posts_status_idx").on(t.status),
+    tenantIdx: index("marketplace_posts_tenant_idx").on(t.tenantId),
+  }),
+);
+
+export const marketplaceApplicationsTable = pgTable(
+  "marketplace_applications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    postId: uuid("post_id").references(() => marketplacePostsTable.id, { onDelete: "cascade" }),
+    listingId: uuid("listing_id").references(() => marketplaceListingsTable.id, { onDelete: "set null" }),
+    applicantTenantId: uuid("applicant_tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    ownerTenantId: uuid("owner_tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    message: text("message").notNull(),
+    bidPence: integer("bid_pence"),
+    status: varchar("status", { length: 16 }).notNull().default("submitted"), // submitted|accepted|declined|withdrawn
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    postIdx: index("marketplace_apps_post_idx").on(t.postId),
+    applicantIdx: index("marketplace_apps_applicant_idx").on(t.applicantTenantId),
+    ownerIdx: index("marketplace_apps_owner_idx").on(t.ownerTenantId),
+  }),
+);
+
+export const marketplaceReviewsTable = pgTable(
+  "marketplace_reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    listingId: uuid("listing_id").notNull().references(() => marketplaceListingsTable.id, { onDelete: "cascade" }),
+    reviewerTenantId: uuid("reviewer_tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    rating: integer("rating").notNull(),
+    comment: text("comment"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    listingIdx: index("marketplace_reviews_listing_idx").on(t.listingId),
+    uniq: unique("marketplace_reviews_uniq").on(t.listingId, t.reviewerTenantId),
+  }),
+);
+
+export type PlatformReferralPartner = typeof platformReferralPartnersTable.$inferSelect;
+export type PlatformReferralLink = typeof platformReferralLinksTable.$inferSelect;
+export type PlatformReferralConversion = typeof platformReferralConversionsTable.$inferSelect;
+export type PlatformReferralCommission = typeof platformReferralCommissionsTable.$inferSelect;
+export type PlatformReferralPayout = typeof platformReferralPayoutsTable.$inferSelect;
+export type TenantReferralCampaign = typeof tenantReferralCampaignsTable.$inferSelect;
+export type TenantReferralCode = typeof tenantReferralCodesTable.$inferSelect;
+export type TenantReferralConversion = typeof tenantReferralConversionsTable.$inferSelect;
+export type TenantReferralReward = typeof tenantReferralRewardsTable.$inferSelect;
+export type MarketplaceListing = typeof marketplaceListingsTable.$inferSelect;
+export type MarketplacePost = typeof marketplacePostsTable.$inferSelect;
+export type MarketplaceApplication = typeof marketplaceApplicationsTable.$inferSelect;
+export type MarketplaceReview = typeof marketplaceReviewsTable.$inferSelect;

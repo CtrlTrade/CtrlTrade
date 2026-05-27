@@ -27,6 +27,10 @@ import usageRouter from "./usage";
 import adminWorkersRouter from "./adminWorkers";
 import inboxRouter from "./inbox";
 import notificationsRouter from "./notifications";
+import partnerRouter from "./partner";
+import adminReferralsRouter from "./adminReferrals";
+import tenantReferralsRouter from "./tenantReferrals";
+import marketplaceRouter from "./marketplace";
 
 const router: IRouter = Router();
 
@@ -65,5 +69,9 @@ router.use(usageRouter);
 router.use(adminWorkersRouter);
 router.use(inboxRouter);
 router.use(notificationsRouter);
+router.use(partnerRouter);
+router.use(adminReferralsRouter);
+router.use(tenantReferralsRouter);
+router.use(marketplaceRouter);
 
 export default router;

@@ -2436,6 +2436,527 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/OkResponse" }
 
+  /v1/public/partner/signup:
+    post:
+      operationId: partnerSignup
+      tags: [partner]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerSignupInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerSession" }
+
+  /v1/public/partner/login:
+    post:
+      operationId: partnerLogin
+      tags: [partner]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerLoginInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerSession" }
+
+  /v1/partner/logout:
+    post:
+      operationId: partnerLogout
+      tags: [partner]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OkResult" }
+
+  /v1/partner/me:
+    get:
+      operationId: getPartnerMe
+      tags: [partner]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerSession" }
+
+  /v1/partner/dashboard:
+    get:
+      operationId: getPartnerDashboard
+      tags: [partner]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerDashboard" }
+
+  /v1/partner/links:
+    get:
+      operationId: listPartnerLinks
+      tags: [partner]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PartnerLink" }
+    post:
+      operationId: createPartnerLink
+      tags: [partner]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerLinkInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerLink" }
+
+  /v1/partner/commissions:
+    get:
+      operationId: listPartnerCommissions
+      tags: [partner]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PartnerCommission" }
+
+  /v1/partner/payouts:
+    get:
+      operationId: listPartnerPayouts
+      tags: [partner]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PartnerPayout" }
+    post:
+      operationId: requestPartnerPayout
+      tags: [partner]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerPayoutRequest" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerPayout" }
+
+  /v1/public/referral/track:
+    post:
+      operationId: trackReferralClick
+      tags: [partner]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReferralTrackInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OkResult" }
+
+  /v1/admin/referrals/partners:
+    get:
+      operationId: adminListPartners
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminPartner" }
+
+  /v1/admin/referrals/partners/{partnerId}:
+    parameters:
+      - in: path
+        name: partnerId
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: adminUpdatePartner
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminPartnerUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminPartner" }
+
+  /v1/admin/referrals/payouts:
+    get:
+      operationId: adminListPayouts
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminPayout" }
+
+  /v1/admin/referrals/payouts/{payoutId}/decide:
+    parameters:
+      - in: path
+        name: payoutId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: adminDecidePayout
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminPayoutDecision" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminPayout" }
+
+  /v1/referral-campaigns:
+    get:
+      operationId: listReferralCampaigns
+      tags: [tenant-referrals]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ReferralCampaign" }
+    post:
+      operationId: createReferralCampaign
+      tags: [tenant-referrals]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReferralCampaignInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReferralCampaign" }
+
+  /v1/referral-campaigns/{campaignId}:
+    parameters:
+      - in: path
+        name: campaignId
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateReferralCampaign
+      tags: [tenant-referrals]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReferralCampaignInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReferralCampaign" }
+    delete:
+      operationId: deleteReferralCampaign
+      tags: [tenant-referrals]
+      responses:
+        "204": { description: Deleted }
+
+  /v1/referral-conversions:
+    get:
+      operationId: listReferralConversions
+      tags: [tenant-referrals]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ReferralConversionRecord" }
+
+  /v1/referral-conversions/{conversionId}/reward:
+    parameters:
+      - in: path
+        name: conversionId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: issueReferralReward
+      tags: [tenant-referrals]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReferralConversionRecord" }
+
+  /v1/public/portal/{tenantSlug}/refer:
+    parameters:
+      - in: path
+        name: tenantSlug
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getPortalReferProgram
+      tags: [tenant-referrals]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PortalReferProgram" }
+    post:
+      operationId: submitPortalReferral
+      tags: [tenant-referrals]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PortalReferralInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OkResult" }
+
+  /v1/public/marketplace/listings:
+    get:
+      operationId: searchMarketplace
+      tags: [marketplace]
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: region
+          schema: { type: string }
+        - in: query
+          name: type
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MarketplaceListingSummary" }
+
+  /v1/public/marketplace/listings/{slug}:
+    parameters:
+      - in: path
+        name: slug
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getMarketplaceListing
+      tags: [marketplace]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MarketplaceListingDetail" }
+
+  /v1/marketplace/listing:
+    get:
+      operationId: getMyMarketplaceListing
+      tags: [marketplace]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MarketplaceListingDetail" }
+    put:
+      operationId: upsertMyMarketplaceListing
+      tags: [marketplace]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MarketplaceListingInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MarketplaceListingDetail" }
+
+  /v1/marketplace/posts:
+    get:
+      operationId: listMarketplacePosts
+      tags: [marketplace]
+      parameters:
+        - in: query
+          name: scope
+          schema: { type: string, enum: [mine, all] }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MarketplacePost" }
+    post:
+      operationId: createMarketplacePost
+      tags: [marketplace]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MarketplacePostInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MarketplacePost" }
+
+  /v1/marketplace/posts/{postId}:
+    parameters:
+      - in: path
+        name: postId
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateMarketplacePost
+      tags: [marketplace]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MarketplacePostInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MarketplacePost" }
+
+  /v1/marketplace/posts/{postId}/applications:
+    parameters:
+      - in: path
+        name: postId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: listMarketplaceApplications
+      tags: [marketplace]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MarketplaceApplication" }
+    post:
+      operationId: createMarketplaceApplication
+      tags: [marketplace]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MarketplaceApplicationInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MarketplaceApplication" }
+
+  /v1/marketplace/applications/{applicationId}/decide:
+    parameters:
+      - in: path
+        name: applicationId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: decideMarketplaceApplication
+      tags: [marketplace]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MarketplaceApplicationDecision" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MarketplaceApplication" }
+
+  /v1/marketplace/listings/{listingId}/reviews:
+    parameters:
+      - in: path
+        name: listingId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: createMarketplaceReview
+      tags: [marketplace]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MarketplaceReviewInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MarketplaceReview" }
+
 components:
   schemas:
     HealthStatus:
@@ -4395,3 +4916,404 @@ components:
       required: [ok]
       properties:
         ok: { type: boolean }
+
+    OkResult:
+      type: object
+      required: [ok]
+      properties:
+        ok: { type: boolean }
+
+    PartnerSignupInput:
+      type: object
+      required: [email, password, name]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+        name: { type: string, minLength: 1 }
+        company: { type: string }
+
+    PartnerLoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 1 }
+
+    PartnerSession:
+      type: object
+      required: [partner]
+      properties:
+        partner: { $ref: "#/components/schemas/PartnerProfile" }
+
+    PartnerProfile:
+      type: object
+      required: [id, email, name, status, commissionType, commissionPct, commissionFixedPence]
+      properties:
+        id: { type: string }
+        email: { type: string }
+        name: { type: string }
+        company: { type: ["string", "null"] }
+        status: { type: string }
+        commissionType: { type: string }
+        commissionPct: { type: integer }
+        commissionFixedPence: { type: integer }
+        payoutMethod: { type: ["string", "null"] }
+
+    PartnerLinkInput:
+      type: object
+      properties:
+        label: { type: string }
+        landingPath: { type: string }
+
+    PartnerLink:
+      type: object
+      required: [id, code, landingPath, shareUrl, createdAt, clicks]
+      properties:
+        id: { type: string }
+        code: { type: string }
+        label: { type: ["string", "null"] }
+        landingPath: { type: string }
+        shareUrl: { type: string }
+        clicks: { type: integer }
+        createdAt: { type: string, format: date-time }
+
+    PartnerDashboard:
+      type: object
+      required: [totals, recentClicks, recentLeads, conversions]
+      properties:
+        totals:
+          type: object
+          required: [clicks, leads, signups, paying, accruedPence, paidPence, currency]
+          properties:
+            clicks: { type: integer }
+            leads: { type: integer }
+            signups: { type: integer }
+            paying: { type: integer }
+            accruedPence: { type: integer }
+            paidPence: { type: integer }
+            currency: { type: string }
+        recentClicks: { type: integer }
+        recentLeads: { type: integer }
+        conversions:
+          type: array
+          items: { $ref: "#/components/schemas/PartnerConversion" }
+
+    PartnerConversion:
+      type: object
+      required: [id, tenantName, status, createdAt]
+      properties:
+        id: { type: string }
+        tenantName: { type: string }
+        status: { type: string }
+        firstPaidAt: { type: ["string", "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+
+    PartnerCommission:
+      type: object
+      required: [id, tenantName, periodStart, periodEnd, commissionPence, currency, status, createdAt]
+      properties:
+        id: { type: string }
+        tenantName: { type: string }
+        periodStart: { type: string, format: date-time }
+        periodEnd: { type: string, format: date-time }
+        invoiceTotalPence: { type: integer }
+        commissionPence: { type: integer }
+        currency: { type: string }
+        status: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    PartnerPayoutRequest:
+      type: object
+      properties:
+        notes: { type: string }
+
+    PartnerPayout:
+      type: object
+      required: [id, amountPence, currency, status, requestedAt]
+      properties:
+        id: { type: string }
+        amountPence: { type: integer }
+        currency: { type: string }
+        status: { type: string }
+        method: { type: ["string", "null"] }
+        reference: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        requestedAt: { type: string, format: date-time }
+        decidedAt: { type: ["string", "null"], format: date-time }
+
+    ReferralTrackInput:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string, minLength: 1 }
+        landingPath: { type: string }
+
+    AdminPartner:
+      type: object
+      required: [id, email, name, status, commissionType, commissionPct, commissionFixedPence, totals, createdAt]
+      properties:
+        id: { type: string }
+        email: { type: string }
+        name: { type: string }
+        company: { type: ["string", "null"] }
+        status: { type: string }
+        commissionType: { type: string }
+        commissionPct: { type: integer }
+        commissionFixedPence: { type: integer }
+        payoutMethod: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        totals:
+          type: object
+          required: [clicks, signups, paying, accruedPence, currency]
+          properties:
+            clicks: { type: integer }
+            signups: { type: integer }
+            paying: { type: integer }
+            accruedPence: { type: integer }
+            currency: { type: string }
+
+    AdminPartnerUpdate:
+      type: object
+      properties:
+        status: { type: string, enum: [pending, approved, disabled] }
+        commissionType: { type: string, enum: [recurring, fixed] }
+        commissionPct: { type: integer, minimum: 0, maximum: 100 }
+        commissionFixedPence: { type: integer, minimum: 0 }
+        payoutMethod: { type: string }
+
+    AdminPayout:
+      type: object
+      required: [id, partnerId, partnerName, amountPence, currency, status, requestedAt]
+      properties:
+        id: { type: string }
+        partnerId: { type: string }
+        partnerName: { type: string }
+        partnerEmail: { type: string }
+        amountPence: { type: integer }
+        currency: { type: string }
+        status: { type: string }
+        method: { type: ["string", "null"] }
+        reference: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        requestedAt: { type: string, format: date-time }
+        decidedAt: { type: ["string", "null"], format: date-time }
+
+    AdminPayoutDecision:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [approved, paid, rejected] }
+        reference: { type: string }
+        notes: { type: string }
+
+    ReferralCampaignInput:
+      type: object
+      required: [name, rewardType, rewardValuePence]
+      properties:
+        name: { type: string, minLength: 1 }
+        rewardType: { type: string, enum: [percent, fixed, cash] }
+        rewardValuePence: { type: integer, minimum: 0 }
+        rewardForReferrer: { type: boolean }
+        rewardForReferee: { type: boolean }
+        description: { type: string }
+        active: { type: boolean }
+
+    ReferralCampaign:
+      type: object
+      required: [id, name, rewardType, rewardValuePence, rewardForReferrer, rewardForReferee, active, createdAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        rewardType: { type: string }
+        rewardValuePence: { type: integer }
+        rewardForReferrer: { type: boolean }
+        rewardForReferee: { type: boolean }
+        description: { type: ["string", "null"] }
+        active: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    ReferralConversionRecord:
+      type: object
+      required: [id, campaignName, status, createdAt, rewardPence]
+      properties:
+        id: { type: string }
+        campaignName: { type: string }
+        referrerName: { type: ["string", "null"] }
+        refereeName: { type: ["string", "null"] }
+        refereeEmail: { type: ["string", "null"] }
+        status: { type: string }
+        rewardPence: { type: integer }
+        createdAt: { type: string, format: date-time }
+        rewardedAt: { type: ["string", "null"], format: date-time }
+
+    PortalReferProgram:
+      type: object
+      required: [enabled]
+      properties:
+        enabled: { type: boolean }
+        campaignName: { type: ["string", "null"] }
+        description: { type: ["string", "null"] }
+        rewardSummary: { type: ["string", "null"] }
+        myCode: { type: ["string", "null"] }
+        shareUrl: { type: ["string", "null"] }
+
+    PortalReferralInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        email: { type: string }
+        phone: { type: string }
+        message: { type: string }
+
+    MarketplaceListingInput:
+      type: object
+      required: [headline, listingType, status]
+      properties:
+        headline: { type: string, minLength: 1 }
+        bio: { type: string }
+        listingType: { type: string, enum: [contractor, supplier, both] }
+        categorySlugs:
+          type: array
+          items: { type: string }
+        serviceArea: { type: string }
+        regions:
+          type: array
+          items: { type: string }
+        hourlyRatePence: { type: integer, minimum: 0 }
+        minJobValuePence: { type: integer, minimum: 0 }
+        contactEmail: { type: string }
+        contactPhone: { type: string }
+        websiteUrl: { type: string }
+        galleryUrls:
+          type: array
+          items: { type: string }
+        status: { type: string, enum: [draft, published, paused] }
+
+    MarketplaceListingSummary:
+      type: object
+      required: [id, slug, headline, listingType, categorySlugs, regions, verified, status, ratingAverage, reviewCount]
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        slug: { type: string }
+        headline: { type: string }
+        listingType: { type: string }
+        categorySlugs:
+          type: array
+          items: { type: string }
+        regions:
+          type: array
+          items: { type: string }
+        serviceArea: { type: ["string", "null"] }
+        hourlyRatePence: { type: ["integer", "null"] }
+        verified: { type: boolean }
+        status: { type: string }
+        ratingAverage: { type: ["number", "null"] }
+        reviewCount: { type: integer }
+        tenantName: { type: string }
+        brandColor: { type: ["string", "null"] }
+        logoUrl: { type: ["string", "null"] }
+
+    MarketplaceListingDetail:
+      allOf:
+        - $ref: "#/components/schemas/MarketplaceListingSummary"
+        - type: object
+          required: [reviews, bio]
+          properties:
+            bio: { type: ["string", "null"] }
+            minJobValuePence: { type: ["integer", "null"] }
+            contactEmail: { type: ["string", "null"] }
+            contactPhone: { type: ["string", "null"] }
+            websiteUrl: { type: ["string", "null"] }
+            galleryUrls:
+              type: array
+              items: { type: string }
+            createdAt: { type: string, format: date-time }
+            reviews:
+              type: array
+              items: { $ref: "#/components/schemas/MarketplaceReview" }
+
+    MarketplacePostInput:
+      type: object
+      required: [kind, title, description]
+      properties:
+        kind: { type: string, enum: [job, supplier_request] }
+        title: { type: string, minLength: 1 }
+        description: { type: string, minLength: 1 }
+        categorySlugs:
+          type: array
+          items: { type: string }
+        region: { type: string }
+        budgetPence: { type: integer, minimum: 0 }
+        status: { type: string, enum: [open, closed, fulfilled] }
+        closesAt: { type: string, format: date-time }
+
+    MarketplacePost:
+      type: object
+      required: [id, tenantId, tenantName, kind, title, description, categorySlugs, status, createdAt, applicationCount]
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        tenantName: { type: string }
+        kind: { type: string }
+        title: { type: string }
+        description: { type: string }
+        categorySlugs:
+          type: array
+          items: { type: string }
+        region: { type: ["string", "null"] }
+        budgetPence: { type: ["integer", "null"] }
+        status: { type: string }
+        closesAt: { type: ["string", "null"], format: date-time }
+        applicationCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+
+    MarketplaceApplicationInput:
+      type: object
+      required: [message]
+      properties:
+        message: { type: string, minLength: 1 }
+        bidPence: { type: integer, minimum: 0 }
+
+    MarketplaceApplication:
+      type: object
+      required: [id, postId, applicantTenantId, applicantTenantName, message, status, createdAt]
+      properties:
+        id: { type: string }
+        postId: { type: ["string", "null"] }
+        applicantTenantId: { type: string }
+        applicantTenantName: { type: string }
+        ownerTenantId: { type: string }
+        listingId: { type: ["string", "null"] }
+        message: { type: string }
+        bidPence: { type: ["integer", "null"] }
+        status: { type: string }
+        decidedAt: { type: ["string", "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+
+    MarketplaceApplicationDecision:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [accepted, declined] }
+
+    MarketplaceReviewInput:
+      type: object
+      required: [rating]
+      properties:
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        comment: { type: string }
+
+    MarketplaceReview:
+      type: object
+      required: [id, rating, createdAt, reviewerTenantName]
+      properties:
+        id: { type: string }
+        reviewerTenantId: { type: string }
+        reviewerTenantName: { type: string }
+        rating: { type: integer }
+        comment: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+

@@ -3843,3 +3843,708 @@ export const UpsertNotificationTemplateResponse = zod.object({
 })
 
 
+export const partnerSignupBodyPasswordMin = 8;
+
+
+
+
+export const PartnerSignupBody = zod.object({
+  "email": zod.string().email(),
+  "password": zod.string().min(partnerSignupBodyPasswordMin),
+  "name": zod.string().min(1),
+  "company": zod.string().optional()
+})
+
+export const PartnerSignupResponse = zod.object({
+  "partner": zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "company": zod.string().nullish(),
+  "status": zod.string(),
+  "commissionType": zod.string(),
+  "commissionPct": zod.number(),
+  "commissionFixedPence": zod.number(),
+  "payoutMethod": zod.string().nullish()
+})
+})
+
+
+
+
+
+export const PartnerLoginBody = zod.object({
+  "email": zod.string().email(),
+  "password": zod.string().min(1)
+})
+
+export const PartnerLoginResponse = zod.object({
+  "partner": zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "company": zod.string().nullish(),
+  "status": zod.string(),
+  "commissionType": zod.string(),
+  "commissionPct": zod.number(),
+  "commissionFixedPence": zod.number(),
+  "payoutMethod": zod.string().nullish()
+})
+})
+
+
+export const PartnerLogoutResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const GetPartnerMeResponse = zod.object({
+  "partner": zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "company": zod.string().nullish(),
+  "status": zod.string(),
+  "commissionType": zod.string(),
+  "commissionPct": zod.number(),
+  "commissionFixedPence": zod.number(),
+  "payoutMethod": zod.string().nullish()
+})
+})
+
+
+export const GetPartnerDashboardResponse = zod.object({
+  "totals": zod.object({
+  "clicks": zod.number(),
+  "leads": zod.number(),
+  "signups": zod.number(),
+  "paying": zod.number(),
+  "accruedPence": zod.number(),
+  "paidPence": zod.number(),
+  "currency": zod.string()
+}),
+  "recentClicks": zod.number(),
+  "recentLeads": zod.number(),
+  "conversions": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantName": zod.string(),
+  "status": zod.string(),
+  "firstPaidAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+export const ListPartnerLinksResponseItem = zod.object({
+  "id": zod.string(),
+  "code": zod.string(),
+  "label": zod.string().nullish(),
+  "landingPath": zod.string(),
+  "shareUrl": zod.string(),
+  "clicks": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListPartnerLinksResponse = zod.array(ListPartnerLinksResponseItem)
+
+
+export const CreatePartnerLinkBody = zod.object({
+  "label": zod.string().optional(),
+  "landingPath": zod.string().optional()
+})
+
+
+export const ListPartnerCommissionsResponseItem = zod.object({
+  "id": zod.string(),
+  "tenantName": zod.string(),
+  "periodStart": zod.coerce.date(),
+  "periodEnd": zod.coerce.date(),
+  "invoiceTotalPence": zod.number().optional(),
+  "commissionPence": zod.number(),
+  "currency": zod.string(),
+  "status": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+export const ListPartnerCommissionsResponse = zod.array(ListPartnerCommissionsResponseItem)
+
+
+export const ListPartnerPayoutsResponseItem = zod.object({
+  "id": zod.string(),
+  "amountPence": zod.number(),
+  "currency": zod.string(),
+  "status": zod.string(),
+  "method": zod.string().nullish(),
+  "reference": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "requestedAt": zod.coerce.date(),
+  "decidedAt": zod.coerce.date().nullish()
+})
+export const ListPartnerPayoutsResponse = zod.array(ListPartnerPayoutsResponseItem)
+
+
+export const RequestPartnerPayoutBody = zod.object({
+  "notes": zod.string().optional()
+})
+
+
+
+
+
+export const TrackReferralClickBody = zod.object({
+  "code": zod.string().min(1),
+  "landingPath": zod.string().optional()
+})
+
+export const TrackReferralClickResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const AdminListPartnersResponseItem = zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "company": zod.string().nullish(),
+  "status": zod.string(),
+  "commissionType": zod.string(),
+  "commissionPct": zod.number(),
+  "commissionFixedPence": zod.number(),
+  "payoutMethod": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "totals": zod.object({
+  "clicks": zod.number(),
+  "signups": zod.number(),
+  "paying": zod.number(),
+  "accruedPence": zod.number(),
+  "currency": zod.string()
+})
+})
+export const AdminListPartnersResponse = zod.array(AdminListPartnersResponseItem)
+
+
+export const AdminUpdatePartnerParams = zod.object({
+  "partnerId": zod.coerce.string()
+})
+
+export const adminUpdatePartnerBodyCommissionPctMin = 0;
+export const adminUpdatePartnerBodyCommissionPctMax = 100;
+
+export const adminUpdatePartnerBodyCommissionFixedPenceMin = 0;
+
+
+
+export const AdminUpdatePartnerBody = zod.object({
+  "status": zod.enum(['pending', 'approved', 'disabled']).optional(),
+  "commissionType": zod.enum(['recurring', 'fixed']).optional(),
+  "commissionPct": zod.number().min(adminUpdatePartnerBodyCommissionPctMin).max(adminUpdatePartnerBodyCommissionPctMax).optional(),
+  "commissionFixedPence": zod.number().min(adminUpdatePartnerBodyCommissionFixedPenceMin).optional(),
+  "payoutMethod": zod.string().optional()
+})
+
+export const AdminUpdatePartnerResponse = zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "company": zod.string().nullish(),
+  "status": zod.string(),
+  "commissionType": zod.string(),
+  "commissionPct": zod.number(),
+  "commissionFixedPence": zod.number(),
+  "payoutMethod": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "totals": zod.object({
+  "clicks": zod.number(),
+  "signups": zod.number(),
+  "paying": zod.number(),
+  "accruedPence": zod.number(),
+  "currency": zod.string()
+})
+})
+
+
+export const AdminListPayoutsResponseItem = zod.object({
+  "id": zod.string(),
+  "partnerId": zod.string(),
+  "partnerName": zod.string(),
+  "partnerEmail": zod.string().optional(),
+  "amountPence": zod.number(),
+  "currency": zod.string(),
+  "status": zod.string(),
+  "method": zod.string().nullish(),
+  "reference": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "requestedAt": zod.coerce.date(),
+  "decidedAt": zod.coerce.date().nullish()
+})
+export const AdminListPayoutsResponse = zod.array(AdminListPayoutsResponseItem)
+
+
+export const AdminDecidePayoutParams = zod.object({
+  "payoutId": zod.coerce.string()
+})
+
+export const AdminDecidePayoutBody = zod.object({
+  "status": zod.enum(['approved', 'paid', 'rejected']),
+  "reference": zod.string().optional(),
+  "notes": zod.string().optional()
+})
+
+export const AdminDecidePayoutResponse = zod.object({
+  "id": zod.string(),
+  "partnerId": zod.string(),
+  "partnerName": zod.string(),
+  "partnerEmail": zod.string().optional(),
+  "amountPence": zod.number(),
+  "currency": zod.string(),
+  "status": zod.string(),
+  "method": zod.string().nullish(),
+  "reference": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "requestedAt": zod.coerce.date(),
+  "decidedAt": zod.coerce.date().nullish()
+})
+
+
+export const ListReferralCampaignsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "rewardType": zod.string(),
+  "rewardValuePence": zod.number(),
+  "rewardForReferrer": zod.boolean(),
+  "rewardForReferee": zod.boolean(),
+  "description": zod.string().nullish(),
+  "active": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})
+export const ListReferralCampaignsResponse = zod.array(ListReferralCampaignsResponseItem)
+
+
+
+export const createReferralCampaignBodyRewardValuePenceMin = 0;
+
+
+
+export const CreateReferralCampaignBody = zod.object({
+  "name": zod.string().min(1),
+  "rewardType": zod.enum(['percent', 'fixed', 'cash']),
+  "rewardValuePence": zod.number().min(createReferralCampaignBodyRewardValuePenceMin),
+  "rewardForReferrer": zod.boolean().optional(),
+  "rewardForReferee": zod.boolean().optional(),
+  "description": zod.string().optional(),
+  "active": zod.boolean().optional()
+})
+
+
+export const UpdateReferralCampaignParams = zod.object({
+  "campaignId": zod.coerce.string()
+})
+
+
+export const updateReferralCampaignBodyRewardValuePenceMin = 0;
+
+
+
+export const UpdateReferralCampaignBody = zod.object({
+  "name": zod.string().min(1),
+  "rewardType": zod.enum(['percent', 'fixed', 'cash']),
+  "rewardValuePence": zod.number().min(updateReferralCampaignBodyRewardValuePenceMin),
+  "rewardForReferrer": zod.boolean().optional(),
+  "rewardForReferee": zod.boolean().optional(),
+  "description": zod.string().optional(),
+  "active": zod.boolean().optional()
+})
+
+export const UpdateReferralCampaignResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "rewardType": zod.string(),
+  "rewardValuePence": zod.number(),
+  "rewardForReferrer": zod.boolean(),
+  "rewardForReferee": zod.boolean(),
+  "description": zod.string().nullish(),
+  "active": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const DeleteReferralCampaignParams = zod.object({
+  "campaignId": zod.coerce.string()
+})
+
+
+export const ListReferralConversionsResponseItem = zod.object({
+  "id": zod.string(),
+  "campaignName": zod.string(),
+  "referrerName": zod.string().nullish(),
+  "refereeName": zod.string().nullish(),
+  "refereeEmail": zod.string().nullish(),
+  "status": zod.string(),
+  "rewardPence": zod.number(),
+  "createdAt": zod.coerce.date(),
+  "rewardedAt": zod.coerce.date().nullish()
+})
+export const ListReferralConversionsResponse = zod.array(ListReferralConversionsResponseItem)
+
+
+export const IssueReferralRewardParams = zod.object({
+  "conversionId": zod.coerce.string()
+})
+
+export const IssueReferralRewardResponse = zod.object({
+  "id": zod.string(),
+  "campaignName": zod.string(),
+  "referrerName": zod.string().nullish(),
+  "refereeName": zod.string().nullish(),
+  "refereeEmail": zod.string().nullish(),
+  "status": zod.string(),
+  "rewardPence": zod.number(),
+  "createdAt": zod.coerce.date(),
+  "rewardedAt": zod.coerce.date().nullish()
+})
+
+
+export const GetPortalReferProgramParams = zod.object({
+  "tenantSlug": zod.coerce.string()
+})
+
+export const GetPortalReferProgramResponse = zod.object({
+  "enabled": zod.boolean(),
+  "campaignName": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "rewardSummary": zod.string().nullish(),
+  "myCode": zod.string().nullish(),
+  "shareUrl": zod.string().nullish()
+})
+
+
+export const SubmitPortalReferralParams = zod.object({
+  "tenantSlug": zod.coerce.string()
+})
+
+
+
+
+export const SubmitPortalReferralBody = zod.object({
+  "name": zod.string().min(1),
+  "email": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "message": zod.string().optional()
+})
+
+export const SubmitPortalReferralResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const SearchMarketplaceQueryParams = zod.object({
+  "q": zod.coerce.string().optional(),
+  "category": zod.coerce.string().optional(),
+  "region": zod.coerce.string().optional(),
+  "type": zod.coerce.string().optional()
+})
+
+export const SearchMarketplaceResponseItem = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string().optional(),
+  "slug": zod.string(),
+  "headline": zod.string(),
+  "listingType": zod.string(),
+  "categorySlugs": zod.array(zod.string()),
+  "regions": zod.array(zod.string()),
+  "serviceArea": zod.string().nullish(),
+  "hourlyRatePence": zod.number().nullish(),
+  "verified": zod.boolean(),
+  "status": zod.string(),
+  "ratingAverage": zod.number().nullable(),
+  "reviewCount": zod.number(),
+  "tenantName": zod.string().optional(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish()
+})
+export const SearchMarketplaceResponse = zod.array(SearchMarketplaceResponseItem)
+
+
+export const GetMarketplaceListingParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetMarketplaceListingResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string().optional(),
+  "slug": zod.string(),
+  "headline": zod.string(),
+  "listingType": zod.string(),
+  "categorySlugs": zod.array(zod.string()),
+  "regions": zod.array(zod.string()),
+  "serviceArea": zod.string().nullish(),
+  "hourlyRatePence": zod.number().nullish(),
+  "verified": zod.boolean(),
+  "status": zod.string(),
+  "ratingAverage": zod.number().nullable(),
+  "reviewCount": zod.number(),
+  "tenantName": zod.string().optional(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish()
+}).and(zod.object({
+  "bio": zod.string().nullable(),
+  "minJobValuePence": zod.number().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "contactPhone": zod.string().nullish(),
+  "websiteUrl": zod.string().nullish(),
+  "galleryUrls": zod.array(zod.string()).optional(),
+  "createdAt": zod.coerce.date().optional(),
+  "reviews": zod.array(zod.object({
+  "id": zod.string(),
+  "reviewerTenantId": zod.string().optional(),
+  "reviewerTenantName": zod.string(),
+  "rating": zod.number(),
+  "comment": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+}))
+
+
+export const GetMyMarketplaceListingResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string().optional(),
+  "slug": zod.string(),
+  "headline": zod.string(),
+  "listingType": zod.string(),
+  "categorySlugs": zod.array(zod.string()),
+  "regions": zod.array(zod.string()),
+  "serviceArea": zod.string().nullish(),
+  "hourlyRatePence": zod.number().nullish(),
+  "verified": zod.boolean(),
+  "status": zod.string(),
+  "ratingAverage": zod.number().nullable(),
+  "reviewCount": zod.number(),
+  "tenantName": zod.string().optional(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish()
+}).and(zod.object({
+  "bio": zod.string().nullable(),
+  "minJobValuePence": zod.number().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "contactPhone": zod.string().nullish(),
+  "websiteUrl": zod.string().nullish(),
+  "galleryUrls": zod.array(zod.string()).optional(),
+  "createdAt": zod.coerce.date().optional(),
+  "reviews": zod.array(zod.object({
+  "id": zod.string(),
+  "reviewerTenantId": zod.string().optional(),
+  "reviewerTenantName": zod.string(),
+  "rating": zod.number(),
+  "comment": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+}))
+
+
+
+export const upsertMyMarketplaceListingBodyHourlyRatePenceMin = 0;
+
+export const upsertMyMarketplaceListingBodyMinJobValuePenceMin = 0;
+
+
+
+export const UpsertMyMarketplaceListingBody = zod.object({
+  "headline": zod.string().min(1),
+  "bio": zod.string().optional(),
+  "listingType": zod.enum(['contractor', 'supplier', 'both']),
+  "categorySlugs": zod.array(zod.string()).optional(),
+  "serviceArea": zod.string().optional(),
+  "regions": zod.array(zod.string()).optional(),
+  "hourlyRatePence": zod.number().min(upsertMyMarketplaceListingBodyHourlyRatePenceMin).optional(),
+  "minJobValuePence": zod.number().min(upsertMyMarketplaceListingBodyMinJobValuePenceMin).optional(),
+  "contactEmail": zod.string().optional(),
+  "contactPhone": zod.string().optional(),
+  "websiteUrl": zod.string().optional(),
+  "galleryUrls": zod.array(zod.string()).optional(),
+  "status": zod.enum(['draft', 'published', 'paused'])
+})
+
+export const UpsertMyMarketplaceListingResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string().optional(),
+  "slug": zod.string(),
+  "headline": zod.string(),
+  "listingType": zod.string(),
+  "categorySlugs": zod.array(zod.string()),
+  "regions": zod.array(zod.string()),
+  "serviceArea": zod.string().nullish(),
+  "hourlyRatePence": zod.number().nullish(),
+  "verified": zod.boolean(),
+  "status": zod.string(),
+  "ratingAverage": zod.number().nullable(),
+  "reviewCount": zod.number(),
+  "tenantName": zod.string().optional(),
+  "brandColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish()
+}).and(zod.object({
+  "bio": zod.string().nullable(),
+  "minJobValuePence": zod.number().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "contactPhone": zod.string().nullish(),
+  "websiteUrl": zod.string().nullish(),
+  "galleryUrls": zod.array(zod.string()).optional(),
+  "createdAt": zod.coerce.date().optional(),
+  "reviews": zod.array(zod.object({
+  "id": zod.string(),
+  "reviewerTenantId": zod.string().optional(),
+  "reviewerTenantName": zod.string(),
+  "rating": zod.number(),
+  "comment": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+}))
+
+
+export const ListMarketplacePostsQueryParams = zod.object({
+  "scope": zod.enum(['mine', 'all']).optional()
+})
+
+export const ListMarketplacePostsResponseItem = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "tenantName": zod.string(),
+  "kind": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "categorySlugs": zod.array(zod.string()),
+  "region": zod.string().nullish(),
+  "budgetPence": zod.number().nullish(),
+  "status": zod.string(),
+  "closesAt": zod.coerce.date().nullish(),
+  "applicationCount": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListMarketplacePostsResponse = zod.array(ListMarketplacePostsResponseItem)
+
+
+
+
+export const createMarketplacePostBodyBudgetPenceMin = 0;
+
+
+
+export const CreateMarketplacePostBody = zod.object({
+  "kind": zod.enum(['job', 'supplier_request']),
+  "title": zod.string().min(1),
+  "description": zod.string().min(1),
+  "categorySlugs": zod.array(zod.string()).optional(),
+  "region": zod.string().optional(),
+  "budgetPence": zod.number().min(createMarketplacePostBodyBudgetPenceMin).optional(),
+  "status": zod.enum(['open', 'closed', 'fulfilled']).optional(),
+  "closesAt": zod.coerce.date().optional()
+})
+
+
+export const UpdateMarketplacePostParams = zod.object({
+  "postId": zod.coerce.string()
+})
+
+
+
+export const updateMarketplacePostBodyBudgetPenceMin = 0;
+
+
+
+export const UpdateMarketplacePostBody = zod.object({
+  "kind": zod.enum(['job', 'supplier_request']),
+  "title": zod.string().min(1),
+  "description": zod.string().min(1),
+  "categorySlugs": zod.array(zod.string()).optional(),
+  "region": zod.string().optional(),
+  "budgetPence": zod.number().min(updateMarketplacePostBodyBudgetPenceMin).optional(),
+  "status": zod.enum(['open', 'closed', 'fulfilled']).optional(),
+  "closesAt": zod.coerce.date().optional()
+})
+
+export const UpdateMarketplacePostResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "tenantName": zod.string(),
+  "kind": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "categorySlugs": zod.array(zod.string()),
+  "region": zod.string().nullish(),
+  "budgetPence": zod.number().nullish(),
+  "status": zod.string(),
+  "closesAt": zod.coerce.date().nullish(),
+  "applicationCount": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const ListMarketplaceApplicationsParams = zod.object({
+  "postId": zod.coerce.string()
+})
+
+export const ListMarketplaceApplicationsResponseItem = zod.object({
+  "id": zod.string(),
+  "postId": zod.string().nullable(),
+  "applicantTenantId": zod.string(),
+  "applicantTenantName": zod.string(),
+  "ownerTenantId": zod.string().optional(),
+  "listingId": zod.string().nullish(),
+  "message": zod.string(),
+  "bidPence": zod.number().nullish(),
+  "status": zod.string(),
+  "decidedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListMarketplaceApplicationsResponse = zod.array(ListMarketplaceApplicationsResponseItem)
+
+
+export const CreateMarketplaceApplicationParams = zod.object({
+  "postId": zod.coerce.string()
+})
+
+
+export const createMarketplaceApplicationBodyBidPenceMin = 0;
+
+
+
+export const CreateMarketplaceApplicationBody = zod.object({
+  "message": zod.string().min(1),
+  "bidPence": zod.number().min(createMarketplaceApplicationBodyBidPenceMin).optional()
+})
+
+
+export const DecideMarketplaceApplicationParams = zod.object({
+  "applicationId": zod.coerce.string()
+})
+
+export const DecideMarketplaceApplicationBody = zod.object({
+  "status": zod.enum(['accepted', 'declined'])
+})
+
+export const DecideMarketplaceApplicationResponse = zod.object({
+  "id": zod.string(),
+  "postId": zod.string().nullable(),
+  "applicantTenantId": zod.string(),
+  "applicantTenantName": zod.string(),
+  "ownerTenantId": zod.string().optional(),
+  "listingId": zod.string().nullish(),
+  "message": zod.string(),
+  "bidPence": zod.number().nullish(),
+  "status": zod.string(),
+  "decidedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const CreateMarketplaceReviewParams = zod.object({
+  "listingId": zod.coerce.string()
+})
+
+export const createMarketplaceReviewBodyRatingMax = 5;
+
+
+
+export const CreateMarketplaceReviewBody = zod.object({
+  "rating": zod.number().min(1).max(createMarketplaceReviewBodyRatingMax),
+  "comment": zod.string().optional()
+})
+
+

@@ -55,6 +55,26 @@ import { PortalDashboard } from "@/pages/portal/PortalDashboard";
 import { PortalQuote } from "@/pages/portal/PortalQuote";
 import { PortalInvoice } from "@/pages/portal/PortalInvoice";
 import { PortalJob } from "@/pages/portal/PortalJob";
+import { PortalRefer } from "@/pages/portal/PortalRefer";
+
+// Partner portal
+import { PartnerLayout } from "@/components/layout/PartnerLayout";
+import { PartnerLogin } from "@/pages/partner/PartnerLogin";
+import { PartnerSignup } from "@/pages/partner/PartnerSignup";
+import { PartnerDashboard } from "@/pages/partner/PartnerDashboard";
+import { PartnerLinks } from "@/pages/partner/PartnerLinks";
+import { PartnerCommissions } from "@/pages/partner/PartnerCommissions";
+import { PartnerPayouts } from "@/pages/partner/PartnerPayouts";
+
+// Marketplace (public)
+import { Marketplace } from "@/pages/public/Marketplace";
+import { MarketplaceListing } from "@/pages/public/MarketplaceListing";
+
+// Admin
+import { AdminReferrals } from "@/pages/admin/Referrals";
+
+// Tracking
+import { ReferralTracker } from "@/components/ReferralTracker";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +90,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "")}>
+          <ReferralTracker />
           <Switch>
             {/* Auth */}
             <Route path="/login" component={Login} />
@@ -107,6 +128,25 @@ function App() {
               </AppLayout>
             </Route>
 
+            {/* Partner portal */}
+            <Route path="/partner" nest>
+              <Switch>
+                <Route path="/login" component={PartnerLogin} />
+                <Route path="/signup" component={PartnerSignup} />
+                <Route>
+                  <PartnerLayout>
+                    <Switch>
+                      <Route path="/" component={PartnerDashboard} />
+                      <Route path="/links" component={PartnerLinks} />
+                      <Route path="/commissions" component={PartnerCommissions} />
+                      <Route path="/payouts" component={PartnerPayouts} />
+                      <Route component={NotFound} />
+                    </Switch>
+                  </PartnerLayout>
+                </Route>
+              </Switch>
+            </Route>
+
             {/* Customer portal */}
             <Route path="/portal/:tenantSlug" nest>
               {(params) => (
@@ -115,6 +155,7 @@ function App() {
                     <Route path="/" component={PortalLogin} />
                     <Route path="/verify" component={PortalVerify} />
                     <Route path="/app" component={PortalDashboard} />
+                    <Route path="/refer" component={PortalRefer} />
                     <Route path="/quotes/:id">
                       {(p) => <PortalQuote key={`${params.tenantSlug}-${p.id}`} />}
                     </Route>
@@ -140,6 +181,7 @@ function App() {
                   <Route path="/feature-flags" component={AdminFeatureFlags} />
                   <Route path="/workers" component={AdminWorkers} />
                   <Route path="/usage" component={AdminUsage} />
+                  <Route path="/referrals" component={AdminReferrals} />
                   <Route component={NotFound} />
                 </Switch>
               </AdminLayout>
@@ -150,6 +192,8 @@ function App() {
               <PublicLayout>
                 <Switch>
                   <Route path="/" component={Home} />
+                  <Route path="/marketplace" component={Marketplace} />
+                  <Route path="/marketplace/:slug" component={MarketplaceListing} />
                   <Route path="/pricing" component={Pricing} />
                   <Route path="/features" component={Features} />
                   <Route path="/industries" component={Industries} />
