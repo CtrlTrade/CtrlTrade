@@ -16,6 +16,7 @@ declare module "express-session" {
     tenantId?: string;
     impersonatedTenantId?: string;
     impersonationStartedAt?: string;
+    integrationOAuth?: Record<string, { tenantId: string; provider: "xero" | "google_calendar" | "outlook"; userId: string; createdAt: number }>;
   }
 }
 

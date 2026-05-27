@@ -34,6 +34,7 @@ import tenantReferralsRouter from "./tenantReferrals";
 import marketplaceRouter from "./marketplace";
 import whiteLabelRouter from "./whiteLabel";
 import reportsRouter from "./reports";
+import integrationsRouter from "./integrations";
 
 const router: IRouter = Router();
 
@@ -79,5 +80,6 @@ router.use(tenantReferralsRouter);
 router.use(marketplaceRouter);
 router.use(whiteLabelRouter);
 router.use(reportsRouter);
+router.use(integrationsRouter);
 
 export default router;

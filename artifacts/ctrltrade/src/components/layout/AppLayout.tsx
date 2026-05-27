@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { useGetSession, useLogout, useStopImpersonation } from "@workspace/api-client-react";
+import { useGetSession, useLogout, useStopImpersonation, useListIntegrations } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target, Inbox, Package, Warehouse, Handshake } from "lucide-react";
@@ -24,6 +24,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const logout = useLogout();
   const qc = useQueryClient();
   const stopImp = useStopImpersonation({ mutation: { onSuccess: () => { qc.invalidateQueries(); setLocation("~/admin/tenants"); } } });
+  const { data: integrations } = useListIntegrations();
+  const failedIntegration = (integrations ?? []).find((i) => i.status === "error");
   const unauthorized = !isLoading && (!session || !session.tenant);
 
   useEffect(() => {
@@ -86,6 +88,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </nav>
       </aside>
       <div className="flex-1 flex flex-col">
+        {failedIntegration && (
+          <div className="bg-red-600 text-white px-6 py-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider" data-testid="banner-integration-failure">
+            <span>Integration disconnected: {failedIntegration.provider} — {failedIntegration.lastError ?? "sync failed"}</span>
+            <Link href="/settings?tab=integrations" className="underline" data-testid="link-reconnect-integration">Reconnect</Link>
+          </div>
+        )}
         {session.impersonation && (
           <div className="bg-amber-500 text-black px-6 py-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider" data-testid="banner-impersonation">
             <span>Impersonating {session.impersonation.tenantName} as {session.impersonation.impersonatorEmail}</span>

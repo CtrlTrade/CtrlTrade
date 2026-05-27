@@ -27,7 +27,153 @@ tags:
   - name: team
   - name: pos
   - name: invoices
+  - name: integrations
 paths:
+  /v1/integrations/providers:
+    get:
+      operationId: listIntegrationProviders
+      tags: [integrations]
+      summary: List all available integration providers and their availability.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/IntegrationProvider" }
+
+  /v1/integrations:
+    get:
+      operationId: listIntegrations
+      tags: [integrations]
+      summary: List the current tenant's integration connections.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TenantIntegration" }
+
+  /v1/integrations/{provider}/connect:
+    post:
+      operationId: connectIntegration
+      tags: [integrations]
+      summary: Start the OAuth handshake for the given provider.
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [authUrl]
+                properties:
+                  authUrl: { type: string }
+
+  /v1/integrations/{provider}:
+    delete:
+      operationId: disconnectIntegration
+      tags: [integrations]
+      summary: Disconnect the integration (tokens are revoked locally).
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: No content }
+
+  /v1/integrations/{provider}/sync:
+    post:
+      operationId: triggerIntegrationSync
+      tags: [integrations]
+      summary: Queue a manual sync for the given provider.
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [enqueued]
+                properties:
+                  enqueued: { type: boolean }
+
+  /v1/integrations/{provider}/logs:
+    get:
+      operationId: getIntegrationLogs
+      tags: [integrations]
+      summary: Recent sync log entries for a provider.
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/IntegrationSyncLog" }
+
+  /v1/admin/integration-catalogue:
+    get:
+      operationId: listAdminIntegrationCatalogue
+      tags: [admin, integrations]
+      summary: List the integration catalogue (super admin).
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminIntegrationCatalogueEntry" }
+
+  /v1/admin/integration-catalogue/{provider}:
+    put:
+      operationId: updateAdminIntegrationCatalogue
+      tags: [admin, integrations]
+      summary: Enable, disable, or restrict a provider in the catalogue.
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminIntegrationCatalogueInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [provider, enabled]
+                properties:
+                  provider: { type: string }
+                  enabled: { type: boolean }
+                  minPlan: { type: ["string", "null"] }
+                  updatedAt: { type: string, format: date-time }
+
   /v1/pos/login:
     post:
       operationId: posLogin
@@ -6003,6 +6149,7 @@ components:
       properties:
         body: { type: string, minLength: 1 }
 
+
     InboxThread:
       type: object
       required: [id, channel, lastMessageAt, unreadCount]
@@ -6562,6 +6709,8 @@ components:
         rating: { type: integer }
         comment: { type: ["string", "null"] }
         createdAt: { type: string, format: date-time }
+
+
 
 
     StockLocation:
@@ -7259,3 +7408,64 @@ components:
         items:
           type: array
           items: { $ref: "#/components/schemas/ReportInsightItem" }
+
+    IntegrationProvider:
+      type: object
+      required: [id, label, description, category, configured, enabled]
+      properties:
+        id: { type: string }
+        label: { type: string }
+        description: { type: string }
+        category: { type: string }
+        configured: { type: boolean }
+        enabled: { type: boolean }
+
+    TenantIntegration:
+      type: object
+      required: [id, provider, status, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        provider: { type: string }
+        status: { type: string }
+        externalAccountId: { type: ["string", "null"] }
+        externalAccountLabel: { type: ["string", "null"] }
+        scopes: { type: ["string", "null"] }
+        lastSyncAt: { type: ["string", "null"], format: date-time }
+        lastError: { type: ["string", "null"] }
+        lastErrorAt: { type: ["string", "null"], format: date-time }
+        connectedAt: { type: ["string", "null"], format: date-time }
+        disconnectedAt: { type: ["string", "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    IntegrationSyncLog:
+      type: object
+      required: [id, direction, status, createdAt]
+      properties:
+        id: { type: string }
+        direction: { type: string }
+        entityKind: { type: ["string", "null"] }
+        entityId: { type: ["string", "null"] }
+        status: { type: string }
+        message: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    AdminIntegrationCatalogueEntry:
+      type: object
+      required: [provider, label, description, category, configured, enabled]
+      properties:
+        provider: { type: string }
+        label: { type: string }
+        description: { type: string }
+        category: { type: string }
+        configured: { type: boolean }
+        enabled: { type: boolean }
+        minPlan: { type: ["string", "null"] }
+        updatedAt: { type: ["string", "null"], format: date-time }
+
+    AdminIntegrationCatalogueInput:
+      type: object
+      required: [enabled]
+      properties:
+        enabled: { type: boolean }
+        minPlan: { type: ["string", "null"] }

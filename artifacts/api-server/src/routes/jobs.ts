@@ -23,8 +23,18 @@ import { requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
 import { nextJobNumber } from "../lib/numbering";
 import { isTenantCustomer, isTenantVehicle, isTenantMember } from "../lib/tenantGuards";
+import { enqueueJob } from "../lib/queue";
+import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
+
+async function enqueueIntegrationSync(tenantId: string, jobId: string, kind: "job.upsert" | "job.delete"): Promise<void> {
+  try {
+    await enqueueJob({ kind: "integration_sync", payload: { tenantId, kind, entityId: jobId } });
+  } catch (err) {
+    logger.warn({ err, jobId, kind }, "integration_sync enqueue failed");
+  }
+}
 
 function serializeJobSummary(j: Job, customerName: string, assignedUserName: string | null) {
   return {
@@ -144,6 +154,7 @@ router.post("/v1/jobs", requireTenant, async (req, res): Promise<void> => {
     kind: "job.created",
     message: `Job ${job.number} created for ${customer.name}`,
   });
+  await enqueueIntegrationSync(tenantId, job.id, "job.upsert");
   const ctx = (await loadJobJoined(tenantId, job.id))!;
   res.status(201).json(GetJobResponse.parse(serializeJob(ctx.j, ctx.customerName, ctx.assignedUserName)));
 });
@@ -203,6 +214,7 @@ router.patch("/v1/jobs/:jobId", requireTenant, async (req, res): Promise<void> =
     res.status(404).json({ error: "Job not found" });
     return;
   }
+  await enqueueIntegrationSync(tenantId, updated.id, "job.upsert");
   const ctx = (await loadJobJoined(tenantId, updated.id))!;
   res.json(UpdateJobResponse.parse(serializeJob(ctx.j, ctx.customerName, ctx.assignedUserName)));
 });
@@ -244,6 +256,7 @@ router.post("/v1/jobs/:jobId/assign", requireTenant, async (req, res): Promise<v
     message: `Job ${updated.number} assignment updated`,
     metadata: parsed.data as Record<string, unknown>,
   });
+  await enqueueIntegrationSync(tenantId, updated.id, "job.upsert");
   const ctx = (await loadJobJoined(tenantId, updated.id))!;
   res.json(AssignJobResponse.parse(serializeJob(ctx.j, ctx.customerName, ctx.assignedUserName)));
 });

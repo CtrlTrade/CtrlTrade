@@ -9,6 +9,128 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary List all available integration providers and their availability.
+ */
+export const ListIntegrationProvidersResponseItem = zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "description": zod.string(),
+  "category": zod.string(),
+  "configured": zod.boolean(),
+  "enabled": zod.boolean()
+})
+export const ListIntegrationProvidersResponse = zod.array(ListIntegrationProvidersResponseItem)
+
+
+/**
+ * @summary List the current tenant's integration connections.
+ */
+export const ListIntegrationsResponseItem = zod.object({
+  "id": zod.string(),
+  "provider": zod.string(),
+  "status": zod.string(),
+  "externalAccountId": zod.string().nullish(),
+  "externalAccountLabel": zod.string().nullish(),
+  "scopes": zod.string().nullish(),
+  "lastSyncAt": zod.coerce.date().nullish(),
+  "lastError": zod.string().nullish(),
+  "lastErrorAt": zod.coerce.date().nullish(),
+  "connectedAt": zod.coerce.date().nullish(),
+  "disconnectedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListIntegrationsResponse = zod.array(ListIntegrationsResponseItem)
+
+
+/**
+ * @summary Start the OAuth handshake for the given provider.
+ */
+export const ConnectIntegrationParams = zod.object({
+  "provider": zod.coerce.string()
+})
+
+export const ConnectIntegrationResponse = zod.object({
+  "authUrl": zod.string()
+})
+
+
+/**
+ * @summary Disconnect the integration (tokens are revoked locally).
+ */
+export const DisconnectIntegrationParams = zod.object({
+  "provider": zod.coerce.string()
+})
+
+
+/**
+ * @summary Queue a manual sync for the given provider.
+ */
+export const TriggerIntegrationSyncParams = zod.object({
+  "provider": zod.coerce.string()
+})
+
+export const TriggerIntegrationSyncResponse = zod.object({
+  "enqueued": zod.boolean()
+})
+
+
+/**
+ * @summary Recent sync log entries for a provider.
+ */
+export const GetIntegrationLogsParams = zod.object({
+  "provider": zod.coerce.string()
+})
+
+export const GetIntegrationLogsResponseItem = zod.object({
+  "id": zod.string(),
+  "direction": zod.string(),
+  "entityKind": zod.string().nullish(),
+  "entityId": zod.string().nullish(),
+  "status": zod.string(),
+  "message": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const GetIntegrationLogsResponse = zod.array(GetIntegrationLogsResponseItem)
+
+
+/**
+ * @summary List the integration catalogue (super admin).
+ */
+export const ListAdminIntegrationCatalogueResponseItem = zod.object({
+  "provider": zod.string(),
+  "label": zod.string(),
+  "description": zod.string(),
+  "category": zod.string(),
+  "configured": zod.boolean(),
+  "enabled": zod.boolean(),
+  "minPlan": zod.string().nullish(),
+  "updatedAt": zod.coerce.date().nullish()
+})
+export const ListAdminIntegrationCatalogueResponse = zod.array(ListAdminIntegrationCatalogueResponseItem)
+
+
+/**
+ * @summary Enable, disable, or restrict a provider in the catalogue.
+ */
+export const UpdateAdminIntegrationCatalogueParams = zod.object({
+  "provider": zod.coerce.string()
+})
+
+export const UpdateAdminIntegrationCatalogueBody = zod.object({
+  "enabled": zod.boolean(),
+  "minPlan": zod.string().nullish()
+})
+
+export const UpdateAdminIntegrationCatalogueResponse = zod.object({
+  "provider": zod.string(),
+  "enabled": zod.boolean(),
+  "minPlan": zod.string().nullish(),
+  "updatedAt": zod.coerce.date().optional()
+})
+
+
+/**
  * @summary Authenticate a field/control user for the CtrlTradePos till
  */
 

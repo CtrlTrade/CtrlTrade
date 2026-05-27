@@ -1689,3 +1689,66 @@ export type SupplierDelivery = typeof supplierDeliveriesTable.$inferSelect;
 export type InventoryAdjustment = typeof inventoryAdjustmentsTable.$inferSelect;
 export type BarcodeLabel = typeof barcodeLabelsTable.$inferSelect;
 
+
+// ---- Integrations (tenant connections + sync log + admin catalogue) -------
+export const tenantIntegrationsTable = pgTable(
+  "tenant_integrations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    provider: varchar("provider", { length: 32 }).notNull(),
+    status: varchar("status", { length: 16 }).notNull().default("disconnected"),
+    accessTokenEnc: text("access_token_enc"),
+    refreshTokenEnc: text("refresh_token_enc"),
+    tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true }),
+    externalAccountId: text("external_account_id"),
+    externalAccountLabel: text("external_account_label"),
+    scopes: text("scopes"),
+    settings: jsonb("settings").$type<Record<string, unknown>>().notNull().default(sql`'{}'::jsonb`),
+    lastSyncAt: timestamp("last_sync_at", { withTimezone: true }),
+    lastErrorAt: timestamp("last_error_at", { withTimezone: true }),
+    lastError: text("last_error"),
+    connectedAt: timestamp("connected_at", { withTimezone: true }),
+    disconnectedAt: timestamp("disconnected_at", { withTimezone: true }),
+    connectedByUserId: uuid("connected_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    uniq: uniqueIndex("tenant_integrations_uniq").on(t.tenantId, t.provider),
+    tenantIdx: index("tenant_integrations_tenant_idx").on(t.tenantId),
+  }),
+);
+
+export const integrationSyncLogsTable = pgTable(
+  "integration_sync_logs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    provider: varchar("provider", { length: 32 }).notNull(),
+    direction: varchar("direction", { length: 8 }).notNull(),
+    entityKind: varchar("entity_kind", { length: 32 }),
+    entityId: uuid("entity_id"),
+    status: varchar("status", { length: 16 }).notNull(),
+    message: text("message"),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantProvIdx: index("integration_sync_logs_tenant_prov_idx").on(t.tenantId, t.provider, t.createdAt),
+  }),
+);
+
+export const integrationCatalogueTable = pgTable("integration_catalogue", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  provider: varchar("provider", { length: 32 }).notNull().unique(),
+  enabled: boolean("enabled").notNull().default(true),
+  minPlan: varchar("min_plan", { length: 32 }),
+  updatedByUserId: uuid("updated_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type TenantIntegration = typeof tenantIntegrationsTable.$inferSelect;
+export type IntegrationSyncLog = typeof integrationSyncLogsTable.$inferSelect;
+export type IntegrationCatalogue = typeof integrationCatalogueTable.$inferSelect;

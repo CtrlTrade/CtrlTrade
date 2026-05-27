@@ -3253,6 +3253,87 @@ export interface ReportInsights {
   items: ReportInsightItem[];
 }
 
+export interface IntegrationProvider {
+  id: string;
+  label: string;
+  description: string;
+  category: string;
+  configured: boolean;
+  enabled: boolean;
+}
+
+export interface TenantIntegration {
+  id: string;
+  provider: string;
+  status: string;
+  /** @nullable */
+  externalAccountId?: string | null;
+  /** @nullable */
+  externalAccountLabel?: string | null;
+  /** @nullable */
+  scopes?: string | null;
+  /** @nullable */
+  lastSyncAt?: string | null;
+  /** @nullable */
+  lastError?: string | null;
+  /** @nullable */
+  lastErrorAt?: string | null;
+  /** @nullable */
+  connectedAt?: string | null;
+  /** @nullable */
+  disconnectedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IntegrationSyncLog {
+  id: string;
+  direction: string;
+  /** @nullable */
+  entityKind?: string | null;
+  /** @nullable */
+  entityId?: string | null;
+  status: string;
+  /** @nullable */
+  message?: string | null;
+  createdAt: string;
+}
+
+export interface AdminIntegrationCatalogueEntry {
+  provider: string;
+  label: string;
+  description: string;
+  category: string;
+  configured: boolean;
+  enabled: boolean;
+  /** @nullable */
+  minPlan?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+}
+
+export interface AdminIntegrationCatalogueInput {
+  enabled: boolean;
+  /** @nullable */
+  minPlan?: string | null;
+}
+
+export type ConnectIntegration200 = {
+  authUrl: string;
+};
+
+export type TriggerIntegrationSync200 = {
+  enqueued: boolean;
+};
+
+export type UpdateAdminIntegrationCatalogue200 = {
+  provider: string;
+  enabled: boolean;
+  /** @nullable */
+  minPlan?: string | null;
+  updatedAt?: string;
+};
+
 export type ListFilesParams = {
 parentKind: string;
 parentId: string;

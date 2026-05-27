@@ -33,6 +33,7 @@ import { getAppBaseUrl } from "../lib/email";
 import { dispatchNotification } from "../lib/notifications";
 import { getUncachableStripeClient, isStripeConnected } from "../stripeClient";
 import { logger } from "../lib/logger";
+import { enqueueJob } from "../lib/queue";
 
 const router: IRouter = Router();
 
@@ -398,6 +399,11 @@ router.post("/v1/invoices", requireTenant, async (req, res): Promise<void> => {
     kind: "invoice.created",
     message: `Invoice ${inv.number} created`,
   });
+  // Fan out to accounting integrations (best-effort, sync runs on worker).
+  await enqueueJob({
+    kind: "integration_sync",
+    payload: { tenantId, provider: "xero", kind: "invoice.upsert", entityId: inv.id },
+  }).catch((err) => logger.warn({ err }, "integration_sync enqueue (invoice.create) failed"));
   const ctx = (await loadInvoiceCtx(tenantId, inv.id))!;
   res.status(201).json(
     GetInvoiceResponse.parse(serializeInvoice(ctx.inv, ctx.customer, ctx.items, ctx.payments, ctx.jobNumber)),
@@ -975,6 +981,11 @@ export async function recordInvoicePayment(opts: {
   await sendPaymentReceipt(inv.id, opts.amountPence).catch((err) =>
     logger.warn({ err, invoiceId: inv.id }, "Receipt email failed"),
   );
+  // Re-push to accounting integrations so Xero reflects the new paid state.
+  await enqueueJob({
+    kind: "integration_sync",
+    payload: { tenantId: inv.tenantId, provider: "xero", kind: "invoice.upsert", entityId: inv.id },
+  }).catch((err) => logger.warn({ err, invoiceId: inv.id }, "integration_sync (payment) enqueue failed"));
 }
 
 export default router;

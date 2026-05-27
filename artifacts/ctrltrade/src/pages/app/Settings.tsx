@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Copy, Palette } from "lucide-react";
 import { Link } from "wouter";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { IntegrationsPanel } from "./IntegrationsPanel";
 import { AppStaff } from "./Staff";
 import { AppNotificationsSettings } from "./NotificationsSettings";
 import { SettingsReferrals } from "./SettingsReferrals";
@@ -80,18 +81,20 @@ export function AppSettings() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold uppercase tracking-tighter">Workspace Settings</h1>
-      <Tabs defaultValue="company" className="space-y-6">
+      <Tabs defaultValue={typeof window !== "undefined" && new URLSearchParams(window.location.search).get("tab") === "integrations" ? "integrations" : "company"} className="space-y-6">
         <TabsList className="rounded-none">
           <TabsTrigger value="company" data-testid="tab-company">Company</TabsTrigger>
           <TabsTrigger value="staff" data-testid="tab-staff">Staff</TabsTrigger>
           <TabsTrigger value="notifications" data-testid="tab-notifications">Notifications</TabsTrigger>
           <TabsTrigger value="referrals" data-testid="tab-referrals">Referrals</TabsTrigger>
           <TabsTrigger value="marketplace" data-testid="tab-marketplace">Marketplace</TabsTrigger>
+          <TabsTrigger value="integrations" data-testid="tab-integrations">Integrations</TabsTrigger>
         </TabsList>
         <TabsContent value="staff"><AppStaff /></TabsContent>
         <TabsContent value="notifications"><AppNotificationsSettings /></TabsContent>
         <TabsContent value="referrals"><SettingsReferrals /></TabsContent>
         <TabsContent value="marketplace"><SettingsMarketplace /></TabsContent>
+        <TabsContent value="integrations"><IntegrationsPanel /></TabsContent>
         <TabsContent value="company">
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="rounded-none border-border shadow-sm">

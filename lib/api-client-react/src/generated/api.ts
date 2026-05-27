@@ -23,6 +23,8 @@ import type {
   AcceptInvitationInput,
   ActivityEntry,
   AdminDashboard,
+  AdminIntegrationCatalogueEntry,
+  AdminIntegrationCatalogueInput,
   AdminPartner,
   AdminPartnerUpdate,
   AdminPayout,
@@ -49,6 +51,7 @@ import type {
   CertificateInput,
   ChildTenantSummary,
   CloseTillSessionInput,
+  ConnectIntegration200,
   CreateChildTenantInput,
   CustomDomain,
   CustomDomainInput,
@@ -93,6 +96,8 @@ import type {
   InboxReplyInput,
   InboxThreadsResponse,
   InboxUnreadCount,
+  IntegrationProvider,
+  IntegrationSyncLog,
   InvitationRecord,
   InviteMemberBody,
   Invoice,
@@ -241,6 +246,7 @@ import type {
   TeamMember,
   TeamOverview,
   Tenant,
+  TenantIntegration,
   TenantUpdate,
   TenantUsage,
   TillSession,
@@ -248,7 +254,9 @@ import type {
   TradeAccount,
   TradeAccountInput,
   TradeCategory,
+  TriggerIntegrationSync200,
   UpcomingRenewal,
+  UpdateAdminIntegrationCatalogue200,
   UpdateInvoiceTemplateInput,
   UpdateMemberInput,
   UploadUrlRequest,
@@ -272,6 +280,596 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
+
+export const getListIntegrationProvidersUrl = () => {
+
+
+
+
+  return `/api/v1/integrations/providers`
+}
+
+/**
+ * @summary List all available integration providers and their availability.
+ */
+export const listIntegrationProviders = async ( options?: RequestInit): Promise<IntegrationProvider[]> => {
+
+  return customFetch<IntegrationProvider[]>(getListIntegrationProvidersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListIntegrationProvidersQueryKey = () => {
+    return [
+    `/api/v1/integrations/providers`
+    ] as const;
+    }
+
+
+export const getListIntegrationProvidersQueryOptions = <TData = Awaited<ReturnType<typeof listIntegrationProviders>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIntegrationProviders>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListIntegrationProvidersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listIntegrationProviders>>> = ({ signal }) => listIntegrationProviders({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listIntegrationProviders>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListIntegrationProvidersQueryResult = NonNullable<Awaited<ReturnType<typeof listIntegrationProviders>>>
+export type ListIntegrationProvidersQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List all available integration providers and their availability.
+ */
+
+export function useListIntegrationProviders<TData = Awaited<ReturnType<typeof listIntegrationProviders>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIntegrationProviders>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListIntegrationProvidersQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListIntegrationsUrl = () => {
+
+
+
+
+  return `/api/v1/integrations`
+}
+
+/**
+ * @summary List the current tenant's integration connections.
+ */
+export const listIntegrations = async ( options?: RequestInit): Promise<TenantIntegration[]> => {
+
+  return customFetch<TenantIntegration[]>(getListIntegrationsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListIntegrationsQueryKey = () => {
+    return [
+    `/api/v1/integrations`
+    ] as const;
+    }
+
+
+export const getListIntegrationsQueryOptions = <TData = Awaited<ReturnType<typeof listIntegrations>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListIntegrationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listIntegrations>>> = ({ signal }) => listIntegrations({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListIntegrationsQueryResult = NonNullable<Awaited<ReturnType<typeof listIntegrations>>>
+export type ListIntegrationsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List the current tenant's integration connections.
+ */
+
+export function useListIntegrations<TData = Awaited<ReturnType<typeof listIntegrations>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIntegrations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListIntegrationsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getConnectIntegrationUrl = (provider: string,) => {
+
+
+
+
+  return `/api/v1/integrations/${provider}/connect`
+}
+
+/**
+ * @summary Start the OAuth handshake for the given provider.
+ */
+export const connectIntegration = async (provider: string, options?: RequestInit): Promise<ConnectIntegration200> => {
+
+  return customFetch<ConnectIntegration200>(getConnectIntegrationUrl(provider),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getConnectIntegrationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof connectIntegration>>, TError,{provider: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof connectIntegration>>, TError,{provider: string}, TContext> => {
+
+const mutationKey = ['connectIntegration'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof connectIntegration>>, {provider: string}> = (props) => {
+          const {provider} = props ?? {};
+
+          return  connectIntegration(provider,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConnectIntegrationMutationResult = NonNullable<Awaited<ReturnType<typeof connectIntegration>>>
+
+    export type ConnectIntegrationMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Start the OAuth handshake for the given provider.
+ */
+export const useConnectIntegration = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof connectIntegration>>, TError,{provider: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof connectIntegration>>,
+        TError,
+        {provider: string},
+        TContext
+      > => {
+      return useMutation(getConnectIntegrationMutationOptions(options));
+    }
+
+export const getDisconnectIntegrationUrl = (provider: string,) => {
+
+
+
+
+  return `/api/v1/integrations/${provider}`
+}
+
+/**
+ * @summary Disconnect the integration (tokens are revoked locally).
+ */
+export const disconnectIntegration = async (provider: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDisconnectIntegrationUrl(provider),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDisconnectIntegrationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectIntegration>>, TError,{provider: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof disconnectIntegration>>, TError,{provider: string}, TContext> => {
+
+const mutationKey = ['disconnectIntegration'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof disconnectIntegration>>, {provider: string}> = (props) => {
+          const {provider} = props ?? {};
+
+          return  disconnectIntegration(provider,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DisconnectIntegrationMutationResult = NonNullable<Awaited<ReturnType<typeof disconnectIntegration>>>
+
+    export type DisconnectIntegrationMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Disconnect the integration (tokens are revoked locally).
+ */
+export const useDisconnectIntegration = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectIntegration>>, TError,{provider: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof disconnectIntegration>>,
+        TError,
+        {provider: string},
+        TContext
+      > => {
+      return useMutation(getDisconnectIntegrationMutationOptions(options));
+    }
+
+export const getTriggerIntegrationSyncUrl = (provider: string,) => {
+
+
+
+
+  return `/api/v1/integrations/${provider}/sync`
+}
+
+/**
+ * @summary Queue a manual sync for the given provider.
+ */
+export const triggerIntegrationSync = async (provider: string, options?: RequestInit): Promise<TriggerIntegrationSync200> => {
+
+  return customFetch<TriggerIntegrationSync200>(getTriggerIntegrationSyncUrl(provider),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getTriggerIntegrationSyncMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerIntegrationSync>>, TError,{provider: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof triggerIntegrationSync>>, TError,{provider: string}, TContext> => {
+
+const mutationKey = ['triggerIntegrationSync'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof triggerIntegrationSync>>, {provider: string}> = (props) => {
+          const {provider} = props ?? {};
+
+          return  triggerIntegrationSync(provider,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TriggerIntegrationSyncMutationResult = NonNullable<Awaited<ReturnType<typeof triggerIntegrationSync>>>
+
+    export type TriggerIntegrationSyncMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Queue a manual sync for the given provider.
+ */
+export const useTriggerIntegrationSync = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerIntegrationSync>>, TError,{provider: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof triggerIntegrationSync>>,
+        TError,
+        {provider: string},
+        TContext
+      > => {
+      return useMutation(getTriggerIntegrationSyncMutationOptions(options));
+    }
+
+export const getGetIntegrationLogsUrl = (provider: string,) => {
+
+
+
+
+  return `/api/v1/integrations/${provider}/logs`
+}
+
+/**
+ * @summary Recent sync log entries for a provider.
+ */
+export const getIntegrationLogs = async (provider: string, options?: RequestInit): Promise<IntegrationSyncLog[]> => {
+
+  return customFetch<IntegrationSyncLog[]>(getGetIntegrationLogsUrl(provider),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIntegrationLogsQueryKey = (provider: string,) => {
+    return [
+    `/api/v1/integrations/${provider}/logs`
+    ] as const;
+    }
+
+
+export const getGetIntegrationLogsQueryOptions = <TData = Awaited<ReturnType<typeof getIntegrationLogs>>, TError = ErrorType<unknown>>(provider: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIntegrationLogs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIntegrationLogsQueryKey(provider);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIntegrationLogs>>> = ({ signal }) => getIntegrationLogs(provider, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(provider), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIntegrationLogs>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIntegrationLogsQueryResult = NonNullable<Awaited<ReturnType<typeof getIntegrationLogs>>>
+export type GetIntegrationLogsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Recent sync log entries for a provider.
+ */
+
+export function useGetIntegrationLogs<TData = Awaited<ReturnType<typeof getIntegrationLogs>>, TError = ErrorType<unknown>>(
+ provider: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIntegrationLogs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIntegrationLogsQueryOptions(provider,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListAdminIntegrationCatalogueUrl = () => {
+
+
+
+
+  return `/api/v1/admin/integration-catalogue`
+}
+
+/**
+ * @summary List the integration catalogue (super admin).
+ */
+export const listAdminIntegrationCatalogue = async ( options?: RequestInit): Promise<AdminIntegrationCatalogueEntry[]> => {
+
+  return customFetch<AdminIntegrationCatalogueEntry[]>(getListAdminIntegrationCatalogueUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminIntegrationCatalogueQueryKey = () => {
+    return [
+    `/api/v1/admin/integration-catalogue`
+    ] as const;
+    }
+
+
+export const getListAdminIntegrationCatalogueQueryOptions = <TData = Awaited<ReturnType<typeof listAdminIntegrationCatalogue>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminIntegrationCatalogue>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminIntegrationCatalogueQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminIntegrationCatalogue>>> = ({ signal }) => listAdminIntegrationCatalogue({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminIntegrationCatalogue>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminIntegrationCatalogueQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminIntegrationCatalogue>>>
+export type ListAdminIntegrationCatalogueQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List the integration catalogue (super admin).
+ */
+
+export function useListAdminIntegrationCatalogue<TData = Awaited<ReturnType<typeof listAdminIntegrationCatalogue>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminIntegrationCatalogue>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminIntegrationCatalogueQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateAdminIntegrationCatalogueUrl = (provider: string,) => {
+
+
+
+
+  return `/api/v1/admin/integration-catalogue/${provider}`
+}
+
+/**
+ * @summary Enable, disable, or restrict a provider in the catalogue.
+ */
+export const updateAdminIntegrationCatalogue = async (provider: string,
+    adminIntegrationCatalogueInput: AdminIntegrationCatalogueInput, options?: RequestInit): Promise<UpdateAdminIntegrationCatalogue200> => {
+
+  return customFetch<UpdateAdminIntegrationCatalogue200>(getUpdateAdminIntegrationCatalogueUrl(provider),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminIntegrationCatalogueInput,)
+  }
+);}
+
+
+
+
+export const getUpdateAdminIntegrationCatalogueMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminIntegrationCatalogue>>, TError,{provider: string;data: BodyType<AdminIntegrationCatalogueInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminIntegrationCatalogue>>, TError,{provider: string;data: BodyType<AdminIntegrationCatalogueInput>}, TContext> => {
+
+const mutationKey = ['updateAdminIntegrationCatalogue'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminIntegrationCatalogue>>, {provider: string;data: BodyType<AdminIntegrationCatalogueInput>}> = (props) => {
+          const {provider,data} = props ?? {};
+
+          return  updateAdminIntegrationCatalogue(provider,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminIntegrationCatalogueMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminIntegrationCatalogue>>>
+    export type UpdateAdminIntegrationCatalogueMutationBody = BodyType<AdminIntegrationCatalogueInput>
+    export type UpdateAdminIntegrationCatalogueMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Enable, disable, or restrict a provider in the catalogue.
+ */
+export const useUpdateAdminIntegrationCatalogue = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminIntegrationCatalogue>>, TError,{provider: string;data: BodyType<AdminIntegrationCatalogueInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminIntegrationCatalogue>>,
+        TError,
+        {provider: string;data: BodyType<AdminIntegrationCatalogueInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateAdminIntegrationCatalogueMutationOptions(options));
+    }
 
 export const getPosLoginUrl = () => {
 

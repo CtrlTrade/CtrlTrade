@@ -77,7 +77,8 @@ const handlers: Record<JobKind, Handler> = {
     if (p?.tenantId) await recordUsage(p.tenantId, "whatsapp", 1, { to: p.to });
   },
   integration_sync: async (p) => {
-    logger.info({ payload: p }, "integration_sync (no integration provider wired — logged)");
+    const { handleIntegrationSync } = await import("./integrations/sync");
+    await handleIntegrationSync(p);
   },
   generate_pdf: async (p) => {
     logger.info({ payload: p }, "generate_pdf (no renderer wired — logged)");
@@ -155,5 +156,7 @@ export async function registerSchedules(): Promise<void> {
   // Daily digest at 08:00 UTC; weekly digest Monday 08:00 UTC.
   await boss.schedule("notification_digest_daily", "0 8 * * *", {}, { tz: "UTC" } as any);
   await boss.schedule("notification_digest_weekly", "0 8 * * 1", {}, { tz: "UTC" } as any);
-  logger.info("Worker schedules registered (hourly expiry+rollup, daily summary+dunning, 5-min notify retry, daily+weekly digests)");
+  // Nightly integration reconciliation (pulls invoice payment status from Xero).
+  await boss.schedule("integration_sync", "30 3 * * *", { kind: "nightly_reconcile" }, { tz: "UTC" } as any);
+  logger.info("Worker schedules registered (hourly expiry+rollup, daily summary+dunning+integrations, 5-min notify retry, daily+weekly digests)");
 }

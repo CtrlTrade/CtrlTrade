@@ -59,6 +59,7 @@ import { AdminTenants } from "@/pages/admin/Tenants";
 import { AdminTenantDetail } from "@/pages/admin/TenantDetail";
 import { AdminTenantWhiteLabel } from "@/pages/admin/TenantWhiteLabel";
 import { AdminFeatureFlags } from "@/pages/admin/FeatureFlags";
+import { AdminIntegrationCatalogue } from "@/pages/admin/IntegrationCatalogue";
 import { AdminWorkers } from "@/pages/admin/Workers";
 import { AdminUsage } from "@/pages/admin/Usage";
 
@@ -224,6 +225,7 @@ function App() {
                   <Route path="/reports/customer-ltv">{() => <CustomerLtvReport admin />}</Route>
                   <Route path="/reports/aged-debtors">{() => <AgedDebtorsReport admin />}</Route>
                   <Route path="/reports/activity-heatmap">{() => <ActivityHeatmapReport admin />}</Route>
+                  <Route path="/integrations" component={AdminIntegrationCatalogue} />
                   <Route component={NotFound} />
                 </Switch>
               </AdminLayout>
