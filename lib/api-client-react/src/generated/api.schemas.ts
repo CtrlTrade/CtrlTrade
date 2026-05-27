@@ -173,6 +173,66 @@ export interface SubscriptionQuantities {
   tills: number;
 }
 
+export interface BillingPlanItem {
+  key: string;
+  label: string;
+  quantity: number;
+  unitAmount: number;
+  subtotal: number;
+  currency: string;
+}
+
+export interface BillingPaymentMethod {
+  id: string;
+  brand: string;
+  last4: string;
+  expMonth: number;
+  expYear: number;
+}
+
+export interface BillingUpcomingInvoice {
+  amountDue: number;
+  currency: string;
+  /** @nullable */
+  periodStart?: string | null;
+  /** @nullable */
+  periodEnd?: string | null;
+  /** @nullable */
+  nextPaymentAttempt?: string | null;
+}
+
+export interface BillingOverview {
+  subscription: Subscription;
+  planItems: BillingPlanItem[];
+  currency: string;
+  monthlyTotal: number;
+  paymentMethod?: BillingPaymentMethod | null;
+  upcomingInvoice?: BillingUpcomingInvoice | null;
+}
+
+export interface BillingInvoice {
+  id: string;
+  /** @nullable */
+  number?: string | null;
+  status: string;
+  total: number;
+  currency: string;
+  created: string;
+  /** @nullable */
+  periodStart?: string | null;
+  /** @nullable */
+  periodEnd?: string | null;
+  /** @nullable */
+  hostedInvoiceUrl?: string | null;
+  /** @nullable */
+  invoicePdf?: string | null;
+}
+
+export interface BillingSetupIntent {
+  clientSecret: string;
+  customerId: string;
+}
+
 export interface OnboardingItem {
   key: string;
   label: string;

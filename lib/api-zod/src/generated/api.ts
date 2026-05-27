@@ -308,6 +308,79 @@ export const ReactivateSubscriptionResponse = zod.object({
 })
 
 
+/**
+ * @summary Subscription, plan items, payment method, and upcoming invoice
+ */
+export const GetBillingOverviewResponse = zod.object({
+  "subscription": zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "status": zod.string(),
+  "controlSeats": zod.number(),
+  "fieldSeats": zod.number(),
+  "tills": zod.number(),
+  "currency": zod.string(),
+  "monthlyTotal": zod.number(),
+  "currentPeriodEnd": zod.coerce.date().nullable(),
+  "trialEndsAt": zod.coerce.date().nullable(),
+  "stripeCustomerId": zod.string(),
+  "stripeSubscriptionId": zod.string(),
+  "cancelAtPeriodEnd": zod.boolean()
+}),
+  "planItems": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "quantity": zod.number(),
+  "unitAmount": zod.number(),
+  "subtotal": zod.number(),
+  "currency": zod.string()
+})),
+  "currency": zod.string(),
+  "monthlyTotal": zod.number(),
+  "paymentMethod": zod.union([zod.object({
+  "id": zod.string(),
+  "brand": zod.string(),
+  "last4": zod.string(),
+  "expMonth": zod.number(),
+  "expYear": zod.number()
+}),zod.null()]).optional(),
+  "upcomingInvoice": zod.union([zod.object({
+  "amountDue": zod.number(),
+  "currency": zod.string(),
+  "periodStart": zod.coerce.date().nullish(),
+  "periodEnd": zod.coerce.date().nullish(),
+  "nextPaymentAttempt": zod.coerce.date().nullish()
+}),zod.null()]).optional()
+})
+
+
+/**
+ * @summary List past invoices for the tenant
+ */
+export const ListBillingInvoicesResponseItem = zod.object({
+  "id": zod.string(),
+  "number": zod.string().nullish(),
+  "status": zod.string(),
+  "total": zod.number(),
+  "currency": zod.string(),
+  "created": zod.coerce.date(),
+  "periodStart": zod.coerce.date().nullish(),
+  "periodEnd": zod.coerce.date().nullish(),
+  "hostedInvoiceUrl": zod.string().nullish(),
+  "invoicePdf": zod.string().nullish()
+})
+export const ListBillingInvoicesResponse = zod.array(ListBillingInvoicesResponseItem)
+
+
+/**
+ * @summary Create a SetupIntent so the tenant can update their card
+ */
+export const CreateBillingPaymentMethodSetupResponse = zod.object({
+  "clientSecret": zod.string(),
+  "customerId": zod.string()
+})
+
+
 export const GetOnboardingResponse = zod.object({
   "percentComplete": zod.number(),
   "items": zod.array(zod.object({

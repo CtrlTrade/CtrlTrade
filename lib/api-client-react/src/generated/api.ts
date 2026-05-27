@@ -25,6 +25,9 @@ import type {
   AdminTenantDetail,
   AdminTenantSummary,
   AuditLogEntry,
+  BillingInvoice,
+  BillingOverview,
+  BillingSetupIntent,
   CancellationReceipt,
   CancellationRequest,
   Certificate,
@@ -1112,6 +1115,230 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getReactivateSubscriptionMutationOptions(options));
+    }
+
+export const getGetBillingOverviewUrl = () => {
+
+
+
+
+  return `/api/v1/billing/overview`
+}
+
+/**
+ * @summary Subscription, plan items, payment method, and upcoming invoice
+ */
+export const getBillingOverview = async ( options?: RequestInit): Promise<BillingOverview> => {
+
+  return customFetch<BillingOverview>(getGetBillingOverviewUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBillingOverviewQueryKey = () => {
+    return [
+    `/api/v1/billing/overview`
+    ] as const;
+    }
+
+
+export const getGetBillingOverviewQueryOptions = <TData = Awaited<ReturnType<typeof getBillingOverview>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBillingOverview>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBillingOverviewQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBillingOverview>>> = ({ signal }) => getBillingOverview({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBillingOverview>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetBillingOverviewQueryResult = NonNullable<Awaited<ReturnType<typeof getBillingOverview>>>
+export type GetBillingOverviewQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Subscription, plan items, payment method, and upcoming invoice
+ */
+
+export function useGetBillingOverview<TData = Awaited<ReturnType<typeof getBillingOverview>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBillingOverview>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetBillingOverviewQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListBillingInvoicesUrl = () => {
+
+
+
+
+  return `/api/v1/billing/invoices`
+}
+
+/**
+ * @summary List past invoices for the tenant
+ */
+export const listBillingInvoices = async ( options?: RequestInit): Promise<BillingInvoice[]> => {
+
+  return customFetch<BillingInvoice[]>(getListBillingInvoicesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListBillingInvoicesQueryKey = () => {
+    return [
+    `/api/v1/billing/invoices`
+    ] as const;
+    }
+
+
+export const getListBillingInvoicesQueryOptions = <TData = Awaited<ReturnType<typeof listBillingInvoices>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listBillingInvoices>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListBillingInvoicesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listBillingInvoices>>> = ({ signal }) => listBillingInvoices({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listBillingInvoices>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListBillingInvoicesQueryResult = NonNullable<Awaited<ReturnType<typeof listBillingInvoices>>>
+export type ListBillingInvoicesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List past invoices for the tenant
+ */
+
+export function useListBillingInvoices<TData = Awaited<ReturnType<typeof listBillingInvoices>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listBillingInvoices>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListBillingInvoicesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateBillingPaymentMethodSetupUrl = () => {
+
+
+
+
+  return `/api/v1/billing/update-payment-method`
+}
+
+/**
+ * @summary Create a SetupIntent so the tenant can update their card
+ */
+export const createBillingPaymentMethodSetup = async ( options?: RequestInit): Promise<BillingSetupIntent> => {
+
+  return customFetch<BillingSetupIntent>(getCreateBillingPaymentMethodSetupUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getCreateBillingPaymentMethodSetupMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createBillingPaymentMethodSetup>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createBillingPaymentMethodSetup>>, TError,void, TContext> => {
+
+const mutationKey = ['createBillingPaymentMethodSetup'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createBillingPaymentMethodSetup>>, void> = () => {
+
+
+          return  createBillingPaymentMethodSetup(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateBillingPaymentMethodSetupMutationResult = NonNullable<Awaited<ReturnType<typeof createBillingPaymentMethodSetup>>>
+
+    export type CreateBillingPaymentMethodSetupMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Create a SetupIntent so the tenant can update their card
+ */
+export const useCreateBillingPaymentMethodSetup = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createBillingPaymentMethodSetup>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createBillingPaymentMethodSetup>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getCreateBillingPaymentMethodSetupMutationOptions(options));
     }
 
 export const getGetOnboardingUrl = () => {

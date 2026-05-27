@@ -12,6 +12,7 @@ tags:
   - name: auth
   - name: tenant
   - name: subscription
+  - name: billing
   - name: payment
   - name: trade-categories
   - name: pricing
@@ -239,6 +240,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Subscription"
+
+  /v1/billing/overview:
+    get:
+      operationId: getBillingOverview
+      tags: [billing]
+      summary: Subscription, plan items, payment method, and upcoming invoice
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillingOverview"
+
+  /v1/billing/invoices:
+    get:
+      operationId: listBillingInvoices
+      tags: [billing]
+      summary: List past invoices for the tenant
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BillingInvoice"
+
+  /v1/billing/update-payment-method:
+    post:
+      operationId: createBillingPaymentMethodSetup
+      tags: [billing]
+      summary: Create a SetupIntent so the tenant can update their card
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillingSetupIntent"
 
   /v1/onboarding:
     get:
@@ -1051,6 +1093,88 @@ components:
         controlSeats: { type: integer, minimum: 1 }
         fieldSeats: { type: integer, minimum: 0 }
         tills: { type: integer, minimum: 0 }
+
+    BillingPlanItem:
+      type: object
+      required: [key, label, quantity, unitAmount, subtotal, currency]
+      properties:
+        key: { type: string }
+        label: { type: string }
+        quantity: { type: integer }
+        unitAmount: { type: number }
+        subtotal: { type: number }
+        currency: { type: string }
+
+    BillingPaymentMethod:
+      type: object
+      required: [id, brand, last4, expMonth, expYear]
+      properties:
+        id: { type: string }
+        brand: { type: string }
+        last4: { type: string }
+        expMonth: { type: integer }
+        expYear: { type: integer }
+
+    BillingUpcomingInvoice:
+      type: object
+      required: [amountDue, currency]
+      properties:
+        amountDue: { type: number }
+        currency: { type: string }
+        periodStart:
+          type: ["string", "null"]
+          format: date-time
+        periodEnd:
+          type: ["string", "null"]
+          format: date-time
+        nextPaymentAttempt:
+          type: ["string", "null"]
+          format: date-time
+
+    BillingOverview:
+      type: object
+      required: [subscription, planItems, currency, monthlyTotal]
+      properties:
+        subscription: { $ref: "#/components/schemas/Subscription" }
+        planItems:
+          type: array
+          items: { $ref: "#/components/schemas/BillingPlanItem" }
+        currency: { type: string }
+        monthlyTotal: { type: number }
+        paymentMethod:
+          oneOf:
+            - $ref: "#/components/schemas/BillingPaymentMethod"
+            - type: "null"
+        upcomingInvoice:
+          oneOf:
+            - $ref: "#/components/schemas/BillingUpcomingInvoice"
+            - type: "null"
+
+    BillingInvoice:
+      type: object
+      required: [id, status, total, currency, created]
+      properties:
+        id: { type: string }
+        number: { type: ["string", "null"] }
+        status: { type: string }
+        total: { type: number }
+        currency: { type: string }
+        created: { type: string, format: date-time }
+        periodStart:
+          type: ["string", "null"]
+          format: date-time
+        periodEnd:
+          type: ["string", "null"]
+          format: date-time
+        hostedInvoiceUrl: { type: ["string", "null"] }
+        invoicePdf: { type: ["string", "null"] }
+
+    BillingSetupIntent:
+      type: object
+      required: [clientSecret, customerId]
+      properties:
+        clientSecret: { type: string }
+        customerId: { type: string }
 
     OnboardingState:
       type: object
