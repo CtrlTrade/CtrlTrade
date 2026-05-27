@@ -2208,6 +2208,30 @@ paths:
       responses:
         "204": { description: Deleted }
 
+  /v1/compliance/verification-status:
+    get:
+      operationId: getVerificationStatus
+      tags: [compliance]
+      summary: Get current badge status for the authenticated tenant.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VerificationStatus" }
+
+  /v1/compliance/request-verification:
+    post:
+      operationId: requestVerification
+      tags: [compliance]
+      summary: Submit all current compliance documents for badge review.
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VerificationSubmissionResult" }
+
   /v1/leads:
     get:
       operationId: listLeads
@@ -3883,6 +3907,74 @@ paths:
               schema:
                 type: array
                 items: { $ref: "#/components/schemas/AdminPayout" }
+
+  /v1/admin/compliance-queue:
+    get:
+      operationId: listComplianceQueue
+      tags: [admin]
+      summary: List all verification submissions (super admin).
+      parameters:
+        - in: query
+          name: status
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminVerificationSubmission" }
+
+  /v1/admin/compliance-queue/{submissionId}/approve:
+    parameters:
+      - in: path
+        name: submissionId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: approveVerificationSubmission
+      tags: [admin]
+      summary: Approve a verification submission and award the badge.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, status]
+                properties:
+                  id: { type: string }
+                  status: { type: string }
+
+  /v1/admin/compliance-queue/{submissionId}/reject:
+    parameters:
+      - in: path
+        name: submissionId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: rejectVerificationSubmission
+      tags: [admin]
+      summary: Reject a verification submission with a reason.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VerificationRejectionInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, status]
+                properties:
+                  id: { type: string }
+                  status: { type: string }
 
   /v1/admin/referrals/payouts/{payoutId}/decide:
     parameters:
@@ -6703,6 +6795,75 @@ components:
         ok: { type: boolean }
         leadId: { type: string }
 
+    VerificationRejectionInput:
+      type: object
+      required: [reason]
+      properties:
+        reason: { type: string, minLength: 1 }
+
+    VerificationStatus:
+      type: object
+      required: [badgeStatus, verifiedBadge]
+      properties:
+        badgeStatus: { type: string, description: "not_applied | under_review | verified | rejected" }
+        verifiedBadge: { type: boolean }
+        badgeAwardedAt: { type: ["string", "null"], format: date-time }
+        latestSubmission:
+          type: ["object", "null"]
+          required: [id, status, submittedAt]
+          properties:
+            id: { type: string }
+            status: { type: string }
+            submittedAt: { type: string, format: date-time }
+            reviewedAt: { type: ["string", "null"], format: date-time }
+            rejectionReason: { type: ["string", "null"] }
+        documents:
+          type: array
+          items:
+            type: object
+            required: [certificateId, kind]
+            properties:
+              certificateId: { type: string }
+              kind: { type: string }
+              reference: { type: ["string", "null"] }
+              documentUrl: { type: ["string", "null"] }
+              expiresAt: { type: ["string", "null"], format: date-time }
+
+    VerificationSubmissionResult:
+      type: object
+      required: [id, status, submittedAt, documentCount]
+      properties:
+        id: { type: string }
+        status: { type: string }
+        submittedAt: { type: string, format: date-time }
+        documentCount: { type: integer }
+
+    AdminVerificationSubmission:
+      type: object
+      required: [id, tenantId, tenantName, tenantSlug, status, submittedAt, documents]
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        tenantName: { type: string }
+        tenantSlug: { type: string }
+        status: { type: string }
+        submittedAt: { type: string, format: date-time }
+        reviewedAt: { type: ["string", "null"], format: date-time }
+        reviewerEmail: { type: ["string", "null"] }
+        rejectionReason: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        documents:
+          type: array
+          items:
+            type: object
+            required: [certificateId, kind]
+            properties:
+              certificateId: { type: string }
+              kind: { type: string }
+              reference: { type: ["string", "null"] }
+              documentUrl: { type: ["string", "null"] }
+              expiresAt: { type: ["string", "null"], format: date-time }
+
     PortalBranding:
       type: object
       required: [tenantName, tenantSlug]
@@ -6716,6 +6877,7 @@ components:
         supportPhone: { type: ["string", "null"] }
         hideCtrlTradeBranding: { type: boolean }
         legalEntity: { type: ["string", "null"] }
+        verifiedBadge: { type: boolean }
 
     PortalMagicLinkRequest:
       type: object

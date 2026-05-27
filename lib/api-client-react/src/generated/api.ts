@@ -32,6 +32,7 @@ import type {
   AdminTenantDetail,
   AdminTenantSummary,
   AdminUsage,
+  AdminVerificationSubmission,
   AdminWorkerJob,
   AdminWorkers,
   AgedDebtors,
@@ -39,6 +40,7 @@ import type {
   ApprovalCountResponse,
   ApprovalDecision,
   ApprovalsResponse,
+  ApproveVerificationSubmission200,
   AuditLogEntry,
   AutomationRuleInput,
   AutomationRuleResponse,
@@ -152,6 +154,7 @@ import type {
   ListAvailableVoiceNumbersParams,
   ListBranchStockParams,
   ListCallRecordsParams,
+  ListComplianceQueueParams,
   ListFeatureFlagsParams,
   ListFilesParams,
   ListInvoicesParams,
@@ -246,6 +249,7 @@ import type {
   ReferralConversionRecord,
   ReferralTrackInput,
   RejectTimesheetEntryInput,
+  RejectVerificationSubmission200,
   ReplyDraftInput,
   ReplyDraftResult,
   ReportActivityHeatmap,
@@ -317,6 +321,9 @@ import type {
   VehicleInput,
   VehicleLocation,
   VehicleLocationInput,
+  VerificationRejectionInput,
+  VerificationStatus,
+  VerificationSubmissionResult,
   VoiceToken,
   VoicemailsResponse,
   WhiteLabelUpdate,
@@ -9935,6 +9942,153 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getDeleteCertificateMutationOptions(options));
     }
 
+export const getGetVerificationStatusUrl = () => {
+
+
+
+
+  return `/api/v1/compliance/verification-status`
+}
+
+/**
+ * @summary Get current badge status for the authenticated tenant.
+ */
+export const getVerificationStatus = async ( options?: RequestInit): Promise<VerificationStatus> => {
+
+  return customFetch<VerificationStatus>(getGetVerificationStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetVerificationStatusQueryKey = () => {
+    return [
+    `/api/v1/compliance/verification-status`
+    ] as const;
+    }
+
+
+export const getGetVerificationStatusQueryOptions = <TData = Awaited<ReturnType<typeof getVerificationStatus>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getVerificationStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetVerificationStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getVerificationStatus>>> = ({ signal }) => getVerificationStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getVerificationStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetVerificationStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getVerificationStatus>>>
+export type GetVerificationStatusQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get current badge status for the authenticated tenant.
+ */
+
+export function useGetVerificationStatus<TData = Awaited<ReturnType<typeof getVerificationStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getVerificationStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetVerificationStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getRequestVerificationUrl = () => {
+
+
+
+
+  return `/api/v1/compliance/request-verification`
+}
+
+/**
+ * @summary Submit all current compliance documents for badge review.
+ */
+export const requestVerification = async ( options?: RequestInit): Promise<VerificationSubmissionResult> => {
+
+  return customFetch<VerificationSubmissionResult>(getRequestVerificationUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getRequestVerificationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestVerification>>, TError,void, TContext> => {
+
+const mutationKey = ['requestVerification'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestVerification>>, void> = () => {
+
+
+          return  requestVerification(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof requestVerification>>>
+
+    export type RequestVerificationMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Submit all current compliance documents for badge review.
+ */
+export const useRequestVerification = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestVerification>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestVerification>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getRequestVerificationMutationOptions(options));
+    }
+
 export const getListLeadsUrl = (params?: ListLeadsParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -17204,6 +17358,232 @@ export function useAdminListPayouts<TData = Awaited<ReturnType<typeof adminListP
 
 
 
+
+export const getListComplianceQueueUrl = (params?: ListComplianceQueueParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/admin/compliance-queue?${stringifiedParams}` : `/api/v1/admin/compliance-queue`
+}
+
+/**
+ * @summary List all verification submissions (super admin).
+ */
+export const listComplianceQueue = async (params?: ListComplianceQueueParams, options?: RequestInit): Promise<AdminVerificationSubmission[]> => {
+
+  return customFetch<AdminVerificationSubmission[]>(getListComplianceQueueUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListComplianceQueueQueryKey = (params?: ListComplianceQueueParams,) => {
+    return [
+    `/api/v1/admin/compliance-queue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListComplianceQueueQueryOptions = <TData = Awaited<ReturnType<typeof listComplianceQueue>>, TError = ErrorType<unknown>>(params?: ListComplianceQueueParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listComplianceQueue>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListComplianceQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listComplianceQueue>>> = ({ signal }) => listComplianceQueue(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listComplianceQueue>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListComplianceQueueQueryResult = NonNullable<Awaited<ReturnType<typeof listComplianceQueue>>>
+export type ListComplianceQueueQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List all verification submissions (super admin).
+ */
+
+export function useListComplianceQueue<TData = Awaited<ReturnType<typeof listComplianceQueue>>, TError = ErrorType<unknown>>(
+ params?: ListComplianceQueueParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listComplianceQueue>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListComplianceQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getApproveVerificationSubmissionUrl = (submissionId: string,) => {
+
+
+
+
+  return `/api/v1/admin/compliance-queue/${submissionId}/approve`
+}
+
+/**
+ * @summary Approve a verification submission and award the badge.
+ */
+export const approveVerificationSubmission = async (submissionId: string, options?: RequestInit): Promise<ApproveVerificationSubmission200> => {
+
+  return customFetch<ApproveVerificationSubmission200>(getApproveVerificationSubmissionUrl(submissionId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getApproveVerificationSubmissionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveVerificationSubmission>>, TError,{submissionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof approveVerificationSubmission>>, TError,{submissionId: string}, TContext> => {
+
+const mutationKey = ['approveVerificationSubmission'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof approveVerificationSubmission>>, {submissionId: string}> = (props) => {
+          const {submissionId} = props ?? {};
+
+          return  approveVerificationSubmission(submissionId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ApproveVerificationSubmissionMutationResult = NonNullable<Awaited<ReturnType<typeof approveVerificationSubmission>>>
+
+    export type ApproveVerificationSubmissionMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Approve a verification submission and award the badge.
+ */
+export const useApproveVerificationSubmission = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveVerificationSubmission>>, TError,{submissionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof approveVerificationSubmission>>,
+        TError,
+        {submissionId: string},
+        TContext
+      > => {
+      return useMutation(getApproveVerificationSubmissionMutationOptions(options));
+    }
+
+export const getRejectVerificationSubmissionUrl = (submissionId: string,) => {
+
+
+
+
+  return `/api/v1/admin/compliance-queue/${submissionId}/reject`
+}
+
+/**
+ * @summary Reject a verification submission with a reason.
+ */
+export const rejectVerificationSubmission = async (submissionId: string,
+    verificationRejectionInput: VerificationRejectionInput, options?: RequestInit): Promise<RejectVerificationSubmission200> => {
+
+  return customFetch<RejectVerificationSubmission200>(getRejectVerificationSubmissionUrl(submissionId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      verificationRejectionInput,)
+  }
+);}
+
+
+
+
+export const getRejectVerificationSubmissionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectVerificationSubmission>>, TError,{submissionId: string;data: BodyType<VerificationRejectionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rejectVerificationSubmission>>, TError,{submissionId: string;data: BodyType<VerificationRejectionInput>}, TContext> => {
+
+const mutationKey = ['rejectVerificationSubmission'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rejectVerificationSubmission>>, {submissionId: string;data: BodyType<VerificationRejectionInput>}> = (props) => {
+          const {submissionId,data} = props ?? {};
+
+          return  rejectVerificationSubmission(submissionId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RejectVerificationSubmissionMutationResult = NonNullable<Awaited<ReturnType<typeof rejectVerificationSubmission>>>
+    export type RejectVerificationSubmissionMutationBody = BodyType<VerificationRejectionInput>
+    export type RejectVerificationSubmissionMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Reject a verification submission with a reason.
+ */
+export const useRejectVerificationSubmission = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectVerificationSubmission>>, TError,{submissionId: string;data: BodyType<VerificationRejectionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof rejectVerificationSubmission>>,
+        TError,
+        {submissionId: string;data: BodyType<VerificationRejectionInput>},
+        TContext
+      > => {
+      return useMutation(getRejectVerificationSubmissionMutationOptions(options));
+    }
 
 export const getAdminDecidePayoutUrl = (payoutId: string,) => {
 

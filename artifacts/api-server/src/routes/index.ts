@@ -42,6 +42,7 @@ import timesheetsRouter from "./timesheets";
 import contractsRouter from "./contracts";
 import staffAvailabilityRouter from "./staffAvailability";
 import twoFactorRouter from "./twoFactor";
+import adminComplianceRouter from "./adminCompliance";
 
 const router: IRouter = Router();
 
@@ -95,5 +96,6 @@ router.use(timesheetsRouter);
 router.use(contractsRouter);
 router.use(staffAvailabilityRouter);
 router.use(twoFactorRouter);
+router.use(adminComplianceRouter);
 
 export default router;

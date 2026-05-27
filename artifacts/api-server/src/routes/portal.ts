@@ -71,6 +71,7 @@ function brandingOf(t: Tenant) {
     supportPhone: typeof wl.supportPhone === "string" ? wl.supportPhone : null,
     hideCtrlTradeBranding: wl.hideCtrlTradeBranding === true,
     legalEntity: typeof wl.legalEntity === "string" ? wl.legalEntity : null,
+    verifiedBadge: t.verifiedBadge,
   };
 }
 

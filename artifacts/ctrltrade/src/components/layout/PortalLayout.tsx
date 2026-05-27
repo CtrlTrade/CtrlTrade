@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, useParams } from "wouter";
 import { useGetPortalBranding, useGetPortalSession, usePortalLogout } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, ShieldCheck } from "lucide-react";
 
 export function PortalLayout({ children }: { children: React.ReactNode }) {
   const { tenantSlug } = useParams<{ tenantSlug: string }>();
@@ -42,6 +42,15 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
             />
             <span>{tenantName}</span>
           </Link>
+          {branding?.verifiedBadge ? (
+            <span
+              className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-primary border border-primary/40 px-2 py-0.5 rounded"
+              title="This business is CtrlTrade Verified"
+              data-testid="badge-ctrltrade-verified"
+            >
+              <ShieldCheck className="h-3 w-3" /> Verified
+            </span>
+          ) : null}
           {session ? (
             <div className="flex items-center gap-3 text-sm">
               <span className="text-muted-foreground hidden sm:inline">

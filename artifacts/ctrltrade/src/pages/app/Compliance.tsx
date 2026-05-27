@@ -4,6 +4,9 @@ import {
   useCreateCertificate,
   useListTeam,
   getListCertificatesQueryKey,
+  useGetVerificationStatus,
+  useRequestVerification,
+  getGetVerificationStatusQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -16,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, ShieldCheck, AlertTriangle } from "lucide-react";
+import { Plus, ShieldCheck, AlertTriangle, Clock, CheckCircle, XCircle, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ObjectUploader, useUpload } from "@workspace/object-storage-web";
 import { Upload } from "lucide-react";
@@ -24,6 +27,103 @@ import { Upload } from "lucide-react";
 function daysUntil(iso: string | null | undefined): number | null {
   if (!iso) return null;
   return Math.ceil((new Date(iso).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+}
+
+function VerificationBadgeCard() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  const { data: status, isLoading } = useGetVerificationStatus();
+  const request = useRequestVerification({
+    mutation: {
+      onSuccess: () => {
+        qc.invalidateQueries({ queryKey: getGetVerificationStatusQueryKey() });
+        toast({ title: "Verification submitted", description: "Our team will review your certificates and documents." });
+      },
+      onError: (e: Error) => toast({ title: "Submission failed", description: e.message, variant: "destructive" }),
+    },
+  });
+
+  const s = status as { badgeStatus: string; verifiedBadge: boolean; submittedAt?: string; reviewedAt?: string; rejectionReason?: string } | undefined;
+
+  return (
+    <Card className="border-border shadow-sm" data-testid="card-verification-badge">
+      <CardHeader>
+        <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+          <ShieldCheck className="h-5 w-5" /> CtrlTrade Verified Badge
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {isLoading ? (
+          <Skeleton className="h-20" />
+        ) : (
+          <>
+            <div className="flex items-start gap-4">
+              <div className="flex-1 space-y-1">
+                {s?.verifiedBadge ? (
+                  <div className="flex items-center gap-2">
+                    <Badge className="rounded-none uppercase bg-green-600 text-white gap-1">
+                      <CheckCircle className="h-3 w-3" /> Verified
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">
+                      Your business displays the CtrlTrade Verified badge on your customer portal.
+                    </span>
+                  </div>
+                ) : s?.badgeStatus === "under_review" ? (
+                  <div className="flex items-center gap-2">
+                    <Badge className="rounded-none uppercase bg-amber-500 text-white gap-1">
+                      <Clock className="h-3 w-3" /> Under Review
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">
+                      Your documents have been submitted and are awaiting admin review.
+                      {s.submittedAt && ` Submitted ${new Date(s.submittedAt).toLocaleDateString()}.`}
+                    </span>
+                  </div>
+                ) : s?.badgeStatus === "rejected" ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive" className="rounded-none uppercase gap-1">
+                        <XCircle className="h-3 w-3" /> Rejected
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        Your verification application was not approved.
+                      </span>
+                    </div>
+                    {s.rejectionReason && (
+                      <p className="text-sm border-l-2 border-destructive pl-3 text-muted-foreground italic">
+                        {s.rejectionReason}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Earn the <strong>CtrlTrade Verified</strong> badge by submitting your business certificates for admin review. Once approved, the badge displays on your customer portal.
+                    </p>
+                    <ul className="text-xs text-muted-foreground list-disc pl-4 space-y-0.5">
+                      <li>Add your certificates below (Gas Safe, NICEIC, Insurance, etc.)</li>
+                      <li>Click "Apply for Verification" to submit them for review</li>
+                      <li>Our team reviews your documents and approves the badge</li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+            {(s?.badgeStatus === "not_applied" || s?.badgeStatus === "rejected") && (
+              <Button
+                className="rounded-none uppercase tracking-wider font-bold gap-2"
+                onClick={() => request.mutate()}
+                disabled={request.isPending}
+                data-testid="button-apply-verification"
+              >
+                <Send className="h-4 w-4" />
+                {request.isPending ? "Submitting…" : s?.badgeStatus === "rejected" ? "Re-apply for Verification" : "Apply for Verification"}
+              </Button>
+            )}
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
 
 export function AppCompliance() {
@@ -89,6 +189,7 @@ export function AppCompliance() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      <VerificationBadgeCard />
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold uppercase tracking-tighter">Compliance</h1>
         <Dialog open={open} onOpenChange={setOpen}>

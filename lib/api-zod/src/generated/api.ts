@@ -3560,6 +3560,30 @@ export const DeleteCertificateParams = zod.object({
 })
 
 
+/**
+ * @summary Get current badge status for the authenticated tenant.
+ */
+export const GetVerificationStatusResponse = zod.object({
+  "badgeStatus": zod.string().describe('not_applied | under_review | verified | rejected'),
+  "verifiedBadge": zod.boolean(),
+  "badgeAwardedAt": zod.coerce.date().nullish(),
+  "latestSubmission": zod.object({
+  "id": zod.string(),
+  "status": zod.string(),
+  "submittedAt": zod.coerce.date(),
+  "reviewedAt": zod.coerce.date().nullish(),
+  "rejectionReason": zod.string().nullish()
+}).nullish(),
+  "documents": zod.array(zod.object({
+  "certificateId": zod.string(),
+  "kind": zod.string(),
+  "reference": zod.string().nullish(),
+  "documentUrl": zod.string().nullish(),
+  "expiresAt": zod.coerce.date().nullish()
+})).optional()
+})
+
+
 export const ListLeadsQueryParams = zod.object({
   "status": zod.coerce.string().optional(),
   "source": zod.coerce.string().optional()
@@ -4011,7 +4035,8 @@ export const GetPortalBrandingResponse = zod.object({
   "supportEmail": zod.string().nullish(),
   "supportPhone": zod.string().nullish(),
   "hideCtrlTradeBranding": zod.boolean().optional(),
-  "legalEntity": zod.string().nullish()
+  "legalEntity": zod.string().nullish(),
+  "verifiedBadge": zod.boolean().optional()
 })
 
 
@@ -4050,7 +4075,8 @@ export const VerifyPortalMagicLinkResponse = zod.object({
   "supportEmail": zod.string().nullish(),
   "supportPhone": zod.string().nullish(),
   "hideCtrlTradeBranding": zod.boolean().optional(),
-  "legalEntity": zod.string().nullish()
+  "legalEntity": zod.string().nullish(),
+  "verifiedBadge": zod.boolean().optional()
 }),
   "customer": zod.object({
   "id": zod.string(),
@@ -4070,7 +4096,8 @@ export const GetPortalSessionResponse = zod.object({
   "supportEmail": zod.string().nullish(),
   "supportPhone": zod.string().nullish(),
   "hideCtrlTradeBranding": zod.boolean().optional(),
-  "legalEntity": zod.string().nullish()
+  "legalEntity": zod.string().nullish(),
+  "verifiedBadge": zod.boolean().optional()
 }),
   "customer": zod.object({
   "id": zod.string(),
@@ -6037,6 +6064,68 @@ export const AdminListPayoutsResponseItem = zod.object({
   "decidedAt": zod.coerce.date().nullish()
 })
 export const AdminListPayoutsResponse = zod.array(AdminListPayoutsResponseItem)
+
+
+/**
+ * @summary List all verification submissions (super admin).
+ */
+export const ListComplianceQueueQueryParams = zod.object({
+  "status": zod.coerce.string().optional()
+})
+
+export const ListComplianceQueueResponseItem = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "tenantName": zod.string(),
+  "tenantSlug": zod.string(),
+  "status": zod.string(),
+  "submittedAt": zod.coerce.date(),
+  "reviewedAt": zod.coerce.date().nullish(),
+  "reviewerEmail": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "createdAt": zod.coerce.date().optional(),
+  "documents": zod.array(zod.object({
+  "certificateId": zod.string(),
+  "kind": zod.string(),
+  "reference": zod.string().nullish(),
+  "documentUrl": zod.string().nullish(),
+  "expiresAt": zod.coerce.date().nullish()
+}))
+})
+export const ListComplianceQueueResponse = zod.array(ListComplianceQueueResponseItem)
+
+
+/**
+ * @summary Approve a verification submission and award the badge.
+ */
+export const ApproveVerificationSubmissionParams = zod.object({
+  "submissionId": zod.coerce.string()
+})
+
+export const ApproveVerificationSubmissionResponse = zod.object({
+  "id": zod.string(),
+  "status": zod.string()
+})
+
+
+/**
+ * @summary Reject a verification submission with a reason.
+ */
+export const RejectVerificationSubmissionParams = zod.object({
+  "submissionId": zod.coerce.string()
+})
+
+
+
+
+export const RejectVerificationSubmissionBody = zod.object({
+  "reason": zod.string().min(1)
+})
+
+export const RejectVerificationSubmissionResponse = zod.object({
+  "id": zod.string(),
+  "status": zod.string()
+})
 
 
 export const AdminDecidePayoutParams = zod.object({

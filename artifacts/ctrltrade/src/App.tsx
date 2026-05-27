@@ -94,6 +94,7 @@ import { MarketplaceListing } from "@/pages/public/MarketplaceListing";
 
 // Admin
 import { AdminReferrals } from "@/pages/admin/Referrals";
+import { AdminCompliance } from "@/pages/admin/Compliance";
 
 // Tracking
 import { ReferralTracker } from "@/components/ReferralTracker";
@@ -227,6 +228,7 @@ function App() {
                   <Route path="/feature-flags" component={AdminFeatureFlags} />
                   <Route path="/workers" component={AdminWorkers} />
                   <Route path="/usage" component={AdminUsage} />
+                  <Route path="/compliance" component={AdminCompliance} />
                   <Route path="/referrals" component={AdminReferrals} />
                   <Route path="/reports" component={ReportsIndex} />
                   <Route path="/reports/revenue">{() => <RevenueReport admin />}</Route>

@@ -1,5 +1,14 @@
-import { and, desc, eq, gte } from "drizzle-orm";
-import { db, auditLogsTable } from "@workspace/db";
+import { and, desc, eq, gte, inArray } from "drizzle-orm";
+import {
+  db,
+  auditLogsTable,
+  tenantsTable,
+  verificationSubmissionsTable,
+  verificationDocumentsTable,
+  certificatesTable,
+  usersTable,
+  membershipsTable,
+} from "@workspace/db";
 import { logger } from "./logger";
 import { logAudit } from "./audit";
 import {
@@ -151,6 +160,7 @@ export function startScheduler(): void {
       const dayAgo = new Date(now.getTime() - ONE_DAY_MS);
       if (await anyDigestSentSince(dayAgo)) return;
       await runExpiryDigestOnce(now);
+      await runBadgeExpiryCheck(now);
     } catch (err) {
       logger.error({ err }, "Expiry digest scheduler tick failed");
     }
@@ -166,5 +176,103 @@ export function stopScheduler(): void {
   if (timer) {
     clearInterval(timer);
     timer = null;
+  }
+}
+
+// ============================================================================
+// Badge expiry re-check — runs as part of the nightly scheduler tick
+// Finds verified tenants whose submitted documents have expired, reverts their
+// badge to "Under Review" (new pending submission) and notifies them + admins.
+// ============================================================================
+
+export async function runBadgeExpiryCheck(now: Date = new Date()): Promise<void> {
+  const verifiedTenants = await db
+    .select({ id: tenantsTable.id, name: tenantsTable.name })
+    .from(tenantsTable)
+    .where(eq(tenantsTable.verifiedBadge, true));
+
+  if (verifiedTenants.length === 0) return;
+
+  for (const tenant of verifiedTenants) {
+    const [latestApproved] = await db
+      .select()
+      .from(verificationSubmissionsTable)
+      .where(
+        and(
+          eq(verificationSubmissionsTable.tenantId, tenant.id),
+          eq(verificationSubmissionsTable.status, "approved"),
+        ),
+      )
+      .orderBy(desc(verificationSubmissionsTable.reviewedAt))
+      .limit(1);
+
+    if (!latestApproved) continue;
+
+    const docs = await db
+      .select({ certId: verificationDocumentsTable.certificateId })
+      .from(verificationDocumentsTable)
+      .where(eq(verificationDocumentsTable.submissionId, latestApproved.id));
+
+    if (docs.length === 0) continue;
+
+    const certIds = docs.map((d) => d.certId);
+    const certRows = await db
+      .select({ id: certificatesTable.id, kind: certificatesTable.kind, expiresAt: certificatesTable.expiresAt })
+      .from(certificatesTable)
+      .where(inArray(certificatesTable.id, certIds));
+
+    const anyExpired = certRows.some((c) => c.expiresAt && c.expiresAt < now);
+
+    if (!anyExpired) continue;
+
+    await db
+      .update(tenantsTable)
+      .set({ verifiedBadge: false, badgeAwardedAt: null })
+      .where(eq(tenantsTable.id, tenant.id));
+
+    const [newSub] = await db
+      .insert(verificationSubmissionsTable)
+      .values({ tenantId: tenant.id })
+      .returning();
+
+    if (certIds.length > 0) {
+      await db.insert(verificationDocumentsTable).values(
+        certIds.map((certId) => ({ submissionId: newSub.id, certificateId: certId })),
+      );
+    }
+
+    await logAudit({
+      tenantId: tenant.id,
+      kind: "compliance.badge_flagged",
+      actorLabel: "scheduler",
+      message: `Verified badge revoked — submitted document(s) have expired. Tenant placed back Under Review.`,
+    });
+
+    const recipients = await db
+      .select({ userId: usersTable.id, email: usersTable.email, name: usersTable.name })
+      .from(membershipsTable)
+      .innerJoin(usersTable, eq(usersTable.id, membershipsTable.userId))
+      .where(
+        and(
+          eq(membershipsTable.tenantId, tenant.id),
+          inArray(membershipsTable.role, ["owner", "admin"]),
+        ),
+      );
+
+    for (const r of recipients) {
+      await dispatchNotification({
+        tenantId: tenant.id,
+        eventKind: "compliance.badge_flagged",
+        vars: { tenantName: tenant.name },
+        to: { email: r.email, name: r.name },
+        subject: "Action required: Your CtrlTrade Verified badge needs renewal",
+        text: `One or more documents submitted for your CtrlTrade Verified badge have expired. Your badge has been temporarily suspended and your documents have been placed back under review. Please renew the expired documents and resubmit for verification.`,
+        html: undefined,
+        recipientUserIds: [r.userId],
+        metadata: { tenantId: tenant.id },
+      });
+    }
+
+    logger.info({ tenantId: tenant.id, tenantName: tenant.name }, "Badge flagged — expired document(s)");
   }
 }

@@ -22,4 +22,5 @@ export interface PortalBranding {
   hideCtrlTradeBranding?: boolean;
   /** @nullable */
   legalEntity?: string | null;
+  verifiedBadge?: boolean;
 }

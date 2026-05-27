@@ -52,6 +52,8 @@ export const tenantsTable = pgTable(
       email?: { signature?: string; header?: string };
       posReceipt?: { header?: string; footer?: string };
     }>(),
+    verifiedBadge: boolean("verified_badge").notNull().default(false),
+    badgeAwardedAt: timestamp("badge_awarded_at", { withTimezone: true }),
     parentTenantId: uuid("parent_tenant_id"),
     whiteLabelConfig: jsonb("white_label_config").$type<{
       hideCtrlTradeBranding?: boolean;
@@ -588,6 +590,41 @@ export const vehicleLocationsTable = pgTable(
 );
 
 // ---- Compliance / certificates --------------------------------------------
+// ---- Verification submissions (CtrlTrade Verified badge) ------------------
+export const verificationSubmissionsTable = pgTable(
+  "verification_submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    status: varchar("status", { length: 24 }).notNull().default("pending"), // pending|approved|rejected
+    submittedAt: timestamp("submitted_at", { withTimezone: true }).notNull().defaultNow(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedByUserId: uuid("reviewed_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    rejectionReason: text("rejection_reason"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("verif_sub_tenant_idx").on(t.tenantId),
+    statusIdx: index("verif_sub_status_idx").on(t.status),
+  }),
+);
+
+export const verificationDocumentsTable = pgTable(
+  "verification_documents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    submissionId: uuid("submission_id").notNull().references(() => verificationSubmissionsTable.id, { onDelete: "cascade" }),
+    certificateId: uuid("certificate_id").notNull().references(() => certificatesTable.id, { onDelete: "cascade" }),
+  },
+  (t) => ({
+    submissionIdx: index("verif_doc_submission_idx").on(t.submissionId),
+    certIdx: index("verif_doc_cert_idx").on(t.certificateId),
+  }),
+);
+
+export type VerificationSubmission = typeof verificationSubmissionsTable.$inferSelect;
+export type VerificationDocument = typeof verificationDocumentsTable.$inferSelect;
+
 export const certificatesTable = pgTable(
   "certificates",
   {

@@ -45,6 +45,9 @@ export const NOTIFICATION_EVENTS: NotificationEvent[] = [
   { kind: "inbox.compose", defaultChannels: ["email"], description: "Operator-initiated message to a customer", category: "inbox" },
   { kind: "contract.expiry_warning", defaultChannels: ["email"], description: "Maintenance contract expiring in 7 days", category: "contract" },
   { kind: "staff.availability.submitted", defaultChannels: ["email"], description: "Staff member submitted a new unavailability block", category: "team" },
+  { kind: "compliance.verification_approved", defaultChannels: ["email"], description: "CtrlTrade Verified badge awarded", category: "compliance" },
+  { kind: "compliance.verification_rejected", defaultChannels: ["email"], description: "CtrlTrade Verified application rejected", category: "compliance" },
+  { kind: "compliance.badge_flagged", defaultChannels: ["email"], description: "Verified badge flagged — document expired", category: "compliance" },
 ];
 
 export const CHANNELS: Channel[] = ["email", "sms", "whatsapp"];

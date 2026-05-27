@@ -1722,6 +1722,81 @@ export interface PublicLeadResult {
   leadId?: string;
 }
 
+export interface VerificationRejectionInput {
+  /** @minLength 1 */
+  reason: string;
+}
+
+/**
+ * @nullable
+ */
+export type VerificationStatusLatestSubmission = {
+  id: string;
+  status: string;
+  submittedAt: string;
+  /** @nullable */
+  reviewedAt?: string | null;
+  /** @nullable */
+  rejectionReason?: string | null;
+} | null;
+
+export type VerificationStatusDocumentsItem = {
+  certificateId: string;
+  kind: string;
+  /** @nullable */
+  reference?: string | null;
+  /** @nullable */
+  documentUrl?: string | null;
+  /** @nullable */
+  expiresAt?: string | null;
+};
+
+export interface VerificationStatus {
+  /** not_applied | under_review | verified | rejected */
+  badgeStatus: string;
+  verifiedBadge: boolean;
+  /** @nullable */
+  badgeAwardedAt?: string | null;
+  /** @nullable */
+  latestSubmission?: VerificationStatusLatestSubmission;
+  documents?: VerificationStatusDocumentsItem[];
+}
+
+export interface VerificationSubmissionResult {
+  id: string;
+  status: string;
+  submittedAt: string;
+  documentCount: number;
+}
+
+export type AdminVerificationSubmissionDocumentsItem = {
+  certificateId: string;
+  kind: string;
+  /** @nullable */
+  reference?: string | null;
+  /** @nullable */
+  documentUrl?: string | null;
+  /** @nullable */
+  expiresAt?: string | null;
+};
+
+export interface AdminVerificationSubmission {
+  id: string;
+  tenantId: string;
+  tenantName: string;
+  tenantSlug: string;
+  status: string;
+  submittedAt: string;
+  /** @nullable */
+  reviewedAt?: string | null;
+  /** @nullable */
+  reviewerEmail?: string | null;
+  /** @nullable */
+  rejectionReason?: string | null;
+  createdAt?: string;
+  documents: AdminVerificationSubmissionDocumentsItem[];
+}
+
 export interface PortalBranding {
   tenantName: string;
   tenantSlug: string;
@@ -1738,6 +1813,7 @@ export interface PortalBranding {
   hideCtrlTradeBranding?: boolean;
   /** @nullable */
   legalEntity?: string | null;
+  verifiedBadge?: boolean;
 }
 
 export interface PortalMagicLinkRequest {
@@ -3944,6 +4020,20 @@ search?: string;
 
 export type ListPosTransactionsParams = {
 sessionId?: string;
+};
+
+export type ListComplianceQueueParams = {
+status?: string;
+};
+
+export type ApproveVerificationSubmission200 = {
+  id: string;
+  status: string;
+};
+
+export type RejectVerificationSubmission200 = {
+  id: string;
+  status: string;
 };
 
 export type SearchMarketplaceParams = {
