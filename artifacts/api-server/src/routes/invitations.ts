@@ -17,7 +17,8 @@ import {
 import { hashPassword } from "../lib/auth";
 import { serializeTenant, serializeUser } from "../lib/serializers";
 import { logAudit } from "../lib/audit";
-import { sendEmail, getAppBaseUrl } from "../lib/email";
+import { getAppBaseUrl } from "../lib/email";
+import { dispatchNotification } from "../lib/notifications";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
@@ -208,12 +209,11 @@ router.post("/v1/public/auth/forgot-password", async (req, res): Promise<void> =
         .from(membershipsTable)
         .where(eq(membershipsTable.userId, user.id));
       if (m) {
-        await sendEmail({
+        await dispatchNotification({
           tenantId: m.tenantId,
-          template: "auth.password_reset",
-          to: [{ email: user.email, name: user.name }],
-          subject: "Reset your CtrlTrade® password",
-          text: `Hi ${user.name},\n\nReset your password:\n${link}\n\nThis link expires in 1 hour. If you didn't request this, you can safely ignore it.\n`,
+          eventKind: "auth.password_reset",
+          vars: { name: user.name, resetUrl: link },
+          to: { email: user.email, name: user.name },
         });
       } else {
         logger.info({ email, link }, "Password reset link (no tenant membership)");

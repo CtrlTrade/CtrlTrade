@@ -4,6 +4,7 @@ import {
   db,
   notificationTemplatesTable,
   notificationPreferencesTable,
+  notificationEventsTable,
 } from "@workspace/db";
 import { requireTenant } from "../middlewares/auth";
 import { CHANNELS, NOTIFICATION_EVENTS } from "../lib/notifications";
@@ -11,8 +12,22 @@ import { logAudit } from "../lib/audit";
 
 const router: IRouter = Router();
 
-router.get("/v1/notifications/events", requireTenant, (_req, res) => {
-  res.json({ events: NOTIFICATION_EVENTS, channels: CHANNELS });
+router.get("/v1/notifications/events", requireTenant, async (_req, res, next) => {
+  try {
+    const rows = await db.select().from(notificationEventsTable);
+    const events =
+      rows.length > 0
+        ? rows.map((r) => ({
+            kind: r.kind,
+            description: r.description,
+            defaultChannels: r.defaultChannels,
+            category: r.category ?? null,
+          }))
+        : NOTIFICATION_EVENTS;
+    res.json({ events, channels: CHANNELS });
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.get("/v1/notifications/preferences", requireTenant, async (req, res, next) => {

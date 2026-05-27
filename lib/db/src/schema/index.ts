@@ -257,12 +257,29 @@ export const notificationDeliveriesTable = pgTable("notification_deliveries", {
   template: varchar("template", { length: 64 }).notNull(),
   subjectKind: varchar("subject_kind", { length: 32 }),
   subjectId: uuid("subject_id"),
+  jobId: uuid("job_id"),
   scheduledAt: timestamp("scheduled_at", { withTimezone: true }),
   subject: text("subject"),
   payload: jsonb("payload"),
   status: varchar("status", { length: 32 }).notNull().default("queued"),
+  providerMessageId: text("provider_message_id"),
+  attemptCount: integer("attempt_count").notNull().default(0),
+  lastError: text("last_error"),
+  nextRetryAt: timestamp("next_retry_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({ tenantIdx: index("notif_tenant_idx").on(t.tenantId) }));
+
+// Registry of notification event kinds. Mirrors the in-code NOTIFICATION_EVENTS
+// constant in lib/notifications.ts; seeded at boot. Operators can see this list
+// when configuring preferences or templates.
+export const notificationEventsTable = pgTable("notification_events", {
+  kind: varchar("kind", { length: 64 }).primaryKey(),
+  description: text("description").notNull(),
+  defaultChannels: text("default_channels").array().notNull().default(sql`'{}'::text[]`),
+  category: varchar("category", { length: 32 }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+});
 
 export const filesTable = pgTable("files", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -850,6 +867,7 @@ export const inboxThreadsTable = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
     customerId: uuid("customer_id").references(() => customersTable.id, { onDelete: "cascade" }),
+    jobId: uuid("job_id").references(() => jobsTable.id, { onDelete: "cascade" }),
     channel: varchar("channel", { length: 16 }).notNull().default("portal"), // portal|email|sms|whatsapp
     subject: text("subject"),
     lastMessageAt: timestamp("last_message_at", { withTimezone: true }).notNull().defaultNow(),
@@ -861,7 +879,9 @@ export const inboxThreadsTable = pgTable(
   (t) => ({
     tenantIdx: index("inbox_threads_tenant_idx").on(t.tenantId, t.lastMessageAt),
     custIdx: index("inbox_threads_cust_idx").on(t.tenantId, t.customerId),
-    uniqChannel: uniqueIndex("inbox_threads_uniq").on(t.tenantId, t.customerId, t.channel),
+    jobIdx: index("inbox_threads_job_idx").on(t.tenantId, t.jobId),
+    // Uniqueness is enforced by a raw partial index in DDL (uses COALESCE
+    // over the nullable customer_id/job_id pair); not modelled in Drizzle.
   }),
 );
 

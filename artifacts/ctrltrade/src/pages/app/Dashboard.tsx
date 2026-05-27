@@ -1,10 +1,10 @@
-import { useGetOnboarding, useGetSubscription, useUpdateSubscriptionQuantities, useCancelTenant, useGetExpiryAttention, useGetLeadSourceRoi } from "@workspace/api-client-react";
+import { useGetOnboarding, useGetSubscription, useUpdateSubscriptionQuantities, useCancelTenant, useGetExpiryAttention, useGetLeadSourceRoi, useGetInboxUnreadCount, useListInboxThreads } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
-import { CheckCircle2, Circle, AlertTriangle, CreditCard, Users, ShoppingCart, Clock, Target } from "lucide-react";
+import { CheckCircle2, Circle, AlertTriangle, CreditCard, Users, ShoppingCart, Clock, Target, Inbox } from "lucide-react";
 import { UsageTile } from "@/components/UsageTile";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -27,6 +27,7 @@ export function AppDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           <AttentionRequiredCard />
+          <InboxTile />
           <LeadSourceRoiCard />
           <UsageTile />
           {onboarding && (
@@ -75,6 +76,60 @@ export function AppDashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+function InboxTile() {
+  const { data: unread } = useGetInboxUnreadCount({ query: { refetchInterval: 30000 } as any });
+  const { data: threadsData, isLoading } = useListInboxThreads({ query: { refetchInterval: 30000 } as any });
+  const threads = (threadsData?.threads ?? []).slice(0, 5);
+  if (isLoading && threads.length === 0) return null;
+  const unreadCount = unread?.count ?? 0;
+  return (
+    <Card className="rounded-none border-border shadow-sm" data-testid="card-inbox">
+      <CardHeader>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+              <Inbox className="h-5 w-5" /> Inbox
+            </CardTitle>
+            <CardDescription>
+              {unreadCount > 0 ? `${unreadCount} unread message${unreadCount === 1 ? "" : "s"}` : "All caught up."}
+            </CardDescription>
+          </div>
+          <Link href="/app/inbox">
+            <Button variant="outline" size="sm" className="rounded-none uppercase tracking-wider text-xs font-bold" data-testid="link-inbox-open">Open inbox</Button>
+          </Link>
+        </div>
+      </CardHeader>
+      {threads.length > 0 && (
+        <CardContent className="pt-0">
+          <div className="divide-y divide-border border border-border">
+            {threads.map((t: any) => (
+              <Link key={t.id} href="/app/inbox">
+                <div className="flex items-center justify-between gap-3 p-3 hover:bg-muted/40 cursor-pointer" data-testid={`row-inbox-${t.id}`}>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 text-sm font-bold truncate">
+                      <span className="uppercase tracking-wider text-xs text-muted-foreground">{t.channel}</span>
+                      <span className="truncate">{t.customerName ?? t.customerEmail ?? "(unknown)"}</span>
+                      {t.unreadCount > 0 && (
+                        <span className="ml-auto inline-flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground px-1.5 py-0.5 rounded-none">
+                          {t.unreadCount}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate mt-0.5">{t.lastMessagePreview ?? t.subject ?? ""}</div>
+                  </div>
+                  <div className="text-[10px] text-muted-foreground shrink-0 font-mono uppercase">
+                    {new Date(t.lastMessageAt).toLocaleDateString("en-GB", { month: "short", day: "numeric" })}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </CardContent>
+      )}
+    </Card>
   );
 }
 

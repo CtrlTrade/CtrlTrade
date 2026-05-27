@@ -1,9 +1,10 @@
-import { and, asc, desc, eq, isNull, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, lte, or, sql } from "drizzle-orm";
 import {
   db,
   notificationTemplatesTable,
   notificationPreferencesTable,
   notificationDeliveriesTable,
+  notificationEventsTable,
   inboxThreadsTable,
   inboxMessagesTable,
   customersTable,
@@ -22,23 +23,26 @@ export interface NotificationEvent {
   kind: string;
   defaultChannels?: Channel[];
   description: string;
+  category?: string;
 }
 
-/** Registered notification event kinds. */
+/** Registered notification event kinds. Mirrored into notification_events at boot. */
 export const NOTIFICATION_EVENTS: NotificationEvent[] = [
-  { kind: "team.invitation", defaultChannels: ["email"], description: "Invitation to join a workspace" },
-  { kind: "auth.password_reset", defaultChannels: ["email"], description: "Password reset link" },
-  { kind: "auth.signup_welcome", defaultChannels: ["email"], description: "Signup welcome email" },
-  { kind: "portal.magic_link", defaultChannels: ["email"], description: "Customer portal magic link" },
-  { kind: "invoice.sent", defaultChannels: ["email"], description: "Invoice sent to customer" },
-  { kind: "invoice.payment.receipt", defaultChannels: ["email"], description: "Payment receipt for paid invoice" },
-  { kind: "invoice.overdue", defaultChannels: ["email"], description: "Invoice overdue reminder" },
-  { kind: "quote.sent", defaultChannels: ["email"], description: "Quote sent to customer" },
-  { kind: "quote.accepted", defaultChannels: ["email"], description: "Quote acceptance receipt" },
-  { kind: "job.scheduled", defaultChannels: ["email", "sms"], description: "Job scheduled — customer notice" },
-  { kind: "job.engineer_on_way", defaultChannels: ["sms"], description: "Engineer en-route" },
-  { kind: "compliance_expiry_digest", defaultChannels: ["email"], description: "Daily compliance/MOT/tax digest" },
-  { kind: "inbox.new_message", defaultChannels: ["email"], description: "New inbound customer message" },
+  { kind: "team.invitation", defaultChannels: ["email"], description: "Invitation to join a workspace", category: "team" },
+  { kind: "auth.password_reset", defaultChannels: ["email"], description: "Password reset link", category: "auth" },
+  { kind: "auth.signup_welcome", defaultChannels: ["email"], description: "Signup welcome email", category: "auth" },
+  { kind: "portal.magic_link", defaultChannels: ["email"], description: "Customer portal magic link", category: "portal" },
+  { kind: "invoice.sent", defaultChannels: ["email"], description: "Invoice sent to customer", category: "invoice" },
+  { kind: "invoice.payment.receipt", defaultChannels: ["email"], description: "Payment receipt for paid invoice", category: "invoice" },
+  { kind: "invoice.overdue", defaultChannels: ["email"], description: "Invoice overdue reminder", category: "invoice" },
+  { kind: "quote.sent", defaultChannels: ["email"], description: "Quote sent to customer", category: "quote" },
+  { kind: "quote.accepted", defaultChannels: ["email"], description: "Quote acceptance receipt", category: "quote" },
+  { kind: "job.scheduled", defaultChannels: ["email", "sms"], description: "Job scheduled — customer notice", category: "job" },
+  { kind: "job.engineer_on_way", defaultChannels: ["sms"], description: "Engineer en-route", category: "job" },
+  { kind: "compliance_expiry_digest", defaultChannels: ["email"], description: "Daily compliance/MOT/tax digest", category: "compliance" },
+  { kind: "inbox.new_message", defaultChannels: ["email"], description: "New inbound customer message", category: "inbox" },
+  { kind: "inbox.reply", defaultChannels: ["email"], description: "Operator reply on a thread", category: "inbox" },
+  { kind: "inbox.compose", defaultChannels: ["email"], description: "Operator-initiated message to a customer", category: "inbox" },
 ];
 
 export const CHANNELS: Channel[] = ["email", "sms", "whatsapp"];
@@ -67,7 +71,6 @@ export async function resolveTemplate(
   eventKind: string,
   channel: Channel,
 ): Promise<ResolvedTemplate | null> {
-  // Tenant override first, then global default.
   const rows = await db
     .select()
     .from(notificationTemplatesTable)
@@ -81,7 +84,6 @@ export async function resolveTemplate(
       ),
     );
   if (rows.length === 0) return null;
-  // Prefer tenant-specific row if present.
   rows.sort((a, b) => (a.tenantId ? -1 : 1) - (b.tenantId ? -1 : 1));
   const row = rows[0];
   return { subject: row.subject, bodyText: row.bodyText, bodyHtml: row.bodyHtml };
@@ -91,26 +93,21 @@ export interface DispatchInput {
   tenantId: string;
   eventKind: string;
   vars: Record<string, unknown>;
-  /** Override channels — defaults to event registration. */
   channels?: Channel[];
-  /** Direct recipient (used for transactional sends that don't go to users). */
   to?: {
     email?: string | null;
     phone?: string | null;
     name?: string | null;
     customerId?: string | null;
   };
-  /** Target tenant users (filtered by their preferences). */
   recipientUserIds?: string[];
-  /** Subject override (skips template subject). */
   subject?: string;
-  /** Plain-text body override (skips template render). */
   text?: string;
-  /** HTML body override. */
   html?: string;
-  /** Optional inbox thread linkage. */
   subjectKind?: string;
   subjectId?: string | null;
+  /** Link the dispatched message to a job for thread-by-job inbox grouping. */
+  jobId?: string | null;
   metadata?: Record<string, unknown>;
 }
 
@@ -141,11 +138,85 @@ async function getUserPrefs(
   return out;
 }
 
+const RETRY_BACKOFF_SECONDS = [60, 5 * 60, 30 * 60, 2 * 60 * 60, 12 * 60 * 60];
+const MAX_DELIVERY_ATTEMPTS = RETRY_BACKOFF_SECONDS.length + 1;
+
+export function nextRetryDelaySeconds(attemptCount: number): number | null {
+  if (attemptCount >= MAX_DELIVERY_ATTEMPTS) return null;
+  return RETRY_BACKOFF_SECONDS[Math.min(attemptCount - 1, RETRY_BACKOFF_SECONDS.length - 1)] ?? null;
+}
+
+/**
+ * Sweep failed notification_deliveries rows whose next_retry_at is due and
+ * re-attempt them. Bounded per-tick so a flood of failures doesn't lock the
+ * worker. Called from the `notification_retry` cron job.
+ */
+export async function processDeliveryRetries(limit = 50): Promise<{ retried: number; succeeded: number }> {
+  const due = await db
+    .select()
+    .from(notificationDeliveriesTable)
+    .where(
+      and(
+        eq(notificationDeliveriesTable.status, "failed"),
+        lte(notificationDeliveriesTable.nextRetryAt, new Date()),
+      ),
+    )
+    .limit(limit);
+
+  let succeeded = 0;
+  for (const row of due) {
+    const payload = (row.payload as Record<string, any>) ?? {};
+    try {
+      if (row.channel === "email") {
+        // Re-send through the email path; sendEmail will update this row by id.
+        await sendEmail({
+          tenantId: row.tenantId,
+          template: row.template,
+          to: payload.to ?? [],
+          subject: row.subject ?? payload.subject ?? "(no subject)",
+          text: payload.text ?? "",
+          html: payload.html ?? undefined,
+          metadata: payload.metadata ?? undefined,
+          _retryDeliveryId: row.id,
+        });
+        succeeded++;
+      } else if (row.channel === "sms" || row.channel === "whatsapp") {
+        const fn = row.channel === "sms" ? sendSmsViaTwilio : sendWhatsAppViaTwilio;
+        const externalRef = await fn(payload.to, payload.text);
+        await db
+          .update(notificationDeliveriesTable)
+          .set({
+            status: externalRef ? "sent" : "logged",
+            providerMessageId: externalRef ?? null,
+            lastError: null,
+            nextRetryAt: null,
+            attemptCount: (row.attemptCount ?? 0) + 1,
+          })
+          .where(eq(notificationDeliveriesTable.id, row.id));
+        succeeded++;
+      }
+    } catch (err) {
+      const nextAttempt = (row.attemptCount ?? 0) + 1;
+      const delay = nextRetryDelaySeconds(nextAttempt);
+      await db
+        .update(notificationDeliveriesTable)
+        .set({
+          status: delay == null ? "dead" : "failed",
+          attemptCount: nextAttempt,
+          lastError: String(err).slice(0, 500),
+          nextRetryAt: delay == null ? null : new Date(Date.now() + delay * 1000),
+        })
+        .where(eq(notificationDeliveriesTable.id, row.id));
+    }
+  }
+  return { retried: due.length, succeeded };
+}
+
 /**
  * Centralised notification dispatcher. Resolves the right template per channel,
  * renders it with `vars`, persists a `notification_deliveries` row, and routes
- * via the appropriate adapter. Also writes an audit log entry and optionally
- * appends to a customer inbox thread.
+ * via the appropriate adapter. Writes an audit-log entry and optionally appends
+ * to a customer/job inbox thread. Failed sends are scheduled for retry.
  */
 export async function dispatchNotification(input: DispatchInput): Promise<DispatchResult> {
   const ev = NOTIFICATION_EVENTS.find((e) => e.kind === input.eventKind);
@@ -155,7 +226,6 @@ export async function dispatchNotification(input: DispatchInput): Promise<Dispat
   const used: Channel[] = [];
 
   for (const ch of channels) {
-    // Resolve template (subject + body) or fall back to caller-provided overrides.
     const tpl = await resolveTemplate(input.tenantId, input.eventKind, ch);
     const subject = input.subject ?? (tpl?.subject ? renderTemplate(tpl.subject, input.vars) : undefined);
     const text = input.text ?? (tpl ? renderTemplate(tpl.bodyText, input.vars) : null);
@@ -169,7 +239,6 @@ export async function dispatchNotification(input: DispatchInput): Promise<Dispat
     }
 
     if (ch === "email") {
-      // Resolve email recipients.
       const recipients: Array<{ email: string; name?: string }> = [];
       if (input.to?.email) {
         recipients.push({ email: input.to.email, name: input.to.name ?? undefined });
@@ -193,6 +262,7 @@ export async function dispatchNotification(input: DispatchInput): Promise<Dispat
         text,
         html,
         metadata: input.metadata,
+        jobId: input.jobId ?? null,
       });
       total += recipients.length;
       used.push("email");
@@ -201,9 +271,6 @@ export async function dispatchNotification(input: DispatchInput): Promise<Dispat
     }
 
     if (ch === "sms" || ch === "whatsapp") {
-      // SMS/WhatsApp targets a phone number provided by the caller (e.g.
-      // customer contact). Internal users don't have phone numbers in this
-      // schema, so we don't fan out to recipientUserIds for these channels.
       const numbers: string[] = [];
       if (input.to?.phone) numbers.push(input.to.phone);
       if (numbers.length === 0) continue;
@@ -215,8 +282,10 @@ export async function dispatchNotification(input: DispatchInput): Promise<Dispat
             channel: ch,
             template: input.eventKind,
             subject: subject ?? null,
+            jobId: input.jobId ?? null,
             payload: { to, text, html, metadata: input.metadata ?? null },
             status: "queued",
+            attemptCount: 1,
           })
           .returning();
         try {
@@ -225,15 +294,18 @@ export async function dispatchNotification(input: DispatchInput): Promise<Dispat
           if (ch === "whatsapp") externalRef = await sendWhatsAppViaTwilio(to, text);
           await db
             .update(notificationDeliveriesTable)
-            .set({ status: externalRef ? "sent" : "logged" })
+            .set({ status: externalRef ? "sent" : "logged", providerMessageId: externalRef ?? null })
             .where(eq(notificationDeliveriesTable.id, delivery.id));
           await recordUsage(input.tenantId, ch === "sms" ? "sms" : "whatsapp", 1, { to });
           await maybeAppendInbox(input, ch, to, subject ?? "", text, delivery.id, externalRef);
         } catch (err) {
+          const delay = nextRetryDelaySeconds(1);
           await db
             .update(notificationDeliveriesTable)
             .set({
               status: "failed",
+              lastError: String(err).slice(0, 500),
+              nextRetryAt: delay == null ? null : new Date(Date.now() + delay * 1000),
               payload: { to, text, error: String(err), metadata: input.metadata ?? null },
             })
             .where(eq(notificationDeliveriesTable.id, delivery.id));
@@ -265,8 +337,9 @@ async function maybeAppendInbox(
   externalRef?: string | null,
 ): Promise<void> {
   const customerId = input.to?.customerId ?? null;
-  if (!customerId) return;
-  const thread = await upsertThread(input.tenantId, customerId, channel, subject || input.eventKind);
+  const jobId = input.jobId ?? null;
+  if (!customerId && !jobId) return;
+  const thread = await upsertThread(input.tenantId, customerId, channel, subject || input.eventKind, jobId);
   await db.insert(inboxMessagesTable).values({
     tenantId: input.tenantId,
     threadId: thread.id,
@@ -295,28 +368,28 @@ export async function upsertThread(
   customerId: string | null,
   channel: string,
   subject: string,
+  jobId: string | null = null,
 ): Promise<{ id: string }> {
-  if (customerId) {
+  if (customerId || jobId) {
+    const conds = [
+      eq(inboxThreadsTable.tenantId, tenantId),
+      eq(inboxThreadsTable.channel, channel),
+      customerId ? eq(inboxThreadsTable.customerId, customerId) : isNull(inboxThreadsTable.customerId),
+      jobId ? eq(inboxThreadsTable.jobId, jobId) : isNull(inboxThreadsTable.jobId),
+    ];
     const [existing] = await db
       .select({ id: inboxThreadsTable.id })
       .from(inboxThreadsTable)
-      .where(
-        and(
-          eq(inboxThreadsTable.tenantId, tenantId),
-          eq(inboxThreadsTable.customerId, customerId),
-          eq(inboxThreadsTable.channel, channel),
-        ),
-      );
+      .where(and(...conds));
     if (existing) return existing;
   }
   const [row] = await db
     .insert(inboxThreadsTable)
-    .values({ tenantId, customerId, channel, subject })
+    .values({ tenantId, customerId, jobId, channel, subject })
     .returning({ id: inboxThreadsTable.id });
   return row;
 }
 
-/** Find an existing customer by email or phone; used by inbound webhooks. */
 export async function findCustomerByContact(
   tenantId: string,
   opts: { email?: string | null; phone?: string | null },
@@ -331,8 +404,6 @@ export async function findCustomerByContact(
   if (opts.phone) {
     const normalize = (p: string) => p.replace(/[^\d+]/g, "");
     const want = normalize(opts.phone);
-    // Postgres doesn't have a built-in normaliser; do an in-memory match scan
-    // over the tenant's customers — usually small enough for transactional use.
     const list = await db
       .select({ id: customersTable.id, name: customersTable.name, phone: customersTable.phone })
       .from(customersTable)
@@ -352,12 +423,14 @@ export async function recordInboundMessage(opts: {
   body: string;
   subject?: string | null;
   externalRef?: string | null;
+  jobId?: string | null;
 }): Promise<void> {
   const thread = await upsertThread(
     opts.tenantId,
     opts.customerId,
     opts.channel,
     opts.subject ?? `${opts.channel} conversation`,
+    opts.jobId ?? null,
   );
   await db.insert(inboxMessagesTable).values({
     tenantId: opts.tenantId,
@@ -388,7 +461,6 @@ export async function recordInboundMessage(opts: {
     metadata: { channel: opts.channel, fromAddr: opts.fromAddr, customerId: opts.customerId ?? null },
   });
 
-  // Notify all tenant owners/admins of new inbound message via their pref.
   try {
     const owners = await db
       .select({ userId: membershipsTable.userId })
@@ -409,8 +481,29 @@ export async function recordInboundMessage(opts: {
   }
 }
 
-/** Seed global default templates. Idempotent — runs on every boot. */
+/** Seed global default templates and the event registry. Idempotent. */
 export async function seedDefaultTemplates(): Promise<void> {
+  // Seed event registry from constant.
+  for (const ev of NOTIFICATION_EVENTS) {
+    await db
+      .insert(notificationEventsTable)
+      .values({
+        kind: ev.kind,
+        description: ev.description,
+        defaultChannels: ev.defaultChannels ?? [],
+        category: ev.category ?? null,
+      })
+      .onConflictDoUpdate({
+        target: notificationEventsTable.kind,
+        set: {
+          description: ev.description,
+          defaultChannels: ev.defaultChannels ?? [],
+          category: ev.category ?? null,
+          updatedAt: new Date(),
+        },
+      });
+  }
+
   const defaults: Array<{
     eventKind: string;
     channel: Channel;
@@ -457,7 +550,7 @@ export async function seedDefaultTemplates(): Promise<void> {
       channel: "email",
       subject: "Payment received — invoice {{invoiceNumber}}",
       bodyText:
-        "Hi {{customerName}},\n\nThanks — we've received your payment of {{amount}} for invoice {{invoiceNumber}}.\n\n{{tenantName}}\n",
+        "Hi {{customerName}},\n\nThanks — we've received your payment of {{amount}} for invoice {{invoiceNumber}}.{{fullyPaidLine}}\n\n{{tenantName}}\n",
     },
     {
       eventKind: "invoice.overdue",
@@ -506,6 +599,28 @@ export async function seedDefaultTemplates(): Promise<void> {
       subject: "New message from {{fromAddr}}",
       bodyText: "You have a new {{channel}} message from {{fromAddr}}:\n\n{{body}}\n\nReview in your inbox.\n",
     },
+    {
+      eventKind: "inbox.reply",
+      channel: "email",
+      subject: "{{subject}}",
+      bodyText: "{{body}}\n",
+    },
+    {
+      eventKind: "inbox.compose",
+      channel: "email",
+      subject: "{{subject}}",
+      bodyText: "{{body}}\n",
+    },
+    {
+      eventKind: "inbox.reply",
+      channel: "sms",
+      bodyText: "{{body}}",
+    },
+    {
+      eventKind: "inbox.compose",
+      channel: "sms",
+      bodyText: "{{body}}",
+    },
   ];
 
   for (const tpl of defaults) {
@@ -521,7 +636,7 @@ export async function seedDefaultTemplates(): Promise<void> {
       })
       .onConflictDoNothing();
   }
-  logger.info({ count: defaults.length }, "Notification templates seeded");
+  logger.info({ events: NOTIFICATION_EVENTS.length, templates: defaults.length }, "Notification events + templates seeded");
 }
 
 export async function listThreadsForTenant(tenantId: string, limit = 100) {
@@ -529,6 +644,7 @@ export async function listThreadsForTenant(tenantId: string, limit = 100) {
     .select({
       id: inboxThreadsTable.id,
       customerId: inboxThreadsTable.customerId,
+      jobId: inboxThreadsTable.jobId,
       channel: inboxThreadsTable.channel,
       subject: inboxThreadsTable.subject,
       lastMessageAt: inboxThreadsTable.lastMessageAt,

@@ -40,7 +40,8 @@ import {
   PostPortalThreadMessageBody,
 } from "@workspace/api-zod";
 import { logAudit } from "../lib/audit";
-import { sendEmail, getAppBaseUrl } from "../lib/email";
+import { getAppBaseUrl } from "../lib/email";
+import { dispatchNotification } from "../lib/notifications";
 import { nextJobNumber, nextInvoiceNumber } from "../lib/numbering";
 import { getUncachableStripeClient, isStripeConnected } from "../stripeClient";
 import { logger } from "../lib/logger";
@@ -120,12 +121,11 @@ router.post(
       const base = getAppBaseUrl();
       const link = `${base}/portal/${tenant.slug}/verify?token=${encodeURIComponent(rawToken)}`;
       try {
-        await sendEmail({
+        await dispatchNotification({
           tenantId: tenant.id,
-          template: "portal.magic_link",
-          to: [{ email, name: customer.name }],
-          subject: `Sign in to ${tenant.name}`,
-          text: `Hi ${customer.name},\n\nSign in to your ${tenant.name} portal:\n${link}\n\nThis link expires in 24 hours.\n`,
+          eventKind: "portal.magic_link",
+          vars: { customerName: customer.name, tenantName: tenant.name, magicUrl: link },
+          to: { email, name: customer.name, customerId: customer.id },
         });
       } catch (err) {
         logger.error({ err, tenantId: tenant.id }, "Magic link email failed");

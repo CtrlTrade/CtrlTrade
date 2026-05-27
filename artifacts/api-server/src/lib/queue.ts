@@ -16,7 +16,8 @@ export type JobKind =
   | "usage_daily_rollup"
   | "failed_payment_recovery"
   | "ai_call"
-  | "voice_dispatch";
+  | "voice_dispatch"
+  | "notification_retry";
 
 export const ALL_JOB_KINDS: JobKind[] = [
   "send_email",
@@ -31,6 +32,7 @@ export const ALL_JOB_KINDS: JobKind[] = [
   "failed_payment_recovery",
   "ai_call",
   "voice_dispatch",
+  "notification_retry",
 ];
 
 let _boss: PgBoss | null = null;

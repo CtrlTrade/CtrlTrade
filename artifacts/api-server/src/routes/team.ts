@@ -16,7 +16,8 @@ import {
 } from "@workspace/api-zod";
 import { requireRole, requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
-import { sendEmail, getAppBaseUrl } from "../lib/email";
+import { getAppBaseUrl } from "../lib/email";
+import { dispatchNotification } from "../lib/notifications";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
@@ -252,12 +253,12 @@ router.post(
 
     const acceptUrl = `${getAppBaseUrl()}/accept-invite?token=${encodeURIComponent(rawToken)}`;
     try {
-      await sendEmail({
+      await dispatchNotification({
         tenantId,
-        template: "team.invitation",
-        to: [{ email }],
-        subject: `You've been invited to ${tenantName} on CtrlTrade®`,
-        text: `${req.auth!.user.name} invited you to join ${tenantName} on CtrlTrade®.\n\nAccept your invitation here:\n${acceptUrl}\n\nThis link expires in 7 days.\n`,
+        eventKind: "team.invitation",
+        vars: { tenantName, inviterName: req.auth!.user.name, acceptUrl, email, role, seatType },
+        to: { email },
+        metadata: { invitationId: inv.id },
       });
     } catch (err) {
       logger.error({ err, tenantId }, "Invitation email failed");
@@ -317,12 +318,12 @@ router.post(
       .returning();
     const acceptUrl = `${getAppBaseUrl()}/accept-invite?token=${encodeURIComponent(rawToken)}`;
     try {
-      await sendEmail({
+      await dispatchNotification({
         tenantId,
-        template: "team.invitation",
-        to: [{ email: existing.email }],
-        subject: `Reminder: join ${tenantName} on CtrlTrade®`,
-        text: `Reminder — you have a pending invitation to join ${tenantName} on CtrlTrade®.\n\nAccept here:\n${acceptUrl}\n\nThis link expires in 7 days.\n`,
+        eventKind: "team.invitation",
+        vars: { tenantName, inviterName: req.auth!.user.name, acceptUrl, email: existing.email },
+        to: { email: existing.email },
+        metadata: { invitationId: existing.id, reminder: true },
       });
     } catch (err) {
       logger.error({ err }, "Resend invitation email failed");
@@ -576,12 +577,11 @@ router.post(
     });
     const link = `${getAppBaseUrl()}/reset-password?token=${encodeURIComponent(rawToken)}`;
     try {
-      await sendEmail({
+      await dispatchNotification({
         tenantId,
-        template: "auth.password_reset",
-        to: [{ email: target.user.email, name: target.user.name }],
-        subject: "Reset your CtrlTrade® password",
-        text: `Hi ${target.user.name},\n\nA password reset was requested by ${req.auth!.user.email}.\n\nReset your password:\n${link}\n\nThis link expires in 1 hour.\n`,
+        eventKind: "auth.password_reset",
+        vars: { name: target.user.name, resetUrl: link, requestedBy: req.auth!.user.email },
+        to: { email: target.user.email, name: target.user.name },
       });
     } catch (err) {
       logger.error({ err }, "Password reset email failed");

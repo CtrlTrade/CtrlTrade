@@ -10,7 +10,7 @@ import {
   EXPIRY_WINDOW_DAYS,
   type TenantDigest,
 } from "./expiryDigest";
-import { sendEmail } from "./email";
+import { dispatchNotification } from "./notifications";
 
 const DIGEST_AUDIT_KIND = "compliance.digest_sent";
 const ONE_HOUR_MS = 60 * 60 * 1000;
@@ -89,19 +89,28 @@ async function sendDigest(
   const text = renderDigestText(digest);
   const html = renderDigestHtml(digest);
   try {
-    await sendEmail({
-      tenantId: digest.tenant.id,
-      template: "compliance_expiry_digest",
-      to: recipients.map((r) => ({ email: r.email, name: r.name })),
-      subject,
-      text,
-      html,
-      metadata: {
-        expiredCount: digest.expiredCount,
-        expiringCount: digest.expiringCount,
-        windowDays: EXPIRY_WINDOW_DAYS,
-      },
-    });
+    for (const r of recipients) {
+      await dispatchNotification({
+        tenantId: digest.tenant.id,
+        eventKind: "compliance_expiry_digest",
+        vars: {
+          tenantName: digest.tenant.name,
+          expiredCount: digest.expiredCount,
+          expiringCount: digest.expiringCount,
+          summary: text,
+        },
+        to: { email: r.email, name: r.name },
+        subject,
+        text,
+        html,
+        recipientUserIds: [r.userId],
+        metadata: {
+          expiredCount: digest.expiredCount,
+          expiringCount: digest.expiringCount,
+          windowDays: EXPIRY_WINDOW_DAYS,
+        },
+      });
+    }
   } catch (err) {
     // sendEmail already recorded the failed delivery; surface it on the audit
     // log too so the tenant can see why no digest arrived today.

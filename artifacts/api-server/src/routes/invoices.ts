@@ -29,7 +29,8 @@ import { requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
 import { nextInvoiceNumber } from "../lib/numbering";
 import { isTenantCustomer } from "../lib/tenantGuards";
-import { sendEmail, getAppBaseUrl } from "../lib/email";
+import { getAppBaseUrl } from "../lib/email";
+import { dispatchNotification } from "../lib/notifications";
 import { getUncachableStripeClient, isStripeConnected } from "../stripeClient";
 import { logger } from "../lib/logger";
 
@@ -444,12 +445,20 @@ router.post("/v1/invoices/:invoiceId/send", requireTenant, async (req, res): Pro
       `${req.auth!.tenant!.name}`,
     ];
     try {
-      await sendEmail({
+      await dispatchNotification({
         tenantId,
-        template: "invoice.sent",
-        to: [{ email: ctx.customer.email, name: ctx.customer.name }],
+        eventKind: "invoice.sent",
+        vars: {
+          customerName: ctx.customer.name,
+          tenantName: req.auth!.tenant!.name,
+          invoiceNumber: ctx.inv.number,
+          amount: `£${(ctx.inv.totalPence / 100).toFixed(2)}`,
+          paymentUrl: url ?? "",
+        },
+        to: { email: ctx.customer.email, name: ctx.customer.name, customerId: ctx.customer.id },
         subject: `Invoice ${ctx.inv.number} from ${req.auth!.tenant!.name}`,
         text: lines.join("\n"),
+        jobId: ctx.inv.jobId ?? null,
         metadata: { invoiceId: ctx.inv.id, paymentLinkUrl: url },
       });
     } catch (err) {
@@ -663,12 +672,20 @@ async function sendPaymentReceipt(invoiceId: string, amountPence: number): Promi
     ``,
     `Reference: ${inv.number}`,
   ];
-  await sendEmail({
+  await dispatchNotification({
     tenantId: inv.tenantId,
-    template: "invoice.payment.receipt",
-    to: [{ email: customer.email, name: customer.name }],
+    eventKind: "invoice.payment.receipt",
+    vars: {
+      customerName: customer.name,
+      tenantName: "",
+      invoiceNumber: inv.number,
+      amount: `£${totalGbp}`,
+      fullyPaidLine: fullyPaid ? " This invoice is now fully paid. Thank you!" : "",
+    },
+    to: { email: customer.email, name: customer.name, customerId: customer.id },
     subject: `Payment received — invoice ${inv.number}`,
     text: lines.join("\n"),
+    jobId: inv.jobId ?? null,
     metadata: { invoiceId: inv.id, amountPence },
   });
 }

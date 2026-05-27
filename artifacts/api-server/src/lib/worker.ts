@@ -4,6 +4,7 @@ import { runExpiryDigestOnce } from "./scheduler";
 import { rollupHourly, rollupDaily, recordUsage } from "./usage";
 import { sendEmail } from "./email";
 import { sendSmsViaTwilio, sendWhatsAppViaTwilio } from "./twilio";
+import { processDeliveryRetries } from "./notifications";
 import { reconcileFromStripeSubscription } from "./stripeReconcile";
 import { db, tenantsTable } from "@workspace/db";
 import { inArray } from "drizzle-orm";
@@ -91,6 +92,10 @@ const handlers: Record<JobKind, Handler> = {
       await recordUsage(p.tenantId, "ai_call", tokens, { prompt: p.prompt });
     }
   },
+  notification_retry: async () => {
+    const { retried, succeeded } = await processDeliveryRetries(50);
+    if (retried > 0) logger.info({ retried, succeeded }, "notification_retry sweep");
+  },
   voice_dispatch: async (p) => {
     logger.info({ payload: p }, "voice_dispatch (no provider configured — logged)");
     if (p?.tenantId) {
@@ -137,5 +142,7 @@ export async function registerSchedules(): Promise<void> {
   await boss.schedule("expiry_digest", "0 * * * *", {}, { tz: "UTC" } as any);
   await boss.schedule("usage_daily_rollup", "0 2 * * *", {}, { tz: "UTC" } as any);
   await boss.schedule("failed_payment_recovery", "0 3 * * *", {}, { tz: "UTC" } as any);
-  logger.info("Worker schedules registered (hourly expiry+rollup, daily summary+dunning)");
+  // Sweep failed notification_deliveries every 5 minutes for due retries.
+  await boss.schedule("notification_retry", "*/5 * * * *", {}, { tz: "UTC" } as any);
+  logger.info("Worker schedules registered (hourly expiry+rollup, daily summary+dunning, 5-min notify retry)");
 }

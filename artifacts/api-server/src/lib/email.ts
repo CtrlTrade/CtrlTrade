@@ -2,6 +2,7 @@ import { db, notificationDeliveriesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "./logger";
 import { recordUsage } from "./usage";
+import { nextRetryDelaySeconds } from "./notifications";
 
 export interface SendEmailInput {
   tenantId: string;
@@ -11,6 +12,9 @@ export interface SendEmailInput {
   text: string;
   html?: string;
   metadata?: Record<string, unknown>;
+  jobId?: string | null;
+  /** Internal: when set, update this delivery row instead of inserting a new one (retry path). */
+  _retryDeliveryId?: string;
 }
 
 export function getAppBaseUrl(): string {
@@ -20,12 +24,10 @@ export function getAppBaseUrl(): string {
   return process.env.APP_BASE_URL ?? "";
 }
 
-async function deliverViaResend(input: SendEmailInput, apiKey: string): Promise<void> {
+async function deliverViaResend(input: SendEmailInput, apiKey: string): Promise<{ id: string | null }> {
   const from = process.env.EMAIL_FROM_ADDRESS;
   const fromName = process.env.EMAIL_FROM_NAME ?? "CtrlTrade";
-  if (!from) {
-    throw new Error("EMAIL_FROM_ADDRESS is required when RESEND_API_KEY is set");
-  }
+  if (!from) throw new Error("EMAIL_FROM_ADDRESS is required when RESEND_API_KEY is set");
   const body = {
     from: `${fromName} <${from}>`,
     to: input.to.map((r) => (r.name ? `${r.name} <${r.email}>` : r.email)),
@@ -42,14 +44,14 @@ async function deliverViaResend(input: SendEmailInput, apiKey: string): Promise<
     const text = await resp.text().catch(() => "");
     throw new Error(`Resend responded ${resp.status}: ${text}`);
   }
+  const json = (await resp.json().catch(() => ({}))) as { id?: string };
+  return { id: json.id ?? null };
 }
 
-async function deliverViaSendGrid(input: SendEmailInput, apiKey: string): Promise<void> {
+async function deliverViaSendGrid(input: SendEmailInput, apiKey: string): Promise<{ id: string | null }> {
   const from = process.env.EMAIL_FROM_ADDRESS;
   const fromName = process.env.EMAIL_FROM_NAME ?? "CtrlTrade";
-  if (!from) {
-    throw new Error("EMAIL_FROM_ADDRESS is required when SENDGRID_API_KEY is set");
-  }
+  if (!from) throw new Error("EMAIL_FROM_ADDRESS is required when SENDGRID_API_KEY is set");
   const body = {
     personalizations: [
       {
@@ -65,46 +67,64 @@ async function deliverViaSendGrid(input: SendEmailInput, apiKey: string): Promis
   };
   const resp = await fetch("https://api.sendgrid.com/v3/mail/send", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   if (!resp.ok) {
     const text = await resp.text().catch(() => "");
     throw new Error(`SendGrid responded ${resp.status}: ${text}`);
   }
+  return { id: (resp.headers.get("x-message-id") ?? null) as string | null };
 }
 
 /**
- * Send an email and record the delivery. Records into the existing
- * `notification_deliveries` table (single source of truth) and then attempts
- * real delivery if a transport is configured via env (currently SendGrid).
- * If no transport is configured, the row stays in `logged` state — readable
- * from the same table by a future drain worker — and we log the payload.
+ * Send an email and record the delivery. Persists into `notification_deliveries`
+ * (single source of truth), then attempts delivery via Resend > SendGrid by
+ * env. On failure, schedules a retry by setting `next_retry_at` with backoff
+ * (the worker's `notification_retry` cron sweeps and re-attempts due rows).
  */
 export async function sendEmail(input: SendEmailInput): Promise<void> {
   if (input.to.length === 0) {
     logger.warn({ tenantId: input.tenantId, template: input.template }, "sendEmail called with no recipients");
     return;
   }
-  const [row] = await db
-    .insert(notificationDeliveriesTable)
-    .values({
-      tenantId: input.tenantId,
-      channel: "email",
-      template: input.template,
-      status: "queued",
-      payload: {
-        to: input.to,
+
+  let rowId: string;
+  let attemptCount: number;
+  if (input._retryDeliveryId) {
+    rowId = input._retryDeliveryId;
+    const [existing] = await db
+      .select({ attemptCount: notificationDeliveriesTable.attemptCount })
+      .from(notificationDeliveriesTable)
+      .where(eq(notificationDeliveriesTable.id, rowId));
+    attemptCount = (existing?.attemptCount ?? 0) + 1;
+    await db
+      .update(notificationDeliveriesTable)
+      .set({ status: "queued", attemptCount, lastError: null, nextRetryAt: null })
+      .where(eq(notificationDeliveriesTable.id, rowId));
+  } else {
+    const [row] = await db
+      .insert(notificationDeliveriesTable)
+      .values({
+        tenantId: input.tenantId,
+        channel: "email",
+        template: input.template,
+        status: "queued",
         subject: input.subject,
-        text: input.text,
-        html: input.html ?? null,
-        metadata: input.metadata ?? null,
-      },
-    })
-    .returning();
+        jobId: input.jobId ?? null,
+        attemptCount: 1,
+        payload: {
+          to: input.to,
+          subject: input.subject,
+          text: input.text,
+          html: input.html ?? null,
+          metadata: input.metadata ?? null,
+        },
+      })
+      .returning({ id: notificationDeliveriesTable.id });
+    rowId = row.id;
+    attemptCount = 1;
+  }
 
   const resendKey = process.env.RESEND_API_KEY;
   const sendgridKey = process.env.SENDGRID_API_KEY;
@@ -113,14 +133,14 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
     await db
       .update(notificationDeliveriesTable)
       .set({ status: "logged" })
-      .where(eq(notificationDeliveriesTable.id, row.id));
+      .where(eq(notificationDeliveriesTable.id, rowId));
     logger.info(
       {
         tenantId: input.tenantId,
         template: input.template,
         recipients: input.to.map((r) => r.email),
         subject: input.subject,
-        deliveryId: row.id,
+        deliveryId: rowId,
       },
       "Email logged (no transport — set RESEND_API_KEY or SENDGRID_API_KEY + EMAIL_FROM_ADDRESS to deliver)",
     );
@@ -128,29 +148,30 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
   }
 
   try {
-    if (transport === "resend") await deliverViaResend(input, resendKey!);
-    else await deliverViaSendGrid(input, sendgridKey!);
+    const { id: providerId } =
+      transport === "resend" ? await deliverViaResend(input, resendKey!) : await deliverViaSendGrid(input, sendgridKey!);
     void recordUsage(input.tenantId, "email", input.to.length, { template: input.template });
     await db
       .update(notificationDeliveriesTable)
-      .set({ status: "sent" })
-      .where(eq(notificationDeliveriesTable.id, row.id));
+      .set({ status: "sent", providerMessageId: providerId, lastError: null, nextRetryAt: null })
+      .where(eq(notificationDeliveriesTable.id, rowId));
     logger.info(
-      {
-        tenantId: input.tenantId,
-        template: input.template,
-        recipients: input.to.map((r) => r.email),
-        deliveryId: row.id,
-        transport,
-      },
+      { tenantId: input.tenantId, template: input.template, recipients: input.to.map((r) => r.email), deliveryId: rowId, providerId, transport },
       "Email sent",
     );
   } catch (err) {
+    const delay = nextRetryDelaySeconds(attemptCount);
+    const nextRetryAt = delay == null ? null : new Date(Date.now() + delay * 1000);
     await db
       .update(notificationDeliveriesTable)
-      .set({ status: "failed", payload: { ...(row.payload as Record<string, unknown>), error: String(err) } })
-      .where(eq(notificationDeliveriesTable.id, row.id));
-    logger.error({ err, tenantId: input.tenantId, template: input.template }, "Email delivery failed");
-    throw err;
+      .set({
+        status: delay == null ? "dead" : "failed",
+        lastError: String(err).slice(0, 500),
+        nextRetryAt,
+      })
+      .where(eq(notificationDeliveriesTable.id, rowId));
+    logger.error({ err, tenantId: input.tenantId, template: input.template, attemptCount, retryAt: nextRetryAt }, "Email delivery failed");
+    // Don't throw on retryable failures — caller doesn't need to know.
+    if (delay == null) throw err;
   }
 }
