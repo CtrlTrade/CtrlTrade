@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useGetSession, useLogout, useStopImpersonation } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target, Inbox } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target, Inbox, Package, Warehouse, Handshake } from "lucide-react";
 import { useGetInboxUnreadCount } from "@workspace/api-client-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -56,6 +56,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/fleet", icon: Truck, label: "Fleet" },
     { href: "/compliance", icon: ShieldCheck, label: "Compliance" },
     { href: "/pos", icon: ShoppingCart, label: "CtrlTradePos®" },
+    { href: "/products", icon: Package, label: "Products" },
+    { href: "/stock", icon: Warehouse, label: "Stock" },
+    { href: "/suppliers", icon: Truck, label: "Suppliers" },
+    { href: "/trade-accounts", icon: Handshake, label: "Trade Accounts" },
     { href: "/reports", icon: BarChart, label: "Reports" },
     { href: "/settings", icon: Settings, label: "Settings" },
     { href: "/billing", icon: CreditCard, label: "Billing" },

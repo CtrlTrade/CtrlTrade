@@ -8,6 +8,11 @@ export default function AppLayout() {
       <Stack.Screen name="sales" />
       <Stack.Screen name="sale" options={{ presentation: "modal" }} />
       <Stack.Screen name="receipt/[id]" options={{ presentation: "modal" }} />
+      <Stack.Screen name="till" options={{ presentation: "modal" }} />
+      <Stack.Screen name="products" />
+      <Stack.Screen name="basket" options={{ presentation: "modal" }} />
+      <Stack.Screen name="refund" options={{ presentation: "modal" }} />
+      <Stack.Screen name="eod-report" options={{ presentation: "modal" }} />
     </Stack>
   );
 }

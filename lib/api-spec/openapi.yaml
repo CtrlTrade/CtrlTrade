@@ -2660,6 +2660,555 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/OkResponse" }
 
+  # ============================================================================
+  # POS catalogue / stock / suppliers / trade accounts / till sessions (task 25)
+  # ============================================================================
+
+  /v1/pos-catalog/products:
+    get:
+      operationId: listProducts
+      tags: [pos-catalog]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Product" }
+    post:
+      operationId: createProduct
+      tags: [pos-catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+
+  /v1/pos-catalog/products/{productId}:
+    patch:
+      operationId: updateProduct
+      tags: [pos-catalog]
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+    delete:
+      operationId: archiveProduct
+      tags: [pos-catalog]
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: No Content }
+
+  /v1/pos-catalog/categories:
+    get:
+      operationId: listProductCategories
+      tags: [pos-catalog]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ProductCategory" }
+    post:
+      operationId: createProductCategory
+      tags: [pos-catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductCategoryInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProductCategory" }
+
+  /v1/pos-catalog/stock-locations:
+    get:
+      operationId: listStockLocations
+      tags: [pos-catalog]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/StockLocation" }
+    post:
+      operationId: createStockLocation
+      tags: [pos-catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StockLocationInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StockLocation" }
+
+  /v1/pos-catalog/stock:
+    get:
+      operationId: listBranchStock
+      tags: [pos-catalog]
+      parameters:
+        - in: query
+          name: locationId
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/BranchStockRow" }
+
+  /v1/pos-catalog/stock/adjust:
+    post:
+      operationId: adjustStock
+      tags: [pos-catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StockAdjustmentInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BranchStockRow" }
+
+  /v1/pos-catalog/stock/transfer:
+    post:
+      operationId: transferStock
+      tags: [pos-catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StockTransferInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StockTransferReceipt" }
+
+  /v1/pos-catalog/stock/low:
+    get:
+      operationId: listLowStock
+      tags: [pos-catalog]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/LowStockRow" }
+
+  /v1/pos-catalog/suppliers:
+    get:
+      operationId: listSuppliers
+      tags: [pos-catalog]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Supplier" }
+    post:
+      operationId: createSupplier
+      tags: [pos-catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SupplierInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Supplier" }
+
+  /v1/pos-catalog/suppliers/{supplierId}:
+    patch:
+      operationId: updateSupplier
+      tags: [pos-catalog]
+      parameters:
+        - in: path
+          name: supplierId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SupplierInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Supplier" }
+
+  /v1/pos-catalog/supplier-orders:
+    get:
+      operationId: listSupplierOrders
+      tags: [pos-catalog]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/SupplierOrder" }
+    post:
+      operationId: createSupplierOrder
+      tags: [pos-catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SupplierOrderInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SupplierOrder" }
+
+  /v1/pos-catalog/supplier-orders/{orderId}/receive:
+    post:
+      operationId: receiveSupplierOrder
+      tags: [pos-catalog]
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SupplierDeliveryInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SupplierOrder" }
+
+  /v1/pos-catalog/trade-accounts:
+    get:
+      operationId: listTradeAccounts
+      tags: [pos-catalog]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TradeAccount" }
+    post:
+      operationId: createTradeAccount
+      tags: [pos-catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TradeAccountInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TradeAccount" }
+
+  /v1/pos-catalog/trade-accounts/{tradeAccountId}:
+    patch:
+      operationId: updateTradeAccount
+      tags: [pos-catalog]
+      parameters:
+        - in: path
+          name: tradeAccountId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TradeAccountInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TradeAccount" }
+
+  /v1/pos-catalog/cash-drawers:
+    get:
+      operationId: listCashDrawers
+      tags: [pos-catalog]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/CashDrawer" }
+    post:
+      operationId: createCashDrawer
+      tags: [pos-catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CashDrawerInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CashDrawer" }
+
+  # ---- POS mobile (till) endpoints ----------------------------------------
+  /v1/pos/products:
+    get:
+      operationId: listPosProducts
+      tags: [pos]
+      parameters:
+        - in: query
+          name: search
+          required: false
+          schema: { type: string }
+        - in: query
+          name: barcode
+          required: false
+          schema: { type: string }
+        - in: query
+          name: locationId
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PosProduct" }
+
+  /v1/pos/trade-accounts:
+    get:
+      operationId: listPosTradeAccounts
+      tags: [pos]
+      parameters:
+        - in: query
+          name: search
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TradeAccount" }
+
+  /v1/pos/stock-locations:
+    get:
+      operationId: listPosStockLocations
+      tags: [pos]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/StockLocation" }
+
+  /v1/pos/till-sessions/current:
+    get:
+      operationId: getCurrentTillSession
+      tags: [pos]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - { $ref: "#/components/schemas/TillSession" }
+                  - type: "null"
+
+  /v1/pos/till-sessions/open:
+    post:
+      operationId: openTillSession
+      tags: [pos]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OpenTillSessionInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TillSession" }
+
+  /v1/pos/till-sessions/{sessionId}/close:
+    post:
+      operationId: closeTillSession
+      tags: [pos]
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CloseTillSessionInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TillSessionReport" }
+
+  /v1/pos/till-sessions/{sessionId}/report:
+    get:
+      operationId: getTillSessionReport
+      tags: [pos]
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TillSessionReport" }
+
+  /v1/pos/transactions:
+    get:
+      operationId: listPosTransactions
+      tags: [pos]
+      parameters:
+        - in: query
+          name: sessionId
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PosTransaction" }
+    post:
+      operationId: createPosTransaction
+      tags: [pos]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PosTransactionInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosTransaction" }
+
+  /v1/pos/transactions/{transactionId}/refund:
+    post:
+      operationId: refundPosTransaction
+      tags: [pos]
+      parameters:
+        - in: path
+          name: transactionId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PosRefundInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosTransaction" }
+
+  /v1/pos/transactions/{transactionId}/receipt:
+    post:
+      operationId: sendPosTransactionReceipt
+      tags: [pos]
+      parameters:
+        - in: path
+          name: transactionId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PosReceiptRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosReceiptReceipt" }
+
   /v1/public/partner/signup:
     post:
       operationId: partnerSignup
@@ -5691,3 +6240,476 @@ components:
         createdAt: { type: string, format: date-time }
 
 
+    StockLocation:
+      type: object
+      required: [id, name, kind, isDefault, archived, createdAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        kind: { type: string, description: "shop | warehouse | van" }
+        code: { type: ["string", "null"] }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+        isDefault: { type: boolean }
+        archived: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    StockLocationInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        kind: { type: string }
+        code: { type: ["string", "null"] }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+        isDefault: { type: boolean }
+
+    ProductCategory:
+      type: object
+      required: [id, name, sortOrder, createdAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        sortOrder: { type: integer }
+        createdAt: { type: string, format: date-time }
+
+    ProductCategoryInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        sortOrder: { type: integer }
+
+    Product:
+      type: object
+      required: [id, sku, name, unit, pricePence, costPence, vatRatePct, trackStock, archived, createdAt]
+      properties:
+        id: { type: string }
+        categoryId: { type: ["string", "null"] }
+        categoryName: { type: ["string", "null"] }
+        sku: { type: string }
+        name: { type: string }
+        description: { type: ["string", "null"] }
+        unit: { type: string }
+        pricePence: { type: integer }
+        costPence: { type: integer }
+        tradePricePence: { type: ["integer", "null"] }
+        vatRatePct: { type: integer }
+        barcode: { type: ["string", "null"] }
+        trackStock: { type: boolean }
+        reorderLevel: { type: integer }
+        reorderQty: { type: integer }
+        supplierId: { type: ["string", "null"] }
+        supplierName: { type: ["string", "null"] }
+        archived: { type: boolean }
+        totalStock: { type: integer }
+        createdAt: { type: string, format: date-time }
+
+    ProductInput:
+      type: object
+      required: [sku, name]
+      properties:
+        sku: { type: string, minLength: 1 }
+        name: { type: string, minLength: 1 }
+        description: { type: ["string", "null"] }
+        categoryId: { type: ["string", "null"] }
+        unit: { type: string }
+        pricePence: { type: integer, minimum: 0 }
+        costPence: { type: integer, minimum: 0 }
+        tradePricePence: { type: ["integer", "null"] }
+        vatRatePct: { type: integer, minimum: 0, maximum: 100 }
+        barcode: { type: ["string", "null"] }
+        trackStock: { type: boolean }
+        reorderLevel: { type: integer, minimum: 0 }
+        reorderQty: { type: integer, minimum: 0 }
+        supplierId: { type: ["string", "null"] }
+        archived: { type: boolean }
+
+    PosProduct:
+      type: object
+      required: [id, sku, name, unit, pricePence, vatRatePct, trackStock, stockHere]
+      properties:
+        id: { type: string }
+        sku: { type: string }
+        name: { type: string }
+        description: { type: ["string", "null"] }
+        categoryId: { type: ["string", "null"] }
+        categoryName: { type: ["string", "null"] }
+        unit: { type: string }
+        pricePence: { type: integer }
+        tradePricePence: { type: ["integer", "null"] }
+        vatRatePct: { type: integer }
+        barcode: { type: ["string", "null"] }
+        trackStock: { type: boolean }
+        stockHere: { type: integer, description: "Stock at the queried location (or total)" }
+
+    BranchStockRow:
+      type: object
+      required: [id, locationId, locationName, productId, productSku, productName, qty]
+      properties:
+        id: { type: string }
+        locationId: { type: string }
+        locationName: { type: string }
+        productId: { type: string }
+        variantId: { type: ["string", "null"] }
+        productSku: { type: string }
+        productName: { type: string }
+        qty: { type: integer }
+        reorderLevel: { type: integer }
+        binCode: { type: ["string", "null"] }
+        updatedAt: { type: string, format: date-time }
+
+    LowStockRow:
+      type: object
+      required: [productId, productSku, productName, totalQty, reorderLevel]
+      properties:
+        productId: { type: string }
+        productSku: { type: string }
+        productName: { type: string }
+        totalQty: { type: integer }
+        reorderLevel: { type: integer }
+        reorderQty: { type: integer }
+        supplierId: { type: ["string", "null"] }
+        supplierName: { type: ["string", "null"] }
+
+    StockAdjustmentInput:
+      type: object
+      required: [locationId, productId, qtyDelta]
+      properties:
+        locationId: { type: string }
+        productId: { type: string }
+        variantId: { type: ["string", "null"] }
+        qtyDelta: { type: integer }
+        reason: { type: string }
+        note: { type: ["string", "null"] }
+
+    StockTransferInput:
+      type: object
+      required: [fromLocationId, toLocationId, items]
+      properties:
+        fromLocationId: { type: string }
+        toLocationId: { type: string }
+        note: { type: ["string", "null"] }
+        items:
+          type: array
+          items:
+            type: object
+            required: [productId, quantity]
+            properties:
+              productId: { type: string }
+              variantId: { type: ["string", "null"] }
+              quantity: { type: integer, minimum: 1 }
+
+    StockTransferReceipt:
+      type: object
+      required: [transferred, fromLocationId, toLocationId]
+      properties:
+        transferred: { type: integer }
+        fromLocationId: { type: string }
+        toLocationId: { type: string }
+
+    Supplier:
+      type: object
+      required: [id, name, paymentTermsDays, archived, createdAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        contactName: { type: ["string", "null"] }
+        email: { type: ["string", "null"] }
+        phone: { type: ["string", "null"] }
+        accountReference: { type: ["string", "null"] }
+        paymentTermsDays: { type: integer }
+        notes: { type: ["string", "null"] }
+        archived: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    SupplierInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        contactName: { type: ["string", "null"] }
+        email: { type: ["string", "null"] }
+        phone: { type: ["string", "null"] }
+        accountReference: { type: ["string", "null"] }
+        paymentTermsDays: { type: integer, minimum: 0 }
+        notes: { type: ["string", "null"] }
+        archived: { type: boolean }
+
+    SupplierOrder:
+      type: object
+      required: [id, supplierId, supplierName, number, status, items, subtotalPence, createdAt]
+      properties:
+        id: { type: string }
+        supplierId: { type: string }
+        supplierName: { type: string }
+        locationId: { type: ["string", "null"] }
+        number: { type: string }
+        status: { type: string }
+        items:
+          type: array
+          items:
+            type: object
+            required: [productId, description, quantity, unitCostPence]
+            properties:
+              productId: { type: string }
+              sku: { type: ["string", "null"] }
+              description: { type: string }
+              quantity: { type: integer }
+              unitCostPence: { type: integer }
+        subtotalPence: { type: integer }
+        notes: { type: ["string", "null"] }
+        expectedAt: { type: ["string", "null"], format: date-time }
+        sentAt: { type: ["string", "null"], format: date-time }
+        receivedAt: { type: ["string", "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+
+    SupplierOrderInput:
+      type: object
+      required: [supplierId, items]
+      properties:
+        supplierId: { type: string }
+        locationId: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        expectedAt: { type: ["string", "null"], format: date-time }
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [productId, description, quantity, unitCostPence]
+            properties:
+              productId: { type: string }
+              sku: { type: ["string", "null"] }
+              description: { type: string }
+              quantity: { type: integer, minimum: 1 }
+              unitCostPence: { type: integer, minimum: 0 }
+
+    SupplierDeliveryInput:
+      type: object
+      required: [locationId, items]
+      properties:
+        locationId: { type: string }
+        notes: { type: ["string", "null"] }
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [productId, quantity]
+            properties:
+              productId: { type: string }
+              variantId: { type: ["string", "null"] }
+              quantity: { type: integer, minimum: 1 }
+
+    TradeAccount:
+      type: object
+      required: [id, accountCode, name, pricingTier, discountPct, creditLimitPence, balancePence, paymentTermsDays, archived, createdAt]
+      properties:
+        id: { type: string }
+        customerId: { type: ["string", "null"] }
+        accountCode: { type: string }
+        name: { type: string }
+        email: { type: ["string", "null"] }
+        phone: { type: ["string", "null"] }
+        pricingTier: { type: string }
+        discountPct: { type: integer }
+        creditLimitPence: { type: integer }
+        balancePence: { type: integer }
+        paymentTermsDays: { type: integer }
+        archived: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    TradeAccountInput:
+      type: object
+      required: [accountCode, name]
+      properties:
+        customerId: { type: ["string", "null"] }
+        accountCode: { type: string, minLength: 1 }
+        name: { type: string, minLength: 1 }
+        email: { type: ["string", "null"] }
+        phone: { type: ["string", "null"] }
+        pricingTier: { type: string }
+        discountPct: { type: integer, minimum: 0, maximum: 100 }
+        creditLimitPence: { type: integer, minimum: 0 }
+        paymentTermsDays: { type: integer, minimum: 0 }
+        pin: { type: ["string", "null"] }
+        archived: { type: boolean }
+
+    CashDrawer:
+      type: object
+      required: [id, name, archived, createdAt]
+      properties:
+        id: { type: string }
+        locationId: { type: ["string", "null"] }
+        locationName: { type: ["string", "null"] }
+        name: { type: string }
+        deviceCode: { type: ["string", "null"] }
+        refundApprovalPin: { type: ["string", "null"] }
+        archived: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    CashDrawerInput:
+      type: object
+      required: [name]
+      properties:
+        locationId: { type: ["string", "null"] }
+        name: { type: string, minLength: 1 }
+        deviceCode: { type: ["string", "null"] }
+        refundApprovalPin: { type: ["string", "null"] }
+        archived: { type: boolean }
+
+    TillSession:
+      type: object
+      required: [id, status, openingFloatPence, cashSalesPence, cardSalesPence, tradeSalesPence, refundsPence, openedAt]
+      properties:
+        id: { type: string }
+        locationId: { type: ["string", "null"] }
+        locationName: { type: ["string", "null"] }
+        cashDrawerId: { type: ["string", "null"] }
+        cashDrawerName: { type: ["string", "null"] }
+        openedByUserId: { type: ["string", "null"] }
+        openedByName: { type: ["string", "null"] }
+        closedByUserId: { type: ["string", "null"] }
+        closedByName: { type: ["string", "null"] }
+        openingFloatPence: { type: integer }
+        countedCashPence: { type: ["integer", "null"] }
+        expectedCashPence: { type: ["integer", "null"] }
+        cashSalesPence: { type: integer }
+        cardSalesPence: { type: integer }
+        tradeSalesPence: { type: integer }
+        refundsPence: { type: integer }
+        variancePence: { type: ["integer", "null"] }
+        status: { type: string }
+        notes: { type: ["string", "null"] }
+        openedAt: { type: string, format: date-time }
+        closedAt: { type: ["string", "null"], format: date-time }
+
+    OpenTillSessionInput:
+      type: object
+      required: [openingFloatPence]
+      properties:
+        openingFloatPence: { type: integer, minimum: 0 }
+        locationId: { type: ["string", "null"] }
+        cashDrawerId: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+
+    CloseTillSessionInput:
+      type: object
+      required: [countedCashPence]
+      properties:
+        countedCashPence: { type: integer, minimum: 0 }
+        notes: { type: ["string", "null"] }
+        emailReportTo: { type: ["string", "null"] }
+
+    TillSessionReport:
+      type: object
+      required: [session, transactionCount, productSold, emailedTo]
+      properties:
+        session: { $ref: "#/components/schemas/TillSession" }
+        transactionCount: { type: integer }
+        productSold: { type: integer }
+        emailedTo: { type: ["string", "null"] }
+
+    PosTransactionItemInput:
+      type: object
+      required: [description, quantity, unitPricePence]
+      properties:
+        productId: { type: ["string", "null"] }
+        variantId: { type: ["string", "null"] }
+        sku: { type: ["string", "null"] }
+        description: { type: string, minLength: 1 }
+        quantity: { type: integer, minimum: 1 }
+        unitPricePence: { type: integer, minimum: 0 }
+        discountPence: { type: integer, minimum: 0 }
+        vatRatePct: { type: integer, minimum: 0, maximum: 100 }
+
+    PosTransactionInput:
+      type: object
+      required: [tender, items]
+      properties:
+        tillSessionId: { type: ["string", "null"] }
+        locationId: { type: ["string", "null"] }
+        tradeAccountId: { type: ["string", "null"] }
+        customerId: { type: ["string", "null"] }
+        customerName: { type: ["string", "null"] }
+        customerEmail: { type: ["string", "null"] }
+        jobReference: { type: ["string", "null"] }
+        tender: { type: string, description: "cash | card | split | trade_account" }
+        cashTakenPence: { type: integer, minimum: 0 }
+        cardTakenPence: { type: integer, minimum: 0 }
+        tradeCreditPence: { type: integer, minimum: 0 }
+        notes: { type: ["string", "null"] }
+        items:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/PosTransactionItemInput" }
+
+    PosRefundInput:
+      type: object
+      required: [approvalPin, items]
+      properties:
+        approvalPin: { type: string }
+        reason: { type: ["string", "null"] }
+        tender: { type: string }
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [originalItemId, quantity]
+            properties:
+              originalItemId: { type: string }
+              quantity: { type: integer, minimum: 1 }
+
+    PosTransactionLine:
+      type: object
+      required: [id, description, quantity, unitPricePence, totalPence]
+      properties:
+        id: { type: string }
+        productId: { type: ["string", "null"] }
+        variantId: { type: ["string", "null"] }
+        sku: { type: ["string", "null"] }
+        description: { type: string }
+        quantity: { type: integer }
+        unitPricePence: { type: integer }
+        discountPence: { type: integer }
+        taxPence: { type: integer }
+        totalPence: { type: integer }
+
+    PosTransaction:
+      type: object
+      required: [id, number, kind, tender, subtotalPence, taxPence, totalPence, currency, items, createdAt]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        kind: { type: string, description: "sale | refund" }
+        refundOfId: { type: ["string", "null"] }
+        tillSessionId: { type: ["string", "null"] }
+        locationId: { type: ["string", "null"] }
+        tradeAccountId: { type: ["string", "null"] }
+        tradeAccountName: { type: ["string", "null"] }
+        customerName: { type: ["string", "null"] }
+        customerEmail: { type: ["string", "null"] }
+        subtotalPence: { type: integer }
+        discountPence: { type: integer }
+        taxPence: { type: integer }
+        totalPence: { type: integer }
+        currency: { type: string }
+        tender: { type: string }
+        cashTakenPence: { type: integer }
+        cardTakenPence: { type: integer }
+        tradeCreditPence: { type: integer }
+        changeGivenPence: { type: integer }
+        notes: { type: ["string", "null"] }
+        createdByName: { type: ["string", "null"] }
+        receiptDeliveredAt: { type: ["string", "null"], format: date-time }
+        receiptMethod: { type: ["string", "null"] }
+        receiptDestination: { type: ["string", "null"] }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/PosTransactionLine" }
+        createdAt: { type: string, format: date-time }

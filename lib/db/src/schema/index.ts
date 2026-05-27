@@ -1296,3 +1296,396 @@ export type MarketplaceListing = typeof marketplaceListingsTable.$inferSelect;
 export type MarketplacePost = typeof marketplacePostsTable.$inferSelect;
 export type MarketplaceApplication = typeof marketplaceApplicationsTable.$inferSelect;
 export type MarketplaceReview = typeof marketplaceReviewsTable.$inferSelect;
+
+export const stockLocationsTable = pgTable(
+  "stock_locations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    kind: varchar("kind", { length: 24 }).notNull().default("shop"), // shop|warehouse|van
+    code: varchar("code", { length: 32 }),
+    addressLine1: text("address_line_1"),
+    city: text("city"),
+    postcode: text("postcode"),
+    isDefault: boolean("is_default").notNull().default(false),
+    archived: boolean("archived").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ tenantIdx: index("stock_locations_tenant_idx").on(t.tenantId) }),
+);
+
+// Product categories (tenant-scoped, single-level for MVP)
+export const productCategoriesTable = pgTable(
+  "product_categories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ tenantIdx: index("product_categories_tenant_idx").on(t.tenantId) }),
+);
+
+// Products (master)
+export const productsTable = pgTable(
+  "products",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    categoryId: uuid("category_id").references(() => productCategoriesTable.id, { onDelete: "set null" }),
+    sku: varchar("sku", { length: 64 }).notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    unit: varchar("unit", { length: 16 }).notNull().default("each"), // each|m|m2|kg|hr
+    pricePence: integer("price_pence").notNull().default(0),
+    costPence: integer("cost_pence").notNull().default(0),
+    tradePricePence: integer("trade_price_pence"),
+    vatRatePct: integer("vat_rate_pct").notNull().default(20),
+    barcode: varchar("barcode", { length: 64 }),
+    trackStock: boolean("track_stock").notNull().default(true),
+    reorderLevel: integer("reorder_level").notNull().default(0),
+    reorderQty: integer("reorder_qty").notNull().default(0),
+    supplierId: uuid("supplier_id"),
+    archived: boolean("archived").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("products_tenant_idx").on(t.tenantId),
+    uniqSku: unique("products_tenant_sku_uniq").on(t.tenantId, t.sku),
+    barcodeIdx: index("products_barcode_idx").on(t.tenantId, t.barcode),
+  }),
+);
+
+// Product variants (size/colour/etc) — optional per product
+export const productVariantsTable = pgTable(
+  "product_variants",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    productId: uuid("product_id").notNull().references(() => productsTable.id, { onDelete: "cascade" }),
+    sku: varchar("sku", { length: 64 }).notNull(),
+    name: text("name").notNull(),
+    barcode: varchar("barcode", { length: 64 }),
+    pricePence: integer("price_pence"),
+    costPence: integer("cost_pence"),
+    attributes: jsonb("attributes").$type<Record<string, string>>(),
+    archived: boolean("archived").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    productIdx: index("product_variants_product_idx").on(t.productId),
+    barcodeIdx: index("product_variants_barcode_idx").on(t.tenantId, t.barcode),
+    uniqSku: unique("product_variants_tenant_sku_uniq").on(t.tenantId, t.sku),
+  }),
+);
+
+// Branch stock — qty on hand per (location, product/variant)
+export const branchStockTable = pgTable(
+  "branch_stock",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    locationId: uuid("location_id").notNull().references(() => stockLocationsTable.id, { onDelete: "cascade" }),
+    productId: uuid("product_id").notNull().references(() => productsTable.id, { onDelete: "cascade" }),
+    variantId: uuid("variant_id").references(() => productVariantsTable.id, { onDelete: "cascade" }),
+    qty: integer("qty").notNull().default(0),
+    binCode: varchar("bin_code", { length: 32 }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("branch_stock_tenant_idx").on(t.tenantId),
+    uniqRow: uniqueIndex("branch_stock_uniq").on(t.locationId, t.productId, t.variantId),
+  }),
+);
+
+// Stock movements (audit trail)
+export const stockMovementsTable = pgTable(
+  "stock_movements",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    locationId: uuid("location_id").notNull().references(() => stockLocationsTable.id, { onDelete: "cascade" }),
+    productId: uuid("product_id").notNull().references(() => productsTable.id, { onDelete: "cascade" }),
+    variantId: uuid("variant_id").references(() => productVariantsTable.id, { onDelete: "cascade" }),
+    qtyDelta: integer("qty_delta").notNull(),
+    reason: varchar("reason", { length: 32 }).notNull(), // sale|refund|adjustment|transfer_in|transfer_out|delivery|count
+    refKind: varchar("ref_kind", { length: 32 }), // pos_transaction|adjustment|delivery|transfer
+    refId: uuid("ref_id"),
+    note: text("note"),
+    actorUserId: uuid("actor_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("stock_movements_tenant_idx").on(t.tenantId),
+    productIdx: index("stock_movements_product_idx").on(t.productId, t.createdAt),
+  }),
+);
+
+// Warehouse bins
+export const warehouseBinsTable = pgTable(
+  "warehouse_bins",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    locationId: uuid("location_id").notNull().references(() => stockLocationsTable.id, { onDelete: "cascade" }),
+    code: varchar("code", { length: 32 }).notNull(),
+    name: text("name"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ uniq: unique("warehouse_bins_uniq").on(t.locationId, t.code) }),
+);
+
+// Suppliers
+export const suppliersTable = pgTable(
+  "suppliers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    contactName: text("contact_name"),
+    email: varchar("email", { length: 255 }),
+    phone: text("phone"),
+    accountReference: text("account_reference"),
+    paymentTermsDays: integer("payment_terms_days").notNull().default(30),
+    notes: text("notes"),
+    archived: boolean("archived").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ tenantIdx: index("suppliers_tenant_idx").on(t.tenantId) }),
+);
+
+// Trade accounts (B2B customers with pricing tiers + credit limits)
+export const tradeAccountsTable = pgTable(
+  "trade_accounts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").references(() => customersTable.id, { onDelete: "set null" }),
+    accountCode: varchar("account_code", { length: 32 }).notNull(),
+    name: text("name").notNull(),
+    email: varchar("email", { length: 255 }),
+    phone: text("phone"),
+    pricingTier: varchar("pricing_tier", { length: 16 }).notNull().default("trade"), // trade|wholesale|custom
+    discountPct: integer("discount_pct").notNull().default(0),
+    creditLimitPence: integer("credit_limit_pence").notNull().default(0),
+    balancePence: integer("balance_pence").notNull().default(0),
+    paymentTermsDays: integer("payment_terms_days").notNull().default(30),
+    pin: varchar("pin", { length: 8 }),
+    archived: boolean("archived").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("trade_accounts_tenant_idx").on(t.tenantId),
+    uniqCode: unique("trade_accounts_tenant_code_uniq").on(t.tenantId, t.accountCode),
+  }),
+);
+
+// Cash drawers (physical till device registration)
+export const cashDrawersTable = pgTable(
+  "cash_drawers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    locationId: uuid("location_id").references(() => stockLocationsTable.id, { onDelete: "set null" }),
+    name: text("name").notNull(),
+    deviceCode: varchar("device_code", { length: 32 }),
+    refundApprovalPin: varchar("refund_approval_pin", { length: 8 }),
+    archived: boolean("archived").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ tenantIdx: index("cash_drawers_tenant_idx").on(t.tenantId) }),
+);
+
+// Till sessions (open / close cycle)
+export const tillSessionsTable = pgTable(
+  "till_sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    locationId: uuid("location_id").references(() => stockLocationsTable.id, { onDelete: "set null" }),
+    cashDrawerId: uuid("cash_drawer_id").references(() => cashDrawersTable.id, { onDelete: "set null" }),
+    openedByUserId: uuid("opened_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    closedByUserId: uuid("closed_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    openingFloatPence: integer("opening_float_pence").notNull().default(0),
+    countedCashPence: integer("counted_cash_pence"),
+    expectedCashPence: integer("expected_cash_pence"),
+    cashSalesPence: integer("cash_sales_pence").notNull().default(0),
+    cardSalesPence: integer("card_sales_pence").notNull().default(0),
+    tradeSalesPence: integer("trade_sales_pence").notNull().default(0),
+    refundsPence: integer("refunds_pence").notNull().default(0),
+    variancePence: integer("variance_pence"),
+    status: varchar("status", { length: 16 }).notNull().default("open"), // open|closed
+    notes: text("notes"),
+    openedAt: timestamp("opened_at", { withTimezone: true }).notNull().defaultNow(),
+    closedAt: timestamp("closed_at", { withTimezone: true }),
+  },
+  (t) => ({
+    tenantIdx: index("till_sessions_tenant_idx").on(t.tenantId),
+    statusIdx: index("till_sessions_status_idx").on(t.tenantId, t.status),
+  }),
+);
+
+// POS transactions (richer than legacy pos_sales — supports basket of products + refunds)
+export const posTransactionsTable = pgTable(
+  "pos_transactions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    tillSessionId: uuid("till_session_id").references(() => tillSessionsTable.id, { onDelete: "set null" }),
+    locationId: uuid("location_id").references(() => stockLocationsTable.id, { onDelete: "set null" }),
+    userId: uuid("user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    customerId: uuid("customer_id").references(() => customersTable.id, { onDelete: "set null" }),
+    tradeAccountId: uuid("trade_account_id").references(() => tradeAccountsTable.id, { onDelete: "set null" }),
+    kind: varchar("kind", { length: 16 }).notNull().default("sale"), // sale|refund
+    refundOfId: uuid("refund_of_id"),
+    number: varchar("number", { length: 32 }).notNull(),
+    customerName: text("customer_name"),
+    customerEmail: text("customer_email"),
+    subtotalPence: integer("subtotal_pence").notNull().default(0),
+    discountPence: integer("discount_pence").notNull().default(0),
+    taxPence: integer("tax_pence").notNull().default(0),
+    totalPence: integer("total_pence").notNull().default(0),
+    currency: varchar("currency", { length: 8 }).notNull().default("gbp"),
+    tender: varchar("tender", { length: 16 }).notNull(), // cash|card|split|trade_account
+    cashTakenPence: integer("cash_taken_pence").notNull().default(0),
+    cardTakenPence: integer("card_taken_pence").notNull().default(0),
+    tradeCreditPence: integer("trade_credit_pence").notNull().default(0),
+    changeGivenPence: integer("change_given_pence").notNull().default(0),
+    refundApprovedByUserId: uuid("refund_approved_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    notes: text("notes"),
+    receiptDeliveredAt: timestamp("receipt_delivered_at", { withTimezone: true }),
+    receiptMethod: varchar("receipt_method", { length: 16 }),
+    receiptDestination: text("receipt_destination"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("pos_transactions_tenant_idx").on(t.tenantId),
+    sessionIdx: index("pos_transactions_session_idx").on(t.tillSessionId),
+    uniqNumber: unique("pos_transactions_tenant_number_uniq").on(t.tenantId, t.number),
+  }),
+);
+
+export const posTransactionItemsTable = pgTable(
+  "pos_transaction_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    transactionId: uuid("transaction_id").notNull().references(() => posTransactionsTable.id, { onDelete: "cascade" }),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    productId: uuid("product_id").references(() => productsTable.id, { onDelete: "set null" }),
+    variantId: uuid("variant_id").references(() => productVariantsTable.id, { onDelete: "set null" }),
+    sku: varchar("sku", { length: 64 }),
+    description: text("description").notNull(),
+    quantity: integer("quantity").notNull().default(1),
+    unitPricePence: integer("unit_price_pence").notNull().default(0),
+    discountPence: integer("discount_pence").notNull().default(0),
+    taxPence: integer("tax_pence").notNull().default(0),
+    totalPence: integer("total_pence").notNull().default(0),
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (t) => ({ txIdx: index("pos_transaction_items_tx_idx").on(t.transactionId) }),
+);
+
+// Supplier purchase orders + deliveries
+export const supplierOrdersTable = pgTable(
+  "supplier_orders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    supplierId: uuid("supplier_id").notNull().references(() => suppliersTable.id, { onDelete: "restrict" }),
+    locationId: uuid("location_id").references(() => stockLocationsTable.id, { onDelete: "set null" }),
+    number: varchar("number", { length: 32 }).notNull(),
+    status: varchar("status", { length: 16 }).notNull().default("draft"), // draft|sent|partial|received|cancelled
+    items: jsonb("items").notNull().$type<Array<{
+      productId: string; sku?: string | null; description: string;
+      quantity: number; unitCostPence: number;
+    }>>(),
+    subtotalPence: integer("subtotal_pence").notNull().default(0),
+    notes: text("notes"),
+    expectedAt: timestamp("expected_at", { withTimezone: true }),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    receivedAt: timestamp("received_at", { withTimezone: true }),
+    createdByUserId: uuid("created_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("supplier_orders_tenant_idx").on(t.tenantId),
+    uniqNum: unique("supplier_orders_tenant_number_uniq").on(t.tenantId, t.number),
+  }),
+);
+
+export const supplierDeliveriesTable = pgTable(
+  "supplier_deliveries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    supplierOrderId: uuid("supplier_order_id").references(() => supplierOrdersTable.id, { onDelete: "set null" }),
+    locationId: uuid("location_id").notNull().references(() => stockLocationsTable.id, { onDelete: "restrict" }),
+    items: jsonb("items").notNull().$type<Array<{
+      productId: string; variantId?: string | null; quantity: number;
+    }>>(),
+    notes: text("notes"),
+    receivedByUserId: uuid("received_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ tenantIdx: index("supplier_deliveries_tenant_idx").on(t.tenantId) }),
+);
+
+// Inventory adjustments (write-offs / stock counts)
+export const inventoryAdjustmentsTable = pgTable(
+  "inventory_adjustments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    locationId: uuid("location_id").notNull().references(() => stockLocationsTable.id, { onDelete: "restrict" }),
+    productId: uuid("product_id").notNull().references(() => productsTable.id, { onDelete: "cascade" }),
+    variantId: uuid("variant_id").references(() => productVariantsTable.id, { onDelete: "cascade" }),
+    qtyDelta: integer("qty_delta").notNull(),
+    reason: varchar("reason", { length: 32 }).notNull().default("adjustment"), // adjustment|count|damage|theft|transfer
+    note: text("note"),
+    actorUserId: uuid("actor_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ tenantIdx: index("inventory_adjustments_tenant_idx").on(t.tenantId) }),
+);
+
+// Barcode label print jobs (kept for traceability)
+export const barcodeLabelsTable = pgTable(
+  "barcode_labels",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    productId: uuid("product_id").references(() => productsTable.id, { onDelete: "cascade" }),
+    variantId: uuid("variant_id").references(() => productVariantsTable.id, { onDelete: "cascade" }),
+    barcode: varchar("barcode", { length: 64 }).notNull(),
+    labelText: text("label_text"),
+    pricePence: integer("price_pence"),
+    quantity: integer("quantity").notNull().default(1),
+    createdByUserId: uuid("created_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ tenantIdx: index("barcode_labels_tenant_idx").on(t.tenantId) }),
+);
+
+export type StockLocation = typeof stockLocationsTable.$inferSelect;
+export type ProductCategory = typeof productCategoriesTable.$inferSelect;
+export type Product = typeof productsTable.$inferSelect;
+export type ProductVariant = typeof productVariantsTable.$inferSelect;
+export type BranchStock = typeof branchStockTable.$inferSelect;
+export type StockMovement = typeof stockMovementsTable.$inferSelect;
+export type WarehouseBin = typeof warehouseBinsTable.$inferSelect;
+export type Supplier = typeof suppliersTable.$inferSelect;
+export type TradeAccount = typeof tradeAccountsTable.$inferSelect;
+export type CashDrawer = typeof cashDrawersTable.$inferSelect;
+export type TillSession = typeof tillSessionsTable.$inferSelect;
+export type PosTransaction = typeof posTransactionsTable.$inferSelect;
+export type PosTransactionItem = typeof posTransactionItemsTable.$inferSelect;
+export type SupplierOrder = typeof supplierOrdersTable.$inferSelect;
+export type SupplierDelivery = typeof supplierDeliveriesTable.$inferSelect;
+export type InventoryAdjustment = typeof inventoryAdjustmentsTable.$inferSelect;
+export type BarcodeLabel = typeof barcodeLabelsTable.$inferSelect;
+
