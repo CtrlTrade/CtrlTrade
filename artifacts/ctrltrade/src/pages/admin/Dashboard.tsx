@@ -1,14 +1,26 @@
-import { useGetAdminDashboard, useGetRevenueBreakdown, useGetAdminActivity, useGetUpcomingRenewals } from "@workspace/api-client-react";
+import { useGetAdminDashboard, useGetRevenueBreakdown, useGetAdminActivity, useGetUpcomingRenewals, useGetAdminUsage } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, CreditCard, AlertCircle, RefreshCw, Activity } from "lucide-react";
+import { Users, CreditCard, AlertCircle, RefreshCw, Activity, Gauge } from "lucide-react";
 import { Link } from "wouter";
+
+const USAGE_KIND_LABELS: Record<string, string> = {
+  email: "Emails",
+  sms: "SMS",
+  whatsapp: "WhatsApp",
+  ai_call: "AI tokens",
+  voice_minute: "Voice mins",
+  api_call: "API calls",
+  pdf_generated: "PDFs",
+  file_uploaded: "Files",
+};
 
 export function AdminDashboard() {
   const { data: dashboard, isLoading: dashLoading } = useGetAdminDashboard();
   const { data: revenue, isLoading: revLoading } = useGetRevenueBreakdown();
   const { data: activity, isLoading: actLoading } = useGetAdminActivity();
   const { data: renewals, isLoading: renLoading } = useGetUpcomingRenewals();
+  const { data: usage } = useGetAdminUsage();
 
   if (dashLoading || revLoading || actLoading || renLoading) {
     return <div className="p-8 space-y-6"><Skeleton className="h-32" /><Skeleton className="h-96" /></div>;
@@ -38,6 +50,32 @@ export function AdminDashboard() {
           <KpiCard title="Failed (30d)" value={dashboard.failedPaymentsLast30d} icon={AlertCircle} className="bg-red-950/20 border-red-900/50 text-red-500" />
         </div>
       </div>
+
+      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+        <CardHeader>
+          <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2">
+            <Gauge className="h-4 w-4" /> Platform usage this month
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {usage && usage.totals.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+              {usage.totals.map((t) => (
+                <Link key={t.kind} href="/admin/usage" className="border border-zinc-800 p-3 bg-zinc-950 hover:border-red-500/50 transition-colors block" data-testid={`admin-usage-${t.kind}`}>
+                  <div className="font-bold uppercase tracking-wider text-[10px] text-zinc-500 mb-1">
+                    {USAGE_KIND_LABELS[t.kind] ?? t.kind}
+                  </div>
+                  <div className="text-xl font-mono font-bold text-zinc-100">{t.count.toLocaleString()}</div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-zinc-500 font-mono">
+              No usage recorded yet this month. <Link href="/admin/usage" className="text-red-500 hover:underline">View breakdown →</Link>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">

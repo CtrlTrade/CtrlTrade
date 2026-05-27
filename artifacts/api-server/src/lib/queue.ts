@@ -7,17 +7,21 @@ import { logger } from "./logger";
 export type JobKind =
   | "send_email"
   | "send_sms"
+  | "send_whatsapp"
   | "stripe_reconcile"
   | "expiry_digest"
   | "integration_sync"
   | "generate_pdf"
   | "usage_rollup"
   | "usage_daily_rollup"
-  | "failed_payment_recovery";
+  | "failed_payment_recovery"
+  | "ai_call"
+  | "voice_dispatch";
 
 export const ALL_JOB_KINDS: JobKind[] = [
   "send_email",
   "send_sms",
+  "send_whatsapp",
   "stripe_reconcile",
   "expiry_digest",
   "integration_sync",
@@ -25,6 +29,8 @@ export const ALL_JOB_KINDS: JobKind[] = [
   "usage_rollup",
   "usage_daily_rollup",
   "failed_payment_recovery",
+  "ai_call",
+  "voice_dispatch",
 ];
 
 let _boss: PgBoss | null = null;

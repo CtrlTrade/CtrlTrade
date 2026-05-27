@@ -1,9 +1,11 @@
 import { logger } from "./logger";
 import { getBoss, type JobKind } from "./queue";
 import { runExpiryDigestOnce } from "./scheduler";
-import { rollupHourly, rollupDaily } from "./usage";
+import { rollupHourly, rollupDaily, recordUsage } from "./usage";
 import { sendEmail } from "./email";
 import { reconcileFromStripeSubscription } from "./stripeReconcile";
+import { db, tenantsTable } from "@workspace/db";
+import { inArray } from "drizzle-orm";
 
 type Handler = (payload: any) => Promise<void>;
 
@@ -18,6 +20,7 @@ const handlers: Record<JobKind, Handler> = {
       html: p.html,
       metadata: p.metadata,
     });
+    // sendEmail itself records "email" usage on provider success.
   },
   expiry_digest: async () => {
     await runExpiryDigestOnce();
@@ -34,20 +37,58 @@ const handlers: Record<JobKind, Handler> = {
     }
   },
   failed_payment_recovery: async () => {
-    // Stub: real implementation would re-attempt collection or notify;
-    // for now logged so the cron is observable.
-    logger.info("Failed-payment recovery sweep (noop)");
+    // Daily sweep: look up tenants with past_due Stripe state and re-reconcile.
+    // Real dunning (re-attempting collection) is provider-side; this
+    // re-reconciles so admin dashboards reflect any state changes.
+    const rows = await db
+      .select({ id: tenantsTable.id, stripeSubscriptionId: tenantsTable.stripeSubscriptionId })
+      .from(tenantsTable)
+      .where(inArray(tenantsTable.status, ["past_due", "unpaid"]));
+    let touched = 0;
+    for (const r of rows) {
+      if (!r.stripeSubscriptionId) continue;
+      try {
+        await reconcileFromStripeSubscription(r.stripeSubscriptionId);
+        touched++;
+      } catch (err) {
+        logger.warn({ err, tenantId: r.id }, "failed_payment_recovery: reconcile error");
+      }
+    }
+    logger.info({ touched, scanned: rows.length }, "Failed-payment recovery sweep complete");
   },
   send_sms: async (p) => {
-    // No SMS provider wired yet; once Twilio/Vonage is integrated, do the send here
-    // and call recordUsage(tenantId, "sms").
+    // No SMS provider wired yet; once Twilio/Vonage is integrated, do the send
+    // here. The usage event is still recorded so per-tenant SMS counts
+    // accumulate against included plan limits.
     logger.info({ payload: p }, "send_sms (no provider configured — logged)");
+    if (p?.tenantId) await recordUsage(p.tenantId, "sms", 1, { to: p.to });
+  },
+  send_whatsapp: async (p) => {
+    logger.info({ payload: p }, "send_whatsapp (no provider configured — logged)");
+    if (p?.tenantId) await recordUsage(p.tenantId, "whatsapp", 1, { to: p.to });
   },
   integration_sync: async (p) => {
     logger.info({ payload: p }, "integration_sync (no integration provider wired — logged)");
   },
   generate_pdf: async (p) => {
     logger.info({ payload: p }, "generate_pdf (no renderer wired — logged)");
+    if (p?.tenantId) await recordUsage(p.tenantId, "pdf_generated", 1);
+  },
+  ai_call: async (p) => {
+    // AI client not yet wired (out of scope here); record token usage from
+    // the payload so cost/limit dashboards work even before the provider lands.
+    logger.info({ payload: p }, "ai_call (no provider configured — logged)");
+    if (p?.tenantId) {
+      const tokens = Math.max(1, Number(p.tokens ?? 1));
+      await recordUsage(p.tenantId, "ai_call", tokens, { prompt: p.prompt });
+    }
+  },
+  voice_dispatch: async (p) => {
+    logger.info({ payload: p }, "voice_dispatch (no provider configured — logged)");
+    if (p?.tenantId) {
+      const minutes = Math.max(1, Number(p.minutes ?? 1));
+      await recordUsage(p.tenantId, "voice_minute", minutes, { to: p.to });
+    }
   },
 };
 
@@ -75,15 +116,18 @@ export async function registerWorkers(): Promise<void> {
 /**
  * Register all cron schedules. pg-boss persists schedules in its tables —
  * calling schedule() again with the same name+cron is idempotent.
+ *
+ * Cadence:
+ *   - usage_rollup           hourly  (top of hour)
+ *   - expiry_digest          hourly  (top of hour) — re-emits at most once per day per tenant via audit-log dedupe
+ *   - usage_daily_rollup     daily   (02:00 UTC)
+ *   - failed_payment_recovery daily  (03:00 UTC)
  */
 export async function registerSchedules(): Promise<void> {
   const boss = await getBoss();
-  // hourly usage rollup
   await boss.schedule("usage_rollup", "0 * * * *", {}, { tz: "UTC" } as any);
-  // daily rollup + expiry digest at 02:00 UTC
+  await boss.schedule("expiry_digest", "0 * * * *", {}, { tz: "UTC" } as any);
   await boss.schedule("usage_daily_rollup", "0 2 * * *", {}, { tz: "UTC" } as any);
-  await boss.schedule("expiry_digest", "0 6 * * *", {}, { tz: "UTC" } as any);
-  // hourly failed-payment sweep
-  await boss.schedule("failed_payment_recovery", "15 * * * *", {}, { tz: "UTC" } as any);
-  logger.info("Worker schedules registered (hourly+daily crons)");
+  await boss.schedule("failed_payment_recovery", "0 3 * * *", {}, { tz: "UTC" } as any);
+  logger.info("Worker schedules registered (hourly expiry+rollup, daily summary+dunning)");
 }

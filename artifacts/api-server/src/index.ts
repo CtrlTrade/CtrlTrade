@@ -3,7 +3,6 @@ import app from "./app";
 import { logger } from "./lib/logger";
 import { getStripeSync, isStripeConnected } from "./stripeClient";
 import { ensurePriceIds } from "./lib/stripeSubscription";
-import { startScheduler } from "./lib/scheduler";
 import { getBoss } from "./lib/queue";
 
 const rawPort = process.env["PORT"];
@@ -51,9 +50,10 @@ app.listen(port, (err) => {
     process.exit(1);
   }
   logger.info({ port }, "API server listening");
-  startScheduler();
   // Start pg-boss in producer mode so /v1/admin/workers and enqueueJob calls work.
-  // Job consumption happens in the separate worker process (pnpm run start:worker).
+  // Job consumption + cron scheduling happen in the separate worker process
+  // (pnpm run start:worker). The legacy in-process interval scheduler has been
+  // removed — pg-boss schedules now own all background timers.
   getBoss()
     .then(() => logger.info("pg-boss connected (producer mode)"))
     .catch((err) => logger.error({ err }, "pg-boss start failed"));

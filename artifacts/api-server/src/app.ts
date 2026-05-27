@@ -7,6 +7,7 @@ import router from "./routes";
 import { logger } from "./lib/logger";
 import { WebhookHandlers } from "./webhookHandlers";
 import { attachAuth } from "./middlewares/auth";
+import { meterApiUsage } from "./middlewares/usageMeter";
 
 const app: Express = express();
 app.set("trust proxy", 1);
@@ -102,6 +103,7 @@ app.use(
 );
 
 app.use(attachAuth);
+app.use("/api", meterApiUsage);
 
 app.use("/api", router);
 
