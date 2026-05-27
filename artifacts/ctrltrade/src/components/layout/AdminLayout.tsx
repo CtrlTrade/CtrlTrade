@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useGetSession, useLogout } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
   const { data: session, isLoading } = useGetSession();
   const logout = useLogout();
+  const unauthorized = !isLoading && (!session || !session.user.isSuperAdmin);
+
+  useEffect(() => {
+    if (unauthorized) setLocation("/login");
+  }, [unauthorized, setLocation]);
 
   const handleLogout = () => {
     logout.mutate(undefined, {
@@ -17,10 +23,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     });
   };
 
-  if (isLoading) return <div className="p-8"><Skeleton className="h-10 w-full mb-4" /><Skeleton className="h-64 w-full" /></div>;
-  if (!session || !session.user.isSuperAdmin) {
-    setLocation("/login");
-    return null;
+  if (isLoading || unauthorized || !session) {
+    return <div className="p-8"><Skeleton className="h-10 w-full mb-4" /><Skeleton className="h-64 w-full" /></div>;
   }
 
   const links = [

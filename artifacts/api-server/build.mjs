@@ -30,6 +30,7 @@ async function buildAll() {
     external: [
       "*.node",
       "stripe-replit-sync",
+      "connect-pg-simple",
       "sharp",
       "better-sqlite3",
       "sqlite3",
