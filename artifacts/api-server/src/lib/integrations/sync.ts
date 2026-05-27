@@ -15,8 +15,8 @@ import { logger } from "../logger";
 import { logAudit } from "../audit";
 import { getProvider } from "./registry";
 import { xeroPushContact, xeroPushInvoice, xeroPullInvoiceStatus } from "./xero";
-import { googleUpsertEvent, googleDeleteEvent } from "./google";
-import { outlookUpsertEvent, outlookDeleteEvent } from "./outlook";
+import { googleUpsertEvent, googleDeleteEvent, googlePullCalendarChanges } from "./google";
+import { outlookUpsertEvent, outlookDeleteEvent, outlookPullCalendarChanges } from "./outlook";
 import { recordInvoicePayment } from "../../routes/invoices";
 import type { DispatchPayload, ProviderId } from "./types";
 
@@ -350,6 +350,193 @@ async function deleteJobFromCalendars(tenantId: string, jobId: string): Promise<
   }
 }
 
+/**
+ * Pull external calendar changes back into job schedules.
+ *
+ * Google:  uses sync tokens stored in `settings.calSyncToken`.
+ *          A null/missing token triggers a baseline scan (90-day window) to
+ *          establish the first token; no job updates are applied on that
+ *          first pass — only the token is captured.
+ *          A 410 response invalidates the stored token; the next call starts fresh.
+ *
+ * Outlook: uses Graph delta links stored in `settings.calDeltaLink`.
+ *          A null/missing link triggers a full delta baseline scan with the
+ *          same first-pass-only-token semantics.
+ *
+ * Deleted events surface as a sync-log warning rather than auto-cancelling the job.
+ */
+async function pullCalendarChanges(tenantId: string, provider: "google_calendar" | "outlook"): Promise<void> {
+  const integ = await getConnectedIntegration(tenantId, provider);
+  if (!integ || integ.status === "disconnected") return;
+
+  const token = await ensureAccessToken(integ);
+  if (!token) {
+    await recordSync({
+      tenantId,
+      provider,
+      direction: "pull",
+      status: "skipped",
+      message: "No valid access token",
+    });
+    return;
+  }
+
+  const settings = (integ.settings ?? {}) as Record<string, unknown>;
+  // eventIds: jobId -> externalEventId (built during push)
+  const eventIds = (settings.eventIds as Record<string, string> | undefined) ?? {};
+  // Invert to externalEventId -> jobId for fast lookup
+  const eventToJob: Record<string, string> = {};
+  for (const [jobId, eventId] of Object.entries(eventIds)) {
+    eventToJob[eventId] = jobId;
+  }
+
+  try {
+    if (provider === "google_calendar") {
+      const syncToken = (settings.calSyncToken as string | null | undefined) ?? null;
+      const isFirstPass = !syncToken;
+
+      const { changes, nextSyncToken } = await googlePullCalendarChanges({
+        accessToken: token,
+        calendarId: integ.externalAccountId ?? "primary",
+        syncToken,
+      });
+
+      // Persist the new token (or clear it if invalidated so next run re-establishes)
+      await db
+        .update(tenantIntegrationsTable)
+        .set({ settings: { ...settings, calSyncToken: nextSyncToken ?? null } })
+        .where(eq(tenantIntegrationsTable.id, integ.id));
+
+      if (isFirstPass) {
+        // First pass just establishes the sync token — don't apply historical changes.
+        await recordSync({
+          tenantId,
+          provider,
+          direction: "pull",
+          status: "ok",
+          message: `Google Calendar sync token initialised; ${changes.length} baseline events seen`,
+        });
+        await markOk(integ);
+        return;
+      }
+
+      await applyCalendarChanges({ tenantId, provider, eventToJob, changes });
+    } else {
+      const deltaLink = (settings.calDeltaLink as string | null | undefined) ?? null;
+      const isFirstPass = !deltaLink;
+
+      const { changes, nextDeltaLink } = await outlookPullCalendarChanges({
+        accessToken: token,
+        deltaLink,
+      });
+
+      await db
+        .update(tenantIntegrationsTable)
+        .set({ settings: { ...settings, calDeltaLink: nextDeltaLink ?? null } })
+        .where(eq(tenantIntegrationsTable.id, integ.id));
+
+      if (isFirstPass) {
+        await recordSync({
+          tenantId,
+          provider,
+          direction: "pull",
+          status: "ok",
+          message: `Outlook delta link initialised; ${changes.length} baseline events seen`,
+        });
+        await markOk(integ);
+        return;
+      }
+
+      await applyCalendarChanges({ tenantId, provider, eventToJob, changes });
+    }
+
+    await markOk(integ);
+  } catch (err) {
+    await markError(integ, err);
+  }
+}
+
+/** Apply a batch of calendar change records to matching jobs. */
+async function applyCalendarChanges(opts: {
+  tenantId: string;
+  provider: "google_calendar" | "outlook";
+  eventToJob: Record<string, string>;
+  changes: Array<{ eventId: string; start?: Date; end?: Date; deleted: boolean }>;
+}): Promise<void> {
+  const { tenantId, provider, eventToJob, changes } = opts;
+  let updated = 0;
+  let warned = 0;
+
+  for (const change of changes) {
+    const jobId = eventToJob[change.eventId];
+    if (!jobId) continue; // event not tracked by us — skip
+
+    if (change.deleted) {
+      // Surface as a warning; do NOT auto-cancel the job.
+      logger.warn(
+        { tenantId, provider, eventId: change.eventId, jobId },
+        "calendar.pull: external event deleted — job NOT auto-cancelled",
+      );
+      await recordSync({
+        tenantId,
+        provider,
+        direction: "pull",
+        entityKind: "job",
+        entityId: jobId,
+        status: "ok",
+        message: "External calendar event was deleted; job schedule left unchanged (manual review required)",
+        metadata: { eventId: change.eventId, externallyDeleted: true },
+      });
+      warned++;
+      continue;
+    }
+
+    if (!change.start) continue; // no time data — nothing to update
+
+    // Guard against invalid dates (e.g. unparseable provider values).
+    if (isNaN(change.start.getTime())) {
+      await recordSync({
+        tenantId,
+        provider,
+        direction: "pull",
+        entityKind: "job",
+        entityId: jobId,
+        status: "error",
+        message: "Skipped update: external event returned an invalid start time",
+        metadata: { eventId: change.eventId },
+      });
+      continue;
+    }
+
+    await db
+      .update(jobsTable)
+      .set({
+        scheduledStart: change.start,
+        scheduledEnd: change.end && !isNaN(change.end.getTime()) ? change.end : null,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(jobsTable.id, jobId), eq(jobsTable.tenantId, tenantId)));
+
+    await recordSync({
+      tenantId,
+      provider,
+      direction: "pull",
+      entityKind: "job",
+      entityId: jobId,
+      status: "ok",
+      message: `Job schedule updated from external ${provider} event`,
+      metadata: {
+        eventId: change.eventId,
+        scheduledStart: change.start.toISOString(),
+        scheduledEnd: change.end?.toISOString() ?? null,
+      },
+    });
+    updated++;
+  }
+
+  logger.info({ tenantId, provider, updated, warned }, "calendar.pull: finished applying changes");
+}
+
 async function nightlyReconcileAll(): Promise<void> {
   // Pull payment status for every unpaid invoice in tenants connected to Xero.
   const integs = await db
@@ -365,6 +552,21 @@ async function nightlyReconcileAll(): Promise<void> {
     for (const u of unpaid) {
       await pullInvoicePayment(integ.tenantId, u.id).catch((err) =>
         logger.warn({ err, invoiceId: u.id }, "nightly reconcile: pull failed"),
+      );
+    }
+  }
+
+  // Pull external calendar changes for every connected calendar integration.
+  const calIntegProviders = ["google_calendar", "outlook"] as const;
+  for (const provider of calIntegProviders) {
+    const calIntegrations = await db
+      .select()
+      .from(tenantIntegrationsTable)
+      .where(eq(tenantIntegrationsTable.provider, provider));
+    for (const integ of calIntegrations) {
+      if (integ.status !== "connected") continue;
+      await pullCalendarChanges(integ.tenantId, provider).catch((err) =>
+        logger.warn({ err, provider, tenantId: integ.tenantId }, "nightly reconcile: calendar pull failed"),
       );
     }
   }
@@ -397,10 +599,20 @@ export async function handleIntegrationSync(payload: DispatchPayload): Promise<v
     case "job.delete":
       if (payload.entityId) await deleteJobFromCalendars(payload.tenantId, payload.entityId);
       break;
-    case "calendar.pull":
-      // Two-way pull is provider-specific (Graph delta / Google sync token).
-      // Framework hook left intentionally as a no-op for the initial release.
+    case "calendar.pull": {
+      // Pull external edits back into job schedules.
+      // Dispatch targets a specific provider, or both calendar providers when unspecified.
+      const calProviders: Array<"google_calendar" | "outlook"> =
+        payload.provider === "google_calendar" || payload.provider === "outlook"
+          ? [payload.provider]
+          : ["google_calendar", "outlook"];
+      for (const cp of calProviders) {
+        await pullCalendarChanges(payload.tenantId, cp).catch((err) =>
+          logger.warn({ err, provider: cp, tenantId: payload.tenantId }, "calendar.pull failed"),
+        );
+      }
       break;
+    }
   }
 }
 

@@ -146,3 +146,77 @@ export async function outlookDeleteEvent(args: { accessToken: string; eventId: s
     throw new Error(`Outlook event delete failed: ${res.status}`);
   }
 }
+
+export interface OutlookCalendarChange {
+  eventId: string;
+  start?: Date;
+  end?: Date;
+  deleted: boolean;
+}
+
+/**
+ * Pull incremental changes from Outlook/Microsoft Graph using delta queries.
+ * Pass `deltaLink: null` on the first call to establish a baseline delta link.
+ * Returns `nextDeltaLink: null` only on unexpected failure; the caller should
+ * discard the stored link and start fresh.
+ */
+export async function outlookPullCalendarChanges(args: {
+  accessToken: string;
+  deltaLink: string | null;
+}): Promise<{ changes: OutlookCalendarChange[]; nextDeltaLink: string | null }> {
+  type GraphEvent = {
+    id: string;
+    "@removed"?: { reason: string };
+    start?: { dateTime: string; timeZone: string };
+    end?: { dateTime: string; timeZone: string };
+  };
+  type DeltaResponse = {
+    value?: GraphEvent[];
+    "@odata.nextLink"?: string;
+    "@odata.deltaLink"?: string;
+  };
+
+  const changes: OutlookCalendarChange[] = [];
+  let nextDeltaLink: string | null = null;
+  let nextUrl: string | null =
+    args.deltaLink ?? "https://graph.microsoft.com/v1.0/me/events/delta?$select=id,start,end,subject";
+
+  while (nextUrl) {
+    const res = await fetch(nextUrl, {
+      headers: {
+        Authorization: `Bearer ${args.accessToken}`,
+        // Ask Graph to return all datetimes normalised to UTC so we can parse
+        // them directly — avoids mis-interpreting non-UTC provider timezones.
+        Prefer: 'outlook.timezone="UTC", odata.maxpagesize=50',
+      },
+    });
+    if (!res.ok) throw new Error(`Outlook calendar delta failed: ${res.status} ${await res.text()}`);
+
+    const json = (await res.json()) as DeltaResponse;
+
+    for (const item of json.value ?? []) {
+      const deleted = "@removed" in item && Boolean(item["@removed"]);
+      // Graph returns datetimes as "2024-01-15T10:00:00.0000000" (no suffix)
+      // when UTC is requested — append "Z" to make them valid ISO 8601 UTC strings.
+      const parseUtc = (dt: string | undefined): Date | undefined => {
+        if (!dt) return undefined;
+        const d = new Date(dt.endsWith("Z") ? dt : dt + "Z");
+        return isNaN(d.getTime()) ? undefined : d;
+      };
+      const start = parseUtc(item.start?.dateTime);
+      const end = parseUtc(item.end?.dateTime);
+      changes.push({ eventId: item.id, start, end, deleted });
+    }
+
+    if (json["@odata.nextLink"]) {
+      nextUrl = json["@odata.nextLink"];
+    } else if (json["@odata.deltaLink"]) {
+      nextDeltaLink = json["@odata.deltaLink"];
+      nextUrl = null;
+    } else {
+      nextUrl = null;
+    }
+  }
+
+  return { changes, nextDeltaLink };
+}
