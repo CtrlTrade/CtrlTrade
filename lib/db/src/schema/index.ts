@@ -38,6 +38,7 @@ export const tenantsTable = pgTable(
     companyNumber: text("company_number"),
     brandColor: varchar("brand_color", { length: 16 }),
     logoUrl: text("logo_url"),
+    vatRatePct: integer("vat_rate_pct").notNull().default(20),
     stripeCustomerId: text("stripe_customer_id"),
     stripeSubscriptionId: text("stripe_subscription_id"),
     trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
@@ -367,6 +368,75 @@ export const posSalesTable = pgTable(
   }),
 );
 
+// ---- Invoices --------------------------------------------------------------
+export const invoicesTable = pgTable(
+  "invoices",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    customerId: uuid("customer_id").notNull().references(() => customersTable.id, { onDelete: "restrict" }),
+    jobId: uuid("job_id").references(() => jobsTable.id, { onDelete: "set null" }),
+    quoteId: uuid("quote_id").references(() => quotesTable.id, { onDelete: "set null" }),
+    number: varchar("number", { length: 32 }).notNull(),
+    title: text("title").notNull(),
+    status: varchar("status", { length: 24 }).notNull().default("draft"), // draft|sent|paid|void
+    currency: varchar("currency", { length: 8 }).notNull().default("gbp"),
+    subtotalPence: integer("subtotal_pence").notNull().default(0),
+    taxPence: integer("tax_pence").notNull().default(0),
+    totalPence: integer("total_pence").notNull().default(0),
+    vatRatePct: integer("vat_rate_pct").notNull().default(20),
+    notes: text("notes"),
+    dueAt: timestamp("due_at", { withTimezone: true }),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    voidedAt: timestamp("voided_at", { withTimezone: true }),
+    stripePaymentLinkId: text("stripe_payment_link_id"),
+    stripePaymentLinkUrl: text("stripe_payment_link_url"),
+    stripeCheckoutSessionId: text("stripe_checkout_session_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("invoices_tenant_idx").on(t.tenantId),
+    statusIdx: index("invoices_status_idx").on(t.status),
+    dueIdx: index("invoices_due_idx").on(t.tenantId, t.dueAt),
+    uniqNum: unique("invoices_tenant_number_uniq").on(t.tenantId, t.number),
+  }),
+);
+
+export const invoiceItemsTable = pgTable(
+  "invoice_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    invoiceId: uuid("invoice_id").notNull().references(() => invoicesTable.id, { onDelete: "cascade" }),
+    description: text("description").notNull(),
+    quantity: integer("quantity").notNull().default(1),
+    unitPricePence: integer("unit_price_pence").notNull().default(0),
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (t) => ({ invoiceIdx: index("invoice_items_invoice_idx").on(t.invoiceId) }),
+);
+
+export const paymentsTable = pgTable(
+  "payments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    invoiceId: uuid("invoice_id").notNull().references(() => invoicesTable.id, { onDelete: "cascade" }),
+    amountPence: integer("amount_pence").notNull(),
+    currency: varchar("currency", { length: 8 }).notNull().default("gbp"),
+    provider: varchar("provider", { length: 24 }).notNull().default("stripe"),
+    stripeCheckoutSessionId: text("stripe_checkout_session_id"),
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
+    status: varchar("status", { length: 24 }).notNull().default("succeeded"),
+    receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("payments_tenant_idx").on(t.tenantId),
+    invoiceIdx: index("payments_invoice_idx").on(t.invoiceId),
+  }),
+);
+
 // ---- Types ----------------------------------------------------------------
 export type Tenant = typeof tenantsTable.$inferSelect;
 export type User = typeof usersTable.$inferSelect;
@@ -382,3 +452,6 @@ export type Vehicle = typeof vehiclesTable.$inferSelect;
 export type VehicleLocation = typeof vehicleLocationsTable.$inferSelect;
 export type Certificate = typeof certificatesTable.$inferSelect;
 export type PosSale = typeof posSalesTable.$inferSelect;
+export type Invoice = typeof invoicesTable.$inferSelect;
+export type InvoiceItem = typeof invoiceItemsTable.$inferSelect;
+export type Payment = typeof paymentsTable.$inferSelect;

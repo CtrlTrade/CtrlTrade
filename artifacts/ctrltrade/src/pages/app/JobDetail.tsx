@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 import {
   useGetJob,
   useAssignJob,
   useListTeam,
   useListVehicles,
+  useGenerateInvoiceFromJob,
   getGetJobQueryKey,
   getListJobsQueryKey,
+  getListInvoicesQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -16,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Receipt } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 function formatGBP(pence: number) {
@@ -37,6 +39,7 @@ export function AppJobDetail() {
   const { data: vehicles } = useListVehicles();
   const qc = useQueryClient();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [assignedUserId, setAssignedUserId] = useState<string>("");
   const [assignedVehicleId, setAssignedVehicleId] = useState<string>("");
   const [start, setStart] = useState("");
@@ -50,6 +53,17 @@ export function AppJobDetail() {
       setEnd(toLocalInput(data.scheduledEnd));
     }
   }, [data]);
+
+  const generateInvoice = useGenerateInvoiceFromJob({
+    mutation: {
+      onSuccess: (inv) => {
+        qc.invalidateQueries({ queryKey: getListInvoicesQueryKey() });
+        toast({ title: `Invoice ${inv.number} created` });
+        setLocation(`/invoices/${inv.id}`);
+      },
+      onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
+    },
+  });
 
   const assign = useAssignJob({
     mutation: {
@@ -80,6 +94,18 @@ export function AppJobDetail() {
         </div>
         <Badge className="uppercase rounded-none">{data.status.replace("_", " ")}</Badge>
       </div>
+
+      {data.status === "completed" && (
+        <Button
+          onClick={() => generateInvoice.mutate({ jobId: id })}
+          disabled={generateInvoice.isPending}
+          className="rounded-none uppercase tracking-wider font-bold"
+          data-testid="button-generate-invoice"
+        >
+          <Receipt className="h-4 w-4 mr-2" />
+          {generateInvoice.isPending ? "Generating…" : "Generate invoice"}
+        </Button>
+      )}
 
       <Card className="rounded-none border-border shadow-sm">
         <CardHeader><CardTitle className="uppercase tracking-tight">Schedule & Assignment</CardTitle></CardHeader>

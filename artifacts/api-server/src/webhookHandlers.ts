@@ -1,5 +1,6 @@
 import { getStripeSync } from "./stripeClient";
 import { reconcileFromStripeSubscription } from "./lib/stripeReconcile";
+import { recordInvoicePayment } from "./routes/invoices";
 import { logger } from "./lib/logger";
 
 export class WebhookHandlers {
@@ -25,6 +26,19 @@ export class WebhookHandlers {
           event?.data?.object?.subscription || event?.data?.object?.id;
         if (subId && typeof subId === "string" && subId.startsWith("sub_")) {
           await reconcileFromStripeSubscription(subId, t);
+        }
+      }
+      if (t === "checkout.session.completed") {
+        const session = event?.data?.object;
+        const invoiceId: string | undefined = session?.metadata?.invoice_id;
+        if (invoiceId && session?.payment_status === "paid") {
+          await recordInvoicePayment({
+            invoiceId,
+            amountPence: Number(session.amount_total ?? 0),
+            currency: String(session.currency ?? "gbp"),
+            stripeCheckoutSessionId: session.id,
+            stripePaymentIntentId: typeof session.payment_intent === "string" ? session.payment_intent : null,
+          });
         }
       }
     } catch (err) {

@@ -1,12 +1,14 @@
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 import {
   useGetQuote,
   useSendQuote,
   useAcceptQuote,
   useConvertQuoteToJob,
+  useGenerateInvoiceFromQuote,
   getGetQuoteQueryKey,
   getListQuotesQueryKey,
   getListJobsQueryKey,
+  getListInvoicesQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -14,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Send, Check, ArrowRightCircle } from "lucide-react";
+import { ArrowLeft, Send, Check, ArrowRightCircle, Receipt } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 function formatGBP(pence: number) {
@@ -26,6 +28,7 @@ export function AppQuoteDetail() {
   const { data, isLoading } = useGetQuote(id);
   const qc = useQueryClient();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: getGetQuoteQueryKey(id) });
     qc.invalidateQueries({ queryKey: getListQuotesQueryKey() });
@@ -41,6 +44,17 @@ export function AppQuoteDetail() {
       },
     },
   });
+  const generateInvoice = useGenerateInvoiceFromQuote({
+    mutation: {
+      onSuccess: (inv) => {
+        qc.invalidateQueries({ queryKey: getListInvoicesQueryKey() });
+        toast({ title: `Invoice ${inv.number} created` });
+        setLocation(`/invoices/${inv.id}`);
+      },
+      onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
+    },
+  });
+  const canInvoice = data?.status === "accepted" || data?.status === "converted";
 
   if (isLoading) return <Skeleton className="h-96" />;
   if (!data) return <p>Quote not found.</p>;
@@ -74,6 +88,13 @@ export function AppQuoteDetail() {
           className="rounded-none uppercase tracking-wider font-bold" data-testid="button-convert-quote">
           <ArrowRightCircle className="h-4 w-4 mr-2" /> Convert to job
         </Button>
+        {canInvoice && (
+          <Button onClick={() => generateInvoice.mutate({ quoteId: id })}
+            disabled={generateInvoice.isPending}
+            className="rounded-none uppercase tracking-wider font-bold" data-testid="button-generate-invoice-quote">
+            <Receipt className="h-4 w-4 mr-2" /> Generate invoice
+          </Button>
+        )}
       </div>
 
       <Card className="rounded-none border-border shadow-sm">

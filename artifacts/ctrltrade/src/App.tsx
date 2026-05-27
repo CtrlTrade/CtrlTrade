@@ -28,6 +28,8 @@ import { AppJobDetail } from "@/pages/app/JobDetail";
 import { AppSchedule } from "@/pages/app/Schedule";
 import { AppFleet } from "@/pages/app/Fleet";
 import { AppCompliance } from "@/pages/app/Compliance";
+import { AppInvoices } from "@/pages/app/Invoices";
+import { AppInvoiceDetail } from "@/pages/app/InvoiceDetail";
 import { PlaceholderPage } from "@/components/PlaceholderPage";
 
 // Admin
@@ -69,6 +71,8 @@ function App() {
                   <Route path="/schedule" component={AppSchedule} />
                   <Route path="/fleet" component={AppFleet} />
                   <Route path="/compliance" component={AppCompliance} />
+                  <Route path="/invoices" component={AppInvoices} />
+                  <Route path="/invoices/:id" component={AppInvoiceDetail} />
                   <Route path="/:id">
                     {() => <PlaceholderPage />}
                   </Route>

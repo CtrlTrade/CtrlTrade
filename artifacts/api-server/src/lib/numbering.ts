@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
-import { db, quotesTable, jobsTable } from "@workspace/db";
+import { db, quotesTable, jobsTable, invoicesTable } from "@workspace/db";
 
-async function nextSequence(tenantId: string, prefix: string, table: typeof quotesTable | typeof jobsTable): Promise<string> {
+async function nextSequence(tenantId: string, prefix: string, table: typeof quotesTable | typeof jobsTable | typeof invoicesTable): Promise<string> {
   const [{ count }] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(table as any)
@@ -16,4 +16,8 @@ export async function nextQuoteNumber(tenantId: string): Promise<string> {
 
 export async function nextJobNumber(tenantId: string): Promise<string> {
   return nextSequence(tenantId, "J", jobsTable);
+}
+
+export async function nextInvoiceNumber(tenantId: string): Promise<string> {
+  return nextSequence(tenantId, "INV", invoicesTable);
 }

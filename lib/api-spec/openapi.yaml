@@ -26,6 +26,7 @@ tags:
   - name: compliance
   - name: team
   - name: pos
+  - name: invoices
 paths:
   /v1/pos/login:
     post:
@@ -834,6 +835,129 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Job" }
+
+  /v1/invoices:
+    get:
+      operationId: listInvoices
+      tags: [invoices]
+      parameters:
+        - in: query
+          name: status
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/InvoiceSummary" }
+    post:
+      operationId: createInvoice
+      tags: [invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InvoiceInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+
+  /v1/invoices/aged-debtors:
+    get:
+      operationId: getAgedDebtors
+      tags: [invoices]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AgedDebtors" }
+
+  /v1/invoices/{invoiceId}:
+    parameters:
+      - in: path
+        name: invoiceId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getInvoice
+      tags: [invoices]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+
+  /v1/invoices/{invoiceId}/send:
+    parameters:
+      - in: path
+        name: invoiceId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: sendInvoice
+      tags: [invoices]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+
+  /v1/invoices/{invoiceId}/void:
+    parameters:
+      - in: path
+        name: invoiceId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: voidInvoice
+      tags: [invoices]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+
+  /v1/jobs/{jobId}/invoice:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: generateInvoiceFromJob
+      tags: [invoices]
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+
+  /v1/quotes/{quoteId}/invoice:
+    parameters:
+      - in: path
+        name: quoteId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: generateInvoiceFromQuote
+      tags: [invoices]
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
 
   /v1/schedule:
     get:
@@ -1782,6 +1906,122 @@ components:
           type: string
           description: "email | print"
         destination: { type: ["string", "null"] }
+
+    InvoiceItemInput:
+      type: object
+      required: [description, quantity, unitPricePence]
+      properties:
+        description: { type: string, minLength: 1 }
+        quantity: { type: integer, minimum: 1 }
+        unitPricePence: { type: integer, minimum: 0 }
+
+    InvoiceItem:
+      type: object
+      required: [id, description, quantity, unitPricePence, sortOrder]
+      properties:
+        id: { type: string }
+        description: { type: string }
+        quantity: { type: integer }
+        unitPricePence: { type: integer }
+        sortOrder: { type: integer }
+
+    InvoicePayment:
+      type: object
+      required: [id, amountPence, currency, provider, status, receivedAt]
+      properties:
+        id: { type: string }
+        amountPence: { type: integer }
+        currency: { type: string }
+        provider: { type: string }
+        status: { type: string }
+        receivedAt: { type: string, format: date-time }
+
+    InvoiceSummary:
+      type: object
+      required: [id, number, title, status, customerId, customerName, totalPence, currency, createdAt]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        title: { type: string }
+        status: { type: string }
+        customerId: { type: string }
+        customerName: { type: string }
+        totalPence: { type: integer }
+        currency: { type: string }
+        dueAt: { type: ["string", "null"], format: date-time }
+        sentAt: { type: ["string", "null"], format: date-time }
+        paidAt: { type: ["string", "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+
+    Invoice:
+      type: object
+      required: [id, number, title, status, customerId, customerName, subtotalPence, taxPence, totalPence, vatRatePct, currency, items, payments, createdAt]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        title: { type: string }
+        status: { type: string }
+        customerId: { type: string }
+        customerName: { type: string }
+        customerEmail: { type: ["string", "null"] }
+        jobId: { type: ["string", "null"] }
+        jobNumber: { type: ["string", "null"] }
+        quoteId: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        subtotalPence: { type: integer }
+        taxPence: { type: integer }
+        totalPence: { type: integer }
+        amountPaidPence: { type: integer }
+        vatRatePct: { type: integer }
+        currency: { type: string }
+        dueAt: { type: ["string", "null"], format: date-time }
+        sentAt: { type: ["string", "null"], format: date-time }
+        paidAt: { type: ["string", "null"], format: date-time }
+        voidedAt: { type: ["string", "null"], format: date-time }
+        paymentLinkUrl: { type: ["string", "null"] }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/InvoiceItem" }
+        payments:
+          type: array
+          items: { $ref: "#/components/schemas/InvoicePayment" }
+        createdAt: { type: string, format: date-time }
+
+    InvoiceInput:
+      type: object
+      required: [customerId, title, items]
+      properties:
+        customerId: { type: string }
+        jobId: { type: string }
+        quoteId: { type: string }
+        title: { type: string, minLength: 1 }
+        notes: { type: string }
+        dueAt: { type: string, format: date-time }
+        vatRatePct: { type: integer, minimum: 0, maximum: 100 }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/InvoiceItemInput" }
+
+    AgedDebtorRow:
+      type: object
+      required: [customerId, customerName, currentPence, days30Pence, days60Pence, days90Pence, totalOutstandingPence]
+      properties:
+        customerId: { type: string }
+        customerName: { type: string }
+        currentPence: { type: integer }
+        days30Pence: { type: integer }
+        days60Pence: { type: integer }
+        days90Pence: { type: integer }
+        totalOutstandingPence: { type: integer }
+
+    AgedDebtors:
+      type: object
+      required: [rows, totals]
+      properties:
+        rows:
+          type: array
+          items: { $ref: "#/components/schemas/AgedDebtorRow" }
+        totals: { $ref: "#/components/schemas/AgedDebtorRow" }
 
     PosReceiptReceipt:
       type: object

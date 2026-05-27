@@ -705,6 +705,119 @@ export interface PosReceiptRequest {
   destination?: string | null;
 }
 
+export interface InvoiceItemInput {
+  /** @minLength 1 */
+  description: string;
+  /** @minimum 1 */
+  quantity: number;
+  /** @minimum 0 */
+  unitPricePence: number;
+}
+
+export interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPricePence: number;
+  sortOrder: number;
+}
+
+export interface InvoicePayment {
+  id: string;
+  amountPence: number;
+  currency: string;
+  provider: string;
+  status: string;
+  receivedAt: string;
+}
+
+export interface InvoiceSummary {
+  id: string;
+  number: string;
+  title: string;
+  status: string;
+  customerId: string;
+  customerName: string;
+  totalPence: number;
+  currency: string;
+  /** @nullable */
+  dueAt?: string | null;
+  /** @nullable */
+  sentAt?: string | null;
+  /** @nullable */
+  paidAt?: string | null;
+  createdAt: string;
+}
+
+export interface Invoice {
+  id: string;
+  number: string;
+  title: string;
+  status: string;
+  customerId: string;
+  customerName: string;
+  /** @nullable */
+  customerEmail?: string | null;
+  /** @nullable */
+  jobId?: string | null;
+  /** @nullable */
+  jobNumber?: string | null;
+  /** @nullable */
+  quoteId?: string | null;
+  /** @nullable */
+  notes?: string | null;
+  subtotalPence: number;
+  taxPence: number;
+  totalPence: number;
+  amountPaidPence?: number;
+  vatRatePct: number;
+  currency: string;
+  /** @nullable */
+  dueAt?: string | null;
+  /** @nullable */
+  sentAt?: string | null;
+  /** @nullable */
+  paidAt?: string | null;
+  /** @nullable */
+  voidedAt?: string | null;
+  /** @nullable */
+  paymentLinkUrl?: string | null;
+  items: InvoiceItem[];
+  payments: InvoicePayment[];
+  createdAt: string;
+}
+
+export interface InvoiceInput {
+  customerId: string;
+  jobId?: string;
+  quoteId?: string;
+  /** @minLength 1 */
+  title: string;
+  notes?: string;
+  dueAt?: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  vatRatePct?: number;
+  items: InvoiceItemInput[];
+}
+
+export interface AgedDebtorRow {
+  customerId: string;
+  customerName: string;
+  currentPence: number;
+  days30Pence: number;
+  days60Pence: number;
+  days90Pence: number;
+  totalOutstandingPence: number;
+}
+
+export interface AgedDebtors {
+  rows: AgedDebtorRow[];
+  totals: AgedDebtorRow;
+}
+
 export interface PosReceiptReceipt {
   delivered: boolean;
   method: string;
@@ -714,6 +827,10 @@ export interface PosReceiptReceipt {
 }
 
 export type ListJobsParams = {
+status?: string;
+};
+
+export type ListInvoicesParams = {
 status?: string;
 };
 
