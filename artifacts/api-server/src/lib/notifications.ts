@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, isNull, lte, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, lte, or, sql } from "drizzle-orm";
 import {
   db,
   notificationTemplatesTable,
@@ -116,11 +116,14 @@ export interface DispatchResult {
   channels: Channel[];
 }
 
-async function getUserPrefs(
+type PrefFrequency = "immediate" | "digest_daily" | "digest_weekly";
+type ChannelPref = { enabled: boolean; frequency: PrefFrequency };
+
+async function getUserPrefsFull(
   tenantId: string,
   userId: string,
   eventKind: string,
-): Promise<Record<Channel, boolean>> {
+): Promise<Record<Channel, ChannelPref>> {
   const rows = await db
     .select()
     .from(notificationPreferencesTable)
@@ -131,15 +134,115 @@ async function getUserPrefs(
         eq(notificationPreferencesTable.eventKind, eventKind),
       ),
     );
-  const out: Record<Channel, boolean> = { email: true, sms: false, whatsapp: false };
+  const out: Record<Channel, ChannelPref> = {
+    email: { enabled: true, frequency: "immediate" },
+    sms: { enabled: false, frequency: "immediate" },
+    whatsapp: { enabled: false, frequency: "immediate" },
+  };
   for (const r of rows) {
     if (!(CHANNELS as string[]).includes(r.channel)) continue;
-    // Suppress channel if disabled, OR if user opted for a digest (deferred
-    // to scheduled digest job — not an immediate send) for this event/channel.
-    const freq = ((r as any).frequency ?? "immediate") as "immediate" | "digest_daily" | "digest_weekly";
-    out[r.channel as Channel] = r.enabled && freq === "immediate";
+    out[r.channel as Channel] = {
+      enabled: r.enabled,
+      frequency: (((r as any).frequency ?? "immediate") as PrefFrequency),
+    };
   }
   return out;
+}
+
+async function enqueueDigestDelivery(args: {
+  tenantId: string;
+  userId: string;
+  userEmail: string;
+  userName: string | null;
+  eventKind: string;
+  channel: Channel;
+  subject: string | null;
+  text: string;
+  html?: string | null;
+  frequency: PrefFrequency;
+  jobId?: string | null;
+  metadata?: Record<string, unknown>;
+}): Promise<void> {
+  await db.insert(notificationDeliveriesTable).values({
+    tenantId: args.tenantId,
+    channel: args.channel,
+    template: args.eventKind,
+    subject: args.subject,
+    jobId: args.jobId ?? null,
+    payload: {
+      to: { email: args.userEmail, name: args.userName },
+      userId: args.userId,
+      subject: args.subject,
+      text: args.text,
+      html: args.html ?? null,
+      frequency: args.frequency,
+      eventKind: args.eventKind,
+      metadata: args.metadata ?? null,
+    },
+    status: "deferred",
+    attemptCount: 0,
+  });
+}
+
+/**
+ * Aggregate deferred deliveries for the given digest cadence into one summary
+ * email per user. Marks consumed rows as `sent` once dispatched. Called by
+ * `notification_digest_daily` and `notification_digest_weekly` cron jobs.
+ */
+export async function processDigests(frequency: PrefFrequency): Promise<{ users: number; items: number }> {
+  if (frequency === "immediate") return { users: 0, items: 0 };
+  const rows = await db
+    .select()
+    .from(notificationDeliveriesTable)
+    .where(
+      and(
+        eq(notificationDeliveriesTable.status, "deferred"),
+        sql`${notificationDeliveriesTable.payload}->>'frequency' = ${frequency}`,
+      ),
+    )
+    .limit(2000);
+
+  // Group by (tenantId, userId, userEmail)
+  const groups = new Map<string, { tenantId: string; email: string; name: string | null; items: any[] }>();
+  for (const r of rows) {
+    const p = (r.payload ?? {}) as any;
+    const email = p?.to?.email;
+    const userId = p?.userId ?? "anon";
+    if (!email) continue;
+    const key = `${r.tenantId}::${userId}::${email}`;
+    if (!groups.has(key)) {
+      groups.set(key, { tenantId: r.tenantId, email, name: p?.to?.name ?? null, items: [] });
+    }
+    groups.get(key)!.items.push({ id: r.id, eventKind: p.eventKind, subject: p.subject, text: p.text, createdAt: r.createdAt });
+  }
+
+  let usersSent = 0;
+  let itemsSent = 0;
+  for (const g of groups.values()) {
+    const subject = `CtrlTrade® ${frequency === "digest_daily" ? "daily" : "weekly"} digest — ${g.items.length} update${g.items.length === 1 ? "" : "s"}`;
+    const text = g.items
+      .map((it) => `• [${it.eventKind}] ${it.subject ?? "(no subject)"}\n${it.text}\n`)
+      .join("\n---\n");
+    try {
+      await sendEmail({
+        tenantId: g.tenantId,
+        template: `digest.${frequency}`,
+        to: [{ email: g.email, name: g.name ?? undefined }],
+        subject,
+        text,
+        metadata: { digest: frequency, count: g.items.length },
+      });
+      await db
+        .update(notificationDeliveriesTable)
+        .set({ status: "sent" })
+        .where(inArray(notificationDeliveriesTable.id, g.items.map((i) => i.id)));
+      usersSent++;
+      itemsSent += g.items.length;
+    } catch (err) {
+      logger.error({ err, email: g.email, frequency }, "Digest send failed");
+    }
+  }
+  return { users: usersSent, items: itemsSent };
 }
 
 const RETRY_BACKOFF_SECONDS = [60, 5 * 60, 30 * 60, 2 * 60 * 60, 12 * 60 * 60];
@@ -253,8 +356,28 @@ export async function dispatchNotification(input: DispatchInput): Promise<Dispat
           .from(usersTable)
           .where(sql`${usersTable.id} = ANY(${input.recipientUserIds})`);
         for (const u of users) {
-          const prefs = await getUserPrefs(input.tenantId, u.id, input.eventKind);
-          if (prefs.email && u.email) recipients.push({ email: u.email, name: u.name ?? undefined });
+          if (!u.email) continue;
+          const prefs = await getUserPrefsFull(input.tenantId, u.id, input.eventKind);
+          const p = prefs.email;
+          if (!p.enabled) continue;
+          if (p.frequency === "immediate") {
+            recipients.push({ email: u.email, name: u.name ?? undefined });
+          } else {
+            await enqueueDigestDelivery({
+              tenantId: input.tenantId,
+              userId: u.id,
+              userEmail: u.email,
+              userName: u.name,
+              eventKind: input.eventKind,
+              channel: "email",
+              subject: subject ?? null,
+              text,
+              html: html ?? null,
+              frequency: p.frequency,
+              jobId: input.jobId ?? null,
+              metadata: input.metadata,
+            });
+          }
         }
       }
       if (recipients.length === 0) continue;

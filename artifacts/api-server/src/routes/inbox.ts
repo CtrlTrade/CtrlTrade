@@ -103,6 +103,14 @@ router.post("/v1/inbox/threads/:threadId/reply", requireTenant, async (req, res,
     }
 
     const channel = (thread.channel === "portal" ? "email" : thread.channel) as "email" | "sms" | "whatsapp";
+    if (channel === "email" && !to.email) {
+      res.status(422).json({ error: "Customer has no email on file for this channel." });
+      return;
+    }
+    if ((channel === "sms" || channel === "whatsapp") && !to.phone) {
+      res.status(422).json({ error: `Customer has no phone on file for ${channel}.` });
+      return;
+    }
     await dispatchNotification({
       tenantId: t,
       eventKind: "inbox.reply",
@@ -136,6 +144,14 @@ router.post("/v1/inbox/compose", requireTenant, async (req, res, next): Promise<
       .from(customersTable)
       .where(and(eq(customersTable.tenantId, t), eq(customersTable.id, customerId)));
     if (!c) { res.status(404).json({ error: "customer not found" }); return; }
+    if (channel === "email" && !c.email) {
+      res.status(422).json({ error: "Customer has no email on file for this channel." });
+      return;
+    }
+    if ((channel === "sms" || channel === "whatsapp") && !c.phone) {
+      res.status(422).json({ error: `Customer has no phone on file for ${channel}.` });
+      return;
+    }
 
     await dispatchNotification({
       tenantId: t,

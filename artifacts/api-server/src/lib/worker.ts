@@ -4,7 +4,7 @@ import { runExpiryDigestOnce } from "./scheduler";
 import { rollupHourly, rollupDaily, recordUsage } from "./usage";
 import { sendEmail } from "./email";
 import { sendSmsViaTwilio, sendWhatsAppViaTwilio } from "./twilio";
-import { processDeliveryRetries } from "./notifications";
+import { processDeliveryRetries, processDigests } from "./notifications";
 import { reconcileFromStripeSubscription } from "./stripeReconcile";
 import { db, tenantsTable } from "@workspace/db";
 import { inArray } from "drizzle-orm";
@@ -96,6 +96,14 @@ const handlers: Record<JobKind, Handler> = {
     const { retried, succeeded } = await processDeliveryRetries(50);
     if (retried > 0) logger.info({ retried, succeeded }, "notification_retry sweep");
   },
+  notification_digest_daily: async () => {
+    const r = await processDigests("digest_daily");
+    if (r.items > 0) logger.info(r, "notification_digest_daily sent");
+  },
+  notification_digest_weekly: async () => {
+    const r = await processDigests("digest_weekly");
+    if (r.items > 0) logger.info(r, "notification_digest_weekly sent");
+  },
   voice_dispatch: async (p) => {
     logger.info({ payload: p }, "voice_dispatch (no provider configured — logged)");
     if (p?.tenantId) {
@@ -144,5 +152,8 @@ export async function registerSchedules(): Promise<void> {
   await boss.schedule("failed_payment_recovery", "0 3 * * *", {}, { tz: "UTC" } as any);
   // Sweep failed notification_deliveries every 5 minutes for due retries.
   await boss.schedule("notification_retry", "*/5 * * * *", {}, { tz: "UTC" } as any);
-  logger.info("Worker schedules registered (hourly expiry+rollup, daily summary+dunning, 5-min notify retry)");
+  // Daily digest at 08:00 UTC; weekly digest Monday 08:00 UTC.
+  await boss.schedule("notification_digest_daily", "0 8 * * *", {}, { tz: "UTC" } as any);
+  await boss.schedule("notification_digest_weekly", "0 8 * * 1", {}, { tz: "UTC" } as any);
+  logger.info("Worker schedules registered (hourly expiry+rollup, daily summary+dunning, 5-min notify retry, daily+weekly digests)");
 }
