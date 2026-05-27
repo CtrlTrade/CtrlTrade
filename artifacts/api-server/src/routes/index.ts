@@ -43,6 +43,7 @@ import contractsRouter from "./contracts";
 import staffAvailabilityRouter from "./staffAvailability";
 import twoFactorRouter from "./twoFactor";
 import adminComplianceRouter from "./adminCompliance";
+import bookingWidgetRouter from "./bookingWidget";
 
 const router: IRouter = Router();
 
@@ -61,6 +62,7 @@ router.use(subscriptionRouter);
 router.use(billingRouter);
 router.use(onboardingRouter);
 router.use(leadsRouter);
+router.use(bookingWidgetRouter);
 router.use(adminRouter);
 router.use(customersRouter);
 router.use(quotesRouter);

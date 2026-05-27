@@ -6,8 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type ListTimesheetsParams = {
-userId?: string;
-from?: Date;
-to?: Date;
-};
+export interface PublicBookingResult {
+  ok: boolean;
+  leadId?: string;
+}

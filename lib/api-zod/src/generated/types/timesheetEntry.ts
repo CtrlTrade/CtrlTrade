@@ -5,34 +5,13 @@
  * CtrlTrade SaaS Portal API
  * OpenAPI spec version: 0.1.0
  */
+import type { JobCheckin } from './jobCheckin';
 
 export interface TimesheetEntry {
-  id: string;
   userId: string;
   /** @nullable */
   userName: string | null;
-  /** @nullable */
-  jobId?: string | null;
-  /** @nullable */
-  jobNumber?: string | null;
-  /** @nullable */
-  checkinId?: string | null;
-  date: string;
-  hoursWorked: number;
-  travelMinutes: number;
-  mileageMiles: number;
-  /** @nullable */
-  notes?: string | null;
-  /** draft|submitted|approved|rejected */
-  status: string;
-  /** @nullable */
-  approvedBy?: string | null;
-  /** @nullable */
-  approvedByName?: string | null;
-  /** @nullable */
-  approvedAt?: Date | null;
-  /** @nullable */
-  rejectionReason?: string | null;
-  createdAt: Date;
-  updatedAt?: Date;
+  date: Date;
+  totalMinutes: number;
+  entries: JobCheckin[];
 }

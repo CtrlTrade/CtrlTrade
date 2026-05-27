@@ -17,6 +17,7 @@ import { AppNotificationsSettings } from "./NotificationsSettings";
 import { SettingsReferrals } from "./SettingsReferrals";
 import { SettingsMarketplace } from "./SettingsMarketplace";
 import { SecuritySettings } from "./SecuritySettings";
+import { BookingWidgetSettings } from "./BookingWidgetSettings";
 
 export function AppSettings() {
   const { data: tenant, isLoading: tenantLoading } = useGetTenant();
@@ -91,6 +92,7 @@ export function AppSettings() {
           <TabsTrigger value="referrals" data-testid="tab-referrals">Referrals</TabsTrigger>
           <TabsTrigger value="marketplace" data-testid="tab-marketplace">Marketplace</TabsTrigger>
           <TabsTrigger value="integrations" data-testid="tab-integrations">Integrations</TabsTrigger>
+          <TabsTrigger value="booking-widget" data-testid="tab-booking-widget">Booking Widget</TabsTrigger>
         </TabsList>
         <TabsContent value="staff"><AppStaff /></TabsContent>
         <TabsContent value="security"><SecuritySettings /></TabsContent>
@@ -98,6 +100,7 @@ export function AppSettings() {
         <TabsContent value="referrals"><SettingsReferrals /></TabsContent>
         <TabsContent value="marketplace"><SettingsMarketplace /></TabsContent>
         <TabsContent value="integrations"><IntegrationsPanel /></TabsContent>
+        <TabsContent value="booking-widget"><BookingWidgetSettings /></TabsContent>
         <TabsContent value="company">
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className=" border-border shadow-sm">

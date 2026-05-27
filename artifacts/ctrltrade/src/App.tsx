@@ -93,6 +93,9 @@ import { PartnerLinks } from "@/pages/partner/PartnerLinks";
 import { PartnerCommissions } from "@/pages/partner/PartnerCommissions";
 import { PartnerPayouts } from "@/pages/partner/PartnerPayouts";
 
+// Booking widget (public)
+import { PublicBooking } from "@/pages/public/PublicBooking";
+
 // Marketplace (public)
 import { Marketplace } from "@/pages/public/Marketplace";
 import { MarketplaceListing } from "@/pages/public/MarketplaceListing";
@@ -248,6 +251,9 @@ function App() {
 
             {/* Reseller console */}
             <Route path="/reseller" component={ResellerDashboard} />
+
+            {/* Public booking page — must be before <PublicLayout> catch-all */}
+            <Route path="/book/:tenantSlug" component={PublicBooking} />
 
             {/* Public */}
             <Route>

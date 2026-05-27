@@ -4064,6 +4064,97 @@ export const GetLeadSourceRoiResponse = zod.object({
 })
 
 
+/**
+ * @summary Get the booking widget configuration for the current tenant.
+ */
+export const GetBookingWidgetConfigResponse = zod.object({
+  "active": zod.boolean(),
+  "jobTypes": zod.array(zod.string()),
+  "showDateField": zod.boolean(),
+  "thankYouMessage": zod.string(),
+  "bookingPageUrl": zod.string(),
+  "embedCode": zod.string(),
+  "iframeCode": zod.string()
+})
+
+
+/**
+ * @summary Update the booking widget configuration.
+ */
+export const updateBookingWidgetConfigBodyThankYouMessageMax = 500;
+
+
+
+export const UpdateBookingWidgetConfigBody = zod.object({
+  "active": zod.boolean().optional(),
+  "jobTypes": zod.array(zod.string()).optional(),
+  "showDateField": zod.boolean().optional(),
+  "thankYouMessage": zod.string().max(updateBookingWidgetConfigBodyThankYouMessageMax).optional()
+})
+
+export const UpdateBookingWidgetConfigResponse = zod.object({
+  "active": zod.boolean(),
+  "jobTypes": zod.array(zod.string()),
+  "showDateField": zod.boolean(),
+  "thankYouMessage": zod.string(),
+  "bookingPageUrl": zod.string(),
+  "embedCode": zod.string(),
+  "iframeCode": zod.string()
+})
+
+
+/**
+ * @summary Public booking page info (branding + widget config). No auth required.
+ */
+export const GetPublicBookingInfoParams = zod.object({
+  "tenantSlug": zod.coerce.string()
+})
+
+export const GetPublicBookingInfoResponse = zod.object({
+  "tenantName": zod.string(),
+  "tenantSlug": zod.string(),
+  "brandColor": zod.string().nullish(),
+  "primaryColor": zod.string().nullish(),
+  "accentColor": zod.string().nullish(),
+  "logoUrl": zod.string().nullish(),
+  "jobTypes": zod.array(zod.string()),
+  "showDateField": zod.boolean(),
+  "thankYouMessage": zod.string()
+})
+
+
+/**
+ * @summary Submit a booking widget enquiry. Creates a lead with source=booking_widget. No auth required.
+ */
+export const SubmitPublicBookingParams = zod.object({
+  "tenantSlug": zod.coerce.string()
+})
+
+export const submitPublicBookingBodyNameMax = 255;
+
+export const submitPublicBookingBodyPhoneMax = 50;
+
+export const submitPublicBookingBodyAddressMax = 500;
+
+export const submitPublicBookingBodyJobTypeMax = 120;
+
+export const submitPublicBookingBodyPreferredDateMax = 50;
+
+export const submitPublicBookingBodyDescriptionMax = 5000;
+
+
+
+export const SubmitPublicBookingBody = zod.object({
+  "name": zod.string().min(1).max(submitPublicBookingBodyNameMax),
+  "email": zod.string().email().nullish(),
+  "phone": zod.string().max(submitPublicBookingBodyPhoneMax).nullish(),
+  "address": zod.string().max(submitPublicBookingBodyAddressMax).nullish(),
+  "jobType": zod.string().max(submitPublicBookingBodyJobTypeMax).nullish(),
+  "preferredDate": zod.string().max(submitPublicBookingBodyPreferredDateMax).nullish(),
+  "description": zod.string().max(submitPublicBookingBodyDescriptionMax).nullish()
+})
+
+
 export const CaptureLeadPublicParams = zod.object({
   "tenantSlug": zod.coerce.string()
 })

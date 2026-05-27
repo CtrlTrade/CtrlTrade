@@ -67,6 +67,12 @@ export const tenantsTable = pgTable(
       legalEntity?: string;
     }>(),
     leadCaptureAllowedOrigins: text("lead_capture_allowed_origins").array().notNull().default(sql`'{}'::text[]`),
+    bookingWidgetConfig: jsonb("booking_widget_config").$type<{
+      active?: boolean;
+      jobTypes?: string[];
+      showDateField?: boolean;
+      thankYouMessage?: string;
+    }>(),
     vatRatePct: integer("vat_rate_pct").notNull().default(20),
     invoiceNumberSeq: integer("invoice_number_seq").notNull().default(0),
     stripeCustomerId: text("stripe_customer_id"),

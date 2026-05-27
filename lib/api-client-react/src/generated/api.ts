@@ -51,6 +51,8 @@ import type {
   BillingOverrideBody,
   BillingOverview,
   BillingSetupIntent,
+  BookingWidgetConfig,
+  BookingWidgetConfigUpdate,
   BranchStockRow,
   Branding,
   BrandingUpdate,
@@ -236,6 +238,9 @@ import type {
   ProductCategoryInput,
   ProductInput,
   ProvisionVoiceNumber201,
+  PublicBookingInfo,
+  PublicBookingInput,
+  PublicBookingResult,
   PublicInvitationPreview,
   PublicLeadInput,
   PublicLeadResult,
@@ -11037,6 +11042,303 @@ export function useGetLeadSourceRoi<TData = Awaited<ReturnType<typeof getLeadSou
 
 
 
+
+export const getGetBookingWidgetConfigUrl = () => {
+
+
+
+
+  return `/api/v1/booking-widget/config`
+}
+
+/**
+ * @summary Get the booking widget configuration for the current tenant.
+ */
+export const getBookingWidgetConfig = async ( options?: RequestInit): Promise<BookingWidgetConfig> => {
+
+  return customFetch<BookingWidgetConfig>(getGetBookingWidgetConfigUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBookingWidgetConfigQueryKey = () => {
+    return [
+    `/api/v1/booking-widget/config`
+    ] as const;
+    }
+
+
+export const getGetBookingWidgetConfigQueryOptions = <TData = Awaited<ReturnType<typeof getBookingWidgetConfig>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBookingWidgetConfig>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBookingWidgetConfigQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBookingWidgetConfig>>> = ({ signal }) => getBookingWidgetConfig({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBookingWidgetConfig>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetBookingWidgetConfigQueryResult = NonNullable<Awaited<ReturnType<typeof getBookingWidgetConfig>>>
+export type GetBookingWidgetConfigQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the booking widget configuration for the current tenant.
+ */
+
+export function useGetBookingWidgetConfig<TData = Awaited<ReturnType<typeof getBookingWidgetConfig>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBookingWidgetConfig>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetBookingWidgetConfigQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateBookingWidgetConfigUrl = () => {
+
+
+
+
+  return `/api/v1/booking-widget/config`
+}
+
+/**
+ * @summary Update the booking widget configuration.
+ */
+export const updateBookingWidgetConfig = async (bookingWidgetConfigUpdate: BookingWidgetConfigUpdate, options?: RequestInit): Promise<BookingWidgetConfig> => {
+
+  return customFetch<BookingWidgetConfig>(getUpdateBookingWidgetConfigUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      bookingWidgetConfigUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateBookingWidgetConfigMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBookingWidgetConfig>>, TError,{data: BodyType<BookingWidgetConfigUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateBookingWidgetConfig>>, TError,{data: BodyType<BookingWidgetConfigUpdate>}, TContext> => {
+
+const mutationKey = ['updateBookingWidgetConfig'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateBookingWidgetConfig>>, {data: BodyType<BookingWidgetConfigUpdate>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateBookingWidgetConfig(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateBookingWidgetConfigMutationResult = NonNullable<Awaited<ReturnType<typeof updateBookingWidgetConfig>>>
+    export type UpdateBookingWidgetConfigMutationBody = BodyType<BookingWidgetConfigUpdate>
+    export type UpdateBookingWidgetConfigMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update the booking widget configuration.
+ */
+export const useUpdateBookingWidgetConfig = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBookingWidgetConfig>>, TError,{data: BodyType<BookingWidgetConfigUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateBookingWidgetConfig>>,
+        TError,
+        {data: BodyType<BookingWidgetConfigUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateBookingWidgetConfigMutationOptions(options));
+    }
+
+export const getGetPublicBookingInfoUrl = (tenantSlug: string,) => {
+
+
+
+
+  return `/api/v1/public/book/${tenantSlug}/info`
+}
+
+/**
+ * @summary Public booking page info (branding + widget config). No auth required.
+ */
+export const getPublicBookingInfo = async (tenantSlug: string, options?: RequestInit): Promise<PublicBookingInfo> => {
+
+  return customFetch<PublicBookingInfo>(getGetPublicBookingInfoUrl(tenantSlug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicBookingInfoQueryKey = (tenantSlug: string,) => {
+    return [
+    `/api/v1/public/book/${tenantSlug}/info`
+    ] as const;
+    }
+
+
+export const getGetPublicBookingInfoQueryOptions = <TData = Awaited<ReturnType<typeof getPublicBookingInfo>>, TError = ErrorType<unknown>>(tenantSlug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicBookingInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicBookingInfoQueryKey(tenantSlug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicBookingInfo>>> = ({ signal }) => getPublicBookingInfo(tenantSlug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(tenantSlug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicBookingInfo>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicBookingInfoQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicBookingInfo>>>
+export type GetPublicBookingInfoQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Public booking page info (branding + widget config). No auth required.
+ */
+
+export function useGetPublicBookingInfo<TData = Awaited<ReturnType<typeof getPublicBookingInfo>>, TError = ErrorType<unknown>>(
+ tenantSlug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicBookingInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicBookingInfoQueryOptions(tenantSlug,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getSubmitPublicBookingUrl = (tenantSlug: string,) => {
+
+
+
+
+  return `/api/v1/public/book/${tenantSlug}`
+}
+
+/**
+ * @summary Submit a booking widget enquiry. Creates a lead with source=booking_widget. No auth required.
+ */
+export const submitPublicBooking = async (tenantSlug: string,
+    publicBookingInput: PublicBookingInput, options?: RequestInit): Promise<PublicBookingResult> => {
+
+  return customFetch<PublicBookingResult>(getSubmitPublicBookingUrl(tenantSlug),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      publicBookingInput,)
+  }
+);}
+
+
+
+
+export const getSubmitPublicBookingMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitPublicBooking>>, TError,{tenantSlug: string;data: BodyType<PublicBookingInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitPublicBooking>>, TError,{tenantSlug: string;data: BodyType<PublicBookingInput>}, TContext> => {
+
+const mutationKey = ['submitPublicBooking'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitPublicBooking>>, {tenantSlug: string;data: BodyType<PublicBookingInput>}> = (props) => {
+          const {tenantSlug,data} = props ?? {};
+
+          return  submitPublicBooking(tenantSlug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitPublicBookingMutationResult = NonNullable<Awaited<ReturnType<typeof submitPublicBooking>>>
+    export type SubmitPublicBookingMutationBody = BodyType<PublicBookingInput>
+    export type SubmitPublicBookingMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Submit a booking widget enquiry. Creates a lead with source=booking_widget. No auth required.
+ */
+export const useSubmitPublicBooking = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitPublicBooking>>, TError,{tenantSlug: string;data: BodyType<PublicBookingInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitPublicBooking>>,
+        TError,
+        {tenantSlug: string;data: BodyType<PublicBookingInput>},
+        TContext
+      > => {
+      return useMutation(getSubmitPublicBookingMutationOptions(options));
+    }
 
 export const getCaptureLeadPublicUrl = (tenantSlug: string,) => {
 

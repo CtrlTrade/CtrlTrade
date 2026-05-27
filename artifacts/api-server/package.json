@@ -26,6 +26,7 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "drizzle-orm": "catalog:",
+    "zod": "catalog:",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "google-auth-library": "^10.6.2",

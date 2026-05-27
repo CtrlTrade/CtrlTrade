@@ -48,6 +48,8 @@ export const NOTIFICATION_EVENTS: NotificationEvent[] = [
   { kind: "compliance.verification_approved", defaultChannels: ["email"], description: "CtrlTrade Verified badge awarded", category: "compliance" },
   { kind: "compliance.verification_rejected", defaultChannels: ["email"], description: "CtrlTrade Verified application rejected", category: "compliance" },
   { kind: "compliance.badge_flagged", defaultChannels: ["email"], description: "Verified badge flagged — document expired", category: "compliance" },
+  { kind: "booking_widget.new_lead", defaultChannels: ["email"], description: "New booking widget enquiry from customer", category: "leads" },
+  { kind: "booking_widget.confirmation", defaultChannels: ["email"], description: "Booking confirmation sent to customer", category: "leads" },
 ];
 
 export const CHANNELS: Channel[] = ["email", "sms", "whatsapp"];

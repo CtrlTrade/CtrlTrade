@@ -2468,6 +2468,72 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/LeadSourceRoiReport" }
 
+  /v1/booking-widget/config:
+    get:
+      operationId: getBookingWidgetConfig
+      tags: [leads]
+      summary: Get the booking widget configuration for the current tenant.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BookingWidgetConfig" }
+    patch:
+      operationId: updateBookingWidgetConfig
+      tags: [leads]
+      summary: Update the booking widget configuration.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingWidgetConfigUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BookingWidgetConfig" }
+
+  /v1/public/book/{tenantSlug}/info:
+    parameters:
+      - in: path
+        name: tenantSlug
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getPublicBookingInfo
+      tags: [leads]
+      summary: Public booking page info (branding + widget config). No auth required.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublicBookingInfo" }
+
+  /v1/public/book/{tenantSlug}:
+    parameters:
+      - in: path
+        name: tenantSlug
+        required: true
+        schema: { type: string }
+    post:
+      operationId: submitPublicBooking
+      tags: [leads]
+      summary: Submit a booking widget enquiry. Creates a lead with source=booking_widget. No auth required.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PublicBookingInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublicBookingResult" }
+
   /v1/public/leads/{tenantSlug}:
     parameters:
       - in: path
@@ -6897,6 +6963,65 @@ components:
               reference: { type: ["string", "null"] }
               documentUrl: { type: ["string", "null"] }
               expiresAt: { type: ["string", "null"], format: date-time }
+
+    BookingWidgetConfig:
+      type: object
+      required: [active, jobTypes, showDateField, thankYouMessage, bookingPageUrl, embedCode, iframeCode]
+      properties:
+        active: { type: boolean }
+        jobTypes:
+          type: array
+          items: { type: string }
+        showDateField: { type: boolean }
+        thankYouMessage: { type: string }
+        bookingPageUrl: { type: string }
+        embedCode: { type: string }
+        iframeCode: { type: string }
+
+    BookingWidgetConfigUpdate:
+      type: object
+      properties:
+        active: { type: boolean }
+        jobTypes:
+          type: array
+          items: { type: string }
+        showDateField: { type: boolean }
+        thankYouMessage: { type: string, maxLength: 500 }
+
+    PublicBookingInfo:
+      type: object
+      required: [tenantName, tenantSlug, jobTypes, showDateField, thankYouMessage]
+      properties:
+        tenantName: { type: string }
+        tenantSlug: { type: string }
+        brandColor: { type: ["string", "null"] }
+        primaryColor: { type: ["string", "null"] }
+        accentColor: { type: ["string", "null"] }
+        logoUrl: { type: ["string", "null"] }
+        jobTypes:
+          type: array
+          items: { type: string }
+        showDateField: { type: boolean }
+        thankYouMessage: { type: string }
+
+    PublicBookingInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 255 }
+        email: { type: ["string", "null"], format: email }
+        phone: { type: ["string", "null"], maxLength: 50 }
+        address: { type: ["string", "null"], maxLength: 500 }
+        jobType: { type: ["string", "null"], maxLength: 120 }
+        preferredDate: { type: ["string", "null"], maxLength: 50 }
+        description: { type: ["string", "null"], maxLength: 5000 }
+
+    PublicBookingResult:
+      type: object
+      required: [ok]
+      properties:
+        ok: { type: boolean }
+        leadId: { type: string }
 
     PortalBranding:
       type: object

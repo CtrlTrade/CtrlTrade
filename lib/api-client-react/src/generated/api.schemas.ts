@@ -1814,6 +1814,80 @@ export interface AdminVerificationSubmission {
   documents: AdminVerificationSubmissionDocumentsItem[];
 }
 
+export interface BookingWidgetConfig {
+  active: boolean;
+  jobTypes: string[];
+  showDateField: boolean;
+  thankYouMessage: string;
+  bookingPageUrl: string;
+  embedCode: string;
+  iframeCode: string;
+}
+
+export interface BookingWidgetConfigUpdate {
+  active?: boolean;
+  jobTypes?: string[];
+  showDateField?: boolean;
+  /** @maxLength 500 */
+  thankYouMessage?: string;
+}
+
+export interface PublicBookingInfo {
+  tenantName: string;
+  tenantSlug: string;
+  /** @nullable */
+  brandColor?: string | null;
+  /** @nullable */
+  primaryColor?: string | null;
+  /** @nullable */
+  accentColor?: string | null;
+  /** @nullable */
+  logoUrl?: string | null;
+  jobTypes: string[];
+  showDateField: boolean;
+  thankYouMessage: string;
+}
+
+export interface PublicBookingInput {
+  /**
+     * @minLength 1
+     * @maxLength 255
+     */
+  name: string;
+  /** @nullable */
+  email?: string | null;
+  /**
+     * @maxLength 50
+     * @nullable
+     */
+  phone?: string | null;
+  /**
+     * @maxLength 500
+     * @nullable
+     */
+  address?: string | null;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  jobType?: string | null;
+  /**
+     * @maxLength 50
+     * @nullable
+     */
+  preferredDate?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  description?: string | null;
+}
+
+export interface PublicBookingResult {
+  ok: boolean;
+  leadId?: string;
+}
+
 export interface PortalBranding {
   tenantName: string;
   tenantSlug: string;
