@@ -750,10 +750,16 @@ router.post("/v1/quotes/:quoteId/invoice", requireTenant, async (req, res): Prom
     res.status(409).json({ error: "Only accepted or converted quotes can be invoiced" });
     return;
   }
+  // Only a prior FINAL invoice blocks issuance. Deposit invoices are
+  // allowed to co-exist with a later final invoice for the same quote.
   const [existing] = await db
     .select({ id: invoicesTable.id })
     .from(invoicesTable)
-    .where(and(eq(invoicesTable.tenantId, tenantId), eq(invoicesTable.quoteId, quote.id)));
+    .where(and(
+      eq(invoicesTable.tenantId, tenantId),
+      eq(invoicesTable.quoteId, quote.id),
+      eq(invoicesTable.isDeposit, false),
+    ));
   if (existing) {
     res.status(409).json({ error: "Quote already invoiced", invoiceId: existing.id });
     return;
@@ -892,6 +898,14 @@ export async function recordInvoicePayment(opts: {
   }
   if (inv.status === "void") {
     logger.warn({ invoiceId: inv.id, number: inv.number }, "recordInvoicePayment: ignoring payment for void invoice");
+    return;
+  }
+  if (inv.status === "paid") {
+    // Reusable Stripe Payment Links can deliver additional completed
+    // sessions after the invoice has been fully paid. Ignore them to
+    // avoid over-recording payments against a closed invoice.
+    logger.info({ invoiceId: inv.id, number: inv.number, checkoutSessionId: opts.stripeCheckoutSessionId },
+      "recordInvoicePayment: invoice already paid, ignoring additional session");
     return;
   }
   if (opts.stripeCheckoutSessionId) {
