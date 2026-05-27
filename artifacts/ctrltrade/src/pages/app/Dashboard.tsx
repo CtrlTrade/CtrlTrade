@@ -1,10 +1,10 @@
-import { useGetOnboarding, useGetSubscription, useUpdateSubscriptionQuantities, useCancelTenant } from "@workspace/api-client-react";
+import { useGetOnboarding, useGetSubscription, useUpdateSubscriptionQuantities, useCancelTenant, useGetExpiryAttention } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
-import { CheckCircle2, Circle, AlertTriangle, CreditCard, Users, ShoppingCart } from "lucide-react";
+import { CheckCircle2, Circle, AlertTriangle, CreditCard, Users, ShoppingCart, Clock } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ export function AppDashboard() {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
+          <AttentionRequiredCard />
           {onboarding && (
             <Card className="rounded-none border-border shadow-sm">
               <CardHeader>
@@ -71,6 +72,80 @@ export function AppDashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+function AttentionRequiredCard() {
+  const { data, isLoading } = useGetExpiryAttention();
+  if (isLoading || !data) return null;
+  if (data.expiredCount === 0 && data.expiringCount === 0) return null;
+  return (
+    <Card className="rounded-none border-destructive/40 shadow-sm bg-destructive/5">
+      <CardHeader>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" /> Attention Required
+            </CardTitle>
+            <CardDescription>
+              Certificates, MOT, tax and service items expiring within {data.windowDays} days — and any already expired.
+            </CardDescription>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <div className="px-2 py-1 text-xs font-bold uppercase tracking-wider bg-destructive/20 text-destructive font-mono">
+              {data.expiredCount} expired
+            </div>
+            <div className="px-2 py-1 text-xs font-bold uppercase tracking-wider bg-primary/20 text-primary font-mono">
+              {data.expiringCount} expiring
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="divide-y divide-border border border-border bg-background">
+          {data.items.slice(0, 6).map((item) => (
+            <Link key={`${item.kind}-${item.recordId}`} href={item.href}>
+              <div className="flex items-center justify-between gap-4 p-3 hover:bg-muted/40 cursor-pointer">
+                <div className="flex items-center gap-3 min-w-0">
+                  <Clock className={`h-4 w-4 shrink-0 ${item.expired ? "text-destructive" : "text-muted-foreground"}`} />
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold truncate">{item.label}</div>
+                    {item.reference && (
+                      <div className="text-xs text-muted-foreground truncate font-mono">{item.reference}</div>
+                    )}
+                  </div>
+                </div>
+                <div className="text-xs font-mono shrink-0 text-right">
+                  {item.expired ? (
+                    <span className="text-destructive font-bold">Expired {Math.abs(item.daysUntil)}d ago</span>
+                  ) : (
+                    <span className="text-foreground">Due in {item.daysUntil}d</span>
+                  )}
+                  <div className="text-muted-foreground">{new Date(item.expiresAt).toLocaleDateString()}</div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+        {data.items.length > 6 && (
+          <p className="text-xs text-muted-foreground mt-2 font-mono">
+            + {data.items.length - 6} more — review on Compliance and Fleet.
+          </p>
+        )}
+      </CardContent>
+      <CardFooter className="gap-2">
+        <Link href="/app/compliance">
+          <Button variant="outline" size="sm" className="rounded-none uppercase tracking-wider text-xs font-bold">
+            Compliance
+          </Button>
+        </Link>
+        <Link href="/app/fleet">
+          <Button variant="outline" size="sm" className="rounded-none uppercase tracking-wider text-xs font-bold">
+            Fleet
+          </Button>
+        </Link>
+      </CardFooter>
+    </Card>
   );
 }
 

@@ -624,6 +624,26 @@ export const ListTeamResponseItem = zod.object({
 export const ListTeamResponse = zod.array(ListTeamResponseItem)
 
 
+/**
+ * @summary Certificates and vehicle MOT/tax/service items expiring soon or already expired
+ */
+export const GetExpiryAttentionResponse = zod.object({
+  "windowDays": zod.number(),
+  "expiredCount": zod.number(),
+  "expiringCount": zod.number(),
+  "items": zod.array(zod.object({
+  "kind": zod.string(),
+  "label": zod.string(),
+  "reference": zod.string().nullish(),
+  "expiresAt": zod.coerce.date(),
+  "daysUntil": zod.number(),
+  "expired": zod.boolean(),
+  "recordId": zod.string(),
+  "href": zod.string()
+}))
+})
+
+
 export const ListCustomersResponseItem = zod.object({
   "id": zod.string(),
   "name": zod.string(),

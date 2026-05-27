@@ -465,6 +465,18 @@ paths:
                 type: array
                 items: { $ref: "#/components/schemas/TeamMember" }
 
+  /v1/dashboard/expiry-attention:
+    get:
+      operationId: getExpiryAttention
+      tags: [compliance]
+      summary: Certificates and vehicle MOT/tax/service items expiring soon or already expired
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ExpiryAttention" }
+
   /v1/customers:
     get:
       operationId: listCustomers
@@ -1560,3 +1572,27 @@ components:
         expiresAt: { type: string, format: date-time }
         documentUrl: { type: string }
         notes: { type: string }
+
+    ExpiryItem:
+      type: object
+      required: [kind, label, expiresAt, daysUntil, expired, recordId, href]
+      properties:
+        kind: { type: string }
+        label: { type: string }
+        reference: { type: ["string", "null"] }
+        expiresAt: { type: string, format: date-time }
+        daysUntil: { type: integer }
+        expired: { type: boolean }
+        recordId: { type: string }
+        href: { type: string }
+
+    ExpiryAttention:
+      type: object
+      required: [windowDays, expiredCount, expiringCount, items]
+      properties:
+        windowDays: { type: integer }
+        expiredCount: { type: integer }
+        expiringCount: { type: integer }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ExpiryItem" }

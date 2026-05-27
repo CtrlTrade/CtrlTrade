@@ -34,6 +34,7 @@ import type {
   CertificateInput,
   Customer,
   CustomerInput,
+  ExpiryAttention,
   GetScheduleParams,
   HealthStatus,
   Job,
@@ -2161,6 +2162,83 @@ export function useListTeam<TData = Awaited<ReturnType<typeof listTeam>>, TError
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListTeamQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetExpiryAttentionUrl = () => {
+
+
+
+
+  return `/api/v1/dashboard/expiry-attention`
+}
+
+/**
+ * @summary Certificates and vehicle MOT/tax/service items expiring soon or already expired
+ */
+export const getExpiryAttention = async ( options?: RequestInit): Promise<ExpiryAttention> => {
+
+  return customFetch<ExpiryAttention>(getGetExpiryAttentionUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetExpiryAttentionQueryKey = () => {
+    return [
+    `/api/v1/dashboard/expiry-attention`
+    ] as const;
+    }
+
+
+export const getGetExpiryAttentionQueryOptions = <TData = Awaited<ReturnType<typeof getExpiryAttention>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExpiryAttention>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetExpiryAttentionQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getExpiryAttention>>> = ({ signal }) => getExpiryAttention({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExpiryAttention>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetExpiryAttentionQueryResult = NonNullable<Awaited<ReturnType<typeof getExpiryAttention>>>
+export type GetExpiryAttentionQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Certificates and vehicle MOT/tax/service items expiring soon or already expired
+ */
+
+export function useGetExpiryAttention<TData = Awaited<ReturnType<typeof getExpiryAttention>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExpiryAttention>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetExpiryAttentionQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

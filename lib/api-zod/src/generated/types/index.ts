@@ -23,6 +23,8 @@ export * from './certificate';
 export * from './certificateInput';
 export * from './customer';
 export * from './customerInput';
+export * from './expiryAttention';
+export * from './expiryItem';
 export * from './getScheduleParams';
 export * from './healthStatus';
 export * from './job';

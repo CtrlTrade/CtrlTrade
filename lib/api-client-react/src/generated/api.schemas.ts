@@ -611,6 +611,25 @@ export interface CertificateInput {
   notes?: string;
 }
 
+export interface ExpiryItem {
+  kind: string;
+  label: string;
+  /** @nullable */
+  reference?: string | null;
+  expiresAt: string;
+  daysUntil: number;
+  expired: boolean;
+  recordId: string;
+  href: string;
+}
+
+export interface ExpiryAttention {
+  windowDays: number;
+  expiredCount: number;
+  expiringCount: number;
+  items: ExpiryItem[];
+}
+
 export type ListJobsParams = {
 status?: string;
 };

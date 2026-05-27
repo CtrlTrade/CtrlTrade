@@ -13,6 +13,7 @@ import jobsRouter from "./jobs";
 import fleetRouter from "./fleet";
 import complianceRouter from "./compliance";
 import teamRouter from "./team";
+import dashboardRouter from "./dashboard";
 
 const router: IRouter = Router();
 
@@ -37,5 +38,6 @@ router.use(jobsRouter);
 router.use(fleetRouter);
 router.use(complianceRouter);
 router.use(teamRouter);
+router.use(dashboardRouter);
 
 export default router;
