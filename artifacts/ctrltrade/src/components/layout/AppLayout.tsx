@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useGetSession, useLogout } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -30,17 +30,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const tenant = session.tenant;
 
   const links = [
-    { href: "/app", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/app/customers", icon: Users, label: "Customers" },
-    { href: "/app/jobs", icon: Briefcase, label: "Jobs" },
-    { href: "/app/quotes", icon: FileText, label: "Quotes" },
-    { href: "/app/invoices", icon: FileSpreadsheet, label: "Invoices" },
-    { href: "/app/schedule", icon: Calendar, label: "Schedule" },
-    { href: "/app/fleet", icon: Truck, label: "Fleet" },
-    { href: "/app/compliance", icon: ShieldCheck, label: "Compliance" },
-    { href: "/app/pos", icon: ShoppingCart, label: "Pos®" },
-    { href: "/app/reports", icon: BarChart, label: "Reports" },
-    { href: "/app/settings", icon: Settings, label: "Settings" },
+    { href: "/", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/customers", icon: Users, label: "Customers" },
+    { href: "/jobs", icon: Briefcase, label: "Jobs" },
+    { href: "/quotes", icon: FileText, label: "Quotes" },
+    { href: "/invoices", icon: FileSpreadsheet, label: "Invoices" },
+    { href: "/schedule", icon: Calendar, label: "Schedule" },
+    { href: "/fleet", icon: Truck, label: "Fleet" },
+    { href: "/compliance", icon: ShieldCheck, label: "Compliance" },
+    { href: "/pos", icon: ShoppingCart, label: "CtrlTradePos®" },
+    { href: "/reports", icon: BarChart, label: "Reports" },
+    { href: "/settings", icon: Settings, label: "Settings" },
+    { href: "/billing", icon: CreditCard, label: "Billing" },
   ];
 
   return (
@@ -51,7 +52,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
         <nav className="flex-1 overflow-y-auto p-4 space-y-1">
           {links.map((link) => {
-            const active = location === link.href;
+            const active = location === link.href || (link.href !== "/" && location.startsWith(link.href));
             return (
               <Link key={link.href} href={link.href} className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent/50'}`} data-testid={`nav-${link.label.toLowerCase()}`}>
                 <link.icon className="h-4 w-4" />

@@ -88,7 +88,7 @@ export function AdminTenantDetail() {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4">
-        <Link href="/admin/tenants" className="p-2 border border-zinc-800 bg-black text-zinc-400 hover:text-white transition-colors">
+        <Link href="/tenants" className="p-2 border border-zinc-800 bg-black text-zinc-400 hover:text-white transition-colors">
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">{tenant.name}</h1>

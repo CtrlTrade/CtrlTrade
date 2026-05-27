@@ -72,7 +72,7 @@ export function AdminDashboard() {
                   {renewals.map(ren => (
                     <div key={ren.tenantId} className="py-3 flex justify-between items-center">
                       <div>
-                        <Link href={`/admin/tenants/${ren.tenantId}`} className="font-bold text-zinc-200 hover:text-red-500 uppercase text-sm">
+                        <Link href={`/tenants/${ren.tenantId}`} className="font-bold text-zinc-200 hover:text-red-500 uppercase text-sm">
                           {ren.tenantName}
                         </Link>
                         <div className="text-xs text-zinc-500 font-mono mt-1">{new Date(ren.renewsAt).toLocaleDateString()}</div>

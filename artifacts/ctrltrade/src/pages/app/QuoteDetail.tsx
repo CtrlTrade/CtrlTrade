@@ -47,7 +47,7 @@ export function AppQuoteDetail() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <Link href="/app/quotes" className="text-sm flex items-center gap-1 text-muted-foreground hover:text-foreground">
+      <Link href="/quotes" className="text-sm flex items-center gap-1 text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to quotes
       </Link>
       <div className="flex justify-between items-start">

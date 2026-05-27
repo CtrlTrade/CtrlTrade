@@ -67,7 +67,7 @@ export function AppJobDetail() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <Link href="/app/jobs" className="text-sm flex items-center gap-1 text-muted-foreground hover:text-foreground">
+      <Link href="/jobs" className="text-sm flex items-center gap-1 text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to jobs
       </Link>
       <div className="flex justify-between items-start">
