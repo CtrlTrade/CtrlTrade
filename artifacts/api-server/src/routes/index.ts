@@ -35,6 +35,9 @@ import marketplaceRouter from "./marketplace";
 import whiteLabelRouter from "./whiteLabel";
 import reportsRouter from "./reports";
 import integrationsRouter from "./integrations";
+import automationRouter from "./automation";
+import aiRouter from "./ai";
+import voiceRouter from "./voice";
 
 const router: IRouter = Router();
 
@@ -81,5 +84,8 @@ router.use(marketplaceRouter);
 router.use(whiteLabelRouter);
 router.use(reportsRouter);
 router.use(integrationsRouter);
+router.use(automationRouter);
+router.use(aiRouter);
+router.use(voiceRouter);
 
 export default router;

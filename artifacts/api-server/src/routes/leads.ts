@@ -38,6 +38,7 @@ import { requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
 import { nextQuoteNumber } from "../lib/numbering";
 import { isTenantMember } from "../lib/tenantGuards";
+import { emitWorkflowEvent } from "../lib/automationEngine";
 
 const router: IRouter = Router();
 
@@ -256,6 +257,16 @@ router.post("/v1/leads", requireTenant, async (req, res): Promise<void> => {
     metadata: { leadId: lead.id, source: lead.source },
   });
   await scheduleFollowUpReminder(tenantId, lead.id, lead.ownerUserId, lead.followUpDueAt);
+  emitWorkflowEvent(tenantId, "lead.created", {
+    leadId: lead.id,
+    name: lead.name,
+    email: lead.email,
+    phone: lead.phone,
+    source: lead.source,
+    score: lead.score,
+    status: lead.status,
+    valuePence: lead.valuePence,
+  }).catch(() => {});
   const ownerName = await loadOwnerName(lead.ownerUserId);
   res.status(201).json(GetLeadResponse.parse(serializeLead(lead, ownerName, "GBP", [], [], [], now)));
 });

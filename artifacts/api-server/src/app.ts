@@ -10,6 +10,7 @@ import { attachAuth } from "./middlewares/auth";
 import { resolveCustomDomain } from "./middlewares/hostResolver";
 import { meterApiUsage } from "./middlewares/usageMeter";
 import { handleTwilioInbound } from "./webhooks/twilio";
+import { handleTwilioVoice, handleTwilioRecording } from "./webhooks/twilioVoice";
 import { handleResendEvent } from "./webhooks/resend";
 
 const app: Express = express();
@@ -83,6 +84,18 @@ app.post(
   "/api/webhooks/twilio/inbound",
   express.urlencoded({ extended: false }),
   handleTwilioInbound,
+);
+// Twilio Voice inbound webhook
+app.post(
+  "/api/webhooks/twilio/voice",
+  express.urlencoded({ extended: false }),
+  handleTwilioVoice,
+);
+// Twilio Recording status callback
+app.post(
+  "/api/webhooks/twilio/recording",
+  express.urlencoded({ extended: false }),
+  handleTwilioRecording,
 );
 // Resend events — route-local express.json with `verify` captures rawBody for
 // signature checking. Must register BEFORE the global JSON parser below.

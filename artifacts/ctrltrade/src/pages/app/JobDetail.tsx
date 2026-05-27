@@ -21,6 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Receipt } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { TenantThread } from "@/components/TenantThread";
+import { AiPanel } from "@/components/ai/AiPanel";
 import { FileAttachments } from "@/components/FileAttachments";
 import { CustomerInbox } from "@/components/CustomerInbox";
 
@@ -166,6 +167,26 @@ export function AppJobDetail() {
           )}
         </CardContent>
       </Card>
+
+      <AiPanel
+        title="CtrlAI — Job Summary"
+        description="Generate a plain-English summary of this job for handover notes or customer communications."
+        buttonLabel="Summarise Job"
+        endpoint="v1/ai/job-summary"
+        resultKey="summary"
+        badgeLabel="AI"
+        prompt={{
+          jobId: id,
+          jobNumber: data.number,
+          status: data.status,
+          description: data.description,
+          customerName: (data as any).customerName,
+          assignedUserName: (data as any).assignedUserName,
+          scheduledStart: data.scheduledStart,
+          scheduledEnd: data.scheduledEnd,
+          valuePence: data.valuePence,
+        }}
+      />
 
       <FileAttachments parentKind="job" parentId={id} kind="job_photo" title="Photos & files" />
 

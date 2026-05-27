@@ -52,6 +52,7 @@ import {
   Paperclip,
   ExternalLink,
 } from "lucide-react";
+import { AiPanel } from "@/components/ai/AiPanel";
 
 function fmtGbp(pence: number): string {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(pence / 100);
@@ -379,6 +380,27 @@ export function AppLeadDetail() {
           )}
         </CardContent>
       </Card>
+
+      <AiPanel
+        title="CtrlAI — Lead Score & Insights"
+        description="AI analysis of this lead's conversion likelihood, suggested next actions, and value estimate."
+        buttonLabel="Analyse Lead"
+        endpoint="v1/ai/lead-score"
+        resultKey="analysis"
+        badgeLabel="AI"
+        prompt={{
+          leadId: lead.id,
+          name: lead.name,
+          source: lead.source,
+          status: lead.status,
+          score: lead.score,
+          valuePence: lead.valuePence,
+          email: lead.email,
+          phone: lead.phone,
+          title: lead.title,
+          message: lead.message,
+        }}
+      />
     </div>
   );
 }

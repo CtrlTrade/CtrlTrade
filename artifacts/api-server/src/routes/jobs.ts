@@ -21,6 +21,7 @@ import {
 } from "@workspace/api-zod";
 import { requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
+import { emitWorkflowEvent } from "../lib/automationEngine";
 import { nextJobNumber } from "../lib/numbering";
 import { isTenantCustomer, isTenantVehicle, isTenantMember } from "../lib/tenantGuards";
 import { enqueueJob } from "../lib/queue";
@@ -156,6 +157,15 @@ router.post("/v1/jobs", requireTenant, async (req, res): Promise<void> => {
   });
   await enqueueIntegrationSync(tenantId, job.id, "job.upsert");
   const ctx = (await loadJobJoined(tenantId, job.id))!;
+  emitWorkflowEvent(tenantId, "job.created", {
+    jobId: job.id,
+    jobNumber: job.number,
+    status: job.status,
+    customerName: ctx.customerName,
+    assignedUserName: ctx.assignedUserName,
+    scheduledStart: job.scheduledStart?.toISOString() ?? null,
+    valuePence: job.valuePence,
+  }).catch(() => {});
   res.status(201).json(GetJobResponse.parse(serializeJob(ctx.j, ctx.customerName, ctx.assignedUserName)));
 });
 

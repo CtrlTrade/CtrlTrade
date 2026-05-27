@@ -25,6 +25,7 @@ import { requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
 import { nextQuoteNumber, nextJobNumber } from "../lib/numbering";
 import { isTenantCustomer, isTenantMember } from "../lib/tenantGuards";
+import { emitWorkflowEvent } from "../lib/automationEngine";
 
 const router: IRouter = Router();
 
@@ -264,6 +265,15 @@ router.post("/v1/quotes/:quoteId/send", requireTenant, async (req, res): Promise
     kind: "quote.sent",
     message: `Quote ${updated.number} sent to ${ctx.customer.name}`,
   });
+  emitWorkflowEvent(tenantId, "quote.sent", {
+    quoteId: updated.id,
+    quoteNumber: updated.number,
+    customerName: ctx.customer.name,
+    email: ctx.customer.email,
+    phone: ctx.customer.phone,
+    status: updated.status,
+    totalPence: lineTotal(ctx.items),
+  }).catch(() => {});
   res.json(SendQuoteResponse.parse(serializeQuote(updated, ctx.customer, ctx.items)));
 });
 
@@ -309,6 +319,15 @@ router.post("/v1/quotes/:quoteId/accept", requireTenant, async (req, res): Promi
     kind: "quote.accepted",
     message: `Quote ${updated.number} accepted`,
   });
+  emitWorkflowEvent(tenantId, "quote.accepted", {
+    quoteId: updated.id,
+    quoteNumber: updated.number,
+    customerName: ctx.customer.name,
+    email: ctx.customer.email,
+    phone: ctx.customer.phone,
+    status: updated.status,
+    totalPence: lineTotal(ctx.items),
+  }).catch(() => {});
   res.json(AcceptQuoteResponse.parse(serializeQuote(updated, ctx.customer, ctx.items)));
 });
 

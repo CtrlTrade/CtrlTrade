@@ -4200,6 +4200,389 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ReportInsights" }
 
+  # ---- CtrlWorkflow ----------------------------------------------------------
+
+  /v1/automation/events:
+    get:
+      operationId: listAutomationEvents
+      tags: [automation]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WorkflowEventsResponse" }
+
+  /v1/automation/rules:
+    get:
+      operationId: listAutomationRules
+      tags: [automation]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AutomationRulesResponse" }
+    post:
+      operationId: createAutomationRule
+      tags: [automation]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AutomationRuleInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AutomationRuleResponse" }
+
+  /v1/automation/rules/{id}:
+    get:
+      operationId: getAutomationRule
+      tags: [automation]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AutomationRuleResponse" }
+    patch:
+      operationId: updateAutomationRule
+      tags: [automation]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AutomationRuleInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AutomationRuleResponse" }
+    delete:
+      operationId: deleteAutomationRule
+      tags: [automation]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OkResponse" }
+
+  /v1/automation/runs:
+    get:
+      operationId: listAutomationRuns
+      tags: [automation]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AutomationRunsResponse" }
+
+  /v1/automation/approvals:
+    get:
+      operationId: listApprovals
+      tags: [automation]
+      parameters:
+        - { name: status, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApprovalsResponse" }
+
+  /v1/automation/approvals/count:
+    get:
+      operationId: getApprovalCount
+      tags: [automation]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApprovalCountResponse" }
+
+  /v1/automation/approvals/{id}/decide:
+    post:
+      operationId: decideApproval
+      tags: [automation]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ApprovalDecision" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [approval]
+                properties:
+                  approval: { $ref: "#/components/schemas/ApprovalRequest" }
+
+  # ---- CtrlAI -----------------------------------------------------------------
+
+  /v1/ai/status:
+    get:
+      operationId: getAiStatus
+      tags: [ai]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AiStatusResponse" }
+
+  /v1/ai/quote-builder:
+    post:
+      operationId: buildQuoteWithAi
+      tags: [ai]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/QuoteBuilderInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/QuoteBuilderResult" }
+
+  /v1/ai/lead-score:
+    post:
+      operationId: scoreLeadWithAi
+      tags: [ai]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadScoreInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadScoreResult" }
+
+  /v1/ai/job-summary:
+    post:
+      operationId: summariseJobWithAi
+      tags: [ai]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/JobSummaryInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JobSummaryResult" }
+
+  /v1/ai/crm-search:
+    post:
+      operationId: crmSearchWithAi
+      tags: [ai]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CrmSearchInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CrmSearchResult" }
+
+  /v1/ai/report-insights:
+    post:
+      operationId: reportInsightsWithAi
+      tags: [ai]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReportInsightsInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportInsightsResult" }
+
+  /v1/ai/reply-draft:
+    post:
+      operationId: draftReplyWithAi
+      tags: [ai]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReplyDraftInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReplyDraftResult" }
+
+  # ---- CtrlVoice --------------------------------------------------------------
+
+  /v1/voice/numbers:
+    get:
+      operationId: listVoiceNumbers
+      tags: [voice]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PhoneNumbersResponse" }
+    post:
+      operationId: provisionVoiceNumber
+      tags: [voice]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PhoneNumberInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [number]
+                properties:
+                  number: { $ref: "#/components/schemas/PhoneNumber" }
+
+  /v1/voice/numbers/available:
+    get:
+      operationId: listAvailableVoiceNumbers
+      tags: [voice]
+      parameters:
+        - { name: country, in: query, schema: { type: string } }
+        - { name: areaCode, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AvailablePhoneNumbersResponse" }
+
+  /v1/voice/numbers/{id}:
+    delete:
+      operationId: releaseVoiceNumber
+      tags: [voice]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OkResponse" }
+
+  /v1/voice/token:
+    post:
+      operationId: getVoiceToken
+      tags: [voice]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VoiceToken" }
+
+  /v1/voice/calls:
+    get:
+      operationId: listCallRecords
+      tags: [voice]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CallRecordsResponse" }
+    post:
+      operationId: makeOutboundCall
+      tags: [voice]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OutboundCallInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CallRecordResponse" }
+
+  /v1/voice/calls/{id}:
+    get:
+      operationId: getCallRecord
+      tags: [voice]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CallRecordResponse" }
+
+  /v1/voice/voicemails:
+    get:
+      operationId: listVoicemails
+      tags: [voice]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VoicemailsResponse" }
+
+  /v1/voice/voicemails/{id}/listen:
+    post:
+      operationId: markVoicemailListened
+      tags: [voice]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [voicemail]
+                properties:
+                  voicemail: { $ref: "#/components/schemas/Voicemail" }
+
 components:
   schemas:
     HealthStatus:
@@ -7469,3 +7852,391 @@ components:
       properties:
         enabled: { type: boolean }
         minPlan: { type: ["string", "null"] }
+
+    # ---- CtrlWorkflow ---------------------------------------------------------
+
+    WorkflowEvent:
+      type: object
+      required: [event, label, category]
+      properties:
+        event: { type: string }
+        label: { type: string }
+        category: { type: string }
+
+    AutomationCondition:
+      type: object
+      required: [field, operator]
+      properties:
+        field: { type: string }
+        operator: { type: string, enum: [equals, not_equals, contains, gt, lt, is_empty, is_not_empty] }
+        value: {}
+
+    AutomationAction:
+      type: object
+      required: [kind, params]
+      properties:
+        kind: { type: string }
+        params: { type: object, additionalProperties: true }
+
+    AutomationRule:
+      type: object
+      required: [id, name, enabled, triggerEvent, conditions, actions, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: ["string", "null"] }
+        enabled: { type: boolean }
+        triggerEvent: { type: string }
+        conditions:
+          type: array
+          items: { $ref: "#/components/schemas/AutomationCondition" }
+        actions:
+          type: array
+          items: { $ref: "#/components/schemas/AutomationAction" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    AutomationRuleInput:
+      type: object
+      required: [name, triggerEvent]
+      properties:
+        name: { type: string, minLength: 1 }
+        description: { type: string }
+        triggerEvent: { type: string, minLength: 1 }
+        enabled: { type: boolean }
+        conditions:
+          type: array
+          items: { $ref: "#/components/schemas/AutomationCondition" }
+        actions:
+          type: array
+          items: { $ref: "#/components/schemas/AutomationAction" }
+
+    AutomationRuleResponse:
+      type: object
+      required: [rule]
+      properties:
+        rule: { $ref: "#/components/schemas/AutomationRule" }
+
+    AutomationRulesResponse:
+      type: object
+      required: [rules]
+      properties:
+        rules:
+          type: array
+          items: { $ref: "#/components/schemas/AutomationRule" }
+
+    AutomationRun:
+      type: object
+      required: [id, triggerEvent, status, actionsRun, startedAt]
+      properties:
+        id: { type: string }
+        ruleId: { type: ["string", "null"] }
+        ruleName: { type: ["string", "null"] }
+        triggerEvent: { type: string }
+        status: { type: string }
+        actionsRun: { type: integer }
+        error: { type: ["string", "null"] }
+        startedAt: { type: string, format: date-time }
+        finishedAt: { type: ["string", "null"], format: date-time }
+
+    AutomationRunsResponse:
+      type: object
+      required: [runs]
+      properties:
+        runs:
+          type: array
+          items: { $ref: "#/components/schemas/AutomationRun" }
+
+    ApprovalRequest:
+      type: object
+      required: [id, promptTitle, status, createdAt]
+      properties:
+        id: { type: string }
+        runId: { type: ["string", "null"] }
+        ruleId: { type: ["string", "null"] }
+        entityKind: { type: ["string", "null"] }
+        entityId: { type: ["string", "null"] }
+        promptTitle: { type: string }
+        promptBody: { type: ["string", "null"] }
+        status: { type: string }
+        decidedBy: { type: ["string", "null"] }
+        decidedAt: { type: ["string", "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+
+    ApprovalsResponse:
+      type: object
+      required: [approvals]
+      properties:
+        approvals:
+          type: array
+          items: { $ref: "#/components/schemas/ApprovalRequest" }
+
+    ApprovalDecision:
+      type: object
+      required: [decision]
+      properties:
+        decision: { type: string, enum: [approved, rejected] }
+
+    ApprovalCountResponse:
+      type: object
+      required: [count]
+      properties:
+        count: { type: integer }
+
+    WorkflowEventsResponse:
+      type: object
+      required: [events]
+      properties:
+        events:
+          type: array
+          items: { $ref: "#/components/schemas/WorkflowEvent" }
+
+    # ---- CtrlAI ---------------------------------------------------------------
+
+    AiStatusResponse:
+      type: object
+      required: [available]
+      properties:
+        available: { type: boolean }
+
+    QuoteBuilderInput:
+      type: object
+      required: [customerName, jobDescription]
+      properties:
+        customerName: { type: string, minLength: 1 }
+        jobDescription: { type: string, minLength: 1 }
+        tradeCategory: { type: string }
+        currency: { type: string }
+
+    QuoteBuilderLineItem:
+      type: object
+      required: [description, quantity, unitPricePence]
+      properties:
+        description: { type: string }
+        quantity: { type: integer }
+        unitPricePence: { type: integer }
+
+    QuoteBuilderResult:
+      type: object
+      required: [title, notes, items]
+      properties:
+        title: { type: string }
+        notes: { type: string }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/QuoteBuilderLineItem" }
+
+    LeadScoreInput:
+      type: object
+      required: [name, source]
+      properties:
+        name: { type: string, minLength: 1 }
+        company: { type: string }
+        source: { type: string, minLength: 1 }
+        message: { type: string }
+        valuePence: { type: integer }
+        email: { type: string }
+        phone: { type: string }
+
+    LeadScoreResult:
+      type: object
+      required: [score, confidence, reasoning, nextAction]
+      properties:
+        score: { type: integer, minimum: 0, maximum: 100 }
+        confidence: { type: string }
+        reasoning: { type: string }
+        nextAction: { type: string }
+
+    JobSummaryInput:
+      type: object
+      required: [jobTitle, status]
+      properties:
+        jobTitle: { type: string, minLength: 1 }
+        status: { type: string, minLength: 1 }
+        description: { type: string }
+        customerName: { type: string }
+        engineerName: { type: string }
+        scheduledStart: { type: string }
+        notes: { type: string }
+
+    JobSummaryResult:
+      type: object
+      required: [summary]
+      properties:
+        summary: { type: string }
+
+    CrmSearchInput:
+      type: object
+      required: [query]
+      properties:
+        query: { type: string, minLength: 1 }
+
+    CrmSearchEntity:
+      type: object
+      required: [kind, value]
+      properties:
+        kind: { type: string }
+        value: { type: string }
+
+    CrmSearchResult:
+      type: object
+      required: [intent, entities, suggestion]
+      properties:
+        intent: { type: string }
+        entities:
+          type: array
+          items: { $ref: "#/components/schemas/CrmSearchEntity" }
+        suggestion: { type: string }
+
+    ReportInsightsInput:
+      type: object
+      required: [reportType, data]
+      properties:
+        reportType: { type: string, minLength: 1 }
+        data: { type: object, additionalProperties: true }
+
+    ReportInsightsResult:
+      type: object
+      required: [insights]
+      properties:
+        insights: { type: string }
+
+    ReplyDraftMessage:
+      type: object
+      required: [direction, body, createdAt]
+      properties:
+        direction: { type: string }
+        body: { type: string }
+        createdAt: { type: string }
+
+    ReplyDraftInput:
+      type: object
+      required: [threadMessages, channel]
+      properties:
+        threadMessages:
+          type: array
+          items: { $ref: "#/components/schemas/ReplyDraftMessage" }
+        channel: { type: string, minLength: 1 }
+        customerName: { type: string }
+
+    ReplyDraftResult:
+      type: object
+      required: [reply]
+      properties:
+        reply: { type: string }
+
+    # ---- CtrlVoice ------------------------------------------------------------
+
+    PhoneNumber:
+      type: object
+      required: [id, phoneNumber, active, createdAt]
+      properties:
+        id: { type: string }
+        phoneNumber: { type: string }
+        friendlyName: { type: ["string", "null"] }
+        twilioSid: { type: ["string", "null"] }
+        capabilities: {}
+        active: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    PhoneNumbersResponse:
+      type: object
+      required: [numbers]
+      properties:
+        numbers:
+          type: array
+          items: { $ref: "#/components/schemas/PhoneNumber" }
+
+    PhoneNumberInput:
+      type: object
+      required: [phoneNumber]
+      properties:
+        phoneNumber: { type: string, minLength: 1 }
+        friendlyName: { type: string }
+
+    AvailablePhoneNumber:
+      type: object
+      required: [phoneNumber, friendlyName]
+      properties:
+        phoneNumber: { type: string }
+        friendlyName: { type: string }
+        region: { type: string }
+        capabilities: {}
+
+    AvailablePhoneNumbersResponse:
+      type: object
+      required: [numbers]
+      properties:
+        numbers:
+          type: array
+          items: { $ref: "#/components/schemas/AvailablePhoneNumber" }
+
+    VoiceToken:
+      type: object
+      required: [token, identity, expiresIn]
+      properties:
+        token: { type: string }
+        identity: { type: string }
+        expiresIn: { type: integer }
+
+    CallRecord:
+      type: object
+      required: [id, direction, status, createdAt]
+      properties:
+        id: { type: string }
+        twilioCallSid: { type: ["string", "null"] }
+        direction: { type: string }
+        fromNumber: { type: ["string", "null"] }
+        toNumber: { type: ["string", "null"] }
+        customerId: { type: ["string", "null"] }
+        status: { type: string }
+        durationSeconds: { type: ["integer", "null"] }
+        recordingUrl: { type: ["string", "null"] }
+        transcription: { type: ["string", "null"] }
+        aiSummary: { type: ["string", "null"] }
+        startedAt: { type: ["string", "null"], format: date-time }
+        endedAt: { type: ["string", "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+
+    CallRecordsResponse:
+      type: object
+      required: [calls]
+      properties:
+        calls:
+          type: array
+          items: { $ref: "#/components/schemas/CallRecord" }
+
+    CallRecordResponse:
+      type: object
+      required: [call]
+      properties:
+        call: { $ref: "#/components/schemas/CallRecord" }
+
+    OutboundCallInput:
+      type: object
+      required: [to]
+      properties:
+        to: { type: string, minLength: 1 }
+        from: { type: string }
+
+    Voicemail:
+      type: object
+      required: [id, createdAt]
+      properties:
+        id: { type: string }
+        callRecordId: { type: ["string", "null"] }
+        fromNumber: { type: ["string", "null"] }
+        customerId: { type: ["string", "null"] }
+        recordingUrl: { type: ["string", "null"] }
+        durationSeconds: { type: ["integer", "null"] }
+        transcription: { type: ["string", "null"] }
+        listenedAt: { type: ["string", "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+
+    VoicemailsResponse:
+      type: object
+      required: [voicemails]
+      properties:
+        voicemails:
+          type: array
+          items: { $ref: "#/components/schemas/Voicemail" }

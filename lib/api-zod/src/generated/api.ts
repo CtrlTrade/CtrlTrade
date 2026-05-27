@@ -6489,3 +6489,471 @@ export const GetAdminReportInsightsResponse = zod.object({
 })
 
 
+export const ListAutomationEventsResponse = zod.object({
+  "events": zod.array(zod.object({
+  "event": zod.string(),
+  "label": zod.string(),
+  "category": zod.string()
+}))
+})
+
+
+export const ListAutomationRulesResponse = zod.object({
+  "rules": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "enabled": zod.boolean(),
+  "triggerEvent": zod.string(),
+  "conditions": zod.array(zod.object({
+  "field": zod.string(),
+  "operator": zod.enum(['equals', 'not_equals', 'contains', 'gt', 'lt', 'is_empty', 'is_not_empty']),
+  "value": zod.unknown().optional()
+})),
+  "actions": zod.array(zod.object({
+  "kind": zod.string(),
+  "params": zod.record(zod.string(), zod.unknown())
+})),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+})
+
+
+
+
+
+
+export const CreateAutomationRuleBody = zod.object({
+  "name": zod.string().min(1),
+  "description": zod.string().optional(),
+  "triggerEvent": zod.string().min(1),
+  "enabled": zod.boolean().optional(),
+  "conditions": zod.array(zod.object({
+  "field": zod.string(),
+  "operator": zod.enum(['equals', 'not_equals', 'contains', 'gt', 'lt', 'is_empty', 'is_not_empty']),
+  "value": zod.unknown().optional()
+})).optional(),
+  "actions": zod.array(zod.object({
+  "kind": zod.string(),
+  "params": zod.record(zod.string(), zod.unknown())
+})).optional()
+})
+
+
+export const GetAutomationRuleParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetAutomationRuleResponse = zod.object({
+  "rule": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "enabled": zod.boolean(),
+  "triggerEvent": zod.string(),
+  "conditions": zod.array(zod.object({
+  "field": zod.string(),
+  "operator": zod.enum(['equals', 'not_equals', 'contains', 'gt', 'lt', 'is_empty', 'is_not_empty']),
+  "value": zod.unknown().optional()
+})),
+  "actions": zod.array(zod.object({
+  "kind": zod.string(),
+  "params": zod.record(zod.string(), zod.unknown())
+})),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+})
+
+
+export const UpdateAutomationRuleParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+
+
+
+
+export const UpdateAutomationRuleBody = zod.object({
+  "name": zod.string().min(1),
+  "description": zod.string().optional(),
+  "triggerEvent": zod.string().min(1),
+  "enabled": zod.boolean().optional(),
+  "conditions": zod.array(zod.object({
+  "field": zod.string(),
+  "operator": zod.enum(['equals', 'not_equals', 'contains', 'gt', 'lt', 'is_empty', 'is_not_empty']),
+  "value": zod.unknown().optional()
+})).optional(),
+  "actions": zod.array(zod.object({
+  "kind": zod.string(),
+  "params": zod.record(zod.string(), zod.unknown())
+})).optional()
+})
+
+export const UpdateAutomationRuleResponse = zod.object({
+  "rule": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "enabled": zod.boolean(),
+  "triggerEvent": zod.string(),
+  "conditions": zod.array(zod.object({
+  "field": zod.string(),
+  "operator": zod.enum(['equals', 'not_equals', 'contains', 'gt', 'lt', 'is_empty', 'is_not_empty']),
+  "value": zod.unknown().optional()
+})),
+  "actions": zod.array(zod.object({
+  "kind": zod.string(),
+  "params": zod.record(zod.string(), zod.unknown())
+})),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+})
+
+
+export const DeleteAutomationRuleParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const DeleteAutomationRuleResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const ListAutomationRunsQueryParams = zod.object({
+  "limit": zod.coerce.number().optional()
+})
+
+export const ListAutomationRunsResponse = zod.object({
+  "runs": zod.array(zod.object({
+  "id": zod.string(),
+  "ruleId": zod.string().nullish(),
+  "ruleName": zod.string().nullish(),
+  "triggerEvent": zod.string(),
+  "status": zod.string(),
+  "actionsRun": zod.number(),
+  "error": zod.string().nullish(),
+  "startedAt": zod.coerce.date(),
+  "finishedAt": zod.coerce.date().nullish()
+}))
+})
+
+
+export const ListApprovalsQueryParams = zod.object({
+  "status": zod.coerce.string().optional()
+})
+
+export const ListApprovalsResponse = zod.object({
+  "approvals": zod.array(zod.object({
+  "id": zod.string(),
+  "runId": zod.string().nullish(),
+  "ruleId": zod.string().nullish(),
+  "entityKind": zod.string().nullish(),
+  "entityId": zod.string().nullish(),
+  "promptTitle": zod.string(),
+  "promptBody": zod.string().nullish(),
+  "status": zod.string(),
+  "decidedBy": zod.string().nullish(),
+  "decidedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+export const GetApprovalCountResponse = zod.object({
+  "count": zod.number()
+})
+
+
+export const DecideApprovalParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const DecideApprovalBody = zod.object({
+  "decision": zod.enum(['approved', 'rejected'])
+})
+
+export const DecideApprovalResponse = zod.object({
+  "approval": zod.object({
+  "id": zod.string(),
+  "runId": zod.string().nullish(),
+  "ruleId": zod.string().nullish(),
+  "entityKind": zod.string().nullish(),
+  "entityId": zod.string().nullish(),
+  "promptTitle": zod.string(),
+  "promptBody": zod.string().nullish(),
+  "status": zod.string(),
+  "decidedBy": zod.string().nullish(),
+  "decidedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+})
+
+
+export const GetAiStatusResponse = zod.object({
+  "available": zod.boolean()
+})
+
+
+
+
+
+
+export const BuildQuoteWithAiBody = zod.object({
+  "customerName": zod.string().min(1),
+  "jobDescription": zod.string().min(1),
+  "tradeCategory": zod.string().optional(),
+  "currency": zod.string().optional()
+})
+
+export const BuildQuoteWithAiResponse = zod.object({
+  "title": zod.string(),
+  "notes": zod.string(),
+  "items": zod.array(zod.object({
+  "description": zod.string(),
+  "quantity": zod.number(),
+  "unitPricePence": zod.number()
+}))
+})
+
+
+
+
+
+
+export const ScoreLeadWithAiBody = zod.object({
+  "name": zod.string().min(1),
+  "company": zod.string().optional(),
+  "source": zod.string().min(1),
+  "message": zod.string().optional(),
+  "valuePence": zod.number().optional(),
+  "email": zod.string().optional(),
+  "phone": zod.string().optional()
+})
+
+export const scoreLeadWithAiResponseScoreMin = 0;
+export const scoreLeadWithAiResponseScoreMax = 100;
+
+
+
+export const ScoreLeadWithAiResponse = zod.object({
+  "score": zod.number().min(scoreLeadWithAiResponseScoreMin).max(scoreLeadWithAiResponseScoreMax),
+  "confidence": zod.string(),
+  "reasoning": zod.string(),
+  "nextAction": zod.string()
+})
+
+
+
+
+
+
+export const SummariseJobWithAiBody = zod.object({
+  "jobTitle": zod.string().min(1),
+  "status": zod.string().min(1),
+  "description": zod.string().optional(),
+  "customerName": zod.string().optional(),
+  "engineerName": zod.string().optional(),
+  "scheduledStart": zod.string().optional(),
+  "notes": zod.string().optional()
+})
+
+export const SummariseJobWithAiResponse = zod.object({
+  "summary": zod.string()
+})
+
+
+
+
+
+export const CrmSearchWithAiBody = zod.object({
+  "query": zod.string().min(1)
+})
+
+export const CrmSearchWithAiResponse = zod.object({
+  "intent": zod.string(),
+  "entities": zod.array(zod.object({
+  "kind": zod.string(),
+  "value": zod.string()
+})),
+  "suggestion": zod.string()
+})
+
+
+
+
+
+export const ReportInsightsWithAiBody = zod.object({
+  "reportType": zod.string().min(1),
+  "data": zod.record(zod.string(), zod.unknown())
+})
+
+export const ReportInsightsWithAiResponse = zod.object({
+  "insights": zod.string()
+})
+
+
+
+
+
+export const DraftReplyWithAiBody = zod.object({
+  "threadMessages": zod.array(zod.object({
+  "direction": zod.string(),
+  "body": zod.string(),
+  "createdAt": zod.string()
+})),
+  "channel": zod.string().min(1),
+  "customerName": zod.string().optional()
+})
+
+export const DraftReplyWithAiResponse = zod.object({
+  "reply": zod.string()
+})
+
+
+export const ListVoiceNumbersResponse = zod.object({
+  "numbers": zod.array(zod.object({
+  "id": zod.string(),
+  "phoneNumber": zod.string(),
+  "friendlyName": zod.string().nullish(),
+  "twilioSid": zod.string().nullish(),
+  "capabilities": zod.unknown().optional(),
+  "active": zod.boolean(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+
+
+
+export const ProvisionVoiceNumberBody = zod.object({
+  "phoneNumber": zod.string().min(1),
+  "friendlyName": zod.string().optional()
+})
+
+
+export const ListAvailableVoiceNumbersQueryParams = zod.object({
+  "country": zod.coerce.string().optional(),
+  "areaCode": zod.coerce.string().optional()
+})
+
+export const ListAvailableVoiceNumbersResponse = zod.object({
+  "numbers": zod.array(zod.object({
+  "phoneNumber": zod.string(),
+  "friendlyName": zod.string(),
+  "region": zod.string().optional(),
+  "capabilities": zod.unknown().optional()
+}))
+})
+
+
+export const ReleaseVoiceNumberParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const ReleaseVoiceNumberResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const GetVoiceTokenResponse = zod.object({
+  "token": zod.string(),
+  "identity": zod.string(),
+  "expiresIn": zod.number()
+})
+
+
+export const ListCallRecordsQueryParams = zod.object({
+  "limit": zod.coerce.number().optional()
+})
+
+export const ListCallRecordsResponse = zod.object({
+  "calls": zod.array(zod.object({
+  "id": zod.string(),
+  "twilioCallSid": zod.string().nullish(),
+  "direction": zod.string(),
+  "fromNumber": zod.string().nullish(),
+  "toNumber": zod.string().nullish(),
+  "customerId": zod.string().nullish(),
+  "status": zod.string(),
+  "durationSeconds": zod.number().nullish(),
+  "recordingUrl": zod.string().nullish(),
+  "transcription": zod.string().nullish(),
+  "aiSummary": zod.string().nullish(),
+  "startedAt": zod.coerce.date().nullish(),
+  "endedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+
+
+
+export const MakeOutboundCallBody = zod.object({
+  "to": zod.string().min(1),
+  "from": zod.string().optional()
+})
+
+
+export const GetCallRecordParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetCallRecordResponse = zod.object({
+  "call": zod.object({
+  "id": zod.string(),
+  "twilioCallSid": zod.string().nullish(),
+  "direction": zod.string(),
+  "fromNumber": zod.string().nullish(),
+  "toNumber": zod.string().nullish(),
+  "customerId": zod.string().nullish(),
+  "status": zod.string(),
+  "durationSeconds": zod.number().nullish(),
+  "recordingUrl": zod.string().nullish(),
+  "transcription": zod.string().nullish(),
+  "aiSummary": zod.string().nullish(),
+  "startedAt": zod.coerce.date().nullish(),
+  "endedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+})
+
+
+export const ListVoicemailsResponse = zod.object({
+  "voicemails": zod.array(zod.object({
+  "id": zod.string(),
+  "callRecordId": zod.string().nullish(),
+  "fromNumber": zod.string().nullish(),
+  "customerId": zod.string().nullish(),
+  "recordingUrl": zod.string().nullish(),
+  "durationSeconds": zod.number().nullish(),
+  "transcription": zod.string().nullish(),
+  "listenedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+export const MarkVoicemailListenedParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const MarkVoicemailListenedResponse = zod.object({
+  "voicemail": zod.object({
+  "id": zod.string(),
+  "callRecordId": zod.string().nullish(),
+  "fromNumber": zod.string().nullish(),
+  "customerId": zod.string().nullish(),
+  "recordingUrl": zod.string().nullish(),
+  "durationSeconds": zod.number().nullish(),
+  "transcription": zod.string().nullish(),
+  "listenedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+})
+
+

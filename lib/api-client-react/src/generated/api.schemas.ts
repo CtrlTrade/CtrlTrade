@@ -3318,6 +3318,347 @@ export interface AdminIntegrationCatalogueInput {
   minPlan?: string | null;
 }
 
+export interface WorkflowEvent {
+  event: string;
+  label: string;
+  category: string;
+}
+
+export type AutomationConditionOperator = typeof AutomationConditionOperator[keyof typeof AutomationConditionOperator];
+
+
+export const AutomationConditionOperator = {
+  equals: 'equals',
+  not_equals: 'not_equals',
+  contains: 'contains',
+  gt: 'gt',
+  lt: 'lt',
+  is_empty: 'is_empty',
+  is_not_empty: 'is_not_empty',
+} as const;
+
+export interface AutomationCondition {
+  field: string;
+  operator: AutomationConditionOperator;
+  value?: unknown;
+}
+
+export type AutomationActionParams = { [key: string]: unknown };
+
+export interface AutomationAction {
+  kind: string;
+  params: AutomationActionParams;
+}
+
+export interface AutomationRule {
+  id: string;
+  name: string;
+  /** @nullable */
+  description?: string | null;
+  enabled: boolean;
+  triggerEvent: string;
+  conditions: AutomationCondition[];
+  actions: AutomationAction[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AutomationRuleInput {
+  /** @minLength 1 */
+  name: string;
+  description?: string;
+  /** @minLength 1 */
+  triggerEvent: string;
+  enabled?: boolean;
+  conditions?: AutomationCondition[];
+  actions?: AutomationAction[];
+}
+
+export interface AutomationRuleResponse {
+  rule: AutomationRule;
+}
+
+export interface AutomationRulesResponse {
+  rules: AutomationRule[];
+}
+
+export interface AutomationRun {
+  id: string;
+  /** @nullable */
+  ruleId?: string | null;
+  /** @nullable */
+  ruleName?: string | null;
+  triggerEvent: string;
+  status: string;
+  actionsRun: number;
+  /** @nullable */
+  error?: string | null;
+  startedAt: string;
+  /** @nullable */
+  finishedAt?: string | null;
+}
+
+export interface AutomationRunsResponse {
+  runs: AutomationRun[];
+}
+
+export interface ApprovalRequest {
+  id: string;
+  /** @nullable */
+  runId?: string | null;
+  /** @nullable */
+  ruleId?: string | null;
+  /** @nullable */
+  entityKind?: string | null;
+  /** @nullable */
+  entityId?: string | null;
+  promptTitle: string;
+  /** @nullable */
+  promptBody?: string | null;
+  status: string;
+  /** @nullable */
+  decidedBy?: string | null;
+  /** @nullable */
+  decidedAt?: string | null;
+  createdAt: string;
+}
+
+export interface ApprovalsResponse {
+  approvals: ApprovalRequest[];
+}
+
+export type ApprovalDecisionDecision = typeof ApprovalDecisionDecision[keyof typeof ApprovalDecisionDecision];
+
+
+export const ApprovalDecisionDecision = {
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface ApprovalDecision {
+  decision: ApprovalDecisionDecision;
+}
+
+export interface ApprovalCountResponse {
+  count: number;
+}
+
+export interface WorkflowEventsResponse {
+  events: WorkflowEvent[];
+}
+
+export interface AiStatusResponse {
+  available: boolean;
+}
+
+export interface QuoteBuilderInput {
+  /** @minLength 1 */
+  customerName: string;
+  /** @minLength 1 */
+  jobDescription: string;
+  tradeCategory?: string;
+  currency?: string;
+}
+
+export interface QuoteBuilderLineItem {
+  description: string;
+  quantity: number;
+  unitPricePence: number;
+}
+
+export interface QuoteBuilderResult {
+  title: string;
+  notes: string;
+  items: QuoteBuilderLineItem[];
+}
+
+export interface LeadScoreInput {
+  /** @minLength 1 */
+  name: string;
+  company?: string;
+  /** @minLength 1 */
+  source: string;
+  message?: string;
+  valuePence?: number;
+  email?: string;
+  phone?: string;
+}
+
+export interface LeadScoreResult {
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  score: number;
+  confidence: string;
+  reasoning: string;
+  nextAction: string;
+}
+
+export interface JobSummaryInput {
+  /** @minLength 1 */
+  jobTitle: string;
+  /** @minLength 1 */
+  status: string;
+  description?: string;
+  customerName?: string;
+  engineerName?: string;
+  scheduledStart?: string;
+  notes?: string;
+}
+
+export interface JobSummaryResult {
+  summary: string;
+}
+
+export interface CrmSearchInput {
+  /** @minLength 1 */
+  query: string;
+}
+
+export interface CrmSearchEntity {
+  kind: string;
+  value: string;
+}
+
+export interface CrmSearchResult {
+  intent: string;
+  entities: CrmSearchEntity[];
+  suggestion: string;
+}
+
+export type ReportInsightsInputData = { [key: string]: unknown };
+
+export interface ReportInsightsInput {
+  /** @minLength 1 */
+  reportType: string;
+  data: ReportInsightsInputData;
+}
+
+export interface ReportInsightsResult {
+  insights: string;
+}
+
+export interface ReplyDraftMessage {
+  direction: string;
+  body: string;
+  createdAt: string;
+}
+
+export interface ReplyDraftInput {
+  threadMessages: ReplyDraftMessage[];
+  /** @minLength 1 */
+  channel: string;
+  customerName?: string;
+}
+
+export interface ReplyDraftResult {
+  reply: string;
+}
+
+export interface PhoneNumber {
+  id: string;
+  phoneNumber: string;
+  /** @nullable */
+  friendlyName?: string | null;
+  /** @nullable */
+  twilioSid?: string | null;
+  capabilities?: unknown;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface PhoneNumbersResponse {
+  numbers: PhoneNumber[];
+}
+
+export interface PhoneNumberInput {
+  /** @minLength 1 */
+  phoneNumber: string;
+  friendlyName?: string;
+}
+
+export interface AvailablePhoneNumber {
+  phoneNumber: string;
+  friendlyName: string;
+  region?: string;
+  capabilities?: unknown;
+}
+
+export interface AvailablePhoneNumbersResponse {
+  numbers: AvailablePhoneNumber[];
+}
+
+export interface VoiceToken {
+  token: string;
+  identity: string;
+  expiresIn: number;
+}
+
+export interface CallRecord {
+  id: string;
+  /** @nullable */
+  twilioCallSid?: string | null;
+  direction: string;
+  /** @nullable */
+  fromNumber?: string | null;
+  /** @nullable */
+  toNumber?: string | null;
+  /** @nullable */
+  customerId?: string | null;
+  status: string;
+  /** @nullable */
+  durationSeconds?: number | null;
+  /** @nullable */
+  recordingUrl?: string | null;
+  /** @nullable */
+  transcription?: string | null;
+  /** @nullable */
+  aiSummary?: string | null;
+  /** @nullable */
+  startedAt?: string | null;
+  /** @nullable */
+  endedAt?: string | null;
+  createdAt: string;
+}
+
+export interface CallRecordsResponse {
+  calls: CallRecord[];
+}
+
+export interface CallRecordResponse {
+  call: CallRecord;
+}
+
+export interface OutboundCallInput {
+  /** @minLength 1 */
+  to: string;
+  from?: string;
+}
+
+export interface Voicemail {
+  id: string;
+  /** @nullable */
+  callRecordId?: string | null;
+  /** @nullable */
+  fromNumber?: string | null;
+  /** @nullable */
+  customerId?: string | null;
+  /** @nullable */
+  recordingUrl?: string | null;
+  /** @nullable */
+  durationSeconds?: number | null;
+  /** @nullable */
+  transcription?: string | null;
+  /** @nullable */
+  listenedAt?: string | null;
+  createdAt: string;
+}
+
+export interface VoicemailsResponse {
+  voicemails: Voicemail[];
+}
+
 export type ConnectIntegration200 = {
   authUrl: string;
 };
@@ -3496,5 +3837,34 @@ to?: string;
 export type GetAdminReportInsightsParams = {
 from?: string;
 to?: string;
+};
+
+export type ListAutomationRunsParams = {
+limit?: number;
+};
+
+export type ListApprovalsParams = {
+status?: string;
+};
+
+export type DecideApproval200 = {
+  approval: ApprovalRequest;
+};
+
+export type ProvisionVoiceNumber201 = {
+  number: PhoneNumber;
+};
+
+export type ListAvailableVoiceNumbersParams = {
+country?: string;
+areaCode?: string;
+};
+
+export type ListCallRecordsParams = {
+limit?: number;
+};
+
+export type MarkVoicemailListened200 = {
+  voicemail: Voicemail;
 };
 

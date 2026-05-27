@@ -20,6 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ArrowLeft, Send, Check, ArrowRightCircle, Receipt, Percent } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { TenantThread } from "@/components/TenantThread";
+import { AiPanel } from "@/components/ai/AiPanel";
 
 function formatGBP(pence: number) {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(pence / 100);
@@ -155,6 +156,24 @@ export function AppQuoteDetail() {
           )}
         </CardContent>
       </Card>
+
+      <AiPanel
+        title="CtrlAI — Quote Builder"
+        description="Get AI suggestions for pricing, scope, or a covering note for this quote."
+        buttonLabel="Generate Suggestions"
+        endpoint="v1/ai/quote-builder"
+        resultKey="suggestions"
+        badgeLabel="AI"
+        prompt={{
+          quoteId: id,
+          number: data.number,
+          customerName: data.customerName,
+          totalPence: data.totalPence,
+          status: data.status,
+          notes: data.notes,
+          items: data.items.map((it) => ({ description: it.description, quantity: it.quantity, unitPricePence: it.unitPricePence })),
+        }}
+      />
 
       <TenantThread subjectKind="quote" subjectId={id} />
     </div>

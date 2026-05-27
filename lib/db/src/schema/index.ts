@@ -1752,3 +1752,137 @@ export const integrationCatalogueTable = pgTable("integration_catalogue", {
 export type TenantIntegration = typeof tenantIntegrationsTable.$inferSelect;
 export type IntegrationSyncLog = typeof integrationSyncLogsTable.$inferSelect;
 export type IntegrationCatalogue = typeof integrationCatalogueTable.$inferSelect;
+
+// ---- CtrlWorkflow: Automation -----------------------------------------------
+
+export const automationRulesTable = pgTable(
+  "automation_rules",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    enabled: boolean("enabled").notNull().default(true),
+    triggerEvent: varchar("trigger_event", { length: 64 }).notNull(),
+    conditions: jsonb("conditions").notNull().default(sql`'[]'::jsonb`),
+    actions: jsonb("actions").notNull().default(sql`'[]'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("automation_rules_tenant_idx").on(t.tenantId),
+  }),
+);
+
+export const automationRunsTable = pgTable(
+  "automation_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    ruleId: uuid("rule_id").references(() => automationRulesTable.id, { onDelete: "set null" }),
+    ruleName: text("rule_name"),
+    triggerEvent: varchar("trigger_event", { length: 64 }).notNull(),
+    triggerPayload: jsonb("trigger_payload"),
+    status: varchar("status", { length: 32 }).notNull().default("pending"),
+    actionsRun: integer("actions_run").notNull().default(0),
+    error: text("error"),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+    finishedAt: timestamp("finished_at", { withTimezone: true }),
+  },
+  (t) => ({
+    tenantIdx: index("automation_runs_tenant_idx").on(t.tenantId, t.startedAt),
+  }),
+);
+
+export const approvalRequestsTable = pgTable(
+  "approval_requests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    runId: uuid("run_id").references(() => automationRunsTable.id, { onDelete: "set null" }),
+    ruleId: uuid("rule_id").references(() => automationRulesTable.id, { onDelete: "set null" }),
+    entityKind: varchar("entity_kind", { length: 32 }),
+    entityId: uuid("entity_id"),
+    promptTitle: text("prompt_title").notNull(),
+    promptBody: text("prompt_body"),
+    status: varchar("status", { length: 16 }).notNull().default("pending"),
+    decidedBy: uuid("decided_by").references(() => usersTable.id, { onDelete: "set null" }),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("approval_requests_tenant_idx").on(t.tenantId, t.status),
+  }),
+);
+
+// ---- CtrlVoice: Telephony ----------------------------------------------------
+
+export const tenantPhoneNumbersTable = pgTable(
+  "tenant_phone_numbers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    phoneNumber: varchar("phone_number", { length: 32 }).notNull(),
+    friendlyName: text("friendly_name"),
+    twilioSid: varchar("twilio_sid", { length: 64 }),
+    capabilities: jsonb("capabilities").default(sql`'{}'::jsonb`),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("tenant_phone_numbers_tenant_idx").on(t.tenantId),
+    uniqueNumber: uniqueIndex("tenant_phone_numbers_number_idx").on(t.phoneNumber),
+  }),
+);
+
+export const callRecordsTable = pgTable(
+  "call_records",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    twilioCallSid: varchar("twilio_call_sid", { length: 64 }).unique(),
+    direction: varchar("direction", { length: 8 }).notNull().default("inbound"),
+    fromNumber: varchar("from_number", { length: 32 }),
+    toNumber: varchar("to_number", { length: 32 }),
+    customerId: uuid("customer_id").references(() => customersTable.id, { onDelete: "set null" }),
+    status: varchar("status", { length: 32 }).notNull().default("queued"),
+    durationSeconds: integer("duration_seconds"),
+    recordingUrl: text("recording_url"),
+    recordingSid: varchar("recording_sid", { length: 64 }),
+    transcription: text("transcription"),
+    aiSummary: text("ai_summary"),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    endedAt: timestamp("ended_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("call_records_tenant_idx").on(t.tenantId, t.createdAt),
+  }),
+);
+
+export const voicemailsTable = pgTable(
+  "voicemails",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    callRecordId: uuid("call_record_id").references(() => callRecordsTable.id, { onDelete: "cascade" }),
+    fromNumber: varchar("from_number", { length: 32 }),
+    customerId: uuid("customer_id").references(() => customersTable.id, { onDelete: "set null" }),
+    recordingUrl: text("recording_url"),
+    recordingSid: varchar("recording_sid", { length: 64 }),
+    durationSeconds: integer("duration_seconds"),
+    transcription: text("transcription"),
+    listenedAt: timestamp("listened_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("voicemails_tenant_idx").on(t.tenantId, t.createdAt),
+  }),
+);
+
+export type AutomationRule = typeof automationRulesTable.$inferSelect;
+export type AutomationRun = typeof automationRunsTable.$inferSelect;
+export type ApprovalRequest = typeof approvalRequestsTable.$inferSelect;
+export type TenantPhoneNumber = typeof tenantPhoneNumbersTable.$inferSelect;
+export type CallRecord = typeof callRecordsTable.$inferSelect;
+export type Voicemail = typeof voicemailsTable.$inferSelect;
