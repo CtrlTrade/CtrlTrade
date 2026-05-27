@@ -1,5 +1,7 @@
-import { db, workerJobsTable, type WorkerJob } from "@workspace/db";
-import { and, asc, eq, gt, isNull, lt, or, sql } from "drizzle-orm";
+import { createRequire } from "node:module";
+const _require = createRequire(import.meta.url);
+const PgBoss: any = _require("pg-boss").PgBoss ?? _require("pg-boss");
+type PgBoss = any;
 import { logger } from "./logger";
 
 export type JobKind =
@@ -13,145 +15,117 @@ export type JobKind =
   | "usage_daily_rollup"
   | "failed_payment_recovery";
 
+export const ALL_JOB_KINDS: JobKind[] = [
+  "send_email",
+  "send_sms",
+  "stripe_reconcile",
+  "expiry_digest",
+  "integration_sync",
+  "generate_pdf",
+  "usage_rollup",
+  "usage_daily_rollup",
+  "failed_payment_recovery",
+];
+
+let _boss: PgBoss | null = null;
+let _starting: Promise<PgBoss> | null = null;
+
+/**
+ * Lazy-init shared pg-boss instance. Both the API (producer) and the worker
+ * process (consumer) call this — pg-boss schema-creation is idempotent.
+ */
+export async function getBoss(): Promise<PgBoss> {
+  if (_boss) return _boss;
+  if (_starting) return _starting;
+  const connectionString = process.env["DATABASE_URL"];
+  if (!connectionString) throw new Error("DATABASE_URL is required for pg-boss");
+  const boss = new PgBoss({
+    connectionString,
+    schema: "pgboss",
+    retentionDays: 7,
+    archiveCompletedAfterSeconds: 60 * 60, // archive after 1h
+    deleteAfterDays: 14,
+    // 30s expire by default; callers can override per-send.
+    expireInSeconds: 60 * 5,
+    max: 10,
+  });
+  boss.on("error", (err: unknown) => logger.error({ err }, "pg-boss error"));
+  _starting = boss.start().then(async () => {
+    _boss = boss;
+    return boss;
+  }).catch((err: unknown) => {
+    // Don't latch a permanently-rejected promise; allow retry on next call.
+    _starting = null;
+    throw err;
+  }).then(async () => {
+    // Ensure queues exist for all known kinds with reasonable defaults.
+    for (const kind of ALL_JOB_KINDS) {
+      try {
+        await boss.createQueue(kind, { name: kind, policy: "standard" } as any);
+      } catch (err: any) {
+        // already exists / older pg-boss: ignore
+        if (!String(err?.message ?? "").includes("already exists")) {
+          logger.debug({ err, kind }, "createQueue noop");
+        }
+      }
+    }
+    return boss;
+  });
+  return _starting;
+}
+
 export interface EnqueueInput {
   kind: JobKind;
   payload?: Record<string, unknown>;
   runAt?: Date;
   maxAttempts?: number;
-  scheduleKey?: string;
-  uniqKey?: string;
+  /** Idempotency key — only one job with the same singletonKey can be queued at a time. */
+  singletonKey?: string;
+  /** Coalesce repeats within this many seconds — used by scheduled jobs. */
+  singletonSeconds?: number;
 }
 
-export async function enqueueJob(input: EnqueueInput): Promise<WorkerJob | null> {
-  try {
-    const [row] = await db
-      .insert(workerJobsTable)
-      .values({
-        kind: input.kind,
-        payload: input.payload ?? {},
-        runAt: input.runAt ?? new Date(),
-        maxAttempts: input.maxAttempts ?? 5,
-        scheduleKey: input.scheduleKey ?? null,
-        uniqKey: input.uniqKey ?? null,
-      })
-      .returning();
-    return row ?? null;
-  } catch (err: any) {
-    if (err?.code === "23505" || err?.cause?.code === "23505") {
-      // uniq_key collision — already queued; treat as idempotent success
-      return null;
-    }
-    throw err;
-  }
+export async function enqueueJob(input: EnqueueInput): Promise<string | null> {
+  const boss = await getBoss();
+  const opts: any = {
+    retryLimit: (input.maxAttempts ?? 5) - 1,
+    retryDelay: 30,
+    retryBackoff: true,
+  };
+  if (input.runAt) opts.startAfter = input.runAt;
+  if (input.singletonKey) opts.singletonKey = input.singletonKey;
+  if (input.singletonSeconds) opts.singletonSeconds = input.singletonSeconds;
+  return boss.send(input.kind, input.payload ?? {}, opts);
 }
 
-const LOCK_DURATION_MS = 5 * 60 * 1000;
-
-export async function claimNextJob(): Promise<WorkerJob | null> {
-  const now = new Date();
-  // Atomic claim: pick one queued/expired-lock row, lock it.
-  const rows = await db.execute(sql`
-    UPDATE worker_jobs
-    SET status = 'running',
-        attempts = attempts + 1,
-        started_at = now(),
-        locked_until = now() + interval '5 minutes',
-        updated_at = now()
-    WHERE id = (
-      SELECT id FROM worker_jobs
-      WHERE (status = 'queued' AND run_at <= now())
-         OR (status = 'running' AND locked_until < now())
-      ORDER BY run_at ASC
-      FOR UPDATE SKIP LOCKED
+/** Re-publish a failed/cancelled/expired job by id (admin retry button). */
+export async function retryJob(jobId: string): Promise<{ id: string; kind: string; status: string } | null> {
+  const boss = await getBoss();
+  // pg-boss v12 getJobById requires the queue name. Look it up first from live or archive.
+  const { db } = await import("@workspace/db");
+  const { sql } = await import("drizzle-orm");
+  const lookup = await db
+    .execute(sql`
+      SELECT name, state, data FROM pgboss.job WHERE id = ${jobId}
+      UNION ALL
+      SELECT name, state, data FROM pgboss.archive WHERE id = ${jobId}
       LIMIT 1
-    )
-    RETURNING *
-  `);
-  const row = (rows as any).rows?.[0] as any;
+    `)
+    .catch(() => null);
+  const row = (lookup as any)?.rows?.[0] as { name: string; state: string; data: unknown } | undefined;
   if (!row) return null;
-  return {
-    id: row.id,
-    kind: row.kind,
-    payload: row.payload,
-    status: row.status,
-    runAt: new Date(row.run_at),
-    lockedUntil: row.locked_until ? new Date(row.locked_until) : null,
-    attempts: row.attempts,
-    maxAttempts: row.max_attempts,
-    lastError: row.last_error,
-    startedAt: row.started_at ? new Date(row.started_at) : null,
-    completedAt: row.completed_at ? new Date(row.completed_at) : null,
-    scheduleKey: row.schedule_key,
-    uniqKey: row.uniq_key,
-    createdAt: new Date(row.created_at),
-    updatedAt: new Date(row.updated_at),
-  } as WorkerJob;
+  const allowed = ["failed", "expired", "cancelled"];
+  if (!allowed.includes(row.state)) {
+    return { id: jobId, kind: row.name, status: row.state };
+  }
+  const newId = await boss.send(row.name, row.data ?? {}, { retryLimit: 4 });
+  return { id: newId ?? jobId, kind: row.name, status: "created" };
 }
 
-export async function completeJob(id: string): Promise<void> {
-  await db
-    .update(workerJobsTable)
-    .set({ status: "done", completedAt: new Date(), lockedUntil: null, lastError: null })
-    .where(eq(workerJobsTable.id, id));
-}
-
-export async function failJob(job: WorkerJob, error: unknown): Promise<void> {
-  const msg = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-  const isDead = job.attempts >= job.maxAttempts;
-  // Exponential backoff: 30s, 2m, 8m, 30m, 2h
-  const delaySec = Math.min(7200, 30 * Math.pow(4, job.attempts - 1));
-  const nextRunAt = new Date(Date.now() + delaySec * 1000);
-  await db
-    .update(workerJobsTable)
-    .set({
-      status: isDead ? "dead" : "queued",
-      lastError: msg.slice(0, 4000),
-      runAt: isDead ? job.runAt : nextRunAt,
-      lockedUntil: null,
-      completedAt: isDead ? new Date() : null,
-    })
-    .where(eq(workerJobsTable.id, job.id));
-  logger.warn({ jobId: job.id, kind: job.kind, attempt: job.attempts, dead: isDead, err: msg }, "Worker job failed");
-}
-
-export async function retryJob(id: string): Promise<WorkerJob | null> {
-  // Only re-queue failed/dead jobs; never disturb running/done/queued.
-  const [row] = await db
-    .update(workerJobsTable)
-    .set({
-      status: "queued",
-      runAt: new Date(),
-      lockedUntil: null,
-      attempts: 0,
-      lastError: null,
-      completedAt: null,
-    })
-    .where(and(
-      eq(workerJobsTable.id, id),
-      or(eq(workerJobsTable.status, "failed"), eq(workerJobsTable.status, "dead")),
-    ))
-    .returning();
-  return row ?? null;
-}
-
-export async function queueDepth(): Promise<{
+export interface DepthCounts {
   queued: number;
   running: number;
   done: number;
   failed: number;
   dead: number;
-}> {
-  const rows = await db
-    .select({ status: workerJobsTable.status, count: sql<number>`count(*)::int` })
-    .from(workerJobsTable)
-    .groupBy(workerJobsTable.status);
-  const out = { queued: 0, running: 0, done: 0, failed: 0, dead: 0 };
-  for (const r of rows) {
-    if (r.status in out) (out as any)[r.status] = r.count;
-  }
-  return out;
 }
-
-// Suppress unused-import warnings while keeping the imports available
-// for callers that consume the same module surface.
-void and; void asc; void gt; void isNull; void lt; void or;

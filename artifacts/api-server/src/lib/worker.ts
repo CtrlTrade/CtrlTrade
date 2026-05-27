@@ -1,24 +1,14 @@
 import { logger } from "./logger";
-import {
-  enqueueJob,
-  claimNextJob,
-  completeJob,
-  failJob,
-  type JobKind,
-} from "./queue";
-import type { WorkerJob } from "@workspace/db";
-import { db, workerJobsTable } from "@workspace/db";
-import { and, eq, gt } from "drizzle-orm";
+import { getBoss, type JobKind } from "./queue";
 import { runExpiryDigestOnce } from "./scheduler";
 import { rollupHourly, rollupDaily } from "./usage";
 import { sendEmail } from "./email";
 import { reconcileFromStripeSubscription } from "./stripeReconcile";
 
-type Handler = (job: WorkerJob) => Promise<void>;
+type Handler = (payload: any) => Promise<void>;
 
-const handlers: Partial<Record<JobKind, Handler>> = {
-  send_email: async (job) => {
-    const p = job.payload as any;
+const handlers: Record<JobKind, Handler> = {
+  send_email: async (p) => {
     await sendEmail({
       tenantId: p.tenantId,
       template: p.template,
@@ -38,114 +28,62 @@ const handlers: Partial<Record<JobKind, Handler>> = {
   usage_daily_rollup: async () => {
     await rollupDaily();
   },
-  stripe_reconcile: async (job) => {
-    const p = job.payload as any;
-    if (p.stripeSubscriptionId) {
+  stripe_reconcile: async (p) => {
+    if (p?.stripeSubscriptionId) {
       await reconcileFromStripeSubscription(p.stripeSubscriptionId);
     }
   },
   failed_payment_recovery: async () => {
-    // Placeholder: real implementation would re-attempt collection or notify;
-    // for now we just emit an audit-friendly noop log so the schedule is real.
+    // Stub: real implementation would re-attempt collection or notify;
+    // for now logged so the cron is observable.
     logger.info("Failed-payment recovery sweep (noop)");
   },
-  send_sms: async (job) => {
-    // No SMS provider wired yet; log so the queue is exercised without losing the job.
-    logger.info({ payload: job.payload }, "send_sms (no provider configured — logged)");
+  send_sms: async (p) => {
+    // No SMS provider wired yet; once Twilio/Vonage is integrated, do the send here
+    // and call recordUsage(tenantId, "sms").
+    logger.info({ payload: p }, "send_sms (no provider configured — logged)");
   },
-  integration_sync: async (job) => {
-    logger.info({ payload: job.payload }, "integration_sync (noop)");
+  integration_sync: async (p) => {
+    logger.info({ payload: p }, "integration_sync (no integration provider wired — logged)");
   },
-  generate_pdf: async (job) => {
-    logger.info({ payload: job.payload }, "generate_pdf (noop)");
+  generate_pdf: async (p) => {
+    logger.info({ payload: p }, "generate_pdf (no renderer wired — logged)");
   },
 };
 
-let running = false;
-let timer: NodeJS.Timeout | null = null;
-const POLL_MS = 2000;
-
-async function processOne(): Promise<boolean> {
-  const job = await claimNextJob();
-  if (!job) return false;
-  const handler = handlers[job.kind as JobKind];
-  try {
-    if (!handler) throw new Error(`No handler for kind ${job.kind}`);
-    await handler(job);
-    await completeJob(job.id);
-    logger.debug({ jobId: job.id, kind: job.kind }, "Worker job done");
-  } catch (err) {
-    await failJob(job, err);
-  }
-  return true;
-}
-
-async function tick(): Promise<void> {
-  if (running) return;
-  running = true;
-  try {
-    // Drain a few jobs per tick to keep up under burst load.
-    for (let i = 0; i < 10; i++) {
-      const more = await processOne();
-      if (!more) break;
-    }
-  } catch (err) {
-    logger.error({ err }, "Worker tick error");
-  } finally {
-    running = false;
+/** Register all job handlers on pg-boss. Called by the worker entrypoint. */
+export async function registerWorkers(): Promise<void> {
+  const boss = await getBoss();
+  for (const [kind, handler] of Object.entries(handlers) as [JobKind, Handler][]) {
+    // batchSize: 1 so that a throw fails only the offending job — never a sibling
+    // whose side effect (e.g. email send) already succeeded.
+    await boss.work(kind, { batchSize: 1 } as any, async (jobs: any) => {
+      const list = Array.isArray(jobs) ? jobs : [jobs];
+      const j = list[0];
+      if (!j) return;
+      try {
+        await handler(j.data ?? {});
+      } catch (err) {
+        logger.error({ err, kind, jobId: j.id }, "Worker handler threw");
+        throw err;
+      }
+    });
+    logger.info({ kind }, "Worker handler registered");
   }
 }
 
-// Internal cron — enqueue scheduled jobs idempotently using uniq_key per bucket.
-async function enqueueScheduled(): Promise<void> {
-  const now = new Date();
-  const hourBucket = `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}-${now.getUTCDate()}T${now.getUTCHours()}`;
-  const dayBucket = `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}-${now.getUTCDate()}`;
-
-  await enqueueJob({
-    kind: "usage_rollup",
-    scheduleKey: "usage_rollup",
-    uniqKey: `usage_rollup:${hourBucket}`,
-  });
-  await enqueueJob({
-    kind: "expiry_digest",
-    scheduleKey: "expiry_digest",
-    uniqKey: `expiry_digest:${hourBucket}`,
-  });
-  // Once per UTC day (kick off after midnight)
-  await enqueueJob({
-    kind: "usage_daily_rollup",
-    scheduleKey: "usage_daily_rollup",
-    uniqKey: `usage_daily_rollup:${dayBucket}`,
-  });
-  await enqueueJob({
-    kind: "failed_payment_recovery",
-    scheduleKey: "failed_payment_recovery",
-    uniqKey: `failed_payment_recovery:${dayBucket}`,
-  });
-}
-
-let scheduleTimer: NodeJS.Timeout | null = null;
-const SCHEDULE_POLL_MS = 5 * 60 * 1000; // every 5 min check what to enqueue
-
-/** Start an in-process worker that polls the DB queue and dispatches jobs. */
-export function startWorker(): void {
-  if (timer) return;
-  logger.info("Worker started (in-process queue poller)");
-  timer = setInterval(() => void tick(), POLL_MS);
-  void tick();
-  scheduleTimer = setInterval(() => void enqueueScheduled(), SCHEDULE_POLL_MS);
-  void enqueueScheduled();
-
-  // Reset orphaned 'running' jobs whose lock has expired so a new worker can claim them.
-  void db
-    .update(workerJobsTable)
-    .set({ status: "queued", lockedUntil: null })
-    .where(and(eq(workerJobsTable.status, "running"), gt(new Date() as any, workerJobsTable.lockedUntil as any)))
-    .catch(() => {});
-}
-
-export function stopWorker(): void {
-  if (timer) { clearInterval(timer); timer = null; }
-  if (scheduleTimer) { clearInterval(scheduleTimer); scheduleTimer = null; }
+/**
+ * Register all cron schedules. pg-boss persists schedules in its tables —
+ * calling schedule() again with the same name+cron is idempotent.
+ */
+export async function registerSchedules(): Promise<void> {
+  const boss = await getBoss();
+  // hourly usage rollup
+  await boss.schedule("usage_rollup", "0 * * * *", {}, { tz: "UTC" } as any);
+  // daily rollup + expiry digest at 02:00 UTC
+  await boss.schedule("usage_daily_rollup", "0 2 * * *", {}, { tz: "UTC" } as any);
+  await boss.schedule("expiry_digest", "0 6 * * *", {}, { tz: "UTC" } as any);
+  // hourly failed-payment sweep
+  await boss.schedule("failed_payment_recovery", "15 * * * *", {}, { tz: "UTC" } as any);
+  logger.info("Worker schedules registered (hourly+daily crons)");
 }

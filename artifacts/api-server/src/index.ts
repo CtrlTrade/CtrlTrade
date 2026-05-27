@@ -4,7 +4,7 @@ import { logger } from "./lib/logger";
 import { getStripeSync, isStripeConnected } from "./stripeClient";
 import { ensurePriceIds } from "./lib/stripeSubscription";
 import { startScheduler } from "./lib/scheduler";
-import { startWorker } from "./lib/worker";
+import { getBoss } from "./lib/queue";
 
 const rawPort = process.env["PORT"];
 if (!rawPort) throw new Error("PORT environment variable is required");
@@ -52,5 +52,9 @@ app.listen(port, (err) => {
   }
   logger.info({ port }, "API server listening");
   startScheduler();
-  startWorker();
+  // Start pg-boss in producer mode so /v1/admin/workers and enqueueJob calls work.
+  // Job consumption happens in the separate worker process (pnpm run start:worker).
+  getBoss()
+    .then(() => logger.info("pg-boss connected (producer mode)"))
+    .catch((err) => logger.error({ err }, "pg-boss start failed"));
 });
