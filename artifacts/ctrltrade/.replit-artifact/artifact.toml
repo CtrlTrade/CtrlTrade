@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "CtrlTrade"
+version = "1.0.0"
+id = "artifacts/ctrltrade"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23264
+
+[services.development]
+run = "pnpm --filter @workspace/ctrltrade run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ctrltrade", "run", "build" ]
+publicDir = "artifacts/ctrltrade/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23264"
+BASE_PATH = "/"
