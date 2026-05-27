@@ -19,6 +19,7 @@
     "@types/express-session": "^1.19.0",
     "@workspace/api-zod": "workspace:*",
     "@workspace/db": "workspace:*",
+    "zod": "catalog:",
     "archiver": "^8.0.0",
     "bcryptjs": "^3.0.3",
     "connect-pg-simple": "^10.0.0",

@@ -40,6 +40,7 @@ import aiRouter from "./ai";
 import voiceRouter from "./voice";
 import timesheetsRouter from "./timesheets";
 import contractsRouter from "./contracts";
+import staffAvailabilityRouter from "./staffAvailability";
 
 const router: IRouter = Router();
 
@@ -91,5 +92,6 @@ router.use(aiRouter);
 router.use(voiceRouter);
 router.use(timesheetsRouter);
 router.use(contractsRouter);
+router.use(staffAvailabilityRouter);
 
 export default router;

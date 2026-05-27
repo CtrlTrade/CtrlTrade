@@ -6,6 +6,7 @@ import {
   customersTable,
   usersTable,
   membershipsTable,
+  staffAvailabilityTable,
   type Job,
 } from "@workspace/db";
 import {
@@ -298,18 +299,51 @@ router.get("/v1/schedule", requireTenant, async (req, res): Promise<void> => {
       ),
     )
     .orderBy(asc(jobsTable.scheduledStart));
+
+  // Load availability blocks that overlap the window for conflict detection
+  const fromDate = from.toISOString().slice(0, 10);
+  const toDate = to.toISOString().slice(0, 10);
+  const availBlocks = await db
+    .select({ userId: staffAvailabilityTable.userId, startDate: staffAvailabilityTable.startDate, endDate: staffAvailabilityTable.endDate })
+    .from(staffAvailabilityTable)
+    .where(
+      and(
+        eq(staffAvailabilityTable.tenantId, tenantId),
+        lte(staffAvailabilityTable.startDate, toDate),
+        gte(staffAvailabilityTable.endDate, fromDate),
+      ),
+    );
+
+  // Build set: userId -> blocked date strings
+  const blockedDates = new Map<string, Set<string>>();
+  for (const block of availBlocks) {
+    if (!blockedDates.has(block.userId)) blockedDates.set(block.userId, new Set());
+    // Expand each day in the range
+    const start = new Date(block.startDate + "T12:00:00Z");
+    const end = new Date(block.endDate + "T12:00:00Z");
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      blockedDates.get(block.userId)!.add(d.toISOString().slice(0, 10));
+    }
+  }
+
   res.json(
     GetScheduleResponse.parse(
-      rows.map((r) => ({
-        jobId: r.j.id,
-        title: `${r.j.number} · ${r.j.title}`,
-        status: r.j.status,
-        start: r.j.scheduledStart!.toISOString(),
-        end: r.j.scheduledEnd?.toISOString() ?? null,
-        assignedUserId: r.j.assignedUserId,
-        assignedUserName: r.assignedUserName,
-        customerName: r.customerName,
-      })),
+      rows.map((r) => {
+        const jobDate = r.j.scheduledStart!.toISOString().slice(0, 10);
+        const assignedUserConflict =
+          !!r.j.assignedUserId && (blockedDates.get(r.j.assignedUserId)?.has(jobDate) ?? false);
+        return {
+          jobId: r.j.id,
+          title: `${r.j.number} · ${r.j.title}`,
+          status: r.j.status,
+          start: r.j.scheduledStart!.toISOString(),
+          end: r.j.scheduledEnd?.toISOString() ?? null,
+          assignedUserId: r.j.assignedUserId,
+          assignedUserName: r.assignedUserName,
+          customerName: r.customerName,
+          assignedUserConflict,
+        };
+      }),
     ),
   );
 });

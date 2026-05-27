@@ -1045,6 +1045,29 @@ export interface ScheduleEntry {
   /** @nullable */
   assignedUserName?: string | null;
   customerName: string;
+  assignedUserConflict?: boolean;
+}
+
+export interface StaffAvailabilityEntry {
+  id: string;
+  userId: string;
+  /** @nullable */
+  userName: string | null;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  /** @nullable */
+  notes?: string | null;
+  createdAt: string;
+}
+
+export interface StaffAvailabilityInput {
+  userId: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  /** @nullable */
+  notes?: string | null;
 }
 
 export interface Vehicle {
@@ -3856,6 +3879,12 @@ status?: string;
 export type GetScheduleParams = {
 from: string;
 to: string;
+};
+
+export type ListStaffAvailabilityParams = {
+from?: string;
+to?: string;
+userId?: string;
 };
 
 export type ListLeadsParams = {

@@ -161,6 +161,7 @@ import type {
   ListPosProductsParams,
   ListPosTradeAccountsParams,
   ListPosTransactionsParams,
+  ListStaffAvailabilityParams,
   ListTimesheetsParams,
   LoginCredentials,
   LowStockRow,
@@ -271,6 +272,8 @@ import type {
   SetupIntent,
   SetupIntentInput,
   SignupPayload,
+  StaffAvailabilityEntry,
+  StaffAvailabilityInput,
   StockAdjustmentInput,
   StockLocation,
   StockLocationInput,
@@ -8665,6 +8668,231 @@ export function useGetSchedule<TData = Awaited<ReturnType<typeof getSchedule>>, 
 
 
 
+
+export const getListStaffAvailabilityUrl = (params?: ListStaffAvailabilityParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/staff/availability?${stringifiedParams}` : `/api/v1/staff/availability`
+}
+
+/**
+ * @summary List staff availability blocks, optionally filtered by date range and/or userId.
+ */
+export const listStaffAvailability = async (params?: ListStaffAvailabilityParams, options?: RequestInit): Promise<StaffAvailabilityEntry[]> => {
+
+  return customFetch<StaffAvailabilityEntry[]>(getListStaffAvailabilityUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListStaffAvailabilityQueryKey = (params?: ListStaffAvailabilityParams,) => {
+    return [
+    `/api/v1/staff/availability`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListStaffAvailabilityQueryOptions = <TData = Awaited<ReturnType<typeof listStaffAvailability>>, TError = ErrorType<unknown>>(params?: ListStaffAvailabilityParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listStaffAvailability>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListStaffAvailabilityQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStaffAvailability>>> = ({ signal }) => listStaffAvailability(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listStaffAvailability>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListStaffAvailabilityQueryResult = NonNullable<Awaited<ReturnType<typeof listStaffAvailability>>>
+export type ListStaffAvailabilityQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List staff availability blocks, optionally filtered by date range and/or userId.
+ */
+
+export function useListStaffAvailability<TData = Awaited<ReturnType<typeof listStaffAvailability>>, TError = ErrorType<unknown>>(
+ params?: ListStaffAvailabilityParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listStaffAvailability>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListStaffAvailabilityQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateStaffAvailabilityUrl = () => {
+
+
+
+
+  return `/api/v1/staff/availability`
+}
+
+/**
+ * @summary Create a new staff availability block.
+ */
+export const createStaffAvailability = async (staffAvailabilityInput: StaffAvailabilityInput, options?: RequestInit): Promise<StaffAvailabilityEntry> => {
+
+  return customFetch<StaffAvailabilityEntry>(getCreateStaffAvailabilityUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      staffAvailabilityInput,)
+  }
+);}
+
+
+
+
+export const getCreateStaffAvailabilityMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createStaffAvailability>>, TError,{data: BodyType<StaffAvailabilityInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createStaffAvailability>>, TError,{data: BodyType<StaffAvailabilityInput>}, TContext> => {
+
+const mutationKey = ['createStaffAvailability'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createStaffAvailability>>, {data: BodyType<StaffAvailabilityInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createStaffAvailability(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateStaffAvailabilityMutationResult = NonNullable<Awaited<ReturnType<typeof createStaffAvailability>>>
+    export type CreateStaffAvailabilityMutationBody = BodyType<StaffAvailabilityInput>
+    export type CreateStaffAvailabilityMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Create a new staff availability block.
+ */
+export const useCreateStaffAvailability = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createStaffAvailability>>, TError,{data: BodyType<StaffAvailabilityInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createStaffAvailability>>,
+        TError,
+        {data: BodyType<StaffAvailabilityInput>},
+        TContext
+      > => {
+      return useMutation(getCreateStaffAvailabilityMutationOptions(options));
+    }
+
+export const getDeleteStaffAvailabilityUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/staff/availability/${id}`
+}
+
+/**
+ * @summary Delete a staff availability block.
+ */
+export const deleteStaffAvailability = async (id: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteStaffAvailabilityUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteStaffAvailabilityMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteStaffAvailability>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteStaffAvailability>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteStaffAvailability'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteStaffAvailability>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteStaffAvailability(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteStaffAvailabilityMutationResult = NonNullable<Awaited<ReturnType<typeof deleteStaffAvailability>>>
+
+    export type DeleteStaffAvailabilityMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete a staff availability block.
+ */
+export const useDeleteStaffAvailability = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteStaffAvailability>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteStaffAvailability>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getDeleteStaffAvailabilityMutationOptions(options));
+    }
 
 export const getListVehiclesUrl = () => {
 

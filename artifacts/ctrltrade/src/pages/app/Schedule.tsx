@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Calendar as CalIcon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ChevronLeft, ChevronRight, Calendar as CalIcon, AlertTriangle } from "lucide-react";
 
 function startOfWeek(d: Date) {
   const x = new Date(d);
@@ -69,7 +70,21 @@ export function AppSchedule() {
                         <div className="font-mono text-xs">{new Date(e.start).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div>
                         <div className="text-xs font-bold truncate">{e.title}</div>
                         <div className="text-xs text-muted-foreground truncate">{e.customerName}</div>
-                        {e.assignedUserName && <Badge variant="outline" className="rounded-none mt-1 text-[10px]">{e.assignedUserName}</Badge>}
+                        <div className="flex items-center gap-1 mt-1 flex-wrap">
+                          {e.assignedUserName && <Badge variant="outline" className="rounded-none text-[10px]">{e.assignedUserName}</Badge>}
+                          {e.assignedUserConflict && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge variant="destructive" className="rounded-none text-[10px] gap-1 cursor-default" data-testid={`badge-conflict-${e.jobId}`}>
+                                  <AlertTriangle className="h-2.5 w-2.5" /> Unavailable
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {e.assignedUserName ?? "Assigned staff"} has an availability block on this day.
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
                       </div>
                     </Link>
                   ))}

@@ -56,6 +56,7 @@ import { AppAutomation } from "@/pages/app/Automation";
 import { AppVoice } from "@/pages/app/Voice";
 import { AppTimesheets } from "@/pages/app/Timesheets";
 import { AppMaintenanceContracts } from "@/pages/app/MaintenanceContracts";
+import { AppAvailability } from "@/pages/app/Availability";
 import { PlaceholderPage } from "@/components/PlaceholderPage";
 
 // Admin
@@ -161,6 +162,7 @@ function App() {
                   <Route path="/reports/aged-debtors">{() => <AgedDebtorsReport />}</Route>
                   <Route path="/reports/activity-heatmap">{() => <ActivityHeatmapReport />}</Route>
                   <Route path="/timesheets" component={AppTimesheets} />
+                  <Route path="/availability" component={AppAvailability} />
                   <Route path="/automation" component={AppAutomation} />
                   <Route path="/voice" component={AppVoice} />
                   <Route path="/contracts" component={AppMaintenanceContracts} />

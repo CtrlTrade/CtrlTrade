@@ -3182,9 +3182,52 @@ export const GetScheduleResponseItem = zod.object({
   "end": zod.coerce.date().nullish(),
   "assignedUserId": zod.string().nullish(),
   "assignedUserName": zod.string().nullish(),
-  "customerName": zod.string()
+  "customerName": zod.string(),
+  "assignedUserConflict": zod.boolean().optional()
 })
 export const GetScheduleResponse = zod.array(GetScheduleResponseItem)
+
+
+/**
+ * @summary List staff availability blocks, optionally filtered by date range and/or userId.
+ */
+export const ListStaffAvailabilityQueryParams = zod.object({
+  "from": zod.coerce.string().optional(),
+  "to": zod.coerce.string().optional(),
+  "userId": zod.coerce.string().optional()
+})
+
+export const ListStaffAvailabilityResponseItem = zod.object({
+  "id": zod.string(),
+  "userId": zod.string(),
+  "userName": zod.string().nullable(),
+  "startDate": zod.coerce.date(),
+  "endDate": zod.coerce.date(),
+  "reason": zod.string(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListStaffAvailabilityResponse = zod.array(ListStaffAvailabilityResponseItem)
+
+
+/**
+ * @summary Create a new staff availability block.
+ */
+export const CreateStaffAvailabilityBody = zod.object({
+  "userId": zod.string(),
+  "startDate": zod.string(),
+  "endDate": zod.string(),
+  "reason": zod.string(),
+  "notes": zod.string().nullish()
+})
+
+
+/**
+ * @summary Delete a staff availability block.
+ */
+export const DeleteStaffAvailabilityParams = zod.object({
+  "id": zod.coerce.string()
+})
 
 
 export const ListVehiclesResponseItem = zod.object({

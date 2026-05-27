@@ -1977,3 +1977,24 @@ export const jobCheckinsTable = pgTable(
   }),
 );
 export type JobCheckin = typeof jobCheckinsTable.$inferSelect;
+
+// ---- Staff availability blocks ------------------------------------------------
+export const staffAvailabilityTable = pgTable(
+  "staff_availability",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+    startDate: text("start_date").notNull(), // YYYY-MM-DD
+    endDate: text("end_date").notNull(), // YYYY-MM-DD
+    reason: varchar("reason", { length: 32 }).notNull().default("holiday"), // holiday|sick|training|other
+    notes: text("notes"),
+    createdByUserId: uuid("created_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("staff_avail_tenant_idx").on(t.tenantId),
+    userIdx: index("staff_avail_user_idx").on(t.tenantId, t.userId),
+  }),
+);
+export type StaffAvailability = typeof staffAvailabilityTable.$inferSelect;

@@ -1933,6 +1933,62 @@ paths:
                 type: array
                 items: { $ref: "#/components/schemas/ScheduleEntry" }
 
+  /v1/staff/availability:
+    get:
+      operationId: listStaffAvailability
+      tags: [team]
+      summary: List staff availability blocks, optionally filtered by date range and/or userId.
+      parameters:
+        - in: query
+          name: from
+          required: false
+          schema: { type: string }
+        - in: query
+          name: to
+          required: false
+          schema: { type: string }
+        - in: query
+          name: userId
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/StaffAvailabilityEntry" }
+    post:
+      operationId: createStaffAvailability
+      tags: [team]
+      summary: Create a new staff availability block.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StaffAvailabilityInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffAvailabilityEntry" }
+
+  /v1/staff/availability/{id}:
+    delete:
+      operationId: deleteStaffAvailability
+      tags: [team]
+      summary: Delete a staff availability block.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: No Content
+
   /v1/fleet/vehicles:
     get:
       operationId: listVehicles
@@ -5909,6 +5965,30 @@ components:
         assignedUserId: { type: ["string", "null"] }
         assignedUserName: { type: ["string", "null"] }
         customerName: { type: string }
+        assignedUserConflict: { type: boolean }
+
+    StaffAvailabilityEntry:
+      type: object
+      required: [id, userId, userName, startDate, endDate, reason, createdAt]
+      properties:
+        id: { type: string }
+        userId: { type: string }
+        userName: { type: ["string", "null"] }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+        reason: { type: string }
+        notes: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    StaffAvailabilityInput:
+      type: object
+      required: [userId, startDate, endDate, reason]
+      properties:
+        userId: { type: string }
+        startDate: { type: string }
+        endDate: { type: string }
+        reason: { type: string }
+        notes: { type: ["string", "null"] }
 
     Vehicle:
       type: object

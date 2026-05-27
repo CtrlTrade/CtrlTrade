@@ -44,6 +44,7 @@ export const NOTIFICATION_EVENTS: NotificationEvent[] = [
   { kind: "inbox.reply", defaultChannels: ["email"], description: "Operator reply on a thread", category: "inbox" },
   { kind: "inbox.compose", defaultChannels: ["email"], description: "Operator-initiated message to a customer", category: "inbox" },
   { kind: "contract.expiry_warning", defaultChannels: ["email"], description: "Maintenance contract expiring in 7 days", category: "contract" },
+  { kind: "staff.availability.submitted", defaultChannels: ["email"], description: "Staff member submitted a new unavailability block", category: "team" },
 ];
 
 export const CHANNELS: Channel[] = ["email", "sms", "whatsapp"];

@@ -18,4 +18,5 @@ export interface ScheduleEntry {
   /** @nullable */
   assignedUserName?: string | null;
   customerName: string;
+  assignedUserConflict?: boolean;
 }
