@@ -35,9 +35,11 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
             className="font-bold text-xl tracking-tighter uppercase text-foreground flex items-center gap-3"
             data-testid="link-portal-home"
           >
-            {branding?.logoUrl ? (
-              <img src={branding.logoUrl} alt={tenantName} className="h-8 w-auto" />
-            ) : null}
+            <img
+              src={branding?.logoUrl?.trim() ? branding.logoUrl : "/assets/ctrltrade-logo.png"}
+              alt={tenantName}
+              className="h-8 w-auto"
+            />
             <span>{tenantName}</span>
           </Link>
           {session ? (
