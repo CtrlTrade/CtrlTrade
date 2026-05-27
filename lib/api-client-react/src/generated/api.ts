@@ -25,6 +25,9 @@ import type {
   AdminDashboard,
   AdminTenantDetail,
   AdminTenantSummary,
+  AdminUsage,
+  AdminWorkerJob,
+  AdminWorkers,
   AgedDebtors,
   AuditLogEntry,
   BillingInvoice,
@@ -131,6 +134,7 @@ import type {
   TeamOverview,
   Tenant,
   TenantUpdate,
+  TenantUsage,
   TradeCategory,
   UpcomingRenewal,
   UpdateInvoiceTemplateInput,
@@ -1008,6 +1012,283 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUpdateBrandingMutationOptions(options));
     }
+
+export const getGetTenantUsageUrl = () => {
+
+
+
+
+  return `/api/v1/usage`
+}
+
+export const getTenantUsage = async ( options?: RequestInit): Promise<TenantUsage> => {
+
+  return customFetch<TenantUsage>(getGetTenantUsageUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTenantUsageQueryKey = () => {
+    return [
+    `/api/v1/usage`
+    ] as const;
+    }
+
+
+export const getGetTenantUsageQueryOptions = <TData = Awaited<ReturnType<typeof getTenantUsage>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantUsage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTenantUsageQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTenantUsage>>> = ({ signal }) => getTenantUsage({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTenantUsage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTenantUsageQueryResult = NonNullable<Awaited<ReturnType<typeof getTenantUsage>>>
+export type GetTenantUsageQueryError = ErrorType<unknown>
+
+
+
+export function useGetTenantUsage<TData = Awaited<ReturnType<typeof getTenantUsage>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantUsage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTenantUsageQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAdminWorkersUrl = () => {
+
+
+
+
+  return `/api/v1/admin/workers`
+}
+
+export const getAdminWorkers = async ( options?: RequestInit): Promise<AdminWorkers> => {
+
+  return customFetch<AdminWorkers>(getGetAdminWorkersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminWorkersQueryKey = () => {
+    return [
+    `/api/v1/admin/workers`
+    ] as const;
+    }
+
+
+export const getGetAdminWorkersQueryOptions = <TData = Awaited<ReturnType<typeof getAdminWorkers>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminWorkers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminWorkersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminWorkers>>> = ({ signal }) => getAdminWorkers({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminWorkers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminWorkersQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminWorkers>>>
+export type GetAdminWorkersQueryError = ErrorType<unknown>
+
+
+
+export function useGetAdminWorkers<TData = Awaited<ReturnType<typeof getAdminWorkers>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminWorkers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminWorkersQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getRetryAdminWorkerJobUrl = (jobId: string,) => {
+
+
+
+
+  return `/api/v1/admin/workers/${jobId}/retry`
+}
+
+export const retryAdminWorkerJob = async (jobId: string, options?: RequestInit): Promise<AdminWorkerJob> => {
+
+  return customFetch<AdminWorkerJob>(getRetryAdminWorkerJobUrl(jobId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getRetryAdminWorkerJobMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryAdminWorkerJob>>, TError,{jobId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof retryAdminWorkerJob>>, TError,{jobId: string}, TContext> => {
+
+const mutationKey = ['retryAdminWorkerJob'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof retryAdminWorkerJob>>, {jobId: string}> = (props) => {
+          const {jobId} = props ?? {};
+
+          return  retryAdminWorkerJob(jobId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RetryAdminWorkerJobMutationResult = NonNullable<Awaited<ReturnType<typeof retryAdminWorkerJob>>>
+
+    export type RetryAdminWorkerJobMutationError = ErrorType<unknown>
+
+    export const useRetryAdminWorkerJob = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryAdminWorkerJob>>, TError,{jobId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof retryAdminWorkerJob>>,
+        TError,
+        {jobId: string},
+        TContext
+      > => {
+      return useMutation(getRetryAdminWorkerJobMutationOptions(options));
+    }
+
+export const getGetAdminUsageUrl = () => {
+
+
+
+
+  return `/api/v1/admin/usage`
+}
+
+export const getAdminUsage = async ( options?: RequestInit): Promise<AdminUsage> => {
+
+  return customFetch<AdminUsage>(getGetAdminUsageUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminUsageQueryKey = () => {
+    return [
+    `/api/v1/admin/usage`
+    ] as const;
+    }
+
+
+export const getGetAdminUsageQueryOptions = <TData = Awaited<ReturnType<typeof getAdminUsage>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminUsage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminUsageQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminUsage>>> = ({ signal }) => getAdminUsage({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminUsage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminUsageQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminUsage>>>
+export type GetAdminUsageQueryError = ErrorType<unknown>
+
+
+
+export function useGetAdminUsage<TData = Awaited<ReturnType<typeof getAdminUsage>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminUsage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminUsageQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getGetPosBrandingUrl = () => {
 

@@ -1,6 +1,7 @@
 import { db, notificationDeliveriesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "./logger";
+import { recordUsage } from "./usage";
 
 export interface SendEmailInput {
   tenantId: string;
@@ -102,6 +103,7 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
 
   try {
     await deliverViaSendGrid(input, sendgridKey);
+    void recordUsage(input.tenantId, "email", input.to.length, { template: input.template });
     await db
       .update(notificationDeliveriesTable)
       .set({ status: "sent" })

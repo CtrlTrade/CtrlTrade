@@ -385,6 +385,89 @@ export const UpdateBrandingResponse = zod.object({
 })
 
 
+export const GetTenantUsageResponse = zod.object({
+  "tenantId": zod.string(),
+  "periodStart": zod.coerce.date(),
+  "periodEnd": zod.coerce.date(),
+  "rows": zod.array(zod.object({
+  "kind": zod.string(),
+  "count": zod.number()
+}))
+})
+
+
+export const GetAdminWorkersResponse = zod.object({
+  "depth": zod.object({
+  "queued": zod.number(),
+  "running": zod.number(),
+  "done": zod.number(),
+  "failed": zod.number(),
+  "dead": zod.number()
+}),
+  "byKind": zod.array(zod.object({
+  "kind": zod.string(),
+  "queued": zod.number(),
+  "running": zod.number(),
+  "done": zod.number(),
+  "failed": zod.number(),
+  "dead": zod.number()
+})),
+  "recent": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.string(),
+  "status": zod.string(),
+  "attempts": zod.number(),
+  "maxAttempts": zod.number(),
+  "runAt": zod.coerce.date(),
+  "startedAt": zod.coerce.date().nullish(),
+  "completedAt": zod.coerce.date().nullish(),
+  "lastError": zod.string().nullish(),
+  "scheduleKey": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+})
+
+
+export const RetryAdminWorkerJobParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+export const RetryAdminWorkerJobResponse = zod.object({
+  "id": zod.string(),
+  "kind": zod.string(),
+  "status": zod.string(),
+  "attempts": zod.number(),
+  "maxAttempts": zod.number(),
+  "runAt": zod.coerce.date(),
+  "startedAt": zod.coerce.date().nullish(),
+  "completedAt": zod.coerce.date().nullish(),
+  "lastError": zod.string().nullish(),
+  "scheduleKey": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const GetAdminUsageResponse = zod.object({
+  "periodStart": zod.coerce.date(),
+  "periodEnd": zod.coerce.date(),
+  "totals": zod.array(zod.object({
+  "kind": zod.string(),
+  "count": zod.number()
+})),
+  "byTenant": zod.array(zod.object({
+  "tenantId": zod.string(),
+  "tenantName": zod.string(),
+  "total": zod.number(),
+  "rows": zod.array(zod.object({
+  "kind": zod.string(),
+  "count": zod.number()
+}))
+}))
+})
+
+
 export const GetPosBrandingResponse = zod.object({
   "tenantId": zod.string(),
   "logoUrl": zod.string().nullish(),

@@ -4,6 +4,7 @@ import { logger } from "./lib/logger";
 import { getStripeSync, isStripeConnected } from "./stripeClient";
 import { ensurePriceIds } from "./lib/stripeSubscription";
 import { startScheduler } from "./lib/scheduler";
+import { startWorker } from "./lib/worker";
 
 const rawPort = process.env["PORT"];
 if (!rawPort) throw new Error("PORT environment variable is required");
@@ -51,4 +52,5 @@ app.listen(port, (err) => {
   }
   logger.info({ port }, "API server listening");
   startScheduler();
+  startWorker();
 });

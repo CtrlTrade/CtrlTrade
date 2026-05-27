@@ -220,6 +220,55 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Branding" }
 
+  /v1/usage:
+    get:
+      operationId: getTenantUsage
+      tags: [usage]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TenantUsage" }
+
+  /v1/admin/workers:
+    get:
+      operationId: getAdminWorkers
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminWorkers" }
+
+  /v1/admin/workers/{jobId}/retry:
+    post:
+      operationId: retryAdminWorkerJob
+      tags: [admin]
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminWorkerJob" }
+
+  /v1/admin/usage:
+    get:
+      operationId: getAdminUsage
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminUsage" }
+
   /v1/pos/branding:
     get:
       operationId: getPosBranding
@@ -2472,6 +2521,96 @@ components:
         brandColor: { type: ["string", "null"] }
         fontFamily: { type: ["string", "null"] }
         brandTemplates: { $ref: "#/components/schemas/BrandTemplates" }
+
+    UsageRow:
+      type: object
+      required: [kind, count]
+      properties:
+        kind: { type: string }
+        count: { type: integer }
+
+    TenantUsage:
+      type: object
+      required: [tenantId, periodStart, periodEnd, rows]
+      properties:
+        tenantId: { type: string }
+        periodStart: { type: string, format: date-time }
+        periodEnd: { type: string, format: date-time }
+        rows:
+          type: array
+          items: { $ref: "#/components/schemas/UsageRow" }
+
+    AdminWorkerJob:
+      type: object
+      required: [id, kind, status, attempts, maxAttempts, runAt, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        kind: { type: string }
+        status: { type: string }
+        attempts: { type: integer }
+        maxAttempts: { type: integer }
+        runAt: { type: string, format: date-time }
+        startedAt: { type: ["string", "null"], format: date-time }
+        completedAt: { type: ["string", "null"], format: date-time }
+        lastError: { type: ["string", "null"] }
+        scheduleKey: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    AdminWorkerKindStat:
+      type: object
+      required: [kind, queued, running, done, failed, dead]
+      properties:
+        kind: { type: string }
+        queued: { type: integer }
+        running: { type: integer }
+        done: { type: integer }
+        failed: { type: integer }
+        dead: { type: integer }
+
+    AdminWorkers:
+      type: object
+      required: [depth, byKind, recent]
+      properties:
+        depth:
+          type: object
+          required: [queued, running, done, failed, dead]
+          properties:
+            queued: { type: integer }
+            running: { type: integer }
+            done: { type: integer }
+            failed: { type: integer }
+            dead: { type: integer }
+        byKind:
+          type: array
+          items: { $ref: "#/components/schemas/AdminWorkerKindStat" }
+        recent:
+          type: array
+          items: { $ref: "#/components/schemas/AdminWorkerJob" }
+
+    AdminUsageTenantRow:
+      type: object
+      required: [tenantId, tenantName, rows, total]
+      properties:
+        tenantId: { type: string }
+        tenantName: { type: string }
+        total: { type: integer }
+        rows:
+          type: array
+          items: { $ref: "#/components/schemas/UsageRow" }
+
+    AdminUsage:
+      type: object
+      required: [periodStart, periodEnd, totals, byTenant]
+      properties:
+        periodStart: { type: string, format: date-time }
+        periodEnd: { type: string, format: date-time }
+        totals:
+          type: array
+          items: { $ref: "#/components/schemas/UsageRow" }
+        byTenant:
+          type: array
+          items: { $ref: "#/components/schemas/AdminUsageTenantRow" }
 
     UploadUrlRequest:
       type: object

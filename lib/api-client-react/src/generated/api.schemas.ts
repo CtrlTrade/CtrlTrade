@@ -232,6 +232,74 @@ export interface BrandingUpdate {
   brandTemplates?: BrandTemplates;
 }
 
+export interface UsageRow {
+  kind: string;
+  count: number;
+}
+
+export interface TenantUsage {
+  tenantId: string;
+  periodStart: string;
+  periodEnd: string;
+  rows: UsageRow[];
+}
+
+export interface AdminWorkerJob {
+  id: string;
+  kind: string;
+  status: string;
+  attempts: number;
+  maxAttempts: number;
+  runAt: string;
+  /** @nullable */
+  startedAt?: string | null;
+  /** @nullable */
+  completedAt?: string | null;
+  /** @nullable */
+  lastError?: string | null;
+  /** @nullable */
+  scheduleKey?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminWorkerKindStat {
+  kind: string;
+  queued: number;
+  running: number;
+  done: number;
+  failed: number;
+  dead: number;
+}
+
+export type AdminWorkersDepth = {
+  queued: number;
+  running: number;
+  done: number;
+  failed: number;
+  dead: number;
+};
+
+export interface AdminWorkers {
+  depth: AdminWorkersDepth;
+  byKind: AdminWorkerKindStat[];
+  recent: AdminWorkerJob[];
+}
+
+export interface AdminUsageTenantRow {
+  tenantId: string;
+  tenantName: string;
+  total: number;
+  rows: UsageRow[];
+}
+
+export interface AdminUsage {
+  periodStart: string;
+  periodEnd: string;
+  totals: UsageRow[];
+  byTenant: AdminUsageTenantRow[];
+}
+
 export interface UploadUrlRequest {
   name: string;
   size: number;

@@ -23,6 +23,8 @@ import invitationsRouter from "./invitations";
 import storageRouter from "./storage";
 import filesRouter from "./files";
 import brandingRouter from "./branding";
+import usageRouter from "./usage";
+import adminWorkersRouter from "./adminWorkers";
 
 const router: IRouter = Router();
 
@@ -57,5 +59,7 @@ router.use(invitationsRouter);
 router.use(storageRouter);
 router.use(filesRouter);
 router.use(brandingRouter);
+router.use(usageRouter);
+router.use(adminWorkersRouter);
 
 export default router;

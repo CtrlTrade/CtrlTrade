@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
 import { CheckCircle2, Circle, AlertTriangle, CreditCard, Users, ShoppingCart, Clock, Target } from "lucide-react";
+import { UsageTile } from "@/components/UsageTile";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ export function AppDashboard() {
         <div className="lg:col-span-2 space-y-8">
           <AttentionRequiredCard />
           <LeadSourceRoiCard />
+          <UsageTile />
           {onboarding && (
             <Card className="rounded-none border-border shadow-sm">
               <CardHeader>

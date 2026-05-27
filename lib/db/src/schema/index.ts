@@ -286,6 +286,56 @@ export const filesTable = pgTable("files", {
 
 export type FileRow = typeof filesTable.$inferSelect;
 
+// ---- Worker queue ----------------------------------------------------------
+export const workerJobsTable = pgTable("worker_jobs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  kind: varchar("kind", { length: 64 }).notNull(),
+  payload: jsonb("payload").notNull().default(sql`'{}'::jsonb`),
+  status: varchar("status", { length: 16 }).notNull().default("queued"), // queued|running|done|failed|dead
+  runAt: timestamp("run_at", { withTimezone: true }).notNull().defaultNow(),
+  lockedUntil: timestamp("locked_until", { withTimezone: true }),
+  attempts: integer("attempts").notNull().default(0),
+  maxAttempts: integer("max_attempts").notNull().default(5),
+  lastError: text("last_error"),
+  startedAt: timestamp("started_at", { withTimezone: true }),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+  scheduleKey: varchar("schedule_key", { length: 64 }),
+  uniqKey: varchar("uniq_key", { length: 128 }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+}, (t) => ({
+  statusRunIdx: index("worker_jobs_status_run_idx").on(t.status, t.runAt),
+  kindIdx: index("worker_jobs_kind_idx").on(t.kind),
+  uniqKeyIdx: uniqueIndex("worker_jobs_uniq_key_idx").on(t.uniqKey).where(sql`uniq_key IS NOT NULL`),
+}));
+
+export type WorkerJob = typeof workerJobsTable.$inferSelect;
+
+// ---- Usage metering --------------------------------------------------------
+export const usageCountersTable = pgTable("usage_counters", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+  kind: varchar("kind", { length: 64 }).notNull(),
+  periodStart: timestamp("period_start", { withTimezone: true }).notNull(), // hour bucket
+  count: integer("count").notNull().default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+}, (t) => ({
+  uniq: uniqueIndex("usage_counters_uniq").on(t.tenantId, t.kind, t.periodStart),
+  tenantIdx: index("usage_counters_tenant_idx").on(t.tenantId),
+}));
+
+export const tenantUsageSummaryTable = pgTable("tenant_usage_summary", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+  kind: varchar("kind", { length: 64 }).notNull(),
+  day: timestamp("day", { withTimezone: true }).notNull(), // UTC midnight
+  count: integer("count").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+  uniq: uniqueIndex("tenant_usage_summary_uniq").on(t.tenantId, t.kind, t.day),
+  tenantIdx: index("tenant_usage_summary_tenant_idx").on(t.tenantId),
+}));
+
 // ============================================================================
 // Layer 2 — tenant workspace domain tables
 // ============================================================================

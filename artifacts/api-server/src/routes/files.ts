@@ -5,6 +5,7 @@ import { ListFilesResponse, ListFilesResponseItem, CreateFileBody } from "@works
 import { requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
 import { ObjectStorageService } from "../lib/objectStorage";
+import { recordUsage } from "../lib/usage";
 
 const objectStorageService = new ObjectStorageService();
 
@@ -83,6 +84,7 @@ router.post("/v1/files", requireTenant, async (req, res): Promise<void> => {
       uploadedByLabel: u.email,
     })
     .returning();
+  await recordUsage(tenantId, "file_uploaded", 1, { fileId: row.id, sizeBytes: row.sizeBytes ?? null });
   await logAudit({
     tenantId,
     actorUserId: u.id,

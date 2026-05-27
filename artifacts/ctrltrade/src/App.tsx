@@ -43,6 +43,8 @@ import { AdminDashboard } from "@/pages/admin/Dashboard";
 import { AdminTenants } from "@/pages/admin/Tenants";
 import { AdminTenantDetail } from "@/pages/admin/TenantDetail";
 import { AdminFeatureFlags } from "@/pages/admin/FeatureFlags";
+import { AdminWorkers } from "@/pages/admin/Workers";
+import { AdminUsage } from "@/pages/admin/Usage";
 
 // Customer portal
 import { PortalLayout } from "@/components/layout/PortalLayout";
@@ -134,6 +136,8 @@ function App() {
                   <Route path="/tenants" component={AdminTenants} />
                   <Route path="/tenants/:id" component={AdminTenantDetail} />
                   <Route path="/feature-flags" component={AdminFeatureFlags} />
+                  <Route path="/workers" component={AdminWorkers} />
+                  <Route path="/usage" component={AdminUsage} />
                   <Route component={NotFound} />
                 </Switch>
               </AdminLayout>
