@@ -81,24 +81,6 @@ export function Login() {
           Sign in to access your workspace
         </p>
 
-        {/* Tab switcher */}
-        <div className="flex mb-7" style={{ borderBottom: "1px solid hsla(220,50%,35%,0.35)" }}>
-          <button
-            type="button"
-            className="flex-1 pb-3 text-sm font-semibold transition-colors"
-            style={{ color: "hsl(46,98%,52%)", borderBottom: "2px solid hsl(46,98%,52%)", marginBottom: "-1px" }}
-          >
-            Sign in
-          </button>
-          <Link
-            href="/signup"
-            className="flex-1 pb-3 text-sm font-semibold text-center transition-colors hover:opacity-80"
-            style={{ color: "hsl(220,25%,58%)" }}
-          >
-            Sign up
-          </Link>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div>
