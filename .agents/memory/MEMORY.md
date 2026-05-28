@@ -1,2 +1,3 @@
-- [Orval schema naming convention](orval-schema-naming.md) — component schema names must differ from operationId-derived names to avoid TS2308 duplicate export errors in api-zod.
-- [Drizzle TTY migrations](drizzle-tty.md) — drizzle-kit push requires interactive TTY; always apply schema changes via raw psql SQL instead.
+- [Orval schema naming](orval-schema-naming.md) — entity-shaped names prevent TS2308; use `export type *` in api-zod index
+- [DB migration pattern](db-migration-pattern.md) — drizzle-kit push requires TTY; always use raw psql for migrations in this env
+- [OpenAPI YAML duplicates](openapi-yaml-duplicates.md) — duplicate schema keys cause yaml.parse to throw; check after every merge
