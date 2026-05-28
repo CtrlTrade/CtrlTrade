@@ -6,7 +6,7 @@ export function AdminReferralsReport() {
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex items-center gap-3">
-        <Link href="/admin/reports">
+        <Link href="/reports">
           <button className="text-zinc-400 hover:text-white transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </button>

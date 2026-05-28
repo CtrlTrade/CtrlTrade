@@ -83,21 +83,18 @@ export function AdminDashboard() {
           value={`£${dashboard.mrr.toLocaleString()}`}
           icon={CreditCard}
           highlight
-          trend={(dashboard as any).mrrGrowthPct}
           testId="mrr"
         />
         <KpiCard
           title="ARR"
           value={`£${dashboard.arr.toLocaleString()}`}
           icon={CreditCard}
-          trend={(dashboard as any).arrGrowthPct}
           testId="arr"
         />
         <KpiCard
           title="Active Tenants"
           value={dashboard.activeTenants}
           icon={Users}
-          trend={(dashboard as any).tenantGrowthPct}
           testId="active-tenants"
         />
         <KpiCard
@@ -163,7 +160,7 @@ export function AdminDashboard() {
               {usage.totals.map((t) => (
                 <Link
                   key={t.kind}
-                  href="/admin/usage"
+                  href="/usage"
                   className="border border-zinc-800 p-3 bg-zinc-950 hover:border-red-500/50 transition-colors block"
                   data-testid={`admin-usage-${t.kind}`}
                 >
@@ -177,7 +174,7 @@ export function AdminDashboard() {
           ) : (
             <div className="py-8 text-center text-zinc-600 font-mono text-sm">
               No usage recorded yet this month.{" "}
-              <Link href="/admin/usage" className="text-red-500 hover:underline">View breakdown →</Link>
+              <Link href="/usage" className="text-red-500 hover:underline">View breakdown →</Link>
             </div>
           )}
         </CardContent>

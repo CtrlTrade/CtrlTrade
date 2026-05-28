@@ -141,7 +141,7 @@ export function AdminTenants() {
             {sorted.map((tenant) => (
               <Link
                 key={tenant.id}
-                href={`/admin/tenants/${tenant.id}`}
+                href={`/tenants/${tenant.id}`}
                 className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-zinc-900/60 transition-colors cursor-pointer"
               >
                 <div className="col-span-4">

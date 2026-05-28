@@ -99,7 +99,7 @@ export function AdminTenantDetail() {
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex items-center gap-3 pb-6 border-b border-zinc-800">
-        <Link href="/admin/tenants" className="p-2 border border-zinc-800 bg-black text-zinc-400 hover:text-white transition-colors shrink-0">
+        <Link href="/tenants" className="p-2 border border-zinc-800 bg-black text-zinc-400 hover:text-white transition-colors shrink-0">
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <Building2 className="h-6 w-6 text-red-500 shrink-0" />
