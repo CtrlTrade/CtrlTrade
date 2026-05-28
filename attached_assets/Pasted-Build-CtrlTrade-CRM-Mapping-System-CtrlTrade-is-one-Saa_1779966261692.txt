@@ -1,0 +1,509 @@
+Build CtrlTrade CRM Mapping System.
+
+CtrlTrade is one SaaS CRM platform, but every tenant must see a version mapped to their industry, business type, shop/POS needs, workforce, branches, warehouse, compliance and add-ons.
+
+SIGNUP QUESTIONS
+
+1. Business details
+- Company name
+- Contact name
+- Email
+- Phone
+- Address
+- Website
+- Company number optional
+- VAT number optional
+
+2. Industry / trade category
+Tenant must choose one:
+- Roofing
+- Plumbing
+- Electrical
+- Gas / Heating
+- Building / Construction
+- Cleaning
+- Landscaping
+- Windows & Doors
+- Flooring
+- Painting & Decorating
+- Bathroom / Kitchen Installer
+- Supplier / Merchant
+- Warehouse / Distributor
+- Field Service Company
+- Other
+
+3. Business structure
+Ask:
+“What best describes your business?”
+
+Options:
+- Sole Trader
+- Trade Business
+- Trade Counter / Merchant
+- Supplier / Distributor
+- Field Service Company
+- Multi-Branch Company
+- Franchise Group
+
+4. Trade shop / POS question
+Ask:
+“Do you operate a trade counter, showroom, warehouse, or physical shop?”
+
+Options:
+- Yes
+- No
+
+If YES:
+- Enable CtrlTrade POS
+- Ask number of tills
+- Ask number of warehouse locations
+- Ask if stock management is required
+
+If NO:
+- Hide all POS, till, retail, barcode and trade-counter features
+
+5. Mobile workforce
+Ask:
+“Do you have field engineers or mobile staff?”
+
+If YES:
+- Enable field seats
+- Mobile jobs
+- Engineer diary
+- Job dispatch
+- Photo uploads
+- Signatures
+- Site checklists
+- Route planning
+- Offline job mode
+
+If NO:
+- Hide field-service modules
+
+6. Appointments
+Ask:
+“Do customers book appointments with you?”
+
+If YES:
+- Enable booking calendar
+- Customer booking portal
+- Time slots
+- Automated reminders
+- Google Calendar sync
+- Outlook sync
+
+7. Branches
+Ask:
+“Do you operate multiple locations?”
+
+If YES:
+- Enable branch selector
+- Branch dashboards
+- Branch stock
+- Inter-branch stock transfers
+- Location-based permissions
+- Branch reporting
+
+8. VAT and accounting
+Ask:
+- VAT registered?
+- Accounting software used?
+- Invoice numbering format?
+- Financial year start?
+
+Enable:
+- Xero
+- QuickBooks
+- Sage
+- Stripe
+- Manual accounting
+
+9. Communication
+Ask:
+“How do you communicate with customers?”
+
+Options:
+- Phone
+- SMS
+- Email
+- WhatsApp
+- VoIP
+- Customer portal
+
+Enable selected modules:
+- SMS notifications
+- Email automation
+- VoIP calls
+- Call recording
+- WhatsApp messaging
+- AI call summaries
+
+10. AI setup
+Ask:
+“What would you like AI to help with?”
+
+Options:
+- Quote writing
+- Job summaries
+- Email drafting
+- Call summaries
+- Scheduling optimisation
+- Lead scoring
+- Customer replies
+- Invoice chasing
+- Profitability insights
+
+Enable selected CtrlAI modules.
+
+CORE SYSTEM RULE
+
+The tenant’s answers must dynamically create:
+- CRM navigation
+- Dashboard widgets
+- Job types
+- Quote templates
+- Invoice templates
+- Custom fields
+- Checklists
+- Risk assessments
+- Compliance documents
+- Permissions
+- Workflows
+- Customer portal
+- POS visibility
+- Warehouse visibility
+- Billing items
+- Mobile app experience
+
+INDUSTRY MAPPING
+
+Roofing tenant sees:
+- Roof repair
+- Flat roof
+- Pitched roof
+- Guttering
+- Leak investigation
+- Fascia & soffits
+- Chimney work
+- Before/after photos
+- Height safety checklist
+- Scaffold required field
+- Roof access notes
+- Weather risk notes
+- Roof survey template
+- Roofing quote templates
+
+Plumbing tenant sees:
+- Emergency leak
+- Bathroom install
+- Pipe repair
+- Drainage issue
+- Water pressure check
+- Stopcock location
+- Parts required
+- Plumbing checklist
+- Plumbing quote templates
+
+Electrical tenant sees:
+- EICR
+- Fault finding
+- Consumer unit upgrade
+- Lighting install
+- Socket install
+- EV charger install
+- Certificate upload
+- Circuit notes
+- Electrical safety checklist
+- Electrical quote templates
+
+Gas / Heating tenant sees:
+- Boiler service
+- Boiler install
+- Heating repair
+- Radiator install
+- Gas safety checks
+- Gas Safe records
+- Landlord certificate
+- Heating quote templates
+
+Cleaning tenant sees:
+- Domestic clean
+- Commercial clean
+- End of tenancy
+- Deep clean
+- Carpet cleaning
+- Room checklist
+- Cleaning supplies
+- COSHH records
+- Cleaning quote templates
+
+Building / Construction tenant sees:
+- Renovation
+- Extension
+- Repairs
+- Maintenance
+- Snagging list
+- Site photos
+- RAMS
+- Materials required
+- Building quote templates
+
+Supplier / Merchant tenant sees:
+- Trade accounts
+- Credit limits
+- Product catalogue
+- Bulk pricing
+- Trade pricing tiers
+- Purchase orders
+- Supplier pricing
+- Stock valuation
+- Delivery notes
+- Account statements
+
+TRADE SHOP / POS LOGIC
+
+If has_trade_shop = true:
+Enable:
+- CtrlTrade POS
+- Till management
+- Product catalogue
+- Barcode scanning
+- Stock inventory
+- Trade counter sales
+- Customer receipts
+- Refunds
+- Cash management
+- Card terminal integration
+- Retail reporting
+- Warehouse stock movements
+- Multi-location stock
+- Trade counter dashboard
+- Walk-in customer sales
+- Shelf stock alerts
+- Purchase ordering
+- EPOS analytics
+- Daily takings reports
+
+If has_trade_shop = false:
+Hide:
+- POS menu
+- Till screens
+- Retail dashboard
+- Barcode scanning
+- Product stock screens
+- Trade counter workflows
+- Cash drawer tools
+
+EXAMPLES
+
+Roofing company with 3 engineers and no shop:
+- Roofing CRM
+- Jobs
+- Quotes
+- Invoices
+- Scheduling
+- Field seats
+- Mobile app
+- Site photos
+- Height safety checklist
+- POS hidden
+
+Plumbing merchant with 4 tills and warehouse:
+- CRM
+- POS
+- Inventory
+- Trade counter
+- Warehouse
+- Supplier purchasing
+- Customer trade accounts
+- 4 till licences
+
+Bathroom showroom:
+- CRM
+- POS
+- Product catalogue
+- Deposits
+- Customer orders
+- Delivery scheduling
+- Showroom quotes
+
+Electrical contractor with mobile staff:
+- Electrical CRM
+- EICR
+- Certificates
+- Engineer diary
+- Job dispatch
+- Customer reminders
+- Quote templates
+
+DATABASE STRUCTURE
+
+Create tables:
+- tenants
+- industries
+- tenant_industry_config
+- business_types
+- tenant_modules
+- tenant_settings
+- job_types
+- custom_fields
+- checklists
+- quote_templates
+- invoice_templates
+- document_templates
+- workflow_templates
+- compliance_templates
+- pos_settings
+- till_licences
+- warehouse_locations
+- branches
+- users
+- roles
+- permissions
+- subscriptions
+- addon_licences
+- audit_logs
+
+Tenant fields:
+- industry_id
+- business_type
+- has_trade_shop
+- pos_enabled
+- warehouse_enabled
+- stock_management_enabled
+- has_mobile_workforce
+- field_service_enabled
+- appointment_booking_enabled
+- multi_branch_enabled
+- vat_registered
+- accounting_provider
+- ai_enabled
+- customer_portal_enabled
+- till_count
+- branch_count
+- warehouse_count
+
+PERMISSION TEMPLATES
+
+Owner:
+- Full access
+
+Manager:
+- CRM
+- Jobs
+- Quotes
+- Invoices
+- Reports
+- Staff
+
+Office Staff:
+- Customers
+- Quotes
+- Jobs
+- Invoices
+
+Engineer:
+- Assigned jobs only
+- Photos
+- Checklists
+- Signatures
+
+Warehouse Staff:
+- Stock
+- Deliveries
+- Purchase orders
+
+POS Staff:
+- Till
+- Sales
+- Receipts
+- Refunds
+
+BILLING LOGIC
+
+Billing must support:
+- Control Seat subscription
+- Field Seat add-ons
+- CtrlTrade POS per till
+- Branch add-ons
+- Warehouse add-ons
+- AI add-ons
+- Customer portal add-ons
+- Stripe subscription sync
+- Free trial
+- Trial expiry
+- Auto suspend
+- Upgrade / downgrade
+
+SUPER ADMIN
+
+Super Admin can:
+- Create industries
+- Edit industry templates
+- Add job types
+- Add custom fields
+- Add checklists
+- Add quote templates
+- Add invoice templates
+- Enable / disable modules
+- View tenant setup
+- Turn POS on/off
+- Add tills
+- Add field seats
+- Manage subscriptions
+- Manage billing
+- View usage
+- View audit logs
+
+TENANT ADMIN
+
+Tenant Admin can:
+- Edit business profile
+- Upload logo
+- Set brand colours
+- Customise invoice design
+- Customise quote templates
+- Add job types
+- Add custom fields
+- Manage users
+- Manage roles
+- Manage branches
+- Manage tills
+- Manage warehouses
+- Enable customer portal
+
+SECURITY RULES
+
+Critical:
+- Every record must have tenant_id
+- Tenant users can only access their tenant data
+- No tenant can see another tenant’s CRM
+- No tenant can see another tenant’s customers
+- No tenant can see another tenant’s quotes
+- No tenant can see another tenant’s invoices
+- No tenant can see another tenant’s files
+- API queries must always filter by tenant_id
+- File storage must be tenant-scoped
+- Role-based access required
+- Audit logs required
+- GDPR export required
+- GDPR delete request required
+- MFA support required
+- Session/device logging required
+
+FINAL GOAL
+
+CtrlTrade should not feel like a generic CRM.
+
+It should automatically become:
+- Roofing CRM for roofers
+- Plumbing CRM for plumbers
+- Electrical CRM for electricians
+- Cleaning CRM for cleaners
+- Construction CRM for builders
+- POS + inventory system for trade shops
+- Warehouse system for suppliers
+- Field service system for mobile engineers
+- Multi-branch system for larger companies
+
+One platform. Many mapped CRM experiences. Fully tenant-isolated.

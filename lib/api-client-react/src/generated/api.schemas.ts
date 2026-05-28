@@ -4276,6 +4276,91 @@ export interface AdminLeadsCsvImportInput {
   csv: string;
 }
 
+export interface MaintenanceContract {
+  id: string;
+  tenantId: string;
+  customerId: string;
+  customerName: string;
+  title: string;
+  frequency: string;
+  startDate: string;
+  /** @nullable */
+  endDate: string | null;
+  /** @nullable */
+  occurrences: number | null;
+  /** @nullable */
+  nextDueAt: string | null;
+  status: string;
+  pricePence: number;
+  /** @nullable */
+  notes: string | null;
+  /** @nullable */
+  addressLine1: string | null;
+  /** @nullable */
+  city: string | null;
+  /** @nullable */
+  postcode: string | null;
+  jobsGenerated: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ContractCreateInput {
+  customerId: string;
+  title: string;
+  frequency: string;
+  startDate: string;
+  /** @nullable */
+  endDate?: string | null;
+  /** @nullable */
+  occurrences?: number | null;
+  pricePence: number;
+  /** @nullable */
+  notes?: string | null;
+  /** @nullable */
+  addressLine1?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  postcode?: string | null;
+}
+
+export interface ContractUpdateInput {
+  title?: string;
+  frequency?: string;
+  /** @nullable */
+  endDate?: string | null;
+  /** @nullable */
+  occurrences?: number | null;
+  status?: string;
+  pricePence?: number;
+  /** @nullable */
+  notes?: string | null;
+  /** @nullable */
+  addressLine1?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  postcode?: string | null;
+  /** @nullable */
+  nextDueAt?: string | null;
+}
+
+export interface ContractJobSummary {
+  id: string;
+  number: string;
+  title: string;
+  status: string;
+  /** @nullable */
+  scheduledStart?: string | null;
+  /** @nullable */
+  completedAt?: string | null;
+  /** @nullable */
+  recurrenceIndex: number | null;
+  /** @nullable */
+  valuePence?: number | null;
+}
+
 export type ConnectIntegration200 = {
   authUrl: string;
 };
@@ -4436,6 +4521,24 @@ to?: string;
 export type GetReportInsightsParams = {
 from?: string;
 to?: string;
+};
+
+export type ListContractsParams = {
+status?: string;
+};
+
+export type CancelContract200 = {
+  success: boolean;
+};
+
+export type TriggerContractJob200 = {
+  success: boolean;
+  message?: string;
+};
+
+export type SkipContractOccurrence200 = {
+  success: boolean;
+  nextDueAt: string;
 };
 
 export type GetAdminReportRevenueParams = {

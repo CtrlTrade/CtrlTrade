@@ -33,4 +33,4 @@ export const CloseTillSessionInput = CloseTillSessionBody;
 export const PosTransactionInput = CreatePosTransactionBody;
 export const PosRefundInput = RefundPosTransactionBody;
 export const PosReceiptRequest = SendPosTransactionReceiptBody;
-export * from './generated/types';
+export type * from './generated/types';

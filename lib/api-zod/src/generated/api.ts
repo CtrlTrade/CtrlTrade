@@ -7302,6 +7302,163 @@ export const GetReportInsightsResponse = zod.object({
 })
 
 
+export const ListContractsQueryParams = zod.object({
+  "status": zod.coerce.string().optional()
+})
+
+export const ListContractsResponseItem = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "title": zod.string(),
+  "frequency": zod.string(),
+  "startDate": zod.coerce.date(),
+  "endDate": zod.coerce.date().nullable(),
+  "occurrences": zod.number().nullable(),
+  "nextDueAt": zod.coerce.date().nullable(),
+  "status": zod.string(),
+  "pricePence": zod.number(),
+  "notes": zod.string().nullable(),
+  "addressLine1": zod.string().nullable(),
+  "city": zod.string().nullable(),
+  "postcode": zod.string().nullable(),
+  "jobsGenerated": zod.number(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListContractsResponse = zod.array(ListContractsResponseItem)
+
+
+export const CreateContractBody = zod.object({
+  "customerId": zod.string(),
+  "title": zod.string(),
+  "frequency": zod.string(),
+  "startDate": zod.coerce.date(),
+  "endDate": zod.coerce.date().nullish(),
+  "occurrences": zod.number().nullish(),
+  "pricePence": zod.number(),
+  "notes": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish()
+})
+
+
+export const GetContractParams = zod.object({
+  "contractId": zod.coerce.string()
+})
+
+export const GetContractResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "title": zod.string(),
+  "frequency": zod.string(),
+  "startDate": zod.coerce.date(),
+  "endDate": zod.coerce.date().nullable(),
+  "occurrences": zod.number().nullable(),
+  "nextDueAt": zod.coerce.date().nullable(),
+  "status": zod.string(),
+  "pricePence": zod.number(),
+  "notes": zod.string().nullable(),
+  "addressLine1": zod.string().nullable(),
+  "city": zod.string().nullable(),
+  "postcode": zod.string().nullable(),
+  "jobsGenerated": zod.number(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const UpdateContractParams = zod.object({
+  "contractId": zod.coerce.string()
+})
+
+export const UpdateContractBody = zod.object({
+  "title": zod.string().optional(),
+  "frequency": zod.string().optional(),
+  "endDate": zod.coerce.date().nullish(),
+  "occurrences": zod.number().nullish(),
+  "status": zod.string().optional(),
+  "pricePence": zod.number().optional(),
+  "notes": zod.string().nullish(),
+  "addressLine1": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "postcode": zod.string().nullish(),
+  "nextDueAt": zod.coerce.date().nullish()
+})
+
+export const UpdateContractResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "title": zod.string(),
+  "frequency": zod.string(),
+  "startDate": zod.coerce.date(),
+  "endDate": zod.coerce.date().nullable(),
+  "occurrences": zod.number().nullable(),
+  "nextDueAt": zod.coerce.date().nullable(),
+  "status": zod.string(),
+  "pricePence": zod.number(),
+  "notes": zod.string().nullable(),
+  "addressLine1": zod.string().nullable(),
+  "city": zod.string().nullable(),
+  "postcode": zod.string().nullable(),
+  "jobsGenerated": zod.number(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const CancelContractParams = zod.object({
+  "contractId": zod.coerce.string()
+})
+
+export const CancelContractResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+export const TriggerContractJobParams = zod.object({
+  "contractId": zod.coerce.string()
+})
+
+export const TriggerContractJobResponse = zod.object({
+  "success": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+export const SkipContractOccurrenceParams = zod.object({
+  "contractId": zod.coerce.string()
+})
+
+export const SkipContractOccurrenceResponse = zod.object({
+  "success": zod.boolean(),
+  "nextDueAt": zod.coerce.date()
+})
+
+
+export const ListContractJobsParams = zod.object({
+  "contractId": zod.coerce.string()
+})
+
+export const ListContractJobsResponseItem = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "scheduledStart": zod.coerce.date().nullish(),
+  "completedAt": zod.coerce.date().nullish(),
+  "recurrenceIndex": zod.number().nullable(),
+  "valuePence": zod.number().nullish()
+})
+export const ListContractJobsResponse = zod.array(ListContractJobsResponseItem)
+
+
 export const GetAdminReportRevenueQueryParams = zod.object({
   "from": zod.date().optional(),
   "to": zod.date().optional()

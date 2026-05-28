@@ -6,9 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type ListTimesheetsParams = {
-userId?: string;
-from?: string;
-to?: string;
-status?: string;
+export type TriggerContractJob200 = {
+  success: boolean;
+  message?: string;
 };

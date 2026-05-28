@@ -4793,6 +4793,141 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ReportInsights" }
 
+  /v1/contracts:
+    get:
+      operationId: listContracts
+      tags: [contracts]
+      parameters:
+        - in: query
+          name: status
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MaintenanceContract" }
+    post:
+      operationId: createContract
+      tags: [contracts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ContractCreateInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MaintenanceContract" }
+
+  /v1/contracts/{contractId}:
+    parameters:
+      - in: path
+        name: contractId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getContract
+      tags: [contracts]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MaintenanceContract" }
+    patch:
+      operationId: updateContract
+      tags: [contracts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ContractUpdateInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MaintenanceContract" }
+    delete:
+      operationId: cancelContract
+      tags: [contracts]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success]
+                properties:
+                  success: { type: boolean }
+
+  /v1/contracts/{contractId}/trigger:
+    parameters:
+      - in: path
+        name: contractId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: triggerContractJob
+      tags: [contracts]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success]
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+
+  /v1/contracts/{contractId}/skip:
+    parameters:
+      - in: path
+        name: contractId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: skipContractOccurrence
+      tags: [contracts]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, nextDueAt]
+                properties:
+                  success: { type: boolean }
+                  nextDueAt: { type: string, format: date-time }
+
+  /v1/contracts/{contractId}/jobs:
+    parameters:
+      - in: path
+        name: contractId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: listContractJobs
+      tags: [contracts]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ContractJobSummary" }
+
   /v1/admin/reports/revenue:
     get:
       operationId: getAdminReportRevenue
@@ -9715,3 +9850,71 @@ components:
       required: [csv]
       properties:
         csv: { type: string }
+
+    MaintenanceContract:
+      type: object
+      required: [id, tenantId, customerId, customerName, title, frequency, startDate, endDate, occurrences, nextDueAt, status, pricePence, notes, addressLine1, city, postcode, jobsGenerated, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        customerId: { type: string }
+        customerName: { type: string }
+        title: { type: string }
+        frequency: { type: string }
+        startDate: { type: string, format: date-time }
+        endDate: { type: ["string", "null"], format: date-time }
+        occurrences: { type: ["integer", "null"] }
+        nextDueAt: { type: ["string", "null"], format: date-time }
+        status: { type: string }
+        pricePence: { type: integer }
+        notes: { type: ["string", "null"] }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+        jobsGenerated: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    ContractCreateInput:
+      type: object
+      required: [customerId, title, frequency, startDate, pricePence]
+      properties:
+        customerId: { type: string }
+        title: { type: string }
+        frequency: { type: string }
+        startDate: { type: string, format: date-time }
+        endDate: { type: ["string", "null"], format: date-time }
+        occurrences: { type: ["integer", "null"] }
+        pricePence: { type: integer }
+        notes: { type: ["string", "null"] }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+
+    ContractUpdateInput:
+      type: object
+      properties:
+        title: { type: string }
+        frequency: { type: string }
+        endDate: { type: ["string", "null"], format: date-time }
+        occurrences: { type: ["integer", "null"] }
+        status: { type: string }
+        pricePence: { type: integer }
+        notes: { type: ["string", "null"] }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+        nextDueAt: { type: ["string", "null"], format: date-time }
+
+    ContractJobSummary:
+      type: object
+      required: [id, number, title, status, recurrenceIndex]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        title: { type: string }
+        status: { type: string }
+        scheduledStart: { type: ["string", "null"], format: date-time }
+        completedAt: { type: ["string", "null"], format: date-time }
+        recurrenceIndex: { type: ["integer", "null"] }
+        valuePence: { type: ["integer", "null"] }

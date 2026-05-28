@@ -55,7 +55,8 @@ import { ActivityHeatmapReport } from "@/pages/app/reports/ActivityHeatmap";
 import { AppAutomation } from "@/pages/app/Automation";
 import { AppVoice } from "@/pages/app/Voice";
 import { AppTimesheets } from "@/pages/app/Timesheets";
-import { AppMaintenanceContracts } from "@/pages/app/MaintenanceContracts";
+import { AppProjects } from "@/pages/app/Projects";
+import { AppProjectDetail } from "@/pages/app/ProjectDetail";
 import { AppAvailability } from "@/pages/app/Availability";
 import { AppBranches } from "@/pages/app/Branches";
 import { AppAreaManagers } from "@/pages/app/AreaManagers";
@@ -180,7 +181,8 @@ function App() {
                   <Route path="/area-managers" component={AppAreaManagers} />
                   <Route path="/automation" component={AppAutomation} />
                   <Route path="/voice" component={AppVoice} />
-                  <Route path="/contracts" component={AppMaintenanceContracts} />
+                  <Route path="/projects" component={AppProjects} />
+                  <Route path="/projects/:id" component={AppProjectDetail} />
                   <Route path="/:id">
                     {() => <PlaceholderPage />}
                   </Route>

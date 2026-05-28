@@ -52,7 +52,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/customers", icon: Users, label: "Customers" },
     { href: "/inbox", icon: Inbox, label: "Inbox" },
     { href: "/jobs", icon: Briefcase, label: "Jobs" },
-    { href: "/contracts", icon: ClipboardList, label: "Contracts" },
+    { href: "/projects", icon: ClipboardList, label: "Projects" },
     { href: "/quotes", icon: FileText, label: "Quotes" },
     { href: "/invoices", icon: FileSpreadsheet, label: "Invoices" },
     { href: "/schedule", icon: Calendar, label: "Schedule" },
