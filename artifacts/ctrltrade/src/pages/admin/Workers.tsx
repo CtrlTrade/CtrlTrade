@@ -64,7 +64,13 @@ export function AdminWorkers() {
                 <div className="text-red-600 font-bold">{k.dead}</div>
               </div>
             ))}
-            {data.byKind.length === 0 && <div className="p-6 text-center text-zinc-600 font-mono text-sm">No jobs yet.</div>}
+            {data.byKind.length === 0 && (
+              <div className="py-12 flex flex-col items-center gap-3">
+                <Cpu className="h-10 w-10 text-zinc-700" />
+                <p className="font-bold uppercase tracking-wider text-sm text-zinc-400">No jobs recorded</p>
+                <p className="text-xs text-zinc-600 font-mono">Background jobs will appear here as they are queued.</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -98,7 +104,13 @@ export function AdminWorkers() {
                 </div>
               </div>
             ))}
-            {data.recent.length === 0 && <div className="p-6 text-center text-zinc-600 font-mono text-sm">No jobs yet.</div>}
+            {data.recent.length === 0 && (
+              <div className="py-12 flex flex-col items-center gap-3">
+                <Cpu className="h-10 w-10 text-zinc-700" />
+                <p className="font-bold uppercase tracking-wider text-sm text-zinc-400">No recent jobs</p>
+                <p className="text-xs text-zinc-600 font-mono">Completed and failed jobs will be listed here.</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

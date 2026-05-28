@@ -127,7 +127,17 @@ export function AdminCompliance() {
           {isLoading ? (
             <Skeleton className="h-48" />
           ) : submissions.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No submissions found.</p>
+            <div className="py-16 flex flex-col items-center gap-3 text-center">
+              <ShieldCheck className="h-10 w-10 text-zinc-700" />
+              <p className="font-bold uppercase tracking-wider text-sm text-zinc-400">
+                {statusFilter === "pending" ? "Queue is clear" : "No submissions found"}
+              </p>
+              <p className="text-xs text-zinc-600 font-mono">
+                {statusFilter === "pending"
+                  ? "All compliance submissions have been reviewed."
+                  : "Try changing the status filter above."}
+              </p>
+            </div>
           ) : (
             <Table>
               <TableHeader>

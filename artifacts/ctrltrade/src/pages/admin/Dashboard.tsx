@@ -13,7 +13,7 @@ import {
   Funnel, TrendingUp, TrendingDown, Minus,
 } from "lucide-react";
 import { Link } from "wouter";
-import { AreaChart, Area, ResponsiveContainer, Tooltip } from "recharts";
+import { BarChart, Bar, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 const USAGE_KIND_LABELS: Record<string, string> = {
@@ -26,17 +26,6 @@ const USAGE_KIND_LABELS: Record<string, string> = {
   pdf_generated: "PDFs",
   file_uploaded: "Files",
 };
-
-function generateSparklineData(seed: number, points = 8) {
-  const data = [];
-  let v = seed * 0.7;
-  for (let i = 0; i < points; i++) {
-    v = Math.max(0, v + (Math.random() - 0.45) * seed * 0.15);
-    data.push({ v: Math.round(v) });
-  }
-  data[data.length - 1].v = seed;
-  return data;
-}
 
 function TrendBadge({ value, suffix = "%" }: { value?: number; suffix?: string }) {
   if (value === undefined || value === null) return null;
@@ -83,8 +72,6 @@ export function AdminDashboard() {
 
   if (!dashboard) return null;
 
-  const mrrSparkline = generateSparklineData(dashboard.mrr);
-
   return (
     <div className="space-y-6">
       <AdminPageHeader title="System Operator Dashboard" />
@@ -96,7 +83,6 @@ export function AdminDashboard() {
           value={`£${dashboard.mrr.toLocaleString()}`}
           icon={CreditCard}
           highlight
-          sparklineData={mrrSparkline}
           trend={(dashboard as any).mrrGrowthPct}
           testId="mrr"
         />
@@ -206,24 +192,34 @@ export function AdminDashboard() {
             </CardHeader>
             <CardContent>
               {revenue?.lines && revenue.lines.length > 0 ? (
-                <div className="space-y-4">
-                  {revenue.lines.map((line, i) => (
-                    <div key={i}>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="font-bold text-zinc-300">
-                          {line.label}{" "}
-                          <span className="text-zinc-500 font-normal">({line.units} units)</span>
-                        </span>
-                        <span className="font-mono text-zinc-100">£{line.amount.toLocaleString()}</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-zinc-900">
-                        <div
-                          className="h-full bg-red-500 transition-all"
-                          style={{ width: `${Math.max(2, (line.amount / Math.max(dashboard.mrr, 1)) * 100)}%` }}
+                <div>
+                  <div className="h-40 w-full mb-4">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={revenue.lines.map((l) => ({ name: l.label, amount: l.amount }))}
+                        margin={{ top: 4, right: 4, left: 4, bottom: 4 }}
+                      >
+                        <Tooltip
+                          contentStyle={{ background: "#09090b", border: "1px solid #27272a", borderRadius: 0, fontSize: 11 }}
+                          formatter={(v: number) => [`£${v.toLocaleString()}`, "Revenue"]}
+                          cursor={{ fill: "rgba(255,255,255,0.04)" }}
                         />
+                        <Bar dataKey="amount" isAnimationActive={false}>
+                          {revenue.lines.map((_, i) => (
+                            <Cell key={i} fill={i % 2 === 0 ? "#ef4444" : "#b91c1c"} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="space-y-2">
+                    {revenue.lines.map((line, i) => (
+                      <div key={i} className="flex justify-between text-sm">
+                        <span className="text-zinc-400">{line.label} <span className="text-zinc-600">({line.units} units)</span></span>
+                        <span className="font-mono text-zinc-100 font-bold">£{line.amount.toLocaleString()}</span>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <div className="py-8 text-center text-zinc-600 font-mono text-sm">No revenue breakdown data available.</div>
@@ -301,14 +297,13 @@ export function AdminDashboard() {
 
 function KpiCard({
   title, value, icon: Icon, highlight = false, danger = false,
-  sparklineData, trend, testId, className = "",
+  trend, testId, className = "",
 }: {
   title: string;
   value: string | number;
   icon: React.ElementType;
   highlight?: boolean;
   danger?: boolean;
-  sparklineData?: Array<{ v: number }>;
   trend?: number;
   testId?: string;
   className?: string;
@@ -334,40 +329,11 @@ function KpiCard({
         >
           {value}
         </div>
-        <div className="flex items-center justify-between mt-2 gap-2">
-          {trend !== undefined ? (
+        {trend !== undefined && (
+          <div className="mt-2">
             <TrendBadge value={trend} />
-          ) : (
-            <span />
-          )}
-          {sparklineData && (
-            <div className="w-20 h-8 shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={sparklineData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                  <defs>
-                    <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <Tooltip
-                    contentStyle={{ display: "none" }}
-                    cursor={false}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="v"
-                    stroke="#ef4444"
-                    strokeWidth={1.5}
-                    fill="url(#sparkGrad)"
-                    dot={false}
-                    isAnimationActive={false}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

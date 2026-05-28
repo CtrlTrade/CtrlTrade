@@ -14,6 +14,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Handshake } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { EmptyState } from "@/components/admin/EmptyState";
 
 function pounds(p: number) { return `£${(p / 100).toFixed(2)}`; }
 
@@ -32,12 +35,19 @@ export function AdminReferrals() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold uppercase tracking-tighter">Referral Partners</h1>
-      <Card className=" border-border">
-        <CardHeader><CardTitle className="uppercase tracking-tight">Partners</CardTitle></CardHeader>
+      <AdminPageHeader
+        title="Referral Partners"
+        icon={<Handshake className="h-6 w-6" />}
+      />
+      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+        <CardHeader><CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Partners</CardTitle></CardHeader>
         <CardContent>
-          {pLoad ? <Skeleton className="h-32 w-full" /> : !partners || partners.length === 0 ? (
-            <div className="text-sm text-muted-foreground py-6 text-center">No partners yet.</div>
+          {pLoad ? <Skeleton className="h-32 w-full bg-zinc-900" /> : !partners || partners.length === 0 ? (
+            <EmptyState
+              icon={<Handshake className="h-10 w-10" />}
+              heading="No partners yet"
+              subtext="Referral partners will appear here once they sign up."
+            />
           ) : (
             <table className="w-full text-sm">
               <thead className="text-xs uppercase tracking-wider text-muted-foreground"><tr>
@@ -63,11 +73,15 @@ export function AdminReferrals() {
         </CardContent>
       </Card>
 
-      <Card className=" border-border">
-        <CardHeader><CardTitle className="uppercase tracking-tight">Payout requests</CardTitle></CardHeader>
+      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+        <CardHeader><CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Payout requests</CardTitle></CardHeader>
         <CardContent>
-          {payLoad ? <Skeleton className="h-32 w-full" /> : !payouts || payouts.length === 0 ? (
-            <div className="text-sm text-muted-foreground py-6 text-center">No payouts pending.</div>
+          {payLoad ? <Skeleton className="h-32 w-full bg-zinc-900" /> : !payouts || payouts.length === 0 ? (
+            <EmptyState
+              icon={<Handshake className="h-10 w-10" />}
+              heading="No payouts pending"
+              subtext="Partner payout requests will appear here."
+            />
           ) : (
             <table className="w-full text-sm">
               <thead className="text-xs uppercase tracking-wider text-muted-foreground"><tr>

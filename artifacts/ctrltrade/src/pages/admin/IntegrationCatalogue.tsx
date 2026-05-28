@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { Plug } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 export function AdminIntegrationCatalogue() {
   const { data, isLoading } = useListAdminIntegrationCatalogue();
@@ -26,13 +28,11 @@ export function AdminIntegrationCatalogue() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div>
-        <h1 className="text-2xl font-bold uppercase tracking-tighter">Integration catalogue</h1>
-        <p className="text-sm text-zinc-400">
-          Enable or disable third-party integrations for all tenants. Disabling hides a provider from tenant settings
-          and prevents new connections.
-        </p>
-      </div>
+      <AdminPageHeader
+        title="Integration Catalogue"
+        subtitle="Enable or disable third-party integrations for all tenants."
+        icon={<Plug className="h-6 w-6" />}
+      />
 
       <Card className="rounded-none border-zinc-800 bg-zinc-900 text-zinc-100">
         <CardHeader>

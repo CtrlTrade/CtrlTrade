@@ -4,84 +4,146 @@ import { useGetSession, useLogout, useStopImpersonation } from "@workspace/api-c
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Users, LogOut, Flag, Activity, Cpu, Handshake,
-  BarChart3, Plug, ShieldCheck, Funnel, Menu, X, ChevronDown,
-  AlertTriangle,
+  BarChart3, Plug, ShieldCheck, Funnel, Menu, X, ChevronRight,
+  AlertTriangle, ChevronsLeft, ChevronsRight,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const NAV_GROUPS = [
   {
+    id: "platform",
     label: "Platform",
     items: [
-      { href: "/", icon: LayoutDashboard, label: "Overview", testId: "overview" },
+      { href: "/",           icon: LayoutDashboard, label: "Overview",   testId: "overview"   },
+      { href: "/tenants",    icon: Users,           label: "Tenants",    testId: "tenants"    },
+      { href: "/compliance", icon: ShieldCheck,     label: "Compliance", testId: "compliance" },
+      { href: "/leads",      icon: Funnel,          label: "Leads",      testId: "leads"      },
     ],
   },
   {
-    label: "Customers",
+    id: "revenue",
+    label: "Revenue",
     items: [
-      { href: "/tenants", icon: Users, label: "Tenants", testId: "tenants" },
-      { href: "/compliance", icon: ShieldCheck, label: "Compliance", testId: "compliance" },
-      { href: "/leads", icon: Funnel, label: "Leads", testId: "leads" },
-    ],
-  },
-  {
-    label: "System",
-    items: [
-      { href: "/feature-flags", icon: Flag, label: "Feature Flags", testId: "feature-flags" },
-      { href: "/workers", icon: Cpu, label: "Workers", testId: "workers" },
-      { href: "/usage", icon: Activity, label: "Usage", testId: "usage" },
+      { href: "/usage",     icon: Activity,  label: "Usage",     testId: "usage"     },
+      { href: "/reports",   icon: BarChart3, label: "Reports",   testId: "reports"   },
       { href: "/referrals", icon: Handshake, label: "Referrals", testId: "referrals" },
-      { href: "/reports", icon: BarChart3, label: "Reports", testId: "reports" },
-      { href: "/integrations", icon: Plug, label: "Integrations", testId: "integrations" },
+    ],
+  },
+  {
+    id: "config",
+    label: "Config",
+    items: [
+      { href: "/feature-flags",  icon: Flag, label: "Feature Flags",  testId: "feature-flags"  },
+      { href: "/workers",        icon: Cpu,  label: "Workers",        testId: "workers"        },
+      { href: "/integrations",   icon: Plug, label: "Integrations",   testId: "integrations"   },
     ],
   },
 ];
 
-function NavItems({ location, onNavigate }: { location: string; onNavigate?: () => void }) {
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+const COLLAPSED_KEY = "admin-sidebar-collapsed";
 
+function NavItem({
+  href, icon: Icon, label, active, collapsed, onClick,
+}: {
+  href: string; icon: React.ElementType; label: string;
+  active: boolean; collapsed: boolean; onClick?: () => void;
+}) {
   return (
-    <div className="space-y-4">
-      {NAV_GROUPS.map((group) => {
-        const isCollapsed = collapsed[group.label];
-        return (
-          <div key={group.label}>
-            <button
-              className="w-full flex items-center justify-between px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-400 transition-colors"
-              onClick={() => setCollapsed((c) => ({ ...c, [group.label]: !c[group.label] }))}
-            >
-              {group.label}
-              <ChevronDown className={`h-3 w-3 transition-transform ${isCollapsed ? "-rotate-90" : ""}`} />
-            </button>
-            {!isCollapsed && (
-              <div className="mt-1 space-y-0.5">
-                {group.items.map((link) => {
-                  const active =
-                    location === link.href ||
-                    (link.href !== "/" && location.startsWith(link.href));
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={onNavigate}
-                      className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${
-                        active
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                          : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-                      }`}
-                      data-testid={`nav-admin-${link.testId}`}
-                    >
-                      <link.icon className="h-4 w-4 shrink-0" />
-                      {link.label}
-                    </Link>
-                  );
-                })}
+    <Link
+      href={href}
+      onClick={onClick}
+      title={collapsed ? label : undefined}
+      className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${
+        collapsed ? "justify-center" : ""
+      } ${
+        active
+          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+          : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+      }`}
+      data-testid={`nav-admin-${label.toLowerCase().replace(/\s+/g, "-")}`}
+    >
+      <Icon className="h-4 w-4 shrink-0" />
+      {!collapsed && label}
+    </Link>
+  );
+}
+
+function SidebarContent({
+  location,
+  collapsed,
+  onNavigate,
+  onToggleCollapse,
+}: {
+  location: string;
+  collapsed: boolean;
+  onNavigate?: () => void;
+  onToggleCollapse?: () => void;
+}) {
+  return (
+    <>
+      {/* Brand header */}
+      <div className={`h-16 flex items-center border-b border-sidebar-border bg-sidebar shrink-0 ${collapsed ? "justify-center px-2" : "gap-3 px-4"}`}>
+        {!collapsed && (
+          <>
+            <img src="/assets/ctrltrade-logo.png" alt="CtrlTrade" className="h-7 w-auto object-contain" />
+            <span className="text-xs font-bold uppercase tracking-widest text-primary border border-primary/40 rounded px-1.5 py-0.5 ml-1">
+              Admin
+            </span>
+          </>
+        )}
+        {collapsed && (
+          <img src="/assets/ctrltrade-logo.png" alt="CtrlTrade" className="h-6 w-auto object-contain" />
+        )}
+      </div>
+
+      {/* Nav groups */}
+      <nav className="flex-1 overflow-y-auto p-2 space-y-4">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.id}>
+            {!collapsed && (
+              <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                {group.label}
               </div>
             )}
+            {collapsed && (
+              <div className="border-t border-sidebar-border mt-1 pt-1" />
+            )}
+            <div className="space-y-0.5">
+              {group.items.map((link) => {
+                const active =
+                  location === link.href ||
+                  (link.href !== "/" && location.startsWith(link.href));
+                return (
+                  <NavItem
+                    key={link.href}
+                    href={link.href}
+                    icon={link.icon}
+                    label={link.label}
+                    active={active}
+                    collapsed={collapsed}
+                    onClick={onNavigate}
+                  />
+                );
+              })}
+            </div>
           </div>
-        );
-      })}
-    </div>
+        ))}
+      </nav>
+
+      {/* Collapse toggle */}
+      {onToggleCollapse && (
+        <div className="p-2 border-t border-sidebar-border shrink-0">
+          <button
+            onClick={onToggleCollapse}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold uppercase text-zinc-500 hover:text-zinc-300 hover:bg-sidebar-accent/50 transition-colors ${collapsed ? "justify-center" : ""}`}
+            data-testid="button-sidebar-collapse"
+          >
+            {collapsed ? <ChevronsRight className="h-4 w-4" /> : <><ChevronsLeft className="h-4 w-4" /> Collapse</>}
+          </button>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -91,6 +153,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const logout = useLogout();
   const stopImpersonation = useStopImpersonation();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    try { return localStorage.getItem(COLLAPSED_KEY) === "true"; } catch { return false; }
+  });
 
   const unauthorized = !isLoading && (!session || !session.user.isSuperAdmin);
   const isImpersonating = !!(session as any)?.impersonation;
@@ -102,6 +168,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setMobileOpen(false);
   }, [location]);
+
+  const handleToggleCollapse = () => {
+    setCollapsed((c) => {
+      const next = !c;
+      try { localStorage.setItem(COLLAPSED_KEY, String(next)); } catch {}
+      return next;
+    });
+  };
 
   const handleLogout = () => {
     logout.mutate(undefined, { onSuccess: () => setLocation("~/login") });
@@ -122,38 +196,25 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const sidebarContent = (
-    <>
-      <div className="h-16 flex items-center gap-3 px-4 border-b border-sidebar-border bg-sidebar shrink-0">
-        <img
-          src="/assets/ctrltrade-logo.png"
-          alt="CtrlTrade"
-          className="h-7 w-auto object-contain"
-        />
-        <span className="text-xs font-bold uppercase tracking-widest text-primary border border-primary/40 rounded px-1.5 py-0.5 ml-1">
-          Admin
-        </span>
-      </div>
-      <nav className="flex-1 overflow-y-auto p-4">
-        <NavItems location={location} onNavigate={() => setMobileOpen(false)} />
-      </nav>
-    </>
-  );
-
   return (
     <div className="min-h-screen bg-background text-foreground flex font-sans">
-      {/* Desktop sidebar */}
-      <aside className="w-64 border-r border-sidebar-border bg-sidebar flex-col hidden md:flex shrink-0">
-        {sidebarContent}
+      {/* Desktop sidebar — collapsed = 56px rail, expanded = 256px */}
+      <aside
+        className={`hidden md:flex flex-col border-r border-sidebar-border bg-sidebar shrink-0 transition-all duration-200 ${
+          collapsed ? "w-14" : "w-64"
+        }`}
+      >
+        <SidebarContent
+          location={location}
+          collapsed={collapsed}
+          onToggleCollapse={handleToggleCollapse}
+        />
       </aside>
 
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
-          <div
-            className="absolute inset-0 bg-black/70"
-            onClick={() => setMobileOpen(false)}
-          />
+          <div className="absolute inset-0 bg-black/70" onClick={() => setMobileOpen(false)} />
           <aside className="relative z-10 w-64 bg-sidebar border-r border-sidebar-border flex flex-col h-full">
             <button
               className="absolute top-4 right-4 text-zinc-400 hover:text-white"
@@ -161,7 +222,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             >
               <X className="h-5 w-5" />
             </button>
-            {sidebarContent}
+            <SidebarContent
+              location={location}
+              collapsed={false}
+              onNavigate={() => setMobileOpen(false)}
+            />
           </aside>
         </div>
       )}
@@ -169,11 +234,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Impersonation banner */}
         {isImpersonating && (
-          <div className="bg-amber-500 text-black px-4 py-2 flex items-center justify-between text-sm font-bold gap-2">
+          <div className="bg-amber-500 text-black px-4 py-2 flex items-center justify-between text-sm font-bold gap-2 shrink-0">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 shrink-0" />
               <span>
-                You are impersonating{" "}
+                Impersonating{" "}
                 <span className="underline">
                   {(session as any).impersonation?.tenantName ?? "a tenant"}
                 </span>

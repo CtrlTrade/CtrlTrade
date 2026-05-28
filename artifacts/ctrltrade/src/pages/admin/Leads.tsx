@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Search, Upload, LayoutList, Columns3, ChevronRight, Funnel } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { EmptyState } from "@/components/admin/EmptyState";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -142,8 +143,12 @@ export function AdminLeads() {
 function TableView({ leads }: { leads: any[] }) {
   if (leads.length === 0) {
     return (
-      <div className="border border-zinc-800 p-16 text-center text-zinc-600 font-mono text-sm">
-        No leads found.
+      <div className="border border-zinc-800">
+        <EmptyState
+          icon={<Funnel className="h-10 w-10" />}
+          heading="No leads found"
+          subtext="Leads will appear here as they are captured or imported."
+        />
       </div>
     );
   }

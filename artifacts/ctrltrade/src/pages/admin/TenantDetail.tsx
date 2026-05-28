@@ -25,13 +25,13 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, RefreshCw, AlertTriangle, ShieldCheck, UserCheck, Download, Trash2, Globe, Building2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
-type Tab = "overview" | "billing" | "audit" | "tools";
+type Tab = "overview" | "billing" | "team" | "settings";
 
 const TABS: Array<{ id: Tab; label: string }> = [
-  { id: "overview", label: "Overview" },
-  { id: "billing",  label: "Billing"  },
-  { id: "audit",    label: "Audit Log" },
-  { id: "tools",    label: "Tools"    },
+  { id: "overview",  label: "Overview"  },
+  { id: "billing",   label: "Billing"   },
+  { id: "team",      label: "Team"      },
+  { id: "settings",  label: "Settings"  },
 ];
 
 export function AdminTenantDetail() {
@@ -45,7 +45,7 @@ export function AdminTenantDetail() {
   const updateQty  = useAdminUpdateTenantQuantities();
 
   const { toast } = useToast();
-  const [activeTab, setActiveTab]     = useState<Tab>("overview");
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [showQtyModal, setShowQtyModal] = useState(false);
   const [qtyForm, setQtyForm]         = useState({ controlSeats: 0, fieldSeats: 0, tills: 0 });
 
@@ -196,7 +196,7 @@ export function AdminTenantDetail() {
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="border-b border-zinc-900 pb-2">
                   <span className="text-zinc-500 uppercase font-bold text-xs block mb-0.5">Branches</span>
-                  <span className="font-mono text-zinc-300 font-bold">{detail.branchCount}</span>
+                  <span className="font-mono text-zinc-300 font-bold">{(detail as any).branchCount ?? "—"}</span>
                 </div>
               </div>
             </CardContent>
@@ -219,7 +219,7 @@ export function AdminTenantDetail() {
               { label: "MRR",         value: <span className="font-mono text-red-500 font-bold">£{subscription.monthlyTotal}</span> },
               { label: "Stripe Cust", value: <span className="font-mono text-zinc-300 text-xs truncate" title={subscription.stripeCustomerId}>{subscription.stripeCustomerId}</span> },
               { label: "Resources",   value: <span className="font-mono text-zinc-300 font-bold">{subscription.controlSeats}C / {subscription.fieldSeats}F / {subscription.tills}T</span> },
-              { label: "Branches",    value: <span className="font-mono text-zinc-300 font-bold">{detail.branchCount}</span> },
+              { label: "Branches",    value: <span className="font-mono text-zinc-300 font-bold">{(detail as any).branchCount ?? "—"}</span> },
             ].map(({ label, value }) => (
               <div key={label} className="grid grid-cols-3 gap-2 border-b border-zinc-900 pb-2">
                 <span className="text-zinc-500 uppercase font-bold text-xs">{label}</span>
@@ -230,36 +230,100 @@ export function AdminTenantDetail() {
         </Card>
       )}
 
-      {/* Tab: Audit Log */}
-      {activeTab === "audit" && (
-        <Card className="rounded-none border-zinc-800 bg-black shadow-none">
-          <CardHeader>
-            <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Audit Log</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {auditLoading ? (
-              <Skeleton className="h-32 bg-zinc-900" />
-            ) : !auditLog || auditLog.length === 0 ? (
-              <div className="py-12 text-center text-zinc-600 font-mono text-sm">No audit events yet.</div>
-            ) : (
-              <div className="divide-y divide-zinc-900">
-                {auditLog.map((log) => (
-                  <div key={log.id} className="py-2 flex gap-4 text-sm">
-                    <div className="w-32 shrink-0 text-zinc-500 font-mono text-xs">{new Date(log.createdAt).toLocaleDateString()}</div>
-                    <div className="w-24 shrink-0 text-red-500/80 font-bold uppercase text-xs">{log.kind}</div>
-                    <div className="flex-1 text-zinc-300">{log.message}</div>
-                    <div className="w-32 shrink-0 text-zinc-600 font-mono text-xs truncate">{log.actor || "system"}</div>
-                  </div>
-                ))}
+      {/* Tab: Team */}
+      {activeTab === "team" && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: "Control Seats",  value: subscription.controlSeats, desc: "Admin & office users"  },
+              { label: "Field Seats",    value: subscription.fieldSeats,   desc: "Mobile / field workers" },
+              { label: "POS Tills",      value: subscription.tills,        desc: "Point-of-sale devices"  },
+              { label: "Branches",       value: (detail as any).branchCount ?? 0, desc: "Locations" },
+            ].map(({ label, value, desc }) => (
+              <div key={label} className="border border-zinc-800 bg-zinc-950 p-4 text-center">
+                <div className="text-3xl font-mono font-bold text-zinc-100 mb-1">{value}</div>
+                <div className="text-xs font-bold uppercase tracking-wider text-zinc-400">{label}</div>
+                <div className="text-[10px] text-zinc-600 mt-0.5">{desc}</div>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            ))}
+          </div>
+
+          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Seat Allocation</CardTitle>
+              <Button variant="ghost" size="sm" onClick={openQtyModal}
+                className="h-6 text-xs uppercase font-bold text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-none">
+                Adjust Seats
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              {[
+                { label: "Control Seats", value: subscription.controlSeats, max: 100, color: "bg-blue-500" },
+                { label: "Field Seats",   value: subscription.fieldSeats,   max: 200, color: "bg-green-500" },
+                { label: "POS Tills",     value: subscription.tills,        max: 50,  color: "bg-purple-500" },
+              ].map(({ label, value, max, color }) => (
+                <div key={label}>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{label}</span>
+                    <span className="text-xs font-mono text-zinc-300">{value}</span>
+                  </div>
+                  <div className="h-1.5 bg-zinc-900">
+                    <div className={`h-full ${color}`} style={{ width: `${Math.min(100, (value / max) * 100)}%` }} />
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+            <CardHeader>
+              <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Audit Log</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {auditLoading ? (
+                <Skeleton className="h-32 bg-zinc-900" />
+              ) : !auditLog || auditLog.length === 0 ? (
+                <div className="py-8 text-center text-zinc-600 font-mono text-sm">No audit events yet.</div>
+              ) : (
+                <div className="divide-y divide-zinc-900 max-h-64 overflow-y-auto">
+                  {auditLog.map((log) => (
+                    <div key={log.id} className="py-2 flex gap-4 text-sm">
+                      <div className="w-24 shrink-0 text-zinc-500 font-mono text-xs">{new Date(log.createdAt).toLocaleDateString()}</div>
+                      <div className="w-20 shrink-0 text-red-500/80 font-bold uppercase text-xs truncate">{log.kind}</div>
+                      <div className="flex-1 text-zinc-300 text-xs">{log.message}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       )}
 
-      {/* Tab: Tools */}
-      {activeTab === "tools" && (
-        <AdminTenantTools tenantId={id!} status={tenant.status} />
+      {/* Tab: Settings */}
+      {activeTab === "settings" && (
+        <div className="space-y-6">
+          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+            <CardHeader>
+              <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Security</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              <div className="grid grid-cols-3 gap-2 border-b border-zinc-900 pb-3">
+                <span className="text-zinc-500 uppercase font-bold text-xs">2FA Policy</span>
+                <span className="col-span-2">
+                  {(tenant as any).require2fa ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-green-500/10 text-green-500 border border-green-500/20">
+                      <ShieldCheck className="h-3 w-3" /> Enforced for all users
+                    </span>
+                  ) : (
+                    <span className="text-xs text-zinc-500 font-mono">Not enforced — user choice</span>
+                  )}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+          <AdminTenantTools tenantId={id!} status={tenant.status} />
+        </div>
       )}
 
       {/* Qty modal */}

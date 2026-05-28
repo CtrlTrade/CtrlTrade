@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PoundSterling, Building2, Cpu, GitBranch } from "lucide-react";
+import { PoundSterling, Building2, Cpu, GitBranch, BarChart3 } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 const CARDS: Array<{ href: string; title: string; description: string; Icon: any }> = [
   {
@@ -31,13 +32,12 @@ const CARDS: Array<{ href: string; title: string; description: string; Icon: any
 
 export function AdminReportsIndex() {
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      <div>
-        <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">Platform Reports</h1>
-        <p className="text-sm text-zinc-500 mt-1">
-          Cross-tenant analytics and platform-level metrics.
-        </p>
-      </div>
+    <div className="space-y-6 max-w-6xl mx-auto">
+      <AdminPageHeader
+        title="Platform Reports"
+        subtitle="Cross-tenant analytics and platform-level metrics."
+        icon={<BarChart3 className="h-6 w-6" />}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {CARDS.map((c) => (

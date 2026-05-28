@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Search, ShieldCheck, ArrowUpDown, ArrowUp, ArrowDown, Users } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { EmptyState } from "@/components/admin/EmptyState";
 
 type SortKey = "name" | "status" | "mrr" | "seats";
 type SortDir = "asc" | "desc";
@@ -69,7 +70,13 @@ export function AdminTenants() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Tenants Directory"
-        subtitle={tenants ? `${tenants.length} tenant${tenants.length !== 1 ? "s" : ""}` : undefined}
+        subtitle={
+          sorted.length > 0
+            ? `Showing ${sorted.length} tenant${sorted.length !== 1 ? "s" : ""}${tenants && sorted.length < tenants.length ? ` (filtered from ${tenants.length})` : ""}`
+            : tenants
+            ? `${tenants.length} tenant${tenants.length !== 1 ? "s" : ""} total`
+            : undefined
+        }
         icon={<Users className="h-6 w-6" />}
       />
 
@@ -114,22 +121,21 @@ export function AdminTenants() {
             {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-12 bg-zinc-900" />)}
           </div>
         ) : sorted.length === 0 ? (
-          <div className="py-16 flex flex-col items-center gap-3 text-center">
-            <Users className="h-10 w-10 text-zinc-700" />
-            <p className="text-zinc-500 font-mono text-sm">
-              {search || statusFilter !== "all"
-                ? "No tenants match the current filters."
-                : "No tenants yet."}
-            </p>
-            {(search || statusFilter !== "all") && (
-              <button
-                className="text-xs text-red-500 uppercase font-bold hover:underline"
-                onClick={() => { setSearch(""); setStatusFilter("all"); }}
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
+          <EmptyState
+            icon={<Users className="h-10 w-10" />}
+            heading={search || statusFilter !== "all" ? "No tenants match filters" : "No tenants yet"}
+            subtext={search || statusFilter !== "all" ? "Try adjusting the search or status filter." : "Tenants will appear here once they sign up."}
+            action={
+              (search || statusFilter !== "all") ? (
+                <button
+                  className="text-xs text-red-500 uppercase font-bold hover:underline"
+                  onClick={() => { setSearch(""); setStatusFilter("all"); }}
+                >
+                  Clear filters
+                </button>
+              ) : undefined
+            }
+          />
         ) : (
           <div className="divide-y divide-zinc-800">
             {sorted.map((tenant) => (
