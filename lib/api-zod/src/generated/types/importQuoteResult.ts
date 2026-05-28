@@ -7,6 +7,8 @@
  */
 
 export interface ImportQuoteResult {
+  /** Number of new cost entries created. */
   created: number;
+  /** Number of line items skipped because they were already imported. */
   skipped: number;
 }

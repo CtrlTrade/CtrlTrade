@@ -362,8 +362,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              description: Raw lead payload from the platform (structure varies by provider).
+              $ref: "#/components/schemas/LeadWebhookPayload"
       responses:
         "200":
           description: OK — lead imported or already existed.
@@ -8149,7 +8148,7 @@ components:
 
     BookingWidgetConfig:
       type: object
-      required: [active, jobTypes, showDateField, thankYouMessage, bookingPageUrl, embedCode, iframeCode]
+      required: [active, jobTypes, showDateField, thankYouMessage, bookingPageUrl, embedCode, iframeCode, widgetScriptTag]
       properties:
         active: { type: boolean }
         jobTypes:
@@ -8160,6 +8159,7 @@ components:
         bookingPageUrl: { type: string }
         embedCode: { type: string }
         iframeCode: { type: string }
+        widgetScriptTag: { type: string }
 
     BookingWidgetConfigUpdate:
       type: object
@@ -9793,6 +9793,11 @@ components:
         apiKey: { type: string, minLength: 1 }
         syncIntervalMinutes: { type: integer, minimum: 5, maximum: 1440 }
 
+    LeadWebhookPayload:
+      type: object
+      description: Raw lead payload from the platform (structure varies by provider).
+      additionalProperties: true
+
     IntegrationProvider:
       type: object
       required: [id, label, description, category, configured, enabled, authKind]
@@ -10583,34 +10588,3 @@ components:
         completedAt: { type: ["string", "null"], format: date-time }
         recurrenceIndex: { type: ["integer", "null"] }
         valuePence: { type: ["integer", "null"] }
-
-    ContractCreateInput:
-      type: object
-      required: [customerId, title, frequency, startDate, pricePence]
-      properties:
-        customerId: { type: string }
-        title: { type: string }
-        frequency: { type: string }
-        startDate: { type: string, format: date-time }
-        endDate: { type: ["string", "null"], format: date-time }
-        occurrences: { type: ["integer", "null"] }
-        pricePence: { type: integer }
-        notes: { type: ["string", "null"] }
-        addressLine1: { type: ["string", "null"] }
-        city: { type: ["string", "null"] }
-        postcode: { type: ["string", "null"] }
-
-    ContractUpdateInput:
-      type: object
-      properties:
-        title: { type: string }
-        frequency: { type: string }
-        endDate: { type: ["string", "null"], format: date-time }
-        occurrences: { type: ["integer", "null"] }
-        status: { type: string }
-        pricePence: { type: integer }
-        notes: { type: ["string", "null"] }
-        addressLine1: { type: ["string", "null"] }
-        city: { type: ["string", "null"] }
-        postcode: { type: ["string", "null"] }
-        nextDueAt: { type: ["string", "null"], format: date-time }

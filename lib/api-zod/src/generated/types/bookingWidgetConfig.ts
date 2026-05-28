@@ -14,4 +14,5 @@ export interface BookingWidgetConfig {
   bookingPageUrl: string;
   embedCode: string;
   iframeCode: string;
+  widgetScriptTag: string;
 }

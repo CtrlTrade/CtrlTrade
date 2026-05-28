@@ -2054,6 +2054,7 @@ export interface BookingWidgetConfig {
   bookingPageUrl: string;
   embedCode: string;
   iframeCode: string;
+  widgetScriptTag: string;
 }
 
 export interface BookingWidgetConfigUpdate {
@@ -3655,6 +3656,13 @@ export interface ReportQuoteConversion {
   timeline: ReportQuoteConversionTimelineItem[];
 }
 
+export interface ImportQuoteResult {
+  /** Number of new cost entries created. */
+  created: number;
+  /** Number of line items skipped because they were already imported. */
+  skipped: number;
+}
+
 export interface JobCostEntry {
   id: string;
   jobId: string;
@@ -3711,11 +3719,6 @@ export interface JobCostsSummary {
   labourCostPence?: number;
   materialCostPence?: number;
   otherCostPence?: number;
-}
-
-export interface ImportQuoteResult {
-  created: number;
-  skipped: number;
 }
 
 export interface ReportJobProfitabilityRow {
@@ -3825,6 +3828,11 @@ export interface ConnectApiKeyBody {
      */
   syncIntervalMinutes?: number;
 }
+
+/**
+ * Raw lead payload from the platform (structure varies by provider).
+ */
+export interface LeadWebhookPayload { [key: string]: unknown }
 
 export type IntegrationProviderAuthKind = typeof IntegrationProviderAuthKind[keyof typeof IntegrationProviderAuthKind];
 
@@ -4593,53 +4601,29 @@ export interface ContractJobSummary {
   valuePence?: number | null;
 }
 
-export interface ContractCreateInput {
-  customerId: string;
-  title: string;
-  frequency: string;
-  startDate: string;
-  /** @nullable */
-  endDate?: string | null;
-  /** @nullable */
-  occurrences?: number | null;
-  pricePence: number;
-  /** @nullable */
-  notes?: string | null;
-  /** @nullable */
-  addressLine1?: string | null;
-  /** @nullable */
-  city?: string | null;
-  /** @nullable */
-  postcode?: string | null;
-}
-
-export interface ContractUpdateInput {
-  title?: string;
-  frequency?: string;
-  /** @nullable */
-  endDate?: string | null;
-  /** @nullable */
-  occurrences?: number | null;
-  status?: string;
-  pricePence?: number;
-  /** @nullable */
-  notes?: string | null;
-  /** @nullable */
-  addressLine1?: string | null;
-  /** @nullable */
-  city?: string | null;
-  /** @nullable */
-  postcode?: string | null;
-  /** @nullable */
-  nextDueAt?: string | null;
-}
-
 export type ConnectIntegration200 = {
   authUrl: string;
 };
 
 export type TriggerIntegrationSync200 = {
   enqueued: boolean;
+};
+
+export type GetIntegrationWebhookInfo200 = {
+  webhookUrl: string;
+  /** @nullable */
+  webhookSecret?: string | null;
+  hasApiKey: boolean;
+};
+
+export type RotateIntegrationWebhookSecret200 = {
+  webhookUrl: string;
+  webhookSecret: string;
+};
+
+export type ReceiveLeadWebhook200 = {
+  imported: boolean;
+  reason?: string;
 };
 
 export type UpdateAdminIntegrationCatalogue200 = {

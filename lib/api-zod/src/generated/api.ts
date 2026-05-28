@@ -304,6 +304,54 @@ export const TriggerIntegrationSyncResponse = zod.object({
 
 
 /**
+ * @summary Return the webhook URL and secret for a connected lead-import integration.
+ */
+export const GetIntegrationWebhookInfoParams = zod.object({
+  "provider": zod.coerce.string()
+})
+
+export const GetIntegrationWebhookInfoResponse = zod.object({
+  "webhookUrl": zod.string(),
+  "webhookSecret": zod.string().nullish(),
+  "hasApiKey": zod.boolean()
+})
+
+
+/**
+ * @summary Generate a new webhook secret for a lead-import integration.
+ */
+export const RotateIntegrationWebhookSecretParams = zod.object({
+  "provider": zod.coerce.string()
+})
+
+export const RotateIntegrationWebhookSecretResponse = zod.object({
+  "webhookUrl": zod.string(),
+  "webhookSecret": zod.string()
+})
+
+
+/**
+ * @summary Receive a real-time lead push from MyJobQuote or Checkatrade. Authenticated via the X-Webhook-Secret header — the secret is shown in the integration settings after connecting.
+
+ */
+export const ReceiveLeadWebhookParams = zod.object({
+  "provider": zod.enum(['myjobquote', 'checkatrade']),
+  "tenantId": zod.coerce.string()
+})
+
+export const ReceiveLeadWebhookHeader = zod.object({
+  "X-Webhook-Secret": zod.string()
+})
+
+export const ReceiveLeadWebhookBody = zod.record(zod.string(), zod.unknown()).describe('Raw lead payload from the platform (structure varies by provider).')
+
+export const ReceiveLeadWebhookResponse = zod.object({
+  "imported": zod.boolean(),
+  "reason": zod.string().optional()
+})
+
+
+/**
  * @summary Recent sync log entries for a provider.
  */
 export const GetIntegrationLogsParams = zod.object({
@@ -3651,6 +3699,19 @@ export const DeleteJobCostEntryParams = zod.object({
 })
 
 
+/**
+ * @summary Import material cost entries from the job's linked quote line items (idempotent).
+ */
+export const ImportJobCostsFromQuoteParams = zod.object({
+  "jobId": zod.coerce.string()
+})
+
+export const ImportJobCostsFromQuoteResponse = zod.object({
+  "created": zod.number().describe('Number of new cost entries created.'),
+  "skipped": zod.number().describe('Number of line items skipped because they were already imported.')
+})
+
+
 export const ListTimesheetsQueryParams = zod.object({
   "userId": zod.coerce.string().optional(),
   "from": zod.coerce.string().optional(),
@@ -4969,7 +5030,8 @@ export const GetBookingWidgetConfigResponse = zod.object({
   "thankYouMessage": zod.string(),
   "bookingPageUrl": zod.string(),
   "embedCode": zod.string(),
-  "iframeCode": zod.string()
+  "iframeCode": zod.string(),
+  "widgetScriptTag": zod.string()
 })
 
 
@@ -4994,7 +5056,8 @@ export const UpdateBookingWidgetConfigResponse = zod.object({
   "thankYouMessage": zod.string(),
   "bookingPageUrl": zod.string(),
   "embedCode": zod.string(),
-  "iframeCode": zod.string()
+  "iframeCode": zod.string(),
+  "widgetScriptTag": zod.string()
 })
 
 

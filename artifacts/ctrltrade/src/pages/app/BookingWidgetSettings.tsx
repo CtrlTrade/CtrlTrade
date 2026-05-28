@@ -253,6 +253,29 @@ export function BookingWidgetSettings() {
           </div>
 
           <div className="space-y-2">
+            <Label className="font-semibold">JS widget embed (recommended)</Label>
+            <p className="text-xs text-muted-foreground">
+              Paste this anywhere on your site. The widget loads dynamically, respects your brand colour, and shows the correct job type dropdown.
+            </p>
+            <Textarea
+              value={data.widgetScriptTag}
+              readOnly
+              rows={3}
+              className="rounded-none font-mono text-xs"
+              data-testid="textarea-widget-script"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="rounded-none uppercase text-xs font-bold"
+              onClick={() => copy(data.widgetScriptTag, "Widget script tag")}
+            >
+              <Copy className="h-3 w-3 mr-1" /> Copy widget script
+            </Button>
+          </div>
+
+          <div className="space-y-2">
             <Label className="font-semibold">HTML + JS embed (native form)</Label>
             <p className="text-xs text-muted-foreground">
               Paste this into any page. The form submits via AJAX and shows the thank-you message inline.

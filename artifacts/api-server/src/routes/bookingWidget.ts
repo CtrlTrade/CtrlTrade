@@ -82,6 +82,7 @@ router.get("/v1/booking-widget/config", requireTenant, async (req, res): Promise
     bookingPageUrl: buildBookingPageUrl(tenant.slug),
     embedCode: buildEmbedCode(tenant.slug),
     iframeCode: buildIframeCode(tenant.slug),
+    widgetScriptTag: buildWidgetScriptTag(tenant.slug),
   });
 });
 
@@ -112,7 +113,33 @@ router.patch("/v1/booking-widget/config", requireTenant, async (req, res): Promi
     bookingPageUrl: buildBookingPageUrl(tenant.slug),
     embedCode: buildEmbedCode(tenant.slug),
     iframeCode: buildIframeCode(tenant.slug),
+    widgetScriptTag: buildWidgetScriptTag(tenant.slug),
   });
+});
+
+router.get("/v1/public/book/:tenantSlug/widget.js", async (req, res): Promise<void> => {
+  const [tenant] = await db
+    .select()
+    .from(tenantsTable)
+    .where(eq(tenantsTable.slug, req.params.tenantSlug as string));
+  if (!tenant) {
+    res.status(404).type("application/javascript").send("/* tenant not found */");
+    return;
+  }
+  const config = tenant.bookingWidgetConfig ?? {};
+  if (config.active === false) {
+    res.status(404).type("application/javascript").send("/* booking widget is disabled */");
+    return;
+  }
+  const baseDomain =
+    process.env.REPLIT_DOMAINS?.split(",")[0] ||
+    process.env.REPLIT_DEV_DOMAIN ||
+    "your-app.replit.app";
+  const apiBase = `https://${baseDomain}/api/v1/public/book/${tenant.slug}`;
+  const script = buildWidgetScript(apiBase);
+  res.setHeader("Content-Type", "application/javascript; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=300");
+  res.send(script);
 });
 
 router.get("/v1/public/book/:tenantSlug/info", async (req, res): Promise<void> => {
@@ -311,6 +338,126 @@ function buildEmbedCode(slug: string): string {
 function buildIframeCode(slug: string): string {
   const baseDomain = process.env.REPLIT_DOMAINS?.split(",")[0] || process.env.REPLIT_DEV_DOMAIN || "your-app.replit.app";
   return `<iframe src="https://${baseDomain}/book/${slug}" width="100%" height="700" frameborder="0" title="Book online"></iframe>`;
+}
+
+function buildWidgetScriptTag(slug: string): string {
+  const baseDomain = process.env.REPLIT_DOMAINS?.split(",")[0] || process.env.REPLIT_DEV_DOMAIN || "your-app.replit.app";
+  return `<div id="ctrltrade-widget"></div>\n<script src="https://${baseDomain}/api/v1/public/book/${slug}/widget.js" async></script>`;
+}
+
+function buildWidgetScript(apiBase: string): string {
+  return `(function () {
+  'use strict';
+  var API_BASE = '${apiBase}';
+  var containerId = 'ctrltrade-widget';
+
+  function init() {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '<p style="font-family:sans-serif;font-size:0.9rem;color:#888">Loading booking form…</p>';
+    fetch(API_BASE + '/info')
+      .then(function (r) {
+        if (!r.ok) throw new Error('unavailable');
+        return r.json();
+      })
+      .then(function (info) { renderForm(container, info); })
+      .catch(function () {
+        container.innerHTML = '<p style="font-family:sans-serif;color:#c00">Booking is currently unavailable.</p>';
+      });
+  }
+
+  function esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderForm(container, info) {
+    var brand = info.brandColor || '#2563eb';
+    var jobTypes = Array.isArray(info.jobTypes) ? info.jobTypes : [];
+    var showDate = info.showDateField !== false;
+
+    var css = [
+      '#ct-bw-form{font-family:sans-serif;max-width:480px;padding:1.5rem;border:1px solid #e2e8f0;border-radius:6px;box-sizing:border-box;}',
+      '#ct-bw-form *{box-sizing:border-box;}',
+      '#ct-bw-form h2{margin:0 0 1rem;font-size:1.1rem;color:#1a202c;}',
+      '#ct-bw-form label{display:block;font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#4a5568;margin-bottom:0.25rem;}',
+      '#ct-bw-form .ct-field{margin-bottom:0.9rem;}',
+      '#ct-bw-form input,#ct-bw-form select,#ct-bw-form textarea{width:100%;padding:0.55rem 0.75rem;border:1px solid #cbd5e0;border-radius:4px;font-size:0.9rem;outline:none;transition:border-color .15s;}',
+      '#ct-bw-form input:focus,#ct-bw-form select:focus,#ct-bw-form textarea:focus{border-color:' + brand + ';}',
+      '#ct-bw-form textarea{resize:vertical;min-height:90px;}',
+      '#ct-bw-form button[type=submit]{background:' + brand + ';color:#fff;border:none;padding:0.65rem 1.5rem;font-size:0.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-radius:4px;cursor:pointer;width:100%;margin-top:0.5rem;}',
+      '#ct-bw-form button[type=submit]:hover{opacity:0.88;}',
+      '#ct-bw-form .ct-success{padding:1rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;color:#15803d;font-size:0.9rem;}',
+      '#ct-bw-form .ct-error{padding:0.75rem;background:#fff1f2;border:1px solid #fecdd3;border-radius:4px;color:#be123c;font-size:0.85rem;margin-bottom:0.75rem;}',
+    ].join('');
+
+    var jobTypeOptions = jobTypes.length
+      ? '<div class="ct-field"><label for="ct-jobType">Type of work</label><select id="ct-jobType" name="jobType"><option value="">— Select —</option>' +
+        jobTypes.map(function (jt) { return '<option value="' + esc(jt) + '">' + esc(jt) + '</option>'; }).join('') +
+        '</select></div>'
+      : '';
+
+    var dateField = showDate
+      ? '<div class="ct-field"><label for="ct-date">Preferred date</label><input type="date" id="ct-date" name="preferredDate" /></div>'
+      : '';
+
+    container.innerHTML =
+      '<style>' + css + '</style>' +
+      '<form id="ct-bw-form" novalidate>' +
+        '<h2>' + esc(info.tenantName) + '</h2>' +
+        '<div id="ct-bw-err"></div>' +
+        '<div class="ct-field"><label for="ct-name">Full name *</label><input type="text" id="ct-name" name="name" required placeholder="Jane Smith" /></div>' +
+        '<div class="ct-field"><label for="ct-email">Email</label><input type="email" id="ct-email" name="email" placeholder="jane@example.com" /></div>' +
+        '<div class="ct-field"><label for="ct-phone">Phone</label><input type="tel" id="ct-phone" name="phone" placeholder="+44 7700 000000" /></div>' +
+        '<div class="ct-field"><label for="ct-address">Address</label><input type="text" id="ct-address" name="address" placeholder="1 High Street, London" /></div>' +
+        jobTypeOptions +
+        dateField +
+        '<div class="ct-field"><label for="ct-desc">Tell us more</label><textarea id="ct-desc" name="description" placeholder="Describe the work needed…"></textarea></div>' +
+        '<button type="submit">Send enquiry</button>' +
+      '</form>';
+
+    var form = document.getElementById('ct-bw-form');
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var errDiv = document.getElementById('ct-bw-err');
+      var btn = form.querySelector('button[type=submit]');
+      var data = {};
+      var fd = new FormData(form);
+      fd.forEach(function (v, k) { data[k] = v; });
+      if (!data.name || !String(data.name).trim()) {
+        if (errDiv) errDiv.innerHTML = '<div class="ct-error">Please enter your name.</div>';
+        return;
+      }
+      if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+      if (errDiv) errDiv.innerHTML = '';
+      fetch(API_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+        .then(function (r) {
+          if (r.ok) {
+            var thankYou = ${JSON.stringify("Thanks for your enquiry — we'll be in touch shortly.")};
+            try { r.json().then(function() {}); } catch(e) {}
+            container.innerHTML = '<style>#ct-bw-success{font-family:sans-serif;max-width:480px;padding:1.5rem;border:1px solid #bbf7d0;border-radius:6px;background:#f0fdf4;color:#15803d;}</style><div id="ct-bw-success"><p style="margin:0;font-size:1rem;">' + esc(thankYou) + '</p></div>';
+          } else {
+            if (btn) { btn.disabled = false; btn.textContent = 'Send enquiry'; }
+            if (errDiv) errDiv.innerHTML = '<div class="ct-error">Something went wrong — please try again.</div>';
+          }
+        })
+        .catch(function () {
+          if (btn) { btn.disabled = false; btn.textContent = 'Send enquiry'; }
+          if (errDiv) errDiv.innerHTML = '<div class="ct-error">Network error — please check your connection and try again.</div>';
+        });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();`;
 }
 
 export default router;

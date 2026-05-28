@@ -113,6 +113,7 @@ import type {
   GetAdminReportRevenueParams,
   GetAdminTenantWhiteLabel200,
   GetHostInfoParams,
+  GetIntegrationWebhookInfo200,
   GetReportActivityHeatmapParams,
   GetReportAgedDebtorsParams,
   GetReportCustomerLtvParams,
@@ -125,6 +126,7 @@ import type {
   GetScheduleParams,
   HealthStatus,
   HostInfo,
+  ImportQuoteResult,
   InboxComposeInput,
   InboxComposeResponse,
   InboxMessagesResponse,
@@ -174,6 +176,7 @@ import type {
   LeadSourceRoiReport,
   LeadSummary,
   LeadUpdateInput,
+  LeadWebhookPayload,
   LinkJobInput,
   LinkJobResult,
   ListAdminLeadsParams,
@@ -287,6 +290,7 @@ import type {
   QuoteConvertInput,
   QuoteInput,
   QuoteSummary,
+  ReceiveLeadWebhook200,
   ReferralCampaign,
   ReferralCampaignInput,
   ReferralConversionRecord,
@@ -309,6 +313,7 @@ import type {
   ResellerDashboard,
   ResetPasswordBody,
   RevenueBreakdown,
+  RotateIntegrationWebhookSecret200,
   ScanReceiptInput,
   ScanReceiptResult,
   ScheduleEntry,
@@ -375,8 +380,7 @@ import type {
   VoiceToken,
   VoicemailsResponse,
   WhiteLabelUpdate,
-  WorkflowEventsResponse,
-  ImportQuoteResult
+  WorkflowEventsResponse
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -1559,6 +1563,229 @@ export const useTriggerIntegrationSync = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getTriggerIntegrationSyncMutationOptions(options));
+    }
+
+export const getGetIntegrationWebhookInfoUrl = (provider: string,) => {
+
+
+
+
+  return `/api/v1/integrations/${provider}/webhook-info`
+}
+
+/**
+ * @summary Return the webhook URL and secret for a connected lead-import integration.
+ */
+export const getIntegrationWebhookInfo = async (provider: string, options?: RequestInit): Promise<GetIntegrationWebhookInfo200> => {
+
+  return customFetch<GetIntegrationWebhookInfo200>(getGetIntegrationWebhookInfoUrl(provider),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIntegrationWebhookInfoQueryKey = (provider: string,) => {
+    return [
+    `/api/v1/integrations/${provider}/webhook-info`
+    ] as const;
+    }
+
+
+export const getGetIntegrationWebhookInfoQueryOptions = <TData = Awaited<ReturnType<typeof getIntegrationWebhookInfo>>, TError = ErrorType<unknown>>(provider: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIntegrationWebhookInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIntegrationWebhookInfoQueryKey(provider);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIntegrationWebhookInfo>>> = ({ signal }) => getIntegrationWebhookInfo(provider, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(provider), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIntegrationWebhookInfo>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIntegrationWebhookInfoQueryResult = NonNullable<Awaited<ReturnType<typeof getIntegrationWebhookInfo>>>
+export type GetIntegrationWebhookInfoQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Return the webhook URL and secret for a connected lead-import integration.
+ */
+
+export function useGetIntegrationWebhookInfo<TData = Awaited<ReturnType<typeof getIntegrationWebhookInfo>>, TError = ErrorType<unknown>>(
+ provider: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIntegrationWebhookInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIntegrationWebhookInfoQueryOptions(provider,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getRotateIntegrationWebhookSecretUrl = (provider: string,) => {
+
+
+
+
+  return `/api/v1/integrations/${provider}/webhook-secret/rotate`
+}
+
+/**
+ * @summary Generate a new webhook secret for a lead-import integration.
+ */
+export const rotateIntegrationWebhookSecret = async (provider: string, options?: RequestInit): Promise<RotateIntegrationWebhookSecret200> => {
+
+  return customFetch<RotateIntegrationWebhookSecret200>(getRotateIntegrationWebhookSecretUrl(provider),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getRotateIntegrationWebhookSecretMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rotateIntegrationWebhookSecret>>, TError,{provider: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rotateIntegrationWebhookSecret>>, TError,{provider: string}, TContext> => {
+
+const mutationKey = ['rotateIntegrationWebhookSecret'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rotateIntegrationWebhookSecret>>, {provider: string}> = (props) => {
+          const {provider} = props ?? {};
+
+          return  rotateIntegrationWebhookSecret(provider,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RotateIntegrationWebhookSecretMutationResult = NonNullable<Awaited<ReturnType<typeof rotateIntegrationWebhookSecret>>>
+
+    export type RotateIntegrationWebhookSecretMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Generate a new webhook secret for a lead-import integration.
+ */
+export const useRotateIntegrationWebhookSecret = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rotateIntegrationWebhookSecret>>, TError,{provider: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof rotateIntegrationWebhookSecret>>,
+        TError,
+        {provider: string},
+        TContext
+      > => {
+      return useMutation(getRotateIntegrationWebhookSecretMutationOptions(options));
+    }
+
+export const getReceiveLeadWebhookUrl = (provider: 'myjobquote' | 'checkatrade',
+    tenantId: string,) => {
+
+
+
+
+  return `/api/v1/webhooks/leads/${provider}/${tenantId}`
+}
+
+/**
+ * @summary Receive a real-time lead push from MyJobQuote or Checkatrade. Authenticated via the X-Webhook-Secret header — the secret is shown in the integration settings after connecting.
+
+ */
+export const receiveLeadWebhook = async (provider: 'myjobquote' | 'checkatrade',
+    tenantId: string,
+    leadWebhookPayload: LeadWebhookPayload, options?: RequestInit): Promise<ReceiveLeadWebhook200> => {
+
+  return customFetch<ReceiveLeadWebhook200>(getReceiveLeadWebhookUrl(provider,tenantId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      leadWebhookPayload,)
+  }
+);}
+
+
+
+
+export const getReceiveLeadWebhookMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof receiveLeadWebhook>>, TError,{provider: 'myjobquote' | 'checkatrade';tenantId: string;data: BodyType<LeadWebhookPayload>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof receiveLeadWebhook>>, TError,{provider: 'myjobquote' | 'checkatrade';tenantId: string;data: BodyType<LeadWebhookPayload>}, TContext> => {
+
+const mutationKey = ['receiveLeadWebhook'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof receiveLeadWebhook>>, {provider: 'myjobquote' | 'checkatrade';tenantId: string;data: BodyType<LeadWebhookPayload>}> = (props) => {
+          const {provider,tenantId,data} = props ?? {};
+
+          return  receiveLeadWebhook(provider,tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReceiveLeadWebhookMutationResult = NonNullable<Awaited<ReturnType<typeof receiveLeadWebhook>>>
+    export type ReceiveLeadWebhookMutationBody = BodyType<LeadWebhookPayload>
+    export type ReceiveLeadWebhookMutationError = ErrorType<void>
+
+    /**
+ * @summary Receive a real-time lead push from MyJobQuote or Checkatrade. Authenticated via the X-Webhook-Secret header — the secret is shown in the integration settings after connecting.
+
+ */
+export const useReceiveLeadWebhook = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof receiveLeadWebhook>>, TError,{provider: 'myjobquote' | 'checkatrade';tenantId: string;data: BodyType<LeadWebhookPayload>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof receiveLeadWebhook>>,
+        TError,
+        {provider: 'myjobquote' | 'checkatrade';tenantId: string;data: BodyType<LeadWebhookPayload>},
+        TContext
+      > => {
+      return useMutation(getReceiveLeadWebhookMutationOptions(options));
     }
 
 export const getGetIntegrationLogsUrl = (provider: string,) => {
@@ -10001,7 +10228,11 @@ export const useDeleteJobCostEntry = <TError = ErrorType<unknown>,
       return useMutation(getDeleteJobCostEntryMutationOptions(options));
     }
 
-export const getImportJobCostsFromQuoteUrl = (jobId: string) => {
+export const getImportJobCostsFromQuoteUrl = (jobId: string,) => {
+
+
+
+
   return `/api/v1/jobs/${jobId}/costs/import-quote`
 }
 
@@ -10009,15 +10240,20 @@ export const getImportJobCostsFromQuoteUrl = (jobId: string) => {
  * @summary Import material cost entries from the job's linked quote line items (idempotent).
  */
 export const importJobCostsFromQuote = async (jobId: string, options?: RequestInit): Promise<ImportQuoteResult> => {
+
   return customFetch<ImportQuoteResult>(getImportJobCostsFromQuoteUrl(jobId),
   {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    method: 'POST'
+
+
   }
 );}
 
-export const getImportJobCostsFromQuoteMutationOptions = <TError = ErrorType<unknown>,
+
+
+
+export const getImportJobCostsFromQuoteMutationOptions = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importJobCostsFromQuote>>, TError,{jobId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof importJobCostsFromQuote>>, TError,{jobId: string}, TContext> => {
 
@@ -10029,21 +10265,29 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {mutation: { mutationKey, }, request: undefined};
 
 
+
+
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof importJobCostsFromQuote>>, {jobId: string}> = (props) => {
           const {jobId} = props ?? {};
+
           return  importJobCostsFromQuote(jobId,requestOptions)
         }
+
+
+
+
+
 
   return  { mutationFn, ...mutationOptions }}
 
     export type ImportJobCostsFromQuoteMutationResult = NonNullable<Awaited<ReturnType<typeof importJobCostsFromQuote>>>
 
-    export type ImportJobCostsFromQuoteMutationError = ErrorType<unknown>
+    export type ImportJobCostsFromQuoteMutationError = ErrorType<void>
 
     /**
  * @summary Import material cost entries from the job's linked quote line items (idempotent).
  */
-export const useImportJobCostsFromQuote = <TError = ErrorType<unknown>,
+export const useImportJobCostsFromQuote = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importJobCostsFromQuote>>, TError,{jobId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof importJobCostsFromQuote>>,
