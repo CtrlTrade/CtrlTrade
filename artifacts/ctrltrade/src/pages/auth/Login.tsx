@@ -68,13 +68,10 @@ export function Login() {
         {/* Logo + tagline */}
         <div className="flex flex-col items-center mb-8">
           <img
-            src="/assets/ctrltrade-logo.png"
+            src="/assets/ctrltrade-logo-clean.png"
             alt="CtrlTrade"
-            className="h-12 w-auto object-contain mb-3"
+            className="h-32 w-auto object-contain"
           />
-          <p className="text-[10px] uppercase tracking-[0.3em] font-medium" style={{ color: "hsl(220,25%,58%)" }}>
-            Control · Position · Power
-          </p>
         </div>
 
         <p className="text-center text-sm mb-7" style={{ color: "hsl(220,25%,58%)" }}>
