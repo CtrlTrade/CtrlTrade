@@ -60,8 +60,6 @@ import { AppProjectDetail } from "@/pages/app/ProjectDetail";
 import { AppAvailability } from "@/pages/app/Availability";
 import { AppBranches } from "@/pages/app/Branches";
 import { AppAreaManagers } from "@/pages/app/AreaManagers";
-import { AppProjects } from "@/pages/app/Projects";
-import { AppProjectDetail } from "@/pages/app/ProjectDetail";
 import { PlaceholderPage } from "@/components/PlaceholderPage";
 
 // Admin
@@ -185,8 +183,6 @@ function App() {
                   <Route path="/projects/:id" component={AppProjectDetail} />
                   <Route path="/automation" component={AppAutomation} />
                   <Route path="/voice" component={AppVoice} />
-                  <Route path="/projects" component={AppProjects} />
-                  <Route path="/projects/:id" component={AppProjectDetail} />
                   <Route path="/:id">
                     {() => <PlaceholderPage />}
                   </Route>

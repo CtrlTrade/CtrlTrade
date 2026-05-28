@@ -36,7 +36,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Target, AlertCircle } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Plus, Target, AlertCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -57,8 +58,14 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "outline" | "dest
 
 const PLATFORM_SOURCES = ["myjobquote", "checkatrade"] as const;
 
+const MANUAL_SOURCES = ["manual", "website", "referral", "marketplace", "booking_widget"];
+
 function isPlatformSource(source: string): boolean {
   return PLATFORM_SOURCES.includes(source as (typeof PLATFORM_SOURCES)[number]);
+}
+
+function isManualSource(source: string): boolean {
+  return MANUAL_SOURCES.includes(source) || !isPlatformSource(source);
 }
 
 function PlatformBadge({ source }: { source: string }) {
@@ -89,13 +96,146 @@ function fmtGbp(pence: number): string {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(pence / 100);
 }
 
+function timeAgo(dateStr: string): string {
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const diffMins = Math.floor(diffMs / 60_000);
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHrs = Math.floor(diffMins / 60);
+  if (diffHrs < 24) return `${diffHrs}h ago`;
+  const diffDays = Math.floor(diffHrs / 24);
+  return `${diffDays}d ago`;
+}
+
+function TabBadge({ count }: { count: number }) {
+  if (count === 0) return null;
+  return (
+    <span className="ml-1.5 inline-flex items-center justify-center rounded-full bg-foreground text-background text-[10px] font-bold min-w-[18px] h-[18px] px-1">
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
+type Lead = {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  company?: string | null;
+  source: string;
+  sourceDetail?: string | null;
+  status: string;
+  score: number;
+  valuePence: number;
+  ownerUserName?: string | null;
+  followUpDueAt?: string | null;
+  followUpOverdue: boolean;
+  createdAt: string;
+};
+
+function LeadTableRows({ leads, showImportTime }: { leads: Lead[]; showImportTime?: boolean }) {
+  return (
+    <>
+      {leads.map((l) => {
+        const isUncontacted = l.status === "new" && isPlatformSource(l.source);
+        return (
+          <TableRow
+            key={l.id}
+            data-testid={`row-lead-${l.id}`}
+            className={`cursor-pointer hover:bg-muted/30 ${isUncontacted ? "bg-amber-50/60 dark:bg-amber-950/20" : ""}`}
+          >
+            <TableCell>
+              <div className="flex items-center gap-2">
+                {isUncontacted && (
+                  <span className="inline-block w-2 h-2 rounded-full bg-amber-500 shrink-0" title="Uncontacted" />
+                )}
+                <div>
+                  <Link href={`/leads/${l.id}`} className="font-medium hover:underline">
+                    {l.name}
+                  </Link>
+                  <div className="text-xs text-muted-foreground">{l.email ?? l.phone ?? "—"}</div>
+                </div>
+              </div>
+            </TableCell>
+            <TableCell>
+              {isPlatformSource(l.source) ? (
+                <div className="space-y-1">
+                  <PlatformBadge source={l.source} />
+                  {l.sourceDetail && <div className="text-xs text-muted-foreground">{l.sourceDetail}</div>}
+                </div>
+              ) : (
+                <div>
+                  <div className="text-sm uppercase tracking-wider font-mono">{l.source}</div>
+                  {l.sourceDetail && <div className="text-xs text-muted-foreground">{l.sourceDetail}</div>}
+                </div>
+              )}
+            </TableCell>
+            <TableCell>
+              <Badge variant={STATUS_VARIANT[l.status] ?? "default"} className="rounded-none uppercase tracking-wider font-bold text-[10px]">
+                {STATUS_LABEL[l.status] ?? l.status}
+              </Badge>
+            </TableCell>
+            <TableCell className="text-right font-mono font-bold">{l.score}</TableCell>
+            <TableCell className="text-sm">{l.ownerUserName ?? <span className="text-muted-foreground">Unassigned</span>}</TableCell>
+            <TableCell className="text-right font-mono">{l.valuePence > 0 ? fmtGbp(l.valuePence) : "—"}</TableCell>
+            {showImportTime ? (
+              <TableCell>
+                <span
+                  className={`inline-flex items-center gap-1 text-xs font-mono ${isUncontacted ? "text-amber-700 font-bold" : "text-muted-foreground"}`}
+                  data-testid={`import-time-${l.id}`}
+                >
+                  <Clock className="h-3 w-3" />
+                  {timeAgo(l.createdAt)}
+                </span>
+              </TableCell>
+            ) : (
+              <TableCell>
+                {l.followUpOverdue ? (
+                  <span className="inline-flex items-center gap-1 text-destructive text-xs font-bold uppercase tracking-wider">
+                    <AlertCircle className="h-3 w-3" /> Overdue
+                  </span>
+                ) : l.followUpDueAt ? (
+                  <span className="text-xs text-muted-foreground">{new Date(l.followUpDueAt).toLocaleDateString("en-GB")}</span>
+                ) : (
+                  <span className="text-xs text-muted-foreground">—</span>
+                )}
+              </TableCell>
+            )}
+          </TableRow>
+        );
+      })}
+    </>
+  );
+}
+
+function LeadTable({ leads, showImportTime, emptyMessage }: { leads: Lead[]; showImportTime?: boolean; emptyMessage: string }) {
+  if (leads.length === 0) {
+    return <p className="text-muted-foreground text-sm">{emptyMessage}</p>;
+  }
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Name</TableHead>
+          <TableHead>Source</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="text-right">Score</TableHead>
+          <TableHead>Owner</TableHead>
+          <TableHead className="text-right">Value</TableHead>
+          <TableHead>{showImportTime ? "Imported" : "Follow-up"}</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <LeadTableRows leads={leads} showImportTime={showImportTime} />
+      </TableBody>
+    </Table>
+  );
+}
+
 export function AppLeads() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [sourceFilter, setSourceFilter] = useState<string>("all");
-  const params = {
-    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
-    ...(sourceFilter !== "all" ? { source: sourceFilter } : {}),
-  };
+  const [activeTab, setActiveTab] = useState<string>("all");
+
+  const params = statusFilter !== "all" ? { status: statusFilter } : {};
   const { data, isLoading } = useListLeads(params);
   const qc = useQueryClient();
   const { toast } = useToast();
@@ -130,7 +270,20 @@ export function AppLeads() {
     });
   }
 
-  const platformLeadCount = data?.filter((l) => isPlatformSource(l.source)).length ?? 0;
+  const allLeads = (data ?? []) as Lead[];
+
+  const platformLeads = allLeads
+    .filter((l) => isPlatformSource(l.source))
+    .sort((a, b) => {
+      const aUncontacted = a.status === "new" ? 0 : 1;
+      const bUncontacted = b.status === "new" ? 0 : 1;
+      if (aUncontacted !== bUncontacted) return aUncontacted - bUncontacted;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+  const manualLeads = allLeads.filter((l) => isManualSource(l.source));
+
+  const uncontactedPlatformCount = platformLeads.filter((l) => l.status === "new").length;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -178,7 +331,7 @@ export function AppLeads() {
         </Dialog>
       </div>
 
-      <div className="flex gap-3 flex-wrap items-end">
+      <div className="flex items-center gap-3">
         <div className="w-48">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Status</Label>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -193,120 +346,130 @@ export function AppLeads() {
             </SelectContent>
           </Select>
         </div>
-        <div className="w-52">
-          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Source</Label>
-          <Select value={sourceFilter} onValueChange={setSourceFilter}>
-            <SelectTrigger className="rounded-none" data-testid="filter-source"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All sources</SelectItem>
-              <SelectItem value="manual">Manual</SelectItem>
-              <SelectItem value="website">Website</SelectItem>
-              <SelectItem value="referral">Referral</SelectItem>
-              <SelectItem value="marketplace">Marketplace</SelectItem>
-              <SelectItem value="myjobquote">MyJobQuote</SelectItem>
-              <SelectItem value="checkatrade">Checkatrade</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        {sourceFilter === "all" && platformLeadCount > 0 && (
-          <div className="flex gap-2 pb-0.5">
-            <button
-              onClick={() => setSourceFilter("myjobquote")}
-              className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-orange-700 border border-orange-300 bg-orange-50 px-2.5 py-1.5 hover:bg-orange-100 transition-colors"
-              data-testid="quick-filter-myjobquote"
-            >
-              <span className="inline-block w-2 h-2 rounded-full bg-orange-600" />
-              MyJobQuote
-            </button>
-            <button
-              onClick={() => setSourceFilter("checkatrade")}
-              className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-teal-700 border border-teal-300 bg-teal-50 px-2.5 py-1.5 hover:bg-teal-100 transition-colors"
-              data-testid="quick-filter-checkatrade"
-            >
-              <span className="inline-block w-2 h-2 rounded-full bg-teal-600" />
-              Checkatrade
-            </button>
-          </div>
+        {uncontactedPlatformCount > 0 && activeTab !== "platform" && (
+          <button
+            onClick={() => setActiveTab("platform")}
+            className="mt-5 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700 border border-amber-300 bg-amber-50 px-2.5 py-1.5 hover:bg-amber-100 transition-colors"
+            data-testid="alert-uncontacted-platform"
+          >
+            <span className="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            {uncontactedPlatformCount} uncontacted platform {uncontactedPlatformCount === 1 ? "lead" : "leads"}
+          </button>
         )}
       </div>
 
-      <Card className=" border-border shadow-sm">
-        <CardHeader>
-          <CardTitle className="uppercase tracking-tight flex items-center gap-2">
-            <Target className="h-5 w-5" /> Pipeline
-            {sourceFilter !== "all" && (
-              <span className="ml-auto text-xs font-normal text-muted-foreground normal-case tracking-normal">
-                Filtered: {sourceFilter}
-              </span>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <Skeleton className="h-48" />
-          ) : !data || data.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No leads yet. Capture some via the embed snippet in Settings, or add one manually.</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Source</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Score</TableHead>
-                  <TableHead>Owner</TableHead>
-                  <TableHead className="text-right">Value</TableHead>
-                  <TableHead>Follow-up</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.map((l) => (
-                  <TableRow key={l.id} data-testid={`row-lead-${l.id}`} className="cursor-pointer hover:bg-muted/30">
-                    <TableCell>
-                      <Link href={`/leads/${l.id}`} className="font-medium hover:underline">
-                        {l.name}
-                      </Link>
-                      <div className="text-xs text-muted-foreground">{l.email ?? l.phone ?? "—"}</div>
-                    </TableCell>
-                    <TableCell>
-                      {isPlatformSource(l.source) ? (
-                        <div className="space-y-1">
-                          <PlatformBadge source={l.source} />
-                          {l.sourceDetail && <div className="text-xs text-muted-foreground">{l.sourceDetail}</div>}
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="text-sm uppercase tracking-wider font-mono">{l.source}</div>
-                          {l.sourceDetail && <div className="text-xs text-muted-foreground">{l.sourceDetail}</div>}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={STATUS_VARIANT[l.status] ?? "default"} className="rounded-none uppercase tracking-wider font-bold text-[10px]">
-                        {STATUS_LABEL[l.status] ?? l.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-mono font-bold">{l.score}</TableCell>
-                    <TableCell className="text-sm">{l.ownerUserName ?? <span className="text-muted-foreground">Unassigned</span>}</TableCell>
-                    <TableCell className="text-right font-mono">{l.valuePence > 0 ? fmtGbp(l.valuePence) : "—"}</TableCell>
-                    <TableCell>
-                      {l.followUpOverdue ? (
-                        <span className="inline-flex items-center gap-1 text-destructive text-xs font-bold uppercase tracking-wider">
-                          <AlertCircle className="h-3 w-3" /> Overdue
-                        </span>
-                      ) : l.followUpDueAt ? (
-                        <span className="text-xs text-muted-foreground">{new Date(l.followUpDueAt).toLocaleDateString("en-GB")}</span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+      <Tabs value={activeTab} onValueChange={setActiveTab} data-testid="leads-tabs">
+        <TabsList className="rounded-none h-auto p-0 bg-transparent border-b border-border w-full justify-start gap-0">
+          <TabsTrigger
+            value="all"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-5 py-2.5 text-xs uppercase tracking-wider font-bold"
+            data-testid="tab-all"
+          >
+            All
+            <TabBadge count={allLeads.length} />
+          </TabsTrigger>
+          <TabsTrigger
+            value="platform"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-5 py-2.5 text-xs uppercase tracking-wider font-bold"
+            data-testid="tab-platform"
+          >
+            Platform
+            <TabBadge count={platformLeads.length} />
+          </TabsTrigger>
+          <TabsTrigger
+            value="manual"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-5 py-2.5 text-xs uppercase tracking-wider font-bold"
+            data-testid="tab-manual"
+          >
+            Manual
+            <TabBadge count={manualLeads.length} />
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all" className="mt-0 pt-4">
+          <Card className="border-border shadow-sm">
+            <CardHeader>
+              <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+                <Target className="h-5 w-5" /> All Leads
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-48" />
+              ) : (
+                <LeadTable
+                  leads={allLeads}
+                  emptyMessage="No leads yet. Capture some via the embed snippet in Settings, or add one manually."
+                />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="platform" className="mt-0 pt-4">
+          <Card className="border-border shadow-sm">
+            <CardHeader>
+              <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+                <Target className="h-5 w-5" /> Platform Inbox
+                {uncontactedPlatformCount > 0 && (
+                  <span className="ml-auto text-xs font-bold normal-case tracking-normal text-amber-700 flex items-center gap-1">
+                    <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
+                    {uncontactedPlatformCount} need contact
+                  </span>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-48" />
+              ) : platformLeads.length === 0 ? (
+                <div className="space-y-2">
+                  <p className="text-muted-foreground text-sm">No platform leads yet.</p>
+                  <p className="text-muted-foreground text-xs">Leads imported from MyJobQuote or Checkatrade will appear here, sorted by urgency.</p>
+                </div>
+              ) : (
+                <>
+                  {uncontactedPlatformCount > 0 && (
+                    <div className="mb-4 flex items-start gap-2 rounded-none border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-300">
+                      <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                      <span>
+                        <span className="font-bold">{uncontactedPlatformCount} uncontacted</span>{" "}
+                        {uncontactedPlatformCount === 1 ? "lead requires" : "leads require"} a response — platform SLAs may apply.
+                        Highlighted rows have not been contacted yet.
+                      </span>
+                    </div>
+                  )}
+                  <LeadTable
+                    leads={platformLeads}
+                    showImportTime
+                    emptyMessage="No platform leads match the current filter."
+                  />
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="manual" className="mt-0 pt-4">
+          <Card className="border-border shadow-sm">
+            <CardHeader>
+              <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+                <Target className="h-5 w-5" /> Manual Pipeline
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-48" />
+              ) : (
+                <LeadTable
+                  leads={manualLeads}
+                  emptyMessage="No manually-created leads yet. Add one or capture via the embed snippet in Settings."
+                />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
