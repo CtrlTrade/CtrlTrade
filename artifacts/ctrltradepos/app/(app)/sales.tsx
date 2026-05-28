@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -14,6 +14,7 @@ import { useListPosSales } from "@workspace/api-client-react";
 import { Header } from "@/components/Header";
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
+import { useModules } from "@/contexts/ModulesContext";
 
 function formatDateTime(iso: string): string {
   const d = new Date(iso);
@@ -23,7 +24,14 @@ function formatDateTime(iso: string): string {
 export default function SalesLogScreen() {
   const colors = useColors();
   const router = useRouter();
+  const { modules, isLoading: modulesLoading } = useModules();
   const salesQuery = useListPosSales();
+
+  useEffect(() => {
+    if (!modulesLoading && !modules?.posEnabled) {
+      router.back();
+    }
+  }, [modulesLoading, modules?.posEnabled, router]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top", "left", "right"]}>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -12,15 +12,23 @@ import {
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
 import { useBasket } from "@/lib/basket";
+import { useModules } from "@/contexts/ModulesContext";
 
 type Tender = "cash" | "card" | "split" | "trade_account";
 
 export default function BasketScreen() {
   const colors = useColors();
   const router = useRouter();
+  const { modules, isLoading: modulesLoading } = useModules();
   const qc = useQueryClient();
   const basket = useBasket();
   const { data: tradeAccounts } = useListPosTradeAccounts();
+
+  useEffect(() => {
+    if (!modulesLoading && !modules?.hasTradeShop) {
+      router.back();
+    }
+  }, [modulesLoading, modules?.hasTradeShop, router]);
   const [tender, setTender] = useState<Tender>("card");
   const [cashStr, setCashStr] = useState("");
   const [cardStr, setCardStr] = useState("");

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -18,6 +18,7 @@ import {
 
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
+import { useModules } from "@/contexts/ModulesContext";
 
 interface DraftLine {
   description: string;
@@ -40,8 +41,15 @@ function lineTotal(line: DraftLine): number {
 export default function NewSaleScreen() {
   const colors = useColors();
   const router = useRouter();
+  const { modules, isLoading: modulesLoading } = useModules();
   const queryClient = useQueryClient();
   const params = useLocalSearchParams<{ jobReference?: string; customerName?: string; estimatedTotal?: string }>();
+
+  useEffect(() => {
+    if (!modulesLoading && !modules?.posEnabled) {
+      router.back();
+    }
+  }, [modulesLoading, modules?.posEnabled, router]);
 
   const [customerName, setCustomerName] = useState<string>(params.customerName ?? "");
   const [customerEmail, setCustomerEmail] = useState<string>("");

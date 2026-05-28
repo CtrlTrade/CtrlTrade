@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -10,11 +10,19 @@ import {
 } from "@workspace/api-client-react";
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
+import { useModules } from "@/contexts/ModulesContext";
 
 export default function RefundScreen() {
   const colors = useColors();
   const router = useRouter();
+  const { modules, isLoading: modulesLoading } = useModules();
   const qc = useQueryClient();
+
+  useEffect(() => {
+    if (!modulesLoading && !modules?.posEnabled) {
+      router.back();
+    }
+  }, [modulesLoading, modules?.posEnabled, router]);
   const { data: transactions, isLoading } = useListPosTransactions();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pin, setPin] = useState("");

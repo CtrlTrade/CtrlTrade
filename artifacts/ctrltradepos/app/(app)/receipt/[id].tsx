@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -18,13 +18,21 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
+import { useModules } from "@/contexts/ModulesContext";
 
 export default function ReceiptScreen() {
   const colors = useColors();
   const router = useRouter();
+  const { modules, isLoading: modulesLoading } = useModules();
   const { state } = useAuth();
   const { id } = useLocalSearchParams<{ id: string }>();
   const salesQuery = useListPosSales();
+
+  useEffect(() => {
+    if (!modulesLoading && !modules?.posEnabled) {
+      router.back();
+    }
+  }, [modulesLoading, modules?.posEnabled, router]);
   const sale = useMemo(
     () => (salesQuery.data ?? []).find((s) => s.id === id) ?? null,
     [salesQuery.data, id],

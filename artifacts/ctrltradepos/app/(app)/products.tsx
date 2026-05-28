@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -6,12 +6,20 @@ import { useListPosProducts, useGetCurrentTillSession } from "@workspace/api-cli
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
 import { useBasket } from "@/lib/basket";
+import { useModules } from "@/contexts/ModulesContext";
 
 export default function ProductsScreen() {
   const colors = useColors();
   const router = useRouter();
+  const { modules, isLoading: modulesLoading } = useModules();
   const [search, setSearch] = useState("");
   const { data: session } = useGetCurrentTillSession();
+
+  useEffect(() => {
+    if (!modulesLoading && !modules?.hasTradeShop) {
+      router.back();
+    }
+  }, [modulesLoading, modules?.hasTradeShop, router]);
   const { data: products, isLoading } = useListPosProducts({ search: search || undefined });
   const { items, addItem, clear: _clear } = useBasket();
   const itemCount = useMemo(() => items.reduce((s, i) => s + i.quantity, 0), [items]);

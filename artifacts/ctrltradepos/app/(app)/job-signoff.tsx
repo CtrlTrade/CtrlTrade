@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from "react";
+import React, { useRef, useState, useCallback, useEffect } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -22,6 +22,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
+import { useModules } from "@/contexts/ModulesContext";
 
 interface Point { x: number; y: number }
 interface Stroke { points: Point[] }
@@ -42,6 +43,7 @@ const CANVAS_H = 180;
 export default function JobSignoffScreen() {
   const colors = useColors();
   const router = useRouter();
+  const { modules, isLoading: modulesLoading } = useModules();
   const qc = useQueryClient();
   const { jobId, jobNumber, jobTitle } = useLocalSearchParams<{
     jobId: string;
@@ -57,11 +59,17 @@ export default function JobSignoffScreen() {
   const strokesRef = useRef(strokes);
   strokesRef.current = strokes;
 
+  useEffect(() => {
+    if (!modulesLoading && !modules?.hasMobileWorkforce) {
+      router.back();
+    }
+  }, [modulesLoading, modules?.hasMobileWorkforce, router]);
+
   const completeJob = useCompleteJob({
     mutation: {
       onSuccess: () => {
         qc.invalidateQueries({ queryKey: getListPosJobsQueryKey() });
-        router.replace("/(app)/");
+        router.replace("/(app)");
       },
       onError: (err: Error) => {
         Alert.alert("Error", err.message || "Failed to complete job");

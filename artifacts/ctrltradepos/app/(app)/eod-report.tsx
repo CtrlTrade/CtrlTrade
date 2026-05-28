@@ -1,16 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useGetCurrentTillSession, useListPosTransactions } from "@workspace/api-client-react";
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
+import { useModules } from "@/contexts/ModulesContext";
 
 export default function EodReportScreen() {
   const colors = useColors();
   const router = useRouter();
+  const { modules, isLoading: modulesLoading } = useModules();
   const { data: session } = useGetCurrentTillSession();
   const { data: txs } = useListPosTransactions();
+
+  useEffect(() => {
+    if (!modulesLoading && !modules?.posEnabled) {
+      router.back();
+    }
+  }, [modulesLoading, modules?.posEnabled, router]);
 
   const lastClosed = !session && txs && txs.length > 0;
 

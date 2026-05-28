@@ -15,6 +15,7 @@ import type { PosJob } from "@workspace/api-client-react";
 import { Header } from "@/components/Header";
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
+import { useModules } from "@/contexts/ModulesContext";
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
@@ -36,7 +37,19 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function JobCard({ job, onPress, onSignOff }: { job: PosJob; onPress: () => void; onSignOff: () => void }) {
+function JobCard({
+  job,
+  onPress,
+  onSignOff,
+  showCaptureSale,
+  showSignOff,
+}: {
+  job: PosJob;
+  onPress: () => void;
+  onSignOff: () => void;
+  showCaptureSale: boolean;
+  showSignOff: boolean;
+}) {
   const colors = useColors();
   const isCompleted = job.status === "completed";
   return (
@@ -74,25 +87,29 @@ function JobCard({ job, onPress, onSignOff }: { job: PosJob; onPress: () => void
             {formatMoney(job.estimatedTotal, job.currency)}
           </Text>
         </View>
-        <View style={styles.actions}>
-          <Pressable
-            onPress={onPress}
-            style={({ pressed }) => [styles.captureBtn, { borderColor: colors.primary, opacity: pressed ? 0.7 : 1 }]}
-          >
-            <Text style={[styles.captureBtnText, { color: colors.primary }]}>CAPTURE SALE →</Text>
-          </Pressable>
-          {!isCompleted && (
-            <Pressable
-              onPress={(e) => { e.stopPropagation?.(); onSignOff(); }}
-              style={({ pressed }) => [
-                styles.signoffBtn,
-                { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1 },
-              ]}
-            >
-              <Text style={[styles.signoffBtnText, { color: colors.primaryForeground }]}>SIGN OFF</Text>
-            </Pressable>
-          )}
-        </View>
+        {(showCaptureSale || showSignOff) && (
+          <View style={styles.actions}>
+            {showCaptureSale && (
+              <Pressable
+                onPress={onPress}
+                style={({ pressed }) => [styles.captureBtn, { borderColor: colors.primary, opacity: pressed ? 0.7 : 1 }]}
+              >
+                <Text style={[styles.captureBtnText, { color: colors.primary }]}>CAPTURE SALE →</Text>
+              </Pressable>
+            )}
+            {showSignOff && !isCompleted && (
+              <Pressable
+                onPress={(e) => { e.stopPropagation?.(); onSignOff(); }}
+                style={({ pressed }) => [
+                  styles.signoffBtn,
+                  { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1 },
+                ]}
+              >
+                <Text style={[styles.signoffBtnText, { color: colors.primaryForeground }]}>SIGN OFF</Text>
+              </Pressable>
+            )}
+          </View>
+        )}
       </View>
     </Pressable>
   );
@@ -101,6 +118,9 @@ function JobCard({ job, onPress, onSignOff }: { job: PosJob; onPress: () => void
 export default function JobsScreen() {
   const colors = useColors();
   const router = useRouter();
+  const { modules, isLoading: modulesLoading } = useModules();
+  const posEnabled = modules?.posEnabled ?? false;
+  const hasMobileWorkforce = modules?.hasMobileWorkforce ?? false;
   const jobsQuery = useListPosJobs();
 
   const goSale = (job?: PosJob) => {
@@ -140,54 +160,98 @@ export default function JobsScreen() {
     });
   };
 
+  if (modulesLoading) {
+    return (
+      <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top", "left", "right"]}>
+        <ActivityIndicator color={colors.primary} style={{ flex: 1 }} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top", "left", "right"]}>
       <Header
         title="TODAY"
         subtitle={new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}
         right={
-          <Pressable
-            onPress={() => router.push("/(app)/sales")}
-            style={({ pressed }) => [
-              styles.headerLink,
-              { borderColor: colors.border, opacity: pressed ? 0.6 : 1 },
-            ]}
-          >
-            <Text style={[styles.headerLinkText, { color: colors.foreground }]}>SALES LOG</Text>
-          </Pressable>
+          posEnabled ? (
+            <Pressable
+              onPress={() => router.push("/(app)/sales")}
+              style={({ pressed }) => [
+                styles.headerLink,
+                { borderColor: colors.border, opacity: pressed ? 0.6 : 1 },
+              ]}
+            >
+              <Text style={[styles.headerLinkText, { color: colors.foreground }]}>SALES LOG</Text>
+            </Pressable>
+          ) : undefined
         }
       />
       <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.sectionRow}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>ASSIGNED JOBS</Text>
-          <Pressable
-            onPress={() => goSale()}
-            style={({ pressed }) => [
-              styles.newSale,
-              { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1 },
-            ]}
-          >
-            <Text style={[styles.newSaleText, { color: colors.primaryForeground }]}>+ NEW SALE</Text>
-          </Pressable>
-        </View>
+        {hasMobileWorkforce && (
+          <>
+            <View style={styles.sectionRow}>
+              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>ASSIGNED JOBS</Text>
+              {posEnabled && (
+                <Pressable
+                  onPress={() => goSale()}
+                  style={({ pressed }) => [
+                    styles.newSale,
+                    { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1 },
+                  ]}
+                >
+                  <Text style={[styles.newSaleText, { color: colors.primaryForeground }]}>+ NEW SALE</Text>
+                </Pressable>
+              )}
+            </View>
 
-        {jobsQuery.isLoading ? (
-          <ActivityIndicator color={colors.primary} style={{ marginTop: 32 }} />
-        ) : jobsQuery.isError ? (
-          <Text style={[styles.error, { color: colors.destructive }]}>
-            Unable to load jobs. Pull to retry.
-          </Text>
-        ) : (
-          <View style={styles.list}>
-            {(jobsQuery.data ?? []).map((job) => (
-              <JobCard key={job.id} job={job} onPress={() => goJobDetail(job)} onSignOff={() => goSignOff(job)} />
-            ))}
-            {(jobsQuery.data ?? []).length === 0 ? (
-              <Text style={[styles.empty, { color: colors.mutedForeground }]}>
-                No jobs assigned today.
+            {jobsQuery.isLoading ? (
+              <ActivityIndicator color={colors.primary} style={{ marginTop: 32 }} />
+            ) : jobsQuery.isError ? (
+              <Text style={[styles.error, { color: colors.destructive }]}>
+                Unable to load jobs. Pull to retry.
               </Text>
-            ) : null}
+            ) : (
+              <View style={styles.list}>
+                {(jobsQuery.data ?? []).map((job) => (
+                  <JobCard
+                    key={job.id}
+                    job={job}
+                    onPress={() => goJobDetail(job)}
+                    onSignOff={() => goSignOff(job)}
+                    showCaptureSale={posEnabled}
+                    showSignOff={hasMobileWorkforce}
+                  />
+                ))}
+                {(jobsQuery.data ?? []).length === 0 ? (
+                  <Text style={[styles.empty, { color: colors.mutedForeground }]}>
+                    No jobs assigned today.
+                  </Text>
+                ) : null}
+              </View>
+            )}
+          </>
+        )}
+
+        {!hasMobileWorkforce && posEnabled && (
+          <View style={styles.posQuickAccess}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>POINT OF SALE</Text>
+            <Pressable
+              onPress={() => goSale()}
+              style={({ pressed }) => [
+                styles.newSale,
+                { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1, marginTop: 16 },
+              ]}
+            >
+              <Text style={[styles.newSaleText, { color: colors.primaryForeground }]}>+ NEW SALE</Text>
+            </Pressable>
           </View>
+        )}
+
+        {!hasMobileWorkforce && !posEnabled && (
+          <Text style={[styles.empty, { color: colors.mutedForeground, marginTop: 48 }]}>
+            No modules enabled for this account.
+          </Text>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -224,4 +288,5 @@ const styles = StyleSheet.create({
   error: { fontFamily: MONO_FONT, fontSize: 13, textAlign: "center", marginTop: 32 },
   headerLink: { borderWidth: 1, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6 },
   headerLinkText: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 2, fontWeight: "700" },
+  posQuickAccess: { alignItems: "flex-start" },
 });

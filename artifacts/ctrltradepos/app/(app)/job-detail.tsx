@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -27,6 +27,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
+import { useModules } from "@/contexts/ModulesContext";
 
 function fmtTime(iso: string | null | undefined): string {
   if (!iso) return "—";
@@ -220,6 +221,7 @@ function CheckinCard({ item, colors }: CheckinCardProps) {
 export default function JobDetailScreen() {
   const colors = useColors();
   const router = useRouter();
+  const { modules, isLoading: modulesLoading } = useModules();
   const params = useLocalSearchParams<{
     jobId: string;
     jobReference: string;
@@ -235,6 +237,12 @@ export default function JobDetailScreen() {
     checkinDate: string;
     durationMinutes: number;
   } | null>(null);
+
+  useEffect(() => {
+    if (!modulesLoading && !modules?.hasMobileWorkforce) {
+      router.back();
+    }
+  }, [modulesLoading, modules?.hasMobileWorkforce, router]);
 
   const checkinsQuery = useListJobCheckins(params.jobId ?? "");
 
