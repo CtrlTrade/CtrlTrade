@@ -9906,6 +9906,7 @@ components:
         postcode: { type: ["string", "null"] }
         nextDueAt: { type: ["string", "null"], format: date-time }
 
+
     ContractJobSummary:
       type: object
       required: [id, number, title, status, recurrenceIndex]
@@ -9918,3 +9919,34 @@ components:
         completedAt: { type: ["string", "null"], format: date-time }
         recurrenceIndex: { type: ["integer", "null"] }
         valuePence: { type: ["integer", "null"] }
+
+    ContractCreateInput:
+      type: object
+      required: [customerId, title, frequency, startDate, pricePence]
+      properties:
+        customerId: { type: string }
+        title: { type: string }
+        frequency: { type: string }
+        startDate: { type: string, format: date-time }
+        endDate: { type: ["string", "null"], format: date-time }
+        occurrences: { type: ["integer", "null"] }
+        pricePence: { type: integer }
+        notes: { type: ["string", "null"] }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+
+    ContractUpdateInput:
+      type: object
+      properties:
+        title: { type: string }
+        frequency: { type: string }
+        endDate: { type: ["string", "null"], format: date-time }
+        occurrences: { type: ["integer", "null"] }
+        status: { type: string }
+        pricePence: { type: integer }
+        notes: { type: ["string", "null"] }
+        addressLine1: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        postcode: { type: ["string", "null"] }
+        nextDueAt: { type: ["string", "null"], format: date-time }

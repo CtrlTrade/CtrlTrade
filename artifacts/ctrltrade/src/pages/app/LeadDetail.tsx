@@ -58,6 +58,82 @@ function fmtGbp(pence: number): string {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(pence / 100);
 }
 
+const PLATFORM_META: Record<string, { label: string; colorClass: string; bgClass: string; borderClass: string }> = {
+  myjobquote: {
+    label: "MyJobQuote",
+    colorClass: "text-orange-700",
+    bgClass: "bg-orange-50",
+    borderClass: "border-orange-300",
+  },
+  checkatrade: {
+    label: "Checkatrade",
+    colorClass: "text-teal-700",
+    bgClass: "bg-teal-50",
+    borderClass: "border-teal-300",
+  },
+};
+
+function isPlatformSource(source: string): boolean {
+  return source in PLATFORM_META;
+}
+
+function PlatformLeadBanner({ source, message, valuePence, sourceDetail }: {
+  source: string;
+  message: string | null | undefined;
+  valuePence: number;
+  sourceDetail: string | null | undefined;
+}) {
+  const meta = PLATFORM_META[source];
+  if (!meta) return null;
+
+  return (
+    <div
+      className={`border ${meta.borderClass} ${meta.bgClass} p-4 space-y-2`}
+      data-testid="platform-lead-banner"
+    >
+      <div className="flex items-center gap-2">
+        <span className={`text-xs font-bold uppercase tracking-widest ${meta.colorClass}`}>
+          {meta.label} Import
+        </span>
+        {sourceDetail && (
+          <span className="text-xs text-muted-foreground">· {sourceDetail}</span>
+        )}
+      </div>
+      {message && (
+        <div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Lead description from {meta.label}</div>
+          <div className="text-sm whitespace-pre-wrap">{message}</div>
+        </div>
+      )}
+      {valuePence > 0 && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs uppercase tracking-wider text-muted-foreground">Customer budget:</span>
+          <span className={`text-sm font-bold font-mono ${meta.colorClass}`}>{fmtGbp(valuePence)}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SourceBadge({ source }: { source: string }) {
+  const meta = PLATFORM_META[source];
+  if (meta) {
+    return (
+      <Badge
+        className={`rounded-none uppercase tracking-wider text-[10px] font-bold border ${meta.borderClass} ${meta.bgClass} ${meta.colorClass} hover:${meta.bgClass}`}
+        data-testid={`badge-source-${source}`}
+      >
+        {meta.label}
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="outline" className="rounded-none uppercase tracking-wider text-[10px] font-bold">
+      {source}
+    </Badge>
+  );
+}
+
 export function AppLeadDetail() {
   const [, params] = useRoute("/leads/:id");
   const [, setLocation] = useLocation();
@@ -117,6 +193,8 @@ export function AppLeadDetail() {
   if (isLoading || !lead) {
     return <div className="space-y-6 max-w-5xl mx-auto"><Skeleton className="h-32" /><Skeleton className="h-64" /></div>;
   }
+
+  const platformLead = isPlatformSource(lead.source);
 
   function handleStatus(status: string) {
     update.mutate({ leadId, data: { status: status as any } });
@@ -196,7 +274,7 @@ export function AppLeadDetail() {
             <div>
               <CardTitle className="text-2xl uppercase tracking-tighter">{lead.name}</CardTitle>
               <div className="flex gap-2 mt-2 flex-wrap">
-                <Badge variant="outline" className="rounded-none uppercase tracking-wider text-[10px] font-bold">{lead.source}</Badge>
+                <SourceBadge source={lead.source} />
                 <Badge className="rounded-none uppercase tracking-wider text-[10px] font-bold">{lead.status}</Badge>
                 <Badge variant="secondary" className="rounded-none uppercase tracking-wider text-[10px] font-bold">Score {lead.score}/100</Badge>
                 {lead.convertedQuoteId && (
@@ -213,13 +291,24 @@ export function AppLeadDetail() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {platformLead && (
+            <PlatformLeadBanner
+              source={lead.source}
+              message={lead.message}
+              valuePence={lead.valuePence}
+              sourceDetail={lead.sourceDetail}
+            />
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" />{lead.email ?? "—"}</div>
             <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" />{lead.phone ?? "—"}</div>
             <div className="flex items-center gap-2"><Building className="h-4 w-4 text-muted-foreground" />{lead.company ?? "—"}</div>
           </div>
           {lead.title && <div className="text-sm"><span className="text-muted-foreground uppercase tracking-wider text-xs mr-2">Need:</span>{lead.title}</div>}
-          {lead.message && <div className="text-sm whitespace-pre-wrap bg-muted/30 p-3 border border-border">{lead.message}</div>}
+          {!platformLead && lead.message && (
+            <div className="text-sm whitespace-pre-wrap bg-muted/30 p-3 border border-border">{lead.message}</div>
+          )}
           {lead.lostReason && <div className="text-sm"><span className="text-destructive uppercase tracking-wider text-xs font-bold mr-2">Lost reason:</span>{lead.lostReason}</div>}
           {lead.followUpDueAt && lead.status !== "won" && lead.status !== "lost" && (
             <div className={`text-sm flex items-center gap-2 ${lead.followUpOverdue ? "text-destructive font-bold" : "text-muted-foreground"}`}>

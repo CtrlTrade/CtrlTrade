@@ -55,6 +55,36 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "outline" | "dest
   lost: "destructive",
 };
 
+const PLATFORM_SOURCES = ["myjobquote", "checkatrade"] as const;
+
+function isPlatformSource(source: string): boolean {
+  return PLATFORM_SOURCES.includes(source as (typeof PLATFORM_SOURCES)[number]);
+}
+
+function PlatformBadge({ source }: { source: string }) {
+  if (source === "myjobquote") {
+    return (
+      <Badge
+        className="rounded-none uppercase tracking-wider font-bold text-[10px] bg-orange-600 hover:bg-orange-600 text-white"
+        data-testid="badge-myjobquote"
+      >
+        MyJobQuote
+      </Badge>
+    );
+  }
+  if (source === "checkatrade") {
+    return (
+      <Badge
+        className="rounded-none uppercase tracking-wider font-bold text-[10px] bg-teal-600 hover:bg-teal-600 text-white"
+        data-testid="badge-checkatrade"
+      >
+        Checkatrade
+      </Badge>
+    );
+  }
+  return null;
+}
+
 function fmtGbp(pence: number): string {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(pence / 100);
 }
@@ -99,6 +129,8 @@ export function AppLeads() {
       },
     });
   }
+
+  const platformLeadCount = data?.filter((l) => isPlatformSource(l.source)).length ?? 0;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -146,7 +178,7 @@ export function AppLeads() {
         </Dialog>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-wrap items-end">
         <div className="w-48">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Status</Label>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -161,25 +193,52 @@ export function AppLeads() {
             </SelectContent>
           </Select>
         </div>
-        <div className="w-48">
+        <div className="w-52">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Source</Label>
           <Select value={sourceFilter} onValueChange={setSourceFilter}>
             <SelectTrigger className="rounded-none" data-testid="filter-source"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="all">All sources</SelectItem>
               <SelectItem value="manual">Manual</SelectItem>
               <SelectItem value="website">Website</SelectItem>
               <SelectItem value="referral">Referral</SelectItem>
               <SelectItem value="marketplace">Marketplace</SelectItem>
+              <SelectItem value="myjobquote">MyJobQuote</SelectItem>
+              <SelectItem value="checkatrade">Checkatrade</SelectItem>
             </SelectContent>
           </Select>
         </div>
+        {sourceFilter === "all" && platformLeadCount > 0 && (
+          <div className="flex gap-2 pb-0.5">
+            <button
+              onClick={() => setSourceFilter("myjobquote")}
+              className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-orange-700 border border-orange-300 bg-orange-50 px-2.5 py-1.5 hover:bg-orange-100 transition-colors"
+              data-testid="quick-filter-myjobquote"
+            >
+              <span className="inline-block w-2 h-2 rounded-full bg-orange-600" />
+              MyJobQuote
+            </button>
+            <button
+              onClick={() => setSourceFilter("checkatrade")}
+              className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-teal-700 border border-teal-300 bg-teal-50 px-2.5 py-1.5 hover:bg-teal-100 transition-colors"
+              data-testid="quick-filter-checkatrade"
+            >
+              <span className="inline-block w-2 h-2 rounded-full bg-teal-600" />
+              Checkatrade
+            </button>
+          </div>
+        )}
       </div>
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
           <CardTitle className="uppercase tracking-tight flex items-center gap-2">
             <Target className="h-5 w-5" /> Pipeline
+            {sourceFilter !== "all" && (
+              <span className="ml-auto text-xs font-normal text-muted-foreground normal-case tracking-normal">
+                Filtered: {sourceFilter}
+              </span>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -210,8 +269,17 @@ export function AppLeads() {
                       <div className="text-xs text-muted-foreground">{l.email ?? l.phone ?? "—"}</div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm uppercase tracking-wider font-mono">{l.source}</div>
-                      {l.sourceDetail && <div className="text-xs text-muted-foreground">{l.sourceDetail}</div>}
+                      {isPlatformSource(l.source) ? (
+                        <div className="space-y-1">
+                          <PlatformBadge source={l.source} />
+                          {l.sourceDetail && <div className="text-xs text-muted-foreground">{l.sourceDetail}</div>}
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="text-sm uppercase tracking-wider font-mono">{l.source}</div>
+                          {l.sourceDetail && <div className="text-xs text-muted-foreground">{l.sourceDetail}</div>}
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge variant={STATUS_VARIANT[l.status] ?? "default"} className="rounded-none uppercase tracking-wider font-bold text-[10px]">

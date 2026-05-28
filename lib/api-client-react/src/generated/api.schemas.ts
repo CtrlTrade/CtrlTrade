@@ -4361,6 +4361,47 @@ export interface ContractJobSummary {
   valuePence?: number | null;
 }
 
+export interface ContractCreateInput {
+  customerId: string;
+  title: string;
+  frequency: string;
+  startDate: string;
+  /** @nullable */
+  endDate?: string | null;
+  /** @nullable */
+  occurrences?: number | null;
+  pricePence: number;
+  /** @nullable */
+  notes?: string | null;
+  /** @nullable */
+  addressLine1?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  postcode?: string | null;
+}
+
+export interface ContractUpdateInput {
+  title?: string;
+  frequency?: string;
+  /** @nullable */
+  endDate?: string | null;
+  /** @nullable */
+  occurrences?: number | null;
+  status?: string;
+  pricePence?: number;
+  /** @nullable */
+  notes?: string | null;
+  /** @nullable */
+  addressLine1?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  postcode?: string | null;
+  /** @nullable */
+  nextDueAt?: string | null;
+}
+
 export type ConnectIntegration200 = {
   authUrl: string;
 };
