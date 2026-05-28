@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/table";
 import { ShieldCheck, ShieldX, FileText, CheckCircle, XCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 type Submission = {
   id: string;
@@ -96,24 +97,25 @@ export function AdminCompliance() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter flex items-center gap-2">
-          <ShieldCheck className="h-7 w-7" /> Compliance Queue
-        </h1>
-        <div className="flex gap-2">
-          {(["pending", "approved", "rejected", "all"] as const).map((s) => (
-            <Button
-              key={s}
-              variant={statusFilter === s ? "default" : "outline"}
-              size="sm"
-              className="uppercase tracking-wider font-bold text-xs rounded-none"
-              onClick={() => setStatusFilter(s)}
-            >
-              {s}
-            </Button>
-          ))}
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Compliance Queue"
+        icon={<ShieldCheck className="h-6 w-6" />}
+        actions={
+          <div className="flex gap-2 flex-wrap">
+            {(["pending", "approved", "rejected", "all"] as const).map((s) => (
+              <Button
+                key={s}
+                variant={statusFilter === s ? "default" : "outline"}
+                size="sm"
+                className="uppercase tracking-wider font-bold text-xs rounded-none"
+                onClick={() => setStatusFilter(s)}
+              >
+                {s}
+              </Button>
+            ))}
+          </div>
+        }
+      />
 
       <Card className="border-border shadow-sm">
         <CardHeader>

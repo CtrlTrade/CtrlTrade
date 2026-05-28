@@ -13,7 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2 } from "lucide-react";
+import { Trash2, Flag } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 export function AdminFeatureFlags() {
   const { data, isLoading } = useListFeatureFlags();
@@ -34,10 +35,11 @@ export function AdminFeatureFlags() {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div>
-        <h1 className="text-2xl font-bold uppercase tracking-tighter">Feature flags</h1>
-        <p className="text-sm text-muted-foreground">Toggle features globally or per tenant. Rollout % controls progressive enablement.</p>
-      </div>
+      <AdminPageHeader
+        title="Feature Flags"
+        subtitle="Toggle features globally or per tenant. Rollout % controls progressive enablement."
+        icon={<Flag className="h-6 w-6" />}
+      />
 
       <Card className=" border-border">
         <CardHeader>

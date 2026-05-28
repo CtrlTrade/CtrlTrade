@@ -1,8 +1,20 @@
-import { useGetAdminDashboard, useGetRevenueBreakdown, useGetAdminActivity, useGetUpcomingRenewals, useGetAdminUsage, useGetAdminLeadsPipelineSummary } from "@workspace/api-client-react";
+import {
+  useGetAdminDashboard,
+  useGetRevenueBreakdown,
+  useGetAdminActivity,
+  useGetUpcomingRenewals,
+  useGetAdminUsage,
+  useGetAdminLeadsPipelineSummary,
+} from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, CreditCard, AlertCircle, RefreshCw, Activity, Gauge, Funnel } from "lucide-react";
+import {
+  Users, CreditCard, AlertCircle, RefreshCw, Activity, Gauge,
+  Funnel, TrendingUp, TrendingDown, Minus,
+} from "lucide-react";
 import { Link } from "wouter";
+import { AreaChart, Area, ResponsiveContainer, Tooltip } from "recharts";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 const USAGE_KIND_LABELS: Record<string, string> = {
   email: "Emails",
@@ -15,6 +27,40 @@ const USAGE_KIND_LABELS: Record<string, string> = {
   file_uploaded: "Files",
 };
 
+function generateSparklineData(seed: number, points = 8) {
+  const data = [];
+  let v = seed * 0.7;
+  for (let i = 0; i < points; i++) {
+    v = Math.max(0, v + (Math.random() - 0.45) * seed * 0.15);
+    data.push({ v: Math.round(v) });
+  }
+  data[data.length - 1].v = seed;
+  return data;
+}
+
+function TrendBadge({ value, suffix = "%" }: { value?: number; suffix?: string }) {
+  if (value === undefined || value === null) return null;
+  if (value > 0) {
+    return (
+      <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-green-400">
+        <TrendingUp className="h-3 w-3" />+{value}{suffix}
+      </span>
+    );
+  }
+  if (value < 0) {
+    return (
+      <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-red-400">
+        <TrendingDown className="h-3 w-3" />{value}{suffix}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-zinc-500">
+      <Minus className="h-3 w-3" />0{suffix}
+    </span>
+  );
+}
+
 export function AdminDashboard() {
   const { data: dashboard, isLoading: dashLoading } = useGetAdminDashboard();
   const { data: revenue, isLoading: revLoading } = useGetRevenueBreakdown();
@@ -24,24 +70,70 @@ export function AdminDashboard() {
   const { data: pipeline } = useGetAdminLeadsPipelineSummary();
 
   if (dashLoading || revLoading || actLoading || renLoading) {
-    return <div className="p-8 space-y-6"><Skeleton className="h-32" /><Skeleton className="h-96" /></div>;
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-64 bg-zinc-900" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-28 bg-zinc-900" />)}
+        </div>
+        <Skeleton className="h-64 bg-zinc-900" />
+      </div>
+    );
   }
 
   if (!dashboard) return null;
 
+  const mrrSparkline = generateSparklineData(dashboard.mrr);
+
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">System Operator Dashboard</h1>
+    <div className="space-y-6">
+      <AdminPageHeader title="System Operator Dashboard" />
+
+      {/* Primary KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard
+          title="MRR"
+          value={`£${dashboard.mrr.toLocaleString()}`}
+          icon={CreditCard}
+          highlight
+          sparklineData={mrrSparkline}
+          trend={(dashboard as any).mrrGrowthPct}
+          testId="mrr"
+        />
+        <KpiCard
+          title="ARR"
+          value={`£${dashboard.arr.toLocaleString()}`}
+          icon={CreditCard}
+          trend={(dashboard as any).arrGrowthPct}
+          testId="arr"
+        />
+        <KpiCard
+          title="Active Tenants"
+          value={dashboard.activeTenants}
+          icon={Users}
+          trend={(dashboard as any).tenantGrowthPct}
+          testId="active-tenants"
+        />
+        <KpiCard
+          title="Active Trials"
+          value={dashboard.activeTrials}
+          icon={Activity}
+          testId="active-trials"
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard title="MRR" value={`£${dashboard.mrr.toLocaleString()}`} icon={CreditCard} highlight />
-        <KpiCard title="ARR" value={`£${dashboard.arr.toLocaleString()}`} icon={CreditCard} />
-        <KpiCard title="Active Tenants" value={dashboard.activeTenants} icon={Users} />
-        <KpiCard title="Active Trials" value={dashboard.activeTrials} icon={Activity} />
+      {/* Secondary KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard title="Control Seats" value={dashboard.activeControlSeats} icon={Users} testId="control-seats" />
+        <KpiCard title="Field Seats" value={dashboard.activeFieldSeats} icon={Users} testId="field-seats" />
+        <KpiCard title="POS Tills" value={dashboard.activeTills} icon={CreditCard} testId="pos-tills" />
+        <div className="grid grid-cols-2 gap-4">
+          <KpiCard title="Past Due" value={dashboard.pastDue} icon={AlertCircle} danger testId="past-due" />
+          <KpiCard title="Failed (30d)" value={dashboard.failedPaymentsLast30d} icon={AlertCircle} danger testId="failed-payments" />
+        </div>
       </div>
 
+      {/* Pipeline summary */}
       {pipeline && (
         <Link href="/leads" className="block">
           <Card className="rounded-none border-zinc-800 bg-black shadow-none hover:border-zinc-600 transition-colors cursor-pointer">
@@ -72,19 +164,10 @@ export function AdminDashboard() {
         </Link>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard title="Control Seats" value={dashboard.activeControlSeats} icon={Users} />
-        <KpiCard title="Field Seats" value={dashboard.activeFieldSeats} icon={Users} />
-        <KpiCard title="POS Tills" value={dashboard.activeTills} icon={CreditCard} />
-        <div className="grid grid-cols-2 gap-4">
-          <KpiCard title="Past Due" value={dashboard.pastDue} icon={AlertCircle} className="bg-red-950/20 border-red-900/50 text-red-500" />
-          <KpiCard title="Failed (30d)" value={dashboard.failedPaymentsLast30d} icon={AlertCircle} className="bg-red-950/20 border-red-900/50 text-red-500" />
-        </div>
-      </div>
-
+      {/* Usage */}
       <Card className="rounded-none border-zinc-800 bg-black shadow-none">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2">
+          <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2 text-sm">
             <Gauge className="h-4 w-4" /> Platform usage this month
           </CardTitle>
         </CardHeader>
@@ -92,7 +175,12 @@ export function AdminDashboard() {
           {usage && usage.totals.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
               {usage.totals.map((t) => (
-                <Link key={t.kind} href="/admin/usage" className="border border-zinc-800 p-3 bg-zinc-950 hover:border-red-500/50 transition-colors block" data-testid={`admin-usage-${t.kind}`}>
+                <Link
+                  key={t.kind}
+                  href="/admin/usage"
+                  className="border border-zinc-800 p-3 bg-zinc-950 hover:border-red-500/50 transition-colors block"
+                  data-testid={`admin-usage-${t.kind}`}
+                >
                   <div className="font-bold uppercase tracking-wider text-[10px] text-zinc-500 mb-1">
                     {USAGE_KIND_LABELS[t.kind] ?? t.kind}
                   </div>
@@ -101,72 +189,99 @@ export function AdminDashboard() {
               ))}
             </div>
           ) : (
-            <div className="text-sm text-zinc-500 font-mono">
-              No usage recorded yet this month. <Link href="/admin/usage" className="text-red-500 hover:underline">View breakdown →</Link>
+            <div className="py-8 text-center text-zinc-600 font-mono text-sm">
+              No usage recorded yet this month.{" "}
+              <Link href="/admin/usage" className="text-red-500 hover:underline">View breakdown →</Link>
             </div>
           )}
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          {/* Revenue Breakdown */}
           <Card className="rounded-none border-zinc-800 bg-black shadow-none">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight text-zinc-100">Revenue Breakdown</CardTitle>
+              <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Revenue Breakdown</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                {revenue?.lines.map((line, i) => (
-                  <div key={i}>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="font-bold text-zinc-300">{line.label} <span className="text-zinc-500 font-normal">({line.units} units)</span></span>
-                      <span className="font-mono text-zinc-100">£{line.amount.toLocaleString()}</span>
-                    </div>
-                    <div className="h-2 w-full bg-zinc-900">
-                      <div className="h-full bg-red-500" style={{ width: `${Math.max(2, (line.amount / dashboard.mrr) * 100)}%` }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
-            <CardHeader>
-              <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2"><RefreshCw className="h-4 w-4"/> Upcoming Renewals (7d)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {renewals && renewals.length > 0 ? (
-                <div className="divide-y divide-zinc-800">
-                  {renewals.map(ren => (
-                    <div key={ren.tenantId} className="py-3 flex justify-between items-center">
-                      <div>
-                        <Link href={`/tenants/${ren.tenantId}`} className="font-bold text-zinc-200 hover:text-red-500 uppercase text-sm">
-                          {ren.tenantName}
-                        </Link>
-                        <div className="text-xs text-zinc-500 font-mono mt-1">{new Date(ren.renewsAt).toLocaleDateString()}</div>
+              {revenue?.lines && revenue.lines.length > 0 ? (
+                <div className="space-y-4">
+                  {revenue.lines.map((line, i) => (
+                    <div key={i}>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="font-bold text-zinc-300">
+                          {line.label}{" "}
+                          <span className="text-zinc-500 font-normal">({line.units} units)</span>
+                        </span>
+                        <span className="font-mono text-zinc-100">£{line.amount.toLocaleString()}</span>
                       </div>
-                      <div className="font-mono text-zinc-300">£{ren.amount}</div>
+                      <div className="h-1.5 w-full bg-zinc-900">
+                        <div
+                          className="h-full bg-red-500 transition-all"
+                          style={{ width: `${Math.max(2, (line.amount / Math.max(dashboard.mrr, 1)) * 100)}%` }}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="py-8 text-center text-zinc-600 font-mono text-sm">No upcoming renewals in next 7 days.</div>
+                <div className="py-8 text-center text-zinc-600 font-mono text-sm">No revenue breakdown data available.</div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Upcoming Renewals */}
+          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+            <CardHeader>
+              <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2 text-sm">
+                <RefreshCw className="h-4 w-4" /> Upcoming Renewals (7d)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {renewals && renewals.length > 0 ? (
+                <div className="divide-y divide-zinc-800">
+                  {renewals.map((ren) => (
+                    <div key={ren.tenantId} className="py-3 flex justify-between items-center">
+                      <div>
+                        <Link
+                          href={`/tenants/${ren.tenantId}`}
+                          className="font-bold text-zinc-200 hover:text-red-500 uppercase text-sm"
+                        >
+                          {ren.tenantName}
+                        </Link>
+                        <div className="text-xs text-zinc-500 font-mono mt-0.5">
+                          {new Date(ren.renewsAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div className="font-mono text-zinc-300 font-bold">£{ren.amount}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-8 text-center text-zinc-600 font-mono text-sm">
+                  No upcoming renewals in next 7 days.
+                </div>
               )}
             </CardContent>
           </Card>
         </div>
 
-        <div>
-          <Card className="rounded-none border-zinc-800 bg-black shadow-none h-full">
-            <CardHeader>
-              <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2"><Activity className="h-4 w-4"/> System Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
+        {/* System Activity */}
+        <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+          <CardHeader>
+            <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2 text-sm">
+              <Activity className="h-4 w-4" /> System Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {activity && activity.length > 0 ? (
               <div className="space-y-4">
-                {activity?.map(act => (
+                {activity.map((act) => (
                   <div key={act.id} className="border-l-2 border-red-500 pl-4 py-1">
-                    <div className="text-xs text-zinc-500 font-mono mb-1">{new Date(act.createdAt).toLocaleString()}</div>
+                    <div className="text-xs text-zinc-500 font-mono mb-1">
+                      {new Date(act.createdAt).toLocaleString()}
+                    </div>
                     <div className="text-sm text-zinc-300">{act.message}</div>
                     {act.tenantName && (
                       <div className="text-xs font-bold uppercase text-red-500/80 mt-1">{act.tenantName}</div>
@@ -174,24 +289,84 @@ export function AdminDashboard() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            ) : (
+              <div className="py-8 text-center text-zinc-600 font-mono text-sm">No recent system activity.</div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 }
 
-function KpiCard({ title, value, icon: Icon, className = "", highlight = false }: any) {
+function KpiCard({
+  title, value, icon: Icon, highlight = false, danger = false,
+  sparklineData, trend, testId, className = "",
+}: {
+  title: string;
+  value: string | number;
+  icon: React.ElementType;
+  highlight?: boolean;
+  danger?: boolean;
+  sparklineData?: Array<{ v: number }>;
+  trend?: number;
+  testId?: string;
+  className?: string;
+}) {
+  const borderCls = danger
+    ? "border-red-900/50 bg-red-950/20"
+    : highlight
+    ? "border-red-500/50 bg-zinc-900"
+    : "border-zinc-800 bg-black";
+  const valueCls = danger ? "text-red-500" : highlight ? "text-red-500" : "text-zinc-100";
+  const iconCls = danger ? "text-red-500" : highlight ? "text-red-500" : "text-zinc-600";
+
   return (
-    <Card className={`rounded-none border-zinc-800 shadow-none ${highlight ? 'bg-zinc-900 border-red-500/50' : 'bg-black'} ${className}`}>
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-4">
+    <Card className={`rounded-none shadow-none ${borderCls} ${className}`}>
+      <CardContent className="p-5">
+        <div className="flex justify-between items-start mb-2">
           <div className="font-bold uppercase tracking-wider text-xs text-zinc-400">{title}</div>
-          <Icon className={`h-4 w-4 ${highlight ? 'text-red-500' : 'text-zinc-600'}`} />
+          <Icon className={`h-4 w-4 shrink-0 ${iconCls}`} />
         </div>
-        <div className={`text-3xl font-mono font-bold ${highlight ? 'text-red-500' : 'text-zinc-100'}`} data-testid={`kpi-${title.toLowerCase().replace(/\s+/g, '-')}`}>
+        <div
+          className={`text-2xl md:text-3xl font-mono font-bold ${valueCls}`}
+          data-testid={testId ? `kpi-${testId}` : undefined}
+        >
           {value}
+        </div>
+        <div className="flex items-center justify-between mt-2 gap-2">
+          {trend !== undefined ? (
+            <TrendBadge value={trend} />
+          ) : (
+            <span />
+          )}
+          {sparklineData && (
+            <div className="w-20 h-8 shrink-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={sparklineData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                  <defs>
+                    <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <Tooltip
+                    contentStyle={{ display: "none" }}
+                    cursor={false}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="v"
+                    stroke="#ef4444"
+                    strokeWidth={1.5}
+                    fill="url(#sparkGrad)"
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

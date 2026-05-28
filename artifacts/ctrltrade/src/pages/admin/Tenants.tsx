@@ -1,39 +1,91 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "wouter";
 import { useListAdminTenants } from "@workspace/api-client-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, ShieldCheck } from "lucide-react";
+import { Search, ShieldCheck, ArrowUpDown, ArrowUp, ArrowDown, Users } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+
+type SortKey = "name" | "status" | "mrr" | "seats";
+type SortDir = "asc" | "desc";
+
+function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; sortDir: SortDir }) {
+  if (col !== sortKey) return <ArrowUpDown className="h-3 w-3 text-zinc-600 ml-1 inline" />;
+  return sortDir === "asc"
+    ? <ArrowUp   className="h-3 w-3 text-red-500 ml-1 inline" />
+    : <ArrowDown className="h-3 w-3 text-red-500 ml-1 inline" />;
+}
 
 export function AdminTenants() {
-  const [search, setSearch] = useState("");
+  const [search, setSearch]             = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  
-  const { data: tenants, isLoading } = useListAdminTenants({ 
+  const [sortKey, setSortKey]           = useState<SortKey>("name");
+  const [sortDir, setSortDir]           = useState<SortDir>("asc");
+
+  const { data: tenants, isLoading } = useListAdminTenants({
     query: { queryKey: ["adminTenants", search, statusFilter] }
   });
 
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  const sorted = useMemo(() => {
+    if (!tenants) return [];
+    return [...tenants].sort((a, b) => {
+      let cmp = 0;
+      if (sortKey === "name") {
+        cmp = (a.name ?? "").localeCompare(b.name ?? "");
+      } else if (sortKey === "status") {
+        cmp = (a.status ?? "").localeCompare(b.status ?? "");
+      } else if (sortKey === "mrr") {
+        cmp = (Number(a.monthlyTotal) || 0) - (Number(b.monthlyTotal) || 0);
+      } else if (sortKey === "seats") {
+        const seatsA = (a.controlSeats || 0) + (a.fieldSeats || 0);
+        const seatsB = (b.controlSeats || 0) + (b.fieldSeats || 0);
+        cmp = seatsA - seatsB;
+      }
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+  }, [tenants, sortKey, sortDir]);
+
+  const ThBtn = ({ col, label }: { col: SortKey; label: string }) => (
+    <button
+      className="flex items-center gap-0.5 font-bold uppercase text-xs tracking-wider text-zinc-500 hover:text-zinc-300 transition-colors"
+      onClick={() => handleSort(col)}
+    >
+      {label}<SortIcon col={col} sortKey={sortKey} sortDir={sortDir} />
+    </button>
+  );
+
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">Tenants Directory</h1>
-      </div>
+    <div className="space-y-6">
+      <AdminPageHeader
+        title="Tenants Directory"
+        subtitle={tenants ? `${tenants.length} tenant${tenants.length !== 1 ? "s" : ""}` : undefined}
+        icon={<Users className="h-6 w-6" />}
+      />
 
       <Card className="rounded-none border-zinc-800 bg-black shadow-none p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-            <Input 
-              placeholder="Search by name, email, or ID..." 
+            <Input
+              placeholder="Search by name, email, or ID..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 rounded-none border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-red-500"
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px] rounded-none border-zinc-700 bg-zinc-900 text-white">
+            <SelectTrigger className="w-full sm:w-[180px] rounded-none border-zinc-700 bg-zinc-900 text-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent className="rounded-none border-zinc-700 bg-zinc-900 text-white">
@@ -49,34 +101,53 @@ export function AdminTenants() {
       </Card>
 
       <div className="border border-zinc-800 bg-black">
-        <div className="grid grid-cols-12 gap-4 p-4 border-b border-zinc-800 font-bold uppercase text-xs tracking-wider text-zinc-500">
-          <div className="col-span-4">Tenant</div>
-          <div className="col-span-2">Status</div>
-          <div className="col-span-3">Resources</div>
-          <div className="col-span-2">MRR</div>
-          <div className="col-span-1 text-right">Action</div>
+        <div className="grid grid-cols-12 gap-4 p-4 border-b border-zinc-800 bg-zinc-950">
+          <div className="col-span-4"><ThBtn col="name"   label="Tenant"    /></div>
+          <div className="col-span-2"><ThBtn col="status" label="Status"    /></div>
+          <div className="col-span-3"><ThBtn col="seats"  label="Resources" /></div>
+          <div className="col-span-2"><ThBtn col="mrr"    label="MRR"       /></div>
+          <div className="col-span-1" />
         </div>
-        
+
         {isLoading ? (
           <div className="p-4 space-y-4">
-            {[1,2,3,4,5].map(i => <Skeleton key={i} className="h-12 bg-zinc-900" />)}
+            {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-12 bg-zinc-900" />)}
           </div>
-        ) : tenants?.length === 0 ? (
-          <div className="p-12 text-center text-zinc-500 font-mono">No tenants found matching criteria.</div>
+        ) : sorted.length === 0 ? (
+          <div className="py-16 flex flex-col items-center gap-3 text-center">
+            <Users className="h-10 w-10 text-zinc-700" />
+            <p className="text-zinc-500 font-mono text-sm">
+              {search || statusFilter !== "all"
+                ? "No tenants match the current filters."
+                : "No tenants yet."}
+            </p>
+            {(search || statusFilter !== "all") && (
+              <button
+                className="text-xs text-red-500 uppercase font-bold hover:underline"
+                onClick={() => { setSearch(""); setStatusFilter("all"); }}
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
         ) : (
           <div className="divide-y divide-zinc-800">
-            {tenants?.map(tenant => (
-              <div key={tenant.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-zinc-900/50 transition-colors">
+            {sorted.map((tenant) => (
+              <Link
+                key={tenant.id}
+                href={`/admin/tenants/${tenant.id}`}
+                className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-zinc-900/60 transition-colors cursor-pointer"
+              >
                 <div className="col-span-4">
                   <div className="font-bold text-zinc-200 uppercase text-sm truncate">{tenant.name}</div>
                   <div className="text-xs text-zinc-500 font-mono truncate">{tenant.ownerEmail}</div>
                 </div>
                 <div className="col-span-2">
-                  <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                    tenant.status === 'active' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
-                    tenant.status === 'trial' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
-                    tenant.status === 'cancelled' ? 'bg-zinc-800 text-zinc-400 border border-zinc-700' :
-                    'bg-red-500/10 text-red-500 border border-red-500/20'
+                  <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider border ${
+                    tenant.status === "active"    ? "bg-green-500/10 text-green-500 border-green-500/20" :
+                    tenant.status === "trial"     ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
+                    tenant.status === "cancelled" ? "bg-zinc-800 text-zinc-400 border-zinc-700" :
+                                                    "bg-red-500/10 text-red-500 border-red-500/20"
                   }`}>
                     {tenant.status}
                   </span>
@@ -90,12 +161,10 @@ export function AdminTenants() {
                     <ShieldCheck className="h-3 w-3 text-green-500" aria-label="2FA enforced" />
                   )}
                 </div>
-                <div className="col-span-1 text-right">
-                  <Link href={`/admin/tenants/${tenant.id}`} className="text-xs uppercase font-bold text-red-500 hover:text-red-400">
-                    View
-                  </Link>
+                <div className="col-span-1 text-right text-xs uppercase font-bold text-red-500">
+                  View →
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

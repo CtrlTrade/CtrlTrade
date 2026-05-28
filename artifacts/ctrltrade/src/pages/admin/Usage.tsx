@@ -2,6 +2,8 @@ import { useGetAdminUsage } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
+import { Activity } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 export function AdminUsage() {
   const { data, isLoading } = useGetAdminUsage();
@@ -11,11 +13,12 @@ export function AdminUsage() {
   const fmtRange = `${new Date(data.periodStart).toLocaleDateString()} – ${new Date(data.periodEnd).toLocaleDateString()}`;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">Usage Metering</h1>
-        <p className="text-sm text-zinc-500 font-mono mt-1">{fmtRange}</p>
-      </div>
+    <div className="space-y-6">
+      <AdminPageHeader
+        title="Usage Metering"
+        subtitle={fmtRange}
+        icon={<Activity className="h-6 w-6" />}
+      />
 
       <Card className="rounded-none border-zinc-800 bg-black shadow-none">
         <CardHeader>

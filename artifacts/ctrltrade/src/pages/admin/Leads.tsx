@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Upload, LayoutList, Columns3, ChevronRight } from "lucide-react";
+import { Search, Upload, LayoutList, Columns3, ChevronRight, Funnel } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -64,40 +65,39 @@ export function AdminLeads() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">Platform Leads</h1>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2 uppercase text-xs font-bold border-zinc-700 text-zinc-300 hover:border-zinc-500"
-            onClick={() => fileRef.current?.click()}
-            disabled={importMutation.isPending}
-          >
-            <Upload className="h-3.5 w-3.5" />
-            {importMutation.isPending ? "Importing…" : "Import CSV"}
-          </Button>
-          <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`gap-1 uppercase text-xs font-bold ${view === "table" ? "text-red-500" : "text-zinc-500"}`}
-            onClick={() => setView("table")}
-          >
-            <LayoutList className="h-3.5 w-3.5" />
-            Table
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`gap-1 uppercase text-xs font-bold ${view === "kanban" ? "text-red-500" : "text-zinc-500"}`}
-            onClick={() => setView("kanban")}
-          >
-            <Columns3 className="h-3.5 w-3.5" />
-            Kanban
-          </Button>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Platform Leads"
+        icon={<Funnel className="h-6 w-6" />}
+        actions={
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 uppercase text-xs font-bold border-zinc-700 text-zinc-300 hover:border-zinc-500 rounded-none"
+              onClick={() => fileRef.current?.click()}
+              disabled={importMutation.isPending}
+            >
+              <Upload className="h-3.5 w-3.5" />
+              {importMutation.isPending ? "Importing…" : "Import CSV"}
+            </Button>
+            <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
+            <Button
+              variant="ghost" size="sm"
+              className={`gap-1 uppercase text-xs font-bold ${view === "table" ? "text-red-500" : "text-zinc-500"}`}
+              onClick={() => setView("table")}
+            >
+              <LayoutList className="h-3.5 w-3.5" /> Table
+            </Button>
+            <Button
+              variant="ghost" size="sm"
+              className={`gap-1 uppercase text-xs font-bold ${view === "kanban" ? "text-red-500" : "text-zinc-500"}`}
+              onClick={() => setView("kanban")}
+            >
+              <Columns3 className="h-3.5 w-3.5" /> Kanban
+            </Button>
+          </>
+        }
+      />
 
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">

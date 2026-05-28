@@ -4,8 +4,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RefreshCw, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { RefreshCw, AlertTriangle, CheckCircle2, Cpu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 export function AdminWorkers() {
   const { data: rawData, isLoading } = useGetAdminWorkers({
@@ -30,8 +31,8 @@ export function AdminWorkers() {
   if (isLoading || !data) return <div className="p-8 space-y-4"><Skeleton className="h-32"/><Skeleton className="h-96"/></div>;
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">Worker Queue</h1>
+    <div className="space-y-6">
+      <AdminPageHeader title="Worker Queue" icon={<Cpu className="h-6 w-6" />} />
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {(["queued","running","done","failed","dead"] as const).map(s => (
