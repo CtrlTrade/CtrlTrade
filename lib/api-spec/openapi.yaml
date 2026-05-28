@@ -720,6 +720,201 @@ paths:
               schema:
                 $ref: "#/components/schemas/Pricing"
 
+  /v1/industries:
+    get:
+      operationId: listIndustries
+      tags: [tenant]
+      summary: List all industries for the signup wizard
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Industry"
+
+  /v1/industries/{slug}:
+    get:
+      operationId: getIndustryDetail
+      tags: [tenant]
+      summary: Get full industry detail with job types, checklists, etc.
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IndustryDetail"
+
+  /v1/tenant/modules:
+    get:
+      operationId: getTenantModules
+      tags: [tenant]
+      summary: Get the tenant's active module configuration
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TenantModules"
+    patch:
+      operationId: updateTenantModules
+      tags: [tenant]
+      summary: Update tenant module flags and optionally trigger provisioning for newly enabled modules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TenantModules"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TenantModules"
+
+  /v1/admin/industries:
+    get:
+      operationId: adminListIndustries
+      tags: [admin]
+      summary: Super admin — list all industries with full content
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/IndustryDetail"
+
+  /v1/admin/industries/{id}/job-types:
+    post:
+      operationId: adminAddIndustryJobType
+      tags: [admin]
+      summary: Add a job type to an industry template
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/IndustryJobTypeInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/IndustryDetail" }
+
+  /v1/admin/industries/{id}/job-types/{itemId}:
+    delete:
+      operationId: adminRemoveIndustryJobType
+      tags: [admin]
+      summary: Remove a job type from an industry template
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: path
+          name: itemId
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: No content }
+
+  /v1/admin/industries/{id}/checklists:
+    post:
+      operationId: adminAddIndustryChecklist
+      tags: [admin]
+      summary: Add a checklist to an industry template
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/IndustryChecklistInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/IndustryDetail" }
+
+  /v1/admin/industries/{id}/checklists/{itemId}:
+    delete:
+      operationId: adminRemoveIndustryChecklist
+      tags: [admin]
+      summary: Remove a checklist from an industry template
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: path
+          name: itemId
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: No content }
+
+  /v1/admin/industries/{id}/document-templates:
+    post:
+      operationId: adminAddIndustryDocumentTemplate
+      tags: [admin]
+      summary: Add a compliance doc template to an industry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/IndustryDocumentTemplateInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/IndustryDetail" }
+
+  /v1/admin/industries/{id}/document-templates/{itemId}:
+    delete:
+      operationId: adminRemoveIndustryDocumentTemplate
+      tags: [admin]
+      summary: Remove a compliance doc template from an industry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: path
+          name: itemId
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: No content }
+
   /v1/trade-categories:
     get:
       operationId: listTradeCategories
@@ -5869,6 +6064,9 @@ components:
             addressLine1: { type: ["string", "null"] }
             city: { type: ["string", "null"] }
             postcode: { type: ["string", "null"] }
+            website: { type: ["string", "null"] }
+            contactName: { type: ["string", "null"] }
+            vatNumber: { type: ["string", "null"] }
         ownerName: { type: string, minLength: 1 }
         ownerEmail: { type: string, format: email }
         ownerPassword: { type: string, minLength: 8 }
@@ -5879,6 +6077,21 @@ components:
           type: array
           items: { type: string }
         paymentMethodId: { type: string }
+        industrySlug: { type: string }
+        businessType: { type: string }
+        hasTradeShop: { type: boolean }
+        hasMobileWorkforce: { type: boolean }
+        appointmentBookingEnabled: { type: boolean }
+        multiBranchEnabled: { type: boolean }
+        vatRegistered: { type: boolean }
+        accountingProvider: { type: string }
+        aiModulesEnabled:
+          type: array
+          items: { type: string }
+        communicationChannels:
+          type: array
+          items: { type: string }
+        posEnabled: { type: boolean }
 
     LoginCredentials:
       type: object
@@ -5961,6 +6174,131 @@ components:
           type: ["string", "null"]
           description: "control | field | null"
 
+    IndustryJobTypeInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        description: { type: string }
+        durationHours: { type: integer }
+
+    IndustryChecklistInput:
+      type: object
+      required: [name, items]
+      properties:
+        name: { type: string }
+        description: { type: string }
+        items:
+          type: array
+          items: { type: string }
+
+    IndustryDocumentTemplateInput:
+      type: object
+      required: [name, documentType]
+      properties:
+        name: { type: string }
+        description: { type: string }
+        documentType: { type: string }
+        required: { type: boolean }
+
+    Industry:
+      type: object
+      required: [id, slug, name, sortOrder]
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        description: { type: ["string", "null"] }
+        icon: { type: ["string", "null"] }
+        sortOrder: { type: integer }
+
+    IndustryDetail:
+      type: object
+      required: [id, slug, name, sortOrder, jobTypes, customFields, checklists, quoteTemplates, documentTemplates]
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        description: { type: ["string", "null"] }
+        sortOrder: { type: integer }
+        jobTypes:
+          type: array
+          items:
+            type: object
+            required: [id, name, sortOrder]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              description: { type: ["string", "null"] }
+              durationHours: { type: ["integer", "null"] }
+              sortOrder: { type: integer }
+        customFields:
+          type: array
+          items:
+            type: object
+            required: [id, label, fieldType, required, sortOrder]
+            properties:
+              id: { type: string }
+              label: { type: string }
+              fieldType: { type: string }
+              required: { type: boolean }
+              sortOrder: { type: integer }
+        checklists:
+          type: array
+          items:
+            type: object
+            required: [id, name, items, sortOrder]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              description: { type: ["string", "null"] }
+              items:
+                type: array
+                items: { type: string }
+              sortOrder: { type: integer }
+        quoteTemplates:
+          type: array
+          items:
+            type: object
+            required: [id, name, sortOrder]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              description: { type: ["string", "null"] }
+              notes: { type: ["string", "null"] }
+              sortOrder: { type: integer }
+        documentTemplates:
+          type: array
+          items:
+            type: object
+            required: [id, name, documentType, required, sortOrder]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              description: { type: ["string", "null"] }
+              documentType: { type: string }
+              required: { type: boolean }
+              sortOrder: { type: integer }
+
+    TenantModules:
+      type: object
+      properties:
+        industrySlug: { type: ["string", "null"] }
+        businessType: { type: ["string", "null"] }
+        hasTradeShop: { type: boolean }
+        hasMobileWorkforce: { type: boolean }
+        appointmentBookingEnabled: { type: boolean }
+        multiBranchEnabled: { type: boolean }
+        vatRegistered: { type: boolean }
+        accountingProvider: { type: ["string", "null"] }
+        aiModulesEnabled:
+          type: array
+          items: { type: string }
+        communicationChannels:
+          type: array
+          items: { type: string }
+        posEnabled: { type: boolean }
+
     Tenant:
       type: object
       required: [id, name, slug, status, createdAt]
@@ -5977,6 +6315,25 @@ components:
         addressLine1: { type: ["string", "null"] }
         city: { type: ["string", "null"] }
         postcode: { type: ["string", "null"] }
+        industryId: { type: ["string", "null"] }
+        industrySlug: { type: ["string", "null"] }
+        businessType: { type: ["string", "null"] }
+        website: { type: ["string", "null"] }
+        contactName: { type: ["string", "null"] }
+        vatNumber: { type: ["string", "null"] }
+        hasTradeShop: { type: boolean }
+        hasMobileWorkforce: { type: boolean }
+        appointmentBookingEnabled: { type: boolean }
+        multiBranchEnabled: { type: boolean }
+        vatRegistered: { type: boolean }
+        accountingProvider: { type: ["string", "null"] }
+        aiModulesEnabled:
+          type: array
+          items: { type: string }
+        communicationChannels:
+          type: array
+          items: { type: string }
+        posEnabled: { type: boolean }
         brandColor: { type: ["string", "null"] }
         logoUrl: { type: ["string", "null"] }
         logoPortalUrl: { type: ["string", "null"] }
@@ -6152,6 +6509,24 @@ components:
         addressLine1: { type: string }
         city: { type: string }
         postcode: { type: string }
+        website: { type: string }
+        contactName: { type: string }
+        vatNumber: { type: string }
+        industrySlug: { type: string }
+        businessType: { type: string }
+        hasTradeShop: { type: boolean }
+        hasMobileWorkforce: { type: boolean }
+        appointmentBookingEnabled: { type: boolean }
+        multiBranchEnabled: { type: boolean }
+        vatRegistered: { type: boolean }
+        accountingProvider: { type: string }
+        aiModulesEnabled:
+          type: array
+          items: { type: string }
+        communicationChannels:
+          type: array
+          items: { type: string }
+        posEnabled: { type: boolean }
         brandColor: { type: string }
         logoUrl: { type: string }
         logoPortalUrl: { type: string }

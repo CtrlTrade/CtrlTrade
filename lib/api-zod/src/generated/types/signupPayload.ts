@@ -22,4 +22,15 @@ export interface SignupPayload {
   tills: number;
   tradeCategorySlugs: string[];
   paymentMethodId: string;
+  industrySlug?: string;
+  businessType?: string;
+  hasTradeShop?: boolean;
+  hasMobileWorkforce?: boolean;
+  appointmentBookingEnabled?: boolean;
+  multiBranchEnabled?: boolean;
+  vatRegistered?: boolean;
+  accountingProvider?: string;
+  aiModulesEnabled?: string[];
+  communicationChannels?: string[];
+  posEnabled?: boolean;
 }

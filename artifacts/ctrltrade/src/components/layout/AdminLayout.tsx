@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Users, LogOut, Flag, Activity, Cpu, Handshake,
   BarChart3, Plug, ShieldCheck, Funnel, Menu, X, ChevronRight,
-  AlertTriangle, ChevronsLeft, ChevronsRight,
+  AlertTriangle, ChevronsLeft, ChevronsRight, Building,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -33,9 +33,10 @@ const NAV_GROUPS = [
     id: "config",
     label: "Config",
     items: [
-      { href: "/feature-flags",  icon: Flag, label: "Feature Flags",  testId: "feature-flags"  },
-      { href: "/workers",        icon: Cpu,  label: "Workers",        testId: "workers"        },
-      { href: "/integrations",   icon: Plug, label: "Integrations",   testId: "integrations"   },
+      { href: "/feature-flags",  icon: Flag,     label: "Feature Flags",  testId: "feature-flags"  },
+      { href: "/workers",        icon: Cpu,      label: "Workers",        testId: "workers"        },
+      { href: "/integrations",   icon: Plug,     label: "Integrations",   testId: "integrations"   },
+      { href: "/industries",     icon: Building, label: "Industries",      testId: "industries"     },
     ],
   },
 ];

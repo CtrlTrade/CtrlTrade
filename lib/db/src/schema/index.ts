@@ -23,6 +23,75 @@ export const tradeCategoriesTable = pgTable("trade_categories", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+// ---- Industries (global reference) ----------------------------------------
+export const industriesTable = pgTable("industries", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: varchar("slug", { length: 64 }).notNull().unique(),
+  name: text("name").notNull(),
+  description: text("description"),
+  icon: varchar("icon", { length: 32 }),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const industryJobTypesTable = pgTable("industry_job_types", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  industryId: uuid("industry_id").notNull().references(() => industriesTable.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  durationHours: integer("duration_hours"),
+  sortOrder: integer("sort_order").notNull().default(0),
+}, (t) => ({ industryIdx: index("industry_job_types_industry_idx").on(t.industryId) }));
+
+export const industryCustomFieldsTable = pgTable("industry_custom_fields", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  industryId: uuid("industry_id").notNull().references(() => industriesTable.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  fieldType: varchar("field_type", { length: 32 }).notNull().default("text"),
+  options: jsonb("options"),
+  required: boolean("required").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+}, (t) => ({ industryIdx: index("industry_custom_fields_industry_idx").on(t.industryId) }));
+
+export const industryChecklistsTable = pgTable("industry_checklists", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  industryId: uuid("industry_id").notNull().references(() => industriesTable.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  items: jsonb("items").notNull().default(sql`'[]'::jsonb`).$type<string[]>(),
+  sortOrder: integer("sort_order").notNull().default(0),
+}, (t) => ({ industryIdx: index("industry_checklists_industry_idx").on(t.industryId) }));
+
+export const industryQuoteTemplatesTable = pgTable("industry_quote_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  industryId: uuid("industry_id").notNull().references(() => industriesTable.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  header: text("header"),
+  footer: text("footer"),
+  notes: text("notes"),
+  lineItems: jsonb("line_items").notNull().default(sql`'[]'::jsonb`).$type<Array<{ description: string; quantity: number; unitPricePence: number }>>(),
+  sortOrder: integer("sort_order").notNull().default(0),
+}, (t) => ({ industryIdx: index("industry_quote_templates_industry_idx").on(t.industryId) }));
+
+export const industryDocumentTemplatesTable = pgTable("industry_document_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  industryId: uuid("industry_id").notNull().references(() => industriesTable.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  documentType: varchar("document_type", { length: 64 }).notNull(),
+  templateBody: text("template_body"),
+  required: boolean("required").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+}, (t) => ({ industryIdx: index("industry_document_templates_industry_idx").on(t.industryId) }));
+
+export type Industry = typeof industriesTable.$inferSelect;
+export type IndustryJobType = typeof industryJobTypesTable.$inferSelect;
+export type IndustryCustomField = typeof industryCustomFieldsTable.$inferSelect;
+export type IndustryChecklist = typeof industryChecklistsTable.$inferSelect;
+export type IndustryQuoteTemplate = typeof industryQuoteTemplatesTable.$inferSelect;
+export type IndustryDocumentTemplate = typeof industryDocumentTemplatesTable.$inferSelect;
+
 // ---- Tenants ---------------------------------------------------------------
 export const tenantsTable = pgTable(
   "tenants",
@@ -37,6 +106,23 @@ export const tenantsTable = pgTable(
     city: text("city"),
     postcode: text("postcode"),
     companyNumber: text("company_number"),
+    // Industry-aware provisioning fields
+    industryId: uuid("industry_id").references(() => industriesTable.id, { onDelete: "set null" }),
+    businessType: varchar("business_type", { length: 32 }),
+    website: text("website"),
+    contactName: text("contact_name"),
+    vatNumber: text("vat_number"),
+    invoiceNumberFormat: varchar("invoice_number_format", { length: 64 }),
+    financialYearStart: varchar("financial_year_start", { length: 8 }),
+    hasTradeShop: boolean("has_trade_shop").notNull().default(false),
+    hasMobileWorkforce: boolean("has_mobile_workforce").notNull().default(false),
+    appointmentBookingEnabled: boolean("appointment_booking_enabled").notNull().default(false),
+    multiBranchEnabled: boolean("multi_branch_enabled").notNull().default(false),
+    vatRegistered: boolean("vat_registered").notNull().default(false),
+    accountingProvider: varchar("accounting_provider", { length: 32 }),
+    aiModulesEnabled: jsonb("ai_modules_enabled").notNull().default(sql`'[]'::jsonb`).$type<string[]>(),
+    communicationChannels: jsonb("communication_channels").notNull().default(sql`'[]'::jsonb`).$type<string[]>(),
+    posEnabled: boolean("pos_enabled").notNull().default(false),
     brandColor: varchar("brand_color", { length: 16 }),
     logoUrl: text("logo_url"),
     logoPortalUrl: text("logo_portal_url"),

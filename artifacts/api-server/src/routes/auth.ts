@@ -8,7 +8,9 @@ import {
   subscriptionsTable,
   tradeCategoriesTable,
   tenantTradeCategoriesTable,
+  industriesTable,
 } from "@workspace/db";
+import { eq as drizzleEq } from "drizzle-orm";
 import {
   SignupBody,
   LoginBody,
@@ -122,6 +124,19 @@ router.post("/v1/auth/signup", async (req, res): Promise<void> => {
         city: body.company.city ?? null,
         postcode: body.company.postcode ?? null,
         companyNumber: body.company.companyNumber ?? null,
+        website: (body as any).website ?? null,
+        contactName: (body as any).contactName ?? null,
+        vatNumber: (body as any).vatNumber ?? null,
+        businessType: (body as any).businessType ?? null,
+        hasTradeShop: (body as any).hasTradeShop ?? false,
+        hasMobileWorkforce: (body as any).hasMobileWorkforce ?? false,
+        appointmentBookingEnabled: (body as any).appointmentBookingEnabled ?? false,
+        multiBranchEnabled: (body as any).multiBranchEnabled ?? false,
+        vatRegistered: (body as any).vatRegistered ?? false,
+        accountingProvider: (body as any).accountingProvider ?? null,
+        aiModulesEnabled: (body as any).aiModulesEnabled ?? [],
+        communicationChannels: (body as any).communicationChannels ?? [],
+        posEnabled: (body as any).posEnabled ?? false,
         stripeCustomerId: customer.id,
         stripeSubscriptionId: subscription.id,
         trialEndsAt,
@@ -156,6 +171,15 @@ router.post("/v1/auth/signup", async (req, res): Promise<void> => {
         await tx.insert(tenantTradeCategoriesTable).values(
           cats.map((c) => ({ tenantId: tenant.id, tradeCategoryId: c.id })),
         );
+      }
+    }
+
+    const industrySlugValue = (body as any).industrySlug as string | null | undefined;
+    if (industrySlugValue) {
+      const [ind] = await tx.select().from(industriesTable).where(drizzleEq(industriesTable.slug, industrySlugValue));
+      if (ind) {
+        await tx.update(tenantsTable).set({ industryId: ind.id }).where(drizzleEq(tenantsTable.id, tenant.id));
+        (tenant as any).industryId = ind.id;
       }
     }
 

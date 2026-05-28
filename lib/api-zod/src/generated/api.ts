@@ -392,6 +392,21 @@ export const PosLoginResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -466,6 +481,21 @@ export const GetPosSessionResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -919,6 +949,241 @@ export const GetPricingResponse = zod.object({
 
 
 /**
+ * @summary List all industries for the signup wizard
+ */
+export const ListIndustriesResponseItem = zod.object({
+  "id": zod.string(),
+  "slug": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "icon": zod.string().nullish(),
+  "sortOrder": zod.number()
+})
+export const ListIndustriesResponse = zod.array(ListIndustriesResponseItem)
+
+
+/**
+ * @summary Get full industry detail with job types, checklists, etc.
+ */
+export const GetIndustryDetailParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetIndustryDetailResponse = zod.object({
+  "id": zod.string(),
+  "slug": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "sortOrder": zod.number(),
+  "jobTypes": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "durationHours": zod.number().nullish(),
+  "sortOrder": zod.number()
+})),
+  "customFields": zod.array(zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "fieldType": zod.string(),
+  "required": zod.boolean(),
+  "sortOrder": zod.number()
+})),
+  "checklists": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "items": zod.array(zod.string()),
+  "sortOrder": zod.number()
+})),
+  "quoteTemplates": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "sortOrder": zod.number()
+})),
+  "documentTemplates": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "documentType": zod.string(),
+  "required": zod.boolean(),
+  "sortOrder": zod.number()
+}))
+})
+
+
+/**
+ * @summary Get the tenant's active module configuration
+ */
+export const GetTenantModulesResponse = zod.object({
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional()
+})
+
+
+/**
+ * @summary Update tenant module flags and optionally trigger provisioning for newly enabled modules
+ */
+export const UpdateTenantModulesBody = zod.object({
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional()
+})
+
+export const UpdateTenantModulesResponse = zod.object({
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional()
+})
+
+
+/**
+ * @summary Super admin — list all industries with full content
+ */
+export const AdminListIndustriesResponseItem = zod.object({
+  "id": zod.string(),
+  "slug": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "sortOrder": zod.number(),
+  "jobTypes": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "durationHours": zod.number().nullish(),
+  "sortOrder": zod.number()
+})),
+  "customFields": zod.array(zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "fieldType": zod.string(),
+  "required": zod.boolean(),
+  "sortOrder": zod.number()
+})),
+  "checklists": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "items": zod.array(zod.string()),
+  "sortOrder": zod.number()
+})),
+  "quoteTemplates": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "sortOrder": zod.number()
+})),
+  "documentTemplates": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "documentType": zod.string(),
+  "required": zod.boolean(),
+  "sortOrder": zod.number()
+}))
+})
+export const AdminListIndustriesResponse = zod.array(AdminListIndustriesResponseItem)
+
+
+/**
+ * @summary Add a job type to an industry template
+ */
+export const AdminAddIndustryJobTypeParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminAddIndustryJobTypeBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "durationHours": zod.number().optional()
+})
+
+
+/**
+ * @summary Remove a job type from an industry template
+ */
+export const AdminRemoveIndustryJobTypeParams = zod.object({
+  "id": zod.coerce.string(),
+  "itemId": zod.coerce.string()
+})
+
+
+/**
+ * @summary Add a checklist to an industry template
+ */
+export const AdminAddIndustryChecklistParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminAddIndustryChecklistBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "items": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Remove a checklist from an industry template
+ */
+export const AdminRemoveIndustryChecklistParams = zod.object({
+  "id": zod.coerce.string(),
+  "itemId": zod.coerce.string()
+})
+
+
+/**
+ * @summary Add a compliance doc template to an industry
+ */
+export const AdminAddIndustryDocumentTemplateParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminAddIndustryDocumentTemplateBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "documentType": zod.string(),
+  "required": zod.boolean().optional()
+})
+
+
+/**
+ * @summary Remove a compliance doc template from an industry
+ */
+export const AdminRemoveIndustryDocumentTemplateParams = zod.object({
+  "id": zod.coerce.string(),
+  "itemId": zod.coerce.string()
+})
+
+
+/**
  * @summary List trade categories
  */
 export const ListTradeCategoriesResponseItem = zod.object({
@@ -952,7 +1217,10 @@ export const SignupBody = zod.object({
   "phone": zod.string().nullish(),
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
-  "postcode": zod.string().nullish()
+  "postcode": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish()
 }),
   "ownerName": zod.string().min(1),
   "ownerEmail": zod.string().email(),
@@ -961,7 +1229,18 @@ export const SignupBody = zod.object({
   "fieldSeats": zod.number().min(signupBodyFieldSeatsMin),
   "tills": zod.number().min(signupBodyTillsMin),
   "tradeCategorySlugs": zod.array(zod.string()),
-  "paymentMethodId": zod.string()
+  "paymentMethodId": zod.string(),
+  "industrySlug": zod.string().optional(),
+  "businessType": zod.string().optional(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().optional(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional()
 })
 
 
@@ -994,6 +1273,21 @@ export const LoginResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -1116,6 +1410,21 @@ export const Submit2faChallengeResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -1193,6 +1502,21 @@ export const GetSessionResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -1274,6 +1598,21 @@ export const GetTenantResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -1328,6 +1667,20 @@ export const UpdateTenantBody = zod.object({
   "addressLine1": zod.string().optional(),
   "city": zod.string().optional(),
   "postcode": zod.string().optional(),
+  "website": zod.string().optional(),
+  "contactName": zod.string().optional(),
+  "vatNumber": zod.string().optional(),
+  "industrySlug": zod.string().optional(),
+  "businessType": zod.string().optional(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().optional(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().optional(),
   "logoUrl": zod.string().optional(),
   "logoPortalUrl": zod.string().optional(),
@@ -1372,6 +1725,21 @@ export const UpdateTenantResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -1681,6 +2049,21 @@ export const GetAdminTenantResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -2029,6 +2412,21 @@ export const AcceptInvitationResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -2136,6 +2534,21 @@ export const StartImpersonationResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -2213,6 +2626,21 @@ export const StopImpersonationResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -5016,6 +5444,21 @@ export const GetAdminTenantWhiteLabelResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -5081,6 +5524,21 @@ export const GetAdminTenantWhiteLabelResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),
@@ -5171,6 +5629,21 @@ export const UpdateAdminTenantWhiteLabelResponse = zod.object({
   "addressLine1": zod.string().nullish(),
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
+  "industryId": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "businessType": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "contactName": zod.string().nullish(),
+  "vatNumber": zod.string().nullish(),
+  "hasTradeShop": zod.boolean().optional(),
+  "hasMobileWorkforce": zod.boolean().optional(),
+  "appointmentBookingEnabled": zod.boolean().optional(),
+  "multiBranchEnabled": zod.boolean().optional(),
+  "vatRegistered": zod.boolean().optional(),
+  "accountingProvider": zod.string().nullish(),
+  "aiModulesEnabled": zod.array(zod.string()).optional(),
+  "communicationChannels": zod.array(zod.string()).optional(),
+  "posEnabled": zod.boolean().optional(),
   "brandColor": zod.string().nullish(),
   "logoUrl": zod.string().nullish(),
   "logoPortalUrl": zod.string().nullish(),

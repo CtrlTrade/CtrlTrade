@@ -51,6 +51,7 @@ import jobCostsRouter from "./jobCosts";
 import adminLeadsRouter from "./adminLeads";
 import publicLeadsRouter from "./publicLeads";
 import leadWebhooksRouter from "./leadWebhooks";
+import industriesRouter from "./industries";
 
 const router: IRouter = Router();
 
@@ -112,6 +113,10 @@ router.use(branchesRouter);
 router.use(areaManagersRouter);
 router.use(jobCostsRouter);
 router.use(adminLeadsRouter);
+<<<<<<< HEAD
 router.use(leadWebhooksRouter);
+=======
+router.use(industriesRouter);
+>>>>>>> 6784e9b (Add industry selection and business setup to tenant configuration)
 
 export default router;

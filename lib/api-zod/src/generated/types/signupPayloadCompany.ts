@@ -20,4 +20,10 @@ export type SignupPayloadCompany = {
   city?: string | null;
   /** @nullable */
   postcode?: string | null;
+  /** @nullable */
+  website?: string | null;
+  /** @nullable */
+  contactName?: string | null;
+  /** @nullable */
+  vatNumber?: string | null;
 };

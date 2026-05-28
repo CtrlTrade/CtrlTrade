@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { useSignup, useGetPricing, useListTradeCategories, useCreateSetupIntent } from "@workspace/api-client-react";
+import { useSignup, useGetPricing, useListTradeCategories, useCreateSetupIntent, useListIndustries } from "@workspace/api-client-react";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,39 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowRight, ArrowLeft, Plus, Minus, CreditCard } from "lucide-react";
+import { ArrowRight, ArrowLeft, Plus, Minus, CreditCard, CheckCircle2 } from "lucide-react";
 
-// Publishable key is fetched from the server (sourced from the Stripe Replit integration).
-// If Stripe isn't connected, the endpoint returns 503 and we fall back to the no-Stripe flow.
+const TOTAL_STEPS = 10;
+
+const BUSINESS_TYPES = [
+  { value: "sole_trader", label: "Sole Trader" },
+  { value: "limited_company", label: "Limited Company" },
+  { value: "partnership", label: "Partnership" },
+  { value: "plc", label: "PLC / Enterprise" },
+];
+
+const ACCOUNTING_PROVIDERS = [
+  { value: "xero", label: "Xero" },
+  { value: "quickbooks", label: "QuickBooks" },
+  { value: "sage", label: "Sage" },
+  { value: "freeagent", label: "FreeAgent" },
+  { value: "none", label: "None" },
+];
+
+const COMMUNICATION_CHANNELS = [
+  { value: "sms", label: "SMS" },
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "email", label: "Email" },
+  { value: "voice", label: "Voice" },
+];
+
+const AI_MODULES = [
+  { value: "quote_assist", label: "AI Quote Assist" },
+  { value: "job_summary", label: "AI Job Summaries" },
+  { value: "customer_insights", label: "Customer Insights" },
+  { value: "scheduling", label: "AI Smart Scheduling" },
+];
+
 let stripePromiseCache: Promise<Stripe | null> | null = null;
 async function loadStripePromise(baseUrl: string): Promise<Stripe | null> {
   if (stripePromiseCache) return stripePromiseCache;
@@ -30,15 +59,27 @@ async function loadStripePromise(baseUrl: string): Promise<Stripe | null> {
 export function Signup() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  
+
   const [step, setStep] = useState(1);
   const { data: categories, isLoading: categoriesLoading } = useListTradeCategories();
   const { data: pricing, isLoading: pricingLoading } = useGetPricing();
+  const { data: industries, isLoading: industriesLoading } = useListIndustries();
   const createSetupIntent = useCreateSetupIntent();
   const signup = useSignup();
 
-  // State
   const [company, setCompany] = useState({ name: "", country: "UK", phone: "", addressLine1: "", city: "", postcode: "", companyNumber: "" });
+  const [contactDetails, setContactDetails] = useState({ contactName: "", website: "", vatNumber: "" });
+  const [industrySlug, setIndustrySlug] = useState<string>("");
+  const [businessType, setBusinessType] = useState<string>("");
+  const [vatRegistered, setVatRegistered] = useState(false);
+  const [accountingProvider, setAccountingProvider] = useState<string>("none");
+  const [hasTradeShop, setHasTradeShop] = useState(false);
+  const [hasMobileWorkforce, setHasMobileWorkforce] = useState(false);
+  const [appointmentBookingEnabled, setAppointmentBookingEnabled] = useState(false);
+  const [multiBranchEnabled, setMultiBranchEnabled] = useState(false);
+  const [posEnabled, setPosEnabled] = useState(false);
+  const [aiModulesEnabled, setAiModulesEnabled] = useState<string[]>([]);
+  const [communicationChannels, setCommunicationChannels] = useState<string[]>(["email"]);
   const [tradeCategorySlugs, setTradeCategorySlugs] = useState<string[]>([]);
   const [controlSeats, setControlSeats] = useState(1);
   const [fieldSeats, setFieldSeats] = useState(0);
@@ -56,21 +97,18 @@ export function Signup() {
       setStripePromise(s ? promise : null);
       setStripeChecked(true);
     });
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
-  const nextStep = () => setStep(s => Math.min(6, s + 1));
-  const prevStep = () => setStep(s => Math.max(1, s - 1));
+  const nextStep = () => setStep((s) => Math.min(TOTAL_STEPS, s + 1));
+  const prevStep = () => setStep((s) => Math.max(1, s - 1));
 
-  const handleStep4Submit = async (e: React.FormEvent) => {
+  const handleOwnerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (owner.password.length < 8) {
       toast({ title: "Password too short", description: "Must be at least 8 characters", variant: "destructive" });
       return;
     }
-    
     if (stripePromise) {
       try {
         const intent = await createSetupIntent.mutateAsync({ data: { email: owner.email, companyName: company.name } });
@@ -81,14 +119,6 @@ export function Signup() {
       }
     }
     nextStep();
-  };
-
-  const handleStripeSuccess = (paymentMethodId: string) => {
-    finishSignup(paymentMethodId);
-  };
-
-  const handleStripeFallbackSkip = () => {
-    finishSignup("pm_fallback_skipped"); // Dummy value when no stripe connected
   };
 
   const finishSignup = (paymentMethodId: string) => {
@@ -102,8 +132,22 @@ export function Signup() {
         ownerName: owner.name,
         ownerEmail: owner.email,
         ownerPassword: owner.password,
-        paymentMethodId
-      }
+        paymentMethodId,
+        industrySlug: industrySlug || undefined,
+        businessType: businessType || undefined,
+        website: contactDetails.website || undefined,
+        contactName: contactDetails.contactName || undefined,
+        vatNumber: contactDetails.vatNumber || undefined,
+        vatRegistered,
+        accountingProvider: accountingProvider !== "none" ? accountingProvider : undefined,
+        hasTradeShop,
+        hasMobileWorkforce,
+        appointmentBookingEnabled,
+        multiBranchEnabled,
+        posEnabled,
+        aiModulesEnabled,
+        communicationChannels,
+      } as any,
     }, {
       onSuccess: () => {
         toast({ title: "Welcome to CTRLTRADE®", description: "Your workspace is ready." });
@@ -111,174 +155,361 @@ export function Signup() {
       },
       onError: (err: any) => {
         toast({ title: "Signup Failed", description: err.message, variant: "destructive" });
-      }
+      },
     });
   };
+
+  const stepTitles = [
+    "Company Details",
+    "Your Industry",
+    "Business Type",
+    "Platform Modules",
+    "Communication & AI",
+    "Trade Categories",
+    "Subscription Sizing",
+    "Owner Account",
+    "Legal & Accounting",
+    "Payment Method",
+  ];
+
+  const stepDescriptions = [
+    "Tell us about your company.",
+    "Select the primary industry your business operates in.",
+    "What type of business are you?",
+    "Choose which platform modules to activate.",
+    "Set up communication channels and AI features.",
+    "Select the trades your business operates in.",
+    "Choose how many seats and POS tills you need.",
+    "Create the owner account for your workspace.",
+    "Legal details and accounting integration.",
+    "Add your payment method to complete setup.",
+  ];
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 py-12">
       <div className="w-full max-w-2xl">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold tracking-tighter uppercase">CTRLTRADE® Setup</h1>
-          <div className="text-sm font-mono text-muted-foreground">STEP {step}/6</div>
+          <div className="text-sm font-mono text-muted-foreground">STEP {step}/{TOTAL_STEPS}</div>
         </div>
 
-        <Card className=" border-border shadow-xl">
+        <div className="w-full bg-muted h-1.5 mb-8">
+          <div className="bg-primary h-full transition-all duration-300" style={{ width: `${(step / TOTAL_STEPS) * 100}%` }} />
+        </div>
+
+        <Card className="border-border shadow-xl">
           <CardHeader>
-            {step === 1 && <CardTitle className="uppercase tracking-tight">Company Details</CardTitle>}
-            {step === 2 && <CardTitle className="uppercase tracking-tight">Industries</CardTitle>}
-            {step === 3 && <CardTitle className="uppercase tracking-tight">Subscription Sizing</CardTitle>}
-            {step === 4 && <CardTitle className="uppercase tracking-tight">Owner Account</CardTitle>}
-            {step === 5 && <CardTitle className="uppercase tracking-tight">Payment Method</CardTitle>}
-            {step === 6 && <CardTitle className="uppercase tracking-tight">Review & Deploy</CardTitle>}
+            <CardTitle className="uppercase tracking-tight">{stepTitles[step - 1]}</CardTitle>
+            <CardDescription>{stepDescriptions[step - 1]}</CardDescription>
           </CardHeader>
           <CardContent>
+
+            {/* Step 1 — Company Details */}
             {step === 1 && (
               <form onSubmit={(e) => { e.preventDefault(); nextStep(); }} className="space-y-4">
                 <div className="space-y-2">
                   <Label>Company Name *</Label>
-                  <Input required value={company.name} onChange={e => setCompany({...company, name: e.target.value})} className="rounded-none" data-testid="input-signup-company-name"/>
+                  <Input required value={company.name} onChange={(e) => setCompany({ ...company, name: e.target.value })} className="rounded-none" data-testid="input-signup-company-name" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Country</Label>
-                    <Input value={company.country} onChange={e => setCompany({...company, country: e.target.value})} className="rounded-none" />
+                    <Input value={company.country} onChange={(e) => setCompany({ ...company, country: e.target.value })} className="rounded-none" />
                   </div>
                   <div className="space-y-2">
                     <Label>Phone</Label>
-                    <Input value={company.phone} onChange={e => setCompany({...company, phone: e.target.value})} className="rounded-none" />
+                    <Input value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} className="rounded-none" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Address</Label>
-                  <Input value={company.addressLine1} onChange={e => setCompany({...company, addressLine1: e.target.value})} className="rounded-none" />
+                  <Input value={company.addressLine1} onChange={(e) => setCompany({ ...company, addressLine1: e.target.value })} className="rounded-none" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>City</Label>
-                    <Input value={company.city} onChange={e => setCompany({...company, city: e.target.value})} className="rounded-none" />
+                    <Input value={company.city} onChange={(e) => setCompany({ ...company, city: e.target.value })} className="rounded-none" />
                   </div>
                   <div className="space-y-2">
                     <Label>Postcode</Label>
-                    <Input value={company.postcode} onChange={e => setCompany({...company, postcode: e.target.value})} className="rounded-none" />
+                    <Input value={company.postcode} onChange={(e) => setCompany({ ...company, postcode: e.target.value })} className="rounded-none" />
                   </div>
                 </div>
                 <div className="flex justify-end pt-4">
-                  <Button type="submit" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-1">Next <ArrowRight className="ml-2 h-4 w-4"/></Button>
+                  <Button type="submit" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-1">
+                    Next <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
                 </div>
               </form>
             )}
 
+            {/* Step 2 — Industry Selection */}
             {step === 2 && (
               <div className="space-y-6">
-                <CardDescription>Select the trades your business operates in.</CardDescription>
-                {categoriesLoading ? <Skeleton className="h-64" /> : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {categories?.map(cat => (
-                      <div key={cat.slug} className="flex items-center space-x-2 border border-border p-4 bg-background hover:border-primary transition-colors">
-                        <Checkbox 
-                          id={`cat-${cat.slug}`} 
-                          checked={tradeCategorySlugs.includes(cat.slug)}
-                          onCheckedChange={(checked) => {
-                            if (checked) setTradeCategorySlugs([...tradeCategorySlugs, cat.slug]);
-                            else setTradeCategorySlugs(tradeCategorySlugs.filter(s => s !== cat.slug));
+                {industriesLoading ? <Skeleton className="h-64" /> : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
+                    {(industries ?? []).map((ind: any) => (
+                      <button
+                        key={ind.slug}
+                        type="button"
+                        onClick={() => setIndustrySlug(ind.slug === industrySlug ? "" : ind.slug)}
+                        className={`flex items-center gap-3 border p-4 text-left transition-colors ${industrySlug === ind.slug ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
+                        data-testid={`btn-industry-${ind.slug}`}
+                      >
+                        {industrySlug === ind.slug && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
+                        <div>
+                          <div className="font-bold uppercase text-sm">{ind.name}</div>
+                          {ind.description && <div className="text-xs text-muted-foreground mt-0.5">{ind.description}</div>}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="flex justify-between pt-4">
+                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-2">
+                    {industrySlug ? "Next" : "Skip for now"} <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3 — Business Type */}
+            {step === 3 && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {BUSINESS_TYPES.map((bt) => (
+                    <button
+                      key={bt.value}
+                      type="button"
+                      onClick={() => setBusinessType(bt.value === businessType ? "" : bt.value)}
+                      className={`border p-4 text-left transition-colors ${businessType === bt.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
+                      data-testid={`btn-business-type-${bt.value}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {businessType === bt.value && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
+                        <span className="font-bold uppercase text-sm">{bt.label}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex justify-between pt-4">
+                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-3">
+                    {businessType ? "Next" : "Skip for now"} <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4 — Platform Modules */}
+            {step === 4 && (
+              <div className="space-y-4">
+                {[
+                  { label: "Trade Shop", description: "Enable a B2B trade products store", value: hasTradeShop, set: setHasTradeShop, id: "mod-trade-shop" },
+                  { label: "Mobile Workforce", description: "Enable field engineer mobile app features", value: hasMobileWorkforce, set: setHasMobileWorkforce, id: "mod-mobile-workforce" },
+                  { label: "Appointment Booking", description: "Enable customer self-booking widget", value: appointmentBookingEnabled, set: setAppointmentBookingEnabled, id: "mod-booking" },
+                  { label: "POS Tills", description: "Enable point-of-sale terminal features", value: posEnabled, set: setPosEnabled, id: "mod-pos" },
+                  { label: "Multi-Branch", description: "Enable branch management and area managers", value: multiBranchEnabled, set: setMultiBranchEnabled, id: "mod-multi-branch" },
+                ].map((mod) => (
+                  <div key={mod.id} className="flex items-center gap-4 border border-border p-4">
+                    <Checkbox id={mod.id} checked={mod.value} onCheckedChange={(c) => mod.set(!!c)} className="rounded-none" />
+                    <label htmlFor={mod.id} className="flex-1 cursor-pointer">
+                      <div className="font-bold uppercase text-sm">{mod.label}</div>
+                      <div className="text-xs text-muted-foreground">{mod.description}</div>
+                    </label>
+                  </div>
+                ))}
+                <div className="flex justify-between pt-4">
+                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-4">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 5 — Communication & AI */}
+            {step === 5 && (
+              <div className="space-y-6">
+                <div>
+                  <Label className="uppercase tracking-wider text-xs mb-3 block">Communication Channels</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {COMMUNICATION_CHANNELS.map((ch) => (
+                      <div key={ch.value} className="flex items-center gap-3 border border-border p-3">
+                        <Checkbox
+                          id={`ch-${ch.value}`}
+                          checked={communicationChannels.includes(ch.value)}
+                          onCheckedChange={(c) => {
+                            if (c) setCommunicationChannels([...communicationChannels, ch.value]);
+                            else setCommunicationChannels(communicationChannels.filter((x) => x !== ch.value));
                           }}
                           className="rounded-none"
                         />
-                        <label htmlFor={`cat-${cat.slug}`} className="text-sm font-bold uppercase cursor-pointer flex-1">
-                          {cat.name}
-                        </label>
+                        <label htmlFor={`ch-${ch.value}`} className="font-bold uppercase text-sm cursor-pointer">{ch.label}</label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Label className="uppercase tracking-wider text-xs mb-3 block">AI Modules</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {AI_MODULES.map((ai) => (
+                      <div key={ai.value} className="flex items-center gap-3 border border-border p-3">
+                        <Checkbox
+                          id={`ai-${ai.value}`}
+                          checked={aiModulesEnabled.includes(ai.value)}
+                          onCheckedChange={(c) => {
+                            if (c) setAiModulesEnabled([...aiModulesEnabled, ai.value]);
+                            else setAiModulesEnabled(aiModulesEnabled.filter((x) => x !== ai.value));
+                          }}
+                          className="rounded-none"
+                        />
+                        <label htmlFor={`ai-${ai.value}`} className="font-bold uppercase text-sm cursor-pointer">{ai.label}</label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex justify-between pt-4">
+                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-5">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 6 — Trade Categories */}
+            {step === 6 && (
+              <div className="space-y-6">
+                {categoriesLoading ? <Skeleton className="h-64" /> : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+                    {categories?.map((cat) => (
+                      <div key={cat.slug} className="flex items-center space-x-2 border border-border p-4 bg-background hover:border-primary transition-colors">
+                        <Checkbox
+                          id={`cat-${cat.slug}`}
+                          checked={tradeCategorySlugs.includes(cat.slug)}
+                          onCheckedChange={(checked) => {
+                            if (checked) setTradeCategorySlugs([...tradeCategorySlugs, cat.slug]);
+                            else setTradeCategorySlugs(tradeCategorySlugs.filter((s) => s !== cat.slug));
+                          }}
+                          className="rounded-none"
+                        />
+                        <label htmlFor={`cat-${cat.slug}`} className="text-sm font-bold uppercase cursor-pointer flex-1">{cat.name}</label>
                       </div>
                     ))}
                   </div>
                 )}
                 <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4"/> Back</Button>
-                  <Button onClick={nextStep} disabled={tradeCategorySlugs.length === 0} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-2">Next <ArrowRight className="ml-2 h-4 w-4"/></Button>
+                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-6">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </div>
             )}
 
-            {step === 3 && (
+            {/* Step 7 — Subscription Sizing */}
+            {step === 7 && (
               <div className="space-y-6">
                 {pricingLoading ? <Skeleton className="h-64" /> : pricing && (
                   <>
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between border border-border p-4 bg-background">
-                        <div>
-                          <div className="font-bold uppercase">Control Seats</div>
-                          <div className="text-sm text-muted-foreground font-mono">£{pricing.controlSeat.amount}/mo</div>
+                      {[
+                        { label: "Control Seats", price: pricing.controlSeat.amount, value: controlSeats, set: setControlSeats, min: 1 },
+                        { label: "Field Seats", price: pricing.fieldSeat.amount, value: fieldSeats, set: setFieldSeats, min: 0 },
+                        { label: "POS Tills", price: pricing.till.amount, value: tills, set: setTills, min: 0 },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center justify-between border border-border p-4 bg-background">
+                          <div>
+                            <div className="font-bold uppercase">{item.label}</div>
+                            <div className="text-sm text-muted-foreground font-mono">£{item.price}/mo</div>
+                          </div>
+                          <div className="flex items-center gap-4 bg-card border border-border p-1">
+                            <Button variant="ghost" size="icon" className="rounded-none h-8 w-8" onClick={() => item.set(Math.max(item.min, item.value - 1))} disabled={item.value <= item.min}><Minus className="h-4 w-4" /></Button>
+                            <span className="w-8 text-center font-bold font-mono">{item.value}</span>
+                            <Button variant="ghost" size="icon" className="rounded-none h-8 w-8" onClick={() => item.set(item.value + 1)}><Plus className="h-4 w-4" /></Button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-4 bg-card border border-border p-1">
-                          <Button variant="ghost" size="icon" className="rounded-none h-8 w-8" onClick={() => setControlSeats(Math.max(1, controlSeats - 1))} disabled={controlSeats <= 1}><Minus className="h-4 w-4" /></Button>
-                          <span className="w-8 text-center font-bold font-mono">{controlSeats}</span>
-                          <Button variant="ghost" size="icon" className="rounded-none h-8 w-8" onClick={() => setControlSeats(controlSeats + 1)}><Plus className="h-4 w-4" /></Button>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between border border-border p-4 bg-background">
-                        <div>
-                          <div className="font-bold uppercase">Field Seats</div>
-                          <div className="text-sm text-muted-foreground font-mono">£{pricing.fieldSeat.amount}/mo</div>
-                        </div>
-                        <div className="flex items-center gap-4 bg-card border border-border p-1">
-                          <Button variant="ghost" size="icon" className="rounded-none h-8 w-8" onClick={() => setFieldSeats(Math.max(0, fieldSeats - 1))} disabled={fieldSeats <= 0}><Minus className="h-4 w-4" /></Button>
-                          <span className="w-8 text-center font-bold font-mono">{fieldSeats}</span>
-                          <Button variant="ghost" size="icon" className="rounded-none h-8 w-8" onClick={() => setFieldSeats(fieldSeats + 1)}><Plus className="h-4 w-4" /></Button>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between border border-border p-4 bg-background">
-                        <div>
-                          <div className="font-bold uppercase">POS Tills</div>
-                          <div className="text-sm text-muted-foreground font-mono">£{pricing.till.amount}/mo</div>
-                        </div>
-                        <div className="flex items-center gap-4 bg-card border border-border p-1">
-                          <Button variant="ghost" size="icon" className="rounded-none h-8 w-8" onClick={() => setTills(Math.max(0, tills - 1))} disabled={tills <= 0}><Minus className="h-4 w-4" /></Button>
-                          <span className="w-8 text-center font-bold font-mono">{tills}</span>
-                          <Button variant="ghost" size="icon" className="rounded-none h-8 w-8" onClick={() => setTills(tills + 1)}><Plus className="h-4 w-4" /></Button>
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                    
                     <div className="border-t border-border pt-4 flex justify-between font-bold text-xl">
                       <span className="uppercase">Monthly Total</span>
                       <span className="font-mono text-primary">£{(controlSeats * pricing.controlSeat.amount) + (fieldSeats * pricing.fieldSeat.amount) + (tills * pricing.till.amount)}</span>
                     </div>
                   </>
                 )}
-                
                 <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4"/> Back</Button>
-                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-3">Next <ArrowRight className="ml-2 h-4 w-4"/></Button>
+                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-7">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </div>
             )}
 
-            {step === 4 && (
-              <form onSubmit={handleStep4Submit} className="space-y-4">
+            {/* Step 8 — Owner Account */}
+            {step === 8 && (
+              <form onSubmit={handleOwnerSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label>Your Full Name *</Label>
-                  <Input required value={owner.name} onChange={e => setOwner({...owner, name: e.target.value})} className="rounded-none" data-testid="input-signup-owner-name"/>
+                  <Input required value={owner.name} onChange={(e) => setOwner({ ...owner, name: e.target.value })} className="rounded-none" data-testid="input-signup-owner-name" />
                 </div>
                 <div className="space-y-2">
                   <Label>Email Address *</Label>
-                  <Input required type="email" value={owner.email} onChange={e => setOwner({...owner, email: e.target.value})} className="rounded-none" data-testid="input-signup-owner-email"/>
+                  <Input required type="email" value={owner.email} onChange={(e) => setOwner({ ...owner, email: e.target.value })} className="rounded-none" data-testid="input-signup-owner-email" />
                 </div>
                 <div className="space-y-2">
                   <Label>Password * (min 8 chars)</Label>
-                  <Input required type="password" minLength={8} value={owner.password} onChange={e => setOwner({...owner, password: e.target.value})} className="rounded-none" data-testid="input-signup-owner-password"/>
+                  <Input required type="password" minLength={8} value={owner.password} onChange={(e) => setOwner({ ...owner, password: e.target.value })} className="rounded-none" data-testid="input-signup-owner-password" />
                 </div>
                 <div className="flex justify-between pt-4">
-                  <Button type="button" variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4"/> Back</Button>
-                  <Button type="submit" disabled={createSetupIntent.isPending} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-4">
-                    {createSetupIntent.isPending ? "Preparing..." : <>Next <ArrowRight className="ml-2 h-4 w-4"/></>}
+                  <Button type="button" variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button type="submit" disabled={createSetupIntent.isPending} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-8">
+                    {createSetupIntent.isPending ? "Preparing..." : <>Next <ArrowRight className="ml-2 h-4 w-4" /></>}
                   </Button>
                 </div>
               </form>
             )}
 
-            {step === 5 && (
+            {/* Step 9 — Legal & Accounting */}
+            {step === 9 && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Contact Name</Label>
+                  <Input value={contactDetails.contactName} onChange={(e) => setContactDetails({ ...contactDetails, contactName: e.target.value })} className="rounded-none" placeholder="Primary contact person" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Website</Label>
+                  <Input value={contactDetails.website} onChange={(e) => setContactDetails({ ...contactDetails, website: e.target.value })} className="rounded-none" placeholder="https://yourcompany.com" />
+                </div>
+                <div className="flex items-center gap-3 border border-border p-3">
+                  <Checkbox id="vat-reg" checked={vatRegistered} onCheckedChange={(c) => setVatRegistered(!!c)} className="rounded-none" />
+                  <label htmlFor="vat-reg" className="font-bold uppercase text-sm cursor-pointer">VAT Registered</label>
+                </div>
+                {vatRegistered && (
+                  <div className="space-y-2">
+                    <Label>VAT Number</Label>
+                    <Input value={contactDetails.vatNumber} onChange={(e) => setContactDetails({ ...contactDetails, vatNumber: e.target.value })} className="rounded-none" placeholder="GB123456789" />
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <Label className="uppercase tracking-wider text-xs">Accounting Software</Label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {ACCOUNTING_PROVIDERS.map((ap) => (
+                      <button
+                        key={ap.value}
+                        type="button"
+                        onClick={() => setAccountingProvider(ap.value)}
+                        className={`border p-3 text-left text-sm font-bold uppercase transition-colors flex items-center gap-1.5 ${accountingProvider === ap.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
+                      >
+                        {accountingProvider === ap.value && <CheckCircle2 className="h-3 w-3 text-primary shrink-0" />}
+                        {ap.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex justify-between pt-4">
+                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-9">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 10 — Payment Method */}
+            {step === 10 && (
               <div className="space-y-6">
                 {!stripeChecked ? (
                   <div className="py-12 flex justify-center"><Skeleton className="h-10 w-10 rounded-full" /></div>
@@ -287,31 +518,38 @@ export function Signup() {
                     <CreditCard className="h-10 w-10 text-destructive mx-auto mb-4" />
                     <h3 className="font-bold uppercase tracking-tight text-destructive mb-2">Stripe Not Connected</h3>
                     <p className="text-sm text-destructive/80 mb-6">Payment capture is disabled in this environment. You can connect Stripe later via Integrations.</p>
-                    <Button onClick={handleStripeFallbackSkip} className="rounded-none font-bold uppercase tracking-wider w-full">Continue Without Payment Method</Button>
+                    <Button onClick={() => finishSignup("pm_fallback_skipped")} disabled={signup.isPending} className="rounded-none font-bold uppercase tracking-wider w-full" data-testid="button-signup-skip-payment">
+                      {signup.isPending ? "Deploying workspace..." : "Continue Without Payment Method"}
+                    </Button>
                   </div>
                 ) : !clientSecret ? (
                   <div className="py-12 flex justify-center"><Skeleton className="h-10 w-10 rounded-full" /></div>
                 ) : (
-                  <Elements stripe={stripePromise} options={{clientSecret, appearance: { theme: 'flat', variables: { colorPrimary: '#f97316', borderRadius: '0px' } }}}>
-                    <StripePaymentForm onSuccess={handleStripeSuccess} onBack={prevStep} isSignupPending={signup.isPending} />
+                  <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: "flat", variables: { colorPrimary: "#f97316", borderRadius: "0px" } } }}>
+                    <StripePaymentForm onSuccess={finishSignup} onBack={prevStep} isSignupPending={signup.isPending} />
                   </Elements>
                 )}
-                
                 {stripePromise && (
                   <div className="flex justify-start pt-4 border-t border-border mt-6">
-                     <Button type="button" variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4"/> Back</Button>
+                    <Button type="button" variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
                   </div>
                 )}
               </div>
             )}
           </CardContent>
         </Card>
+
+        <div className="flex justify-center gap-1.5 mt-6">
+          {Array.from({ length: TOTAL_STEPS }, (_, i) => (
+            <div key={i} className={`h-1.5 w-6 transition-colors ${i + 1 === step ? "bg-primary" : i + 1 < step ? "bg-primary/40" : "bg-muted"}`} />
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-function StripePaymentForm({ onSuccess, onBack, isSignupPending }: { onSuccess: (pmId: string) => void, onBack: () => void, isSignupPending: boolean }) {
+function StripePaymentForm({ onSuccess, onBack, isSignupPending }: { onSuccess: (pmId: string) => void; onBack: () => void; isSignupPending: boolean }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -320,15 +558,8 @@ function StripePaymentForm({ onSuccess, onBack, isSignupPending }: { onSuccess: 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stripe || !elements) return;
-
     setLoading(true);
-    
-    // We confirm the setup intent, but prevent redirect since we want to handle signup first
-    const { error, setupIntent } = await stripe.confirmSetup({
-      elements,
-      redirect: 'if_required',
-    });
-
+    const { error, setupIntent } = await stripe.confirmSetup({ elements, redirect: "if_required" });
     if (error) {
       toast({ title: "Payment Method Error", description: error.message, variant: "destructive" });
       setLoading(false);
@@ -341,7 +572,7 @@ function StripePaymentForm({ onSuccess, onBack, isSignupPending }: { onSuccess: 
     <form onSubmit={handleSubmit} className="space-y-6">
       <PaymentElement />
       <Button type="submit" disabled={!stripe || loading || isSignupPending} className="w-full font-bold uppercase tracking-wider h-12" data-testid="button-signup-submit-stripe">
-        {loading || isSignupPending ? "Processing Setup..." : "Save Payment Method & Deploy Workspace"}
+        {loading || isSignupPending ? "Deploying workspace..." : "Save Payment Method & Deploy Workspace"}
       </Button>
     </form>
   );

@@ -131,6 +131,11 @@ import type {
   InboxReplyInput,
   InboxThreadsResponse,
   InboxUnreadCount,
+  Industry,
+  IndustryChecklistInput,
+  IndustryDetail,
+  IndustryDocumentTemplateInput,
+  IndustryJobTypeInput,
   IntegrationProvider,
   IntegrationSyncLog,
   InvitationRecord,
@@ -333,6 +338,7 @@ import type {
   TeamOverview,
   Tenant,
   TenantIntegration,
+  TenantModules,
   TenantUpdate,
   TenantUsage,
   TillSession,
@@ -3134,6 +3140,817 @@ export function useGetPricing<TData = Awaited<ReturnType<typeof getPricing>>, TE
 
 
 
+
+export const getListIndustriesUrl = () => {
+
+
+
+
+  return `/api/v1/industries`
+}
+
+/**
+ * @summary List all industries for the signup wizard
+ */
+export const listIndustries = async ( options?: RequestInit): Promise<Industry[]> => {
+
+  return customFetch<Industry[]>(getListIndustriesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListIndustriesQueryKey = () => {
+    return [
+    `/api/v1/industries`
+    ] as const;
+    }
+
+
+export const getListIndustriesQueryOptions = <TData = Awaited<ReturnType<typeof listIndustries>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIndustries>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListIndustriesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listIndustries>>> = ({ signal }) => listIndustries({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listIndustries>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListIndustriesQueryResult = NonNullable<Awaited<ReturnType<typeof listIndustries>>>
+export type ListIndustriesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List all industries for the signup wizard
+ */
+
+export function useListIndustries<TData = Awaited<ReturnType<typeof listIndustries>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIndustries>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListIndustriesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetIndustryDetailUrl = (slug: string,) => {
+
+
+
+
+  return `/api/v1/industries/${slug}`
+}
+
+/**
+ * @summary Get full industry detail with job types, checklists, etc.
+ */
+export const getIndustryDetail = async (slug: string, options?: RequestInit): Promise<IndustryDetail> => {
+
+  return customFetch<IndustryDetail>(getGetIndustryDetailUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIndustryDetailQueryKey = (slug: string,) => {
+    return [
+    `/api/v1/industries/${slug}`
+    ] as const;
+    }
+
+
+export const getGetIndustryDetailQueryOptions = <TData = Awaited<ReturnType<typeof getIndustryDetail>>, TError = ErrorType<unknown>>(slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIndustryDetail>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIndustryDetailQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIndustryDetail>>> = ({ signal }) => getIndustryDetail(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIndustryDetail>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIndustryDetailQueryResult = NonNullable<Awaited<ReturnType<typeof getIndustryDetail>>>
+export type GetIndustryDetailQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get full industry detail with job types, checklists, etc.
+ */
+
+export function useGetIndustryDetail<TData = Awaited<ReturnType<typeof getIndustryDetail>>, TError = ErrorType<unknown>>(
+ slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIndustryDetail>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIndustryDetailQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetTenantModulesUrl = () => {
+
+
+
+
+  return `/api/v1/tenant/modules`
+}
+
+/**
+ * @summary Get the tenant's active module configuration
+ */
+export const getTenantModules = async ( options?: RequestInit): Promise<TenantModules> => {
+
+  return customFetch<TenantModules>(getGetTenantModulesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTenantModulesQueryKey = () => {
+    return [
+    `/api/v1/tenant/modules`
+    ] as const;
+    }
+
+
+export const getGetTenantModulesQueryOptions = <TData = Awaited<ReturnType<typeof getTenantModules>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantModules>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTenantModulesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTenantModules>>> = ({ signal }) => getTenantModules({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTenantModules>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTenantModulesQueryResult = NonNullable<Awaited<ReturnType<typeof getTenantModules>>>
+export type GetTenantModulesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the tenant's active module configuration
+ */
+
+export function useGetTenantModules<TData = Awaited<ReturnType<typeof getTenantModules>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantModules>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTenantModulesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateTenantModulesUrl = () => {
+
+
+
+
+  return `/api/v1/tenant/modules`
+}
+
+/**
+ * @summary Update tenant module flags and optionally trigger provisioning for newly enabled modules
+ */
+export const updateTenantModules = async (tenantModules: TenantModules, options?: RequestInit): Promise<TenantModules> => {
+
+  return customFetch<TenantModules>(getUpdateTenantModulesUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      tenantModules,)
+  }
+);}
+
+
+
+
+export const getUpdateTenantModulesMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTenantModules>>, TError,{data: BodyType<TenantModules>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTenantModules>>, TError,{data: BodyType<TenantModules>}, TContext> => {
+
+const mutationKey = ['updateTenantModules'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTenantModules>>, {data: BodyType<TenantModules>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateTenantModules(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTenantModulesMutationResult = NonNullable<Awaited<ReturnType<typeof updateTenantModules>>>
+    export type UpdateTenantModulesMutationBody = BodyType<TenantModules>
+    export type UpdateTenantModulesMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update tenant module flags and optionally trigger provisioning for newly enabled modules
+ */
+export const useUpdateTenantModules = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTenantModules>>, TError,{data: BodyType<TenantModules>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateTenantModules>>,
+        TError,
+        {data: BodyType<TenantModules>},
+        TContext
+      > => {
+      return useMutation(getUpdateTenantModulesMutationOptions(options));
+    }
+
+export const getAdminListIndustriesUrl = () => {
+
+
+
+
+  return `/api/v1/admin/industries`
+}
+
+/**
+ * @summary Super admin — list all industries with full content
+ */
+export const adminListIndustries = async ( options?: RequestInit): Promise<IndustryDetail[]> => {
+
+  return customFetch<IndustryDetail[]>(getAdminListIndustriesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminListIndustriesQueryKey = () => {
+    return [
+    `/api/v1/admin/industries`
+    ] as const;
+    }
+
+
+export const getAdminListIndustriesQueryOptions = <TData = Awaited<ReturnType<typeof adminListIndustries>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListIndustries>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminListIndustriesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListIndustries>>> = ({ signal }) => adminListIndustries({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminListIndustries>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminListIndustriesQueryResult = NonNullable<Awaited<ReturnType<typeof adminListIndustries>>>
+export type AdminListIndustriesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Super admin — list all industries with full content
+ */
+
+export function useAdminListIndustries<TData = Awaited<ReturnType<typeof adminListIndustries>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListIndustries>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminListIndustriesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAdminAddIndustryJobTypeUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/admin/industries/${id}/job-types`
+}
+
+/**
+ * @summary Add a job type to an industry template
+ */
+export const adminAddIndustryJobType = async (id: string,
+    industryJobTypeInput: IndustryJobTypeInput, options?: RequestInit): Promise<IndustryDetail> => {
+
+  return customFetch<IndustryDetail>(getAdminAddIndustryJobTypeUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      industryJobTypeInput,)
+  }
+);}
+
+
+
+
+export const getAdminAddIndustryJobTypeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminAddIndustryJobType>>, TError,{id: string;data: BodyType<IndustryJobTypeInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminAddIndustryJobType>>, TError,{id: string;data: BodyType<IndustryJobTypeInput>}, TContext> => {
+
+const mutationKey = ['adminAddIndustryJobType'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminAddIndustryJobType>>, {id: string;data: BodyType<IndustryJobTypeInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  adminAddIndustryJobType(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminAddIndustryJobTypeMutationResult = NonNullable<Awaited<ReturnType<typeof adminAddIndustryJobType>>>
+    export type AdminAddIndustryJobTypeMutationBody = BodyType<IndustryJobTypeInput>
+    export type AdminAddIndustryJobTypeMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Add a job type to an industry template
+ */
+export const useAdminAddIndustryJobType = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminAddIndustryJobType>>, TError,{id: string;data: BodyType<IndustryJobTypeInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminAddIndustryJobType>>,
+        TError,
+        {id: string;data: BodyType<IndustryJobTypeInput>},
+        TContext
+      > => {
+      return useMutation(getAdminAddIndustryJobTypeMutationOptions(options));
+    }
+
+export const getAdminRemoveIndustryJobTypeUrl = (id: string,
+    itemId: string,) => {
+
+
+
+
+  return `/api/v1/admin/industries/${id}/job-types/${itemId}`
+}
+
+/**
+ * @summary Remove a job type from an industry template
+ */
+export const adminRemoveIndustryJobType = async (id: string,
+    itemId: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getAdminRemoveIndustryJobTypeUrl(id,itemId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getAdminRemoveIndustryJobTypeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminRemoveIndustryJobType>>, TError,{id: string;itemId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminRemoveIndustryJobType>>, TError,{id: string;itemId: string}, TContext> => {
+
+const mutationKey = ['adminRemoveIndustryJobType'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminRemoveIndustryJobType>>, {id: string;itemId: string}> = (props) => {
+          const {id,itemId} = props ?? {};
+
+          return  adminRemoveIndustryJobType(id,itemId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminRemoveIndustryJobTypeMutationResult = NonNullable<Awaited<ReturnType<typeof adminRemoveIndustryJobType>>>
+
+    export type AdminRemoveIndustryJobTypeMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Remove a job type from an industry template
+ */
+export const useAdminRemoveIndustryJobType = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminRemoveIndustryJobType>>, TError,{id: string;itemId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminRemoveIndustryJobType>>,
+        TError,
+        {id: string;itemId: string},
+        TContext
+      > => {
+      return useMutation(getAdminRemoveIndustryJobTypeMutationOptions(options));
+    }
+
+export const getAdminAddIndustryChecklistUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/admin/industries/${id}/checklists`
+}
+
+/**
+ * @summary Add a checklist to an industry template
+ */
+export const adminAddIndustryChecklist = async (id: string,
+    industryChecklistInput: IndustryChecklistInput, options?: RequestInit): Promise<IndustryDetail> => {
+
+  return customFetch<IndustryDetail>(getAdminAddIndustryChecklistUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      industryChecklistInput,)
+  }
+);}
+
+
+
+
+export const getAdminAddIndustryChecklistMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminAddIndustryChecklist>>, TError,{id: string;data: BodyType<IndustryChecklistInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminAddIndustryChecklist>>, TError,{id: string;data: BodyType<IndustryChecklistInput>}, TContext> => {
+
+const mutationKey = ['adminAddIndustryChecklist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminAddIndustryChecklist>>, {id: string;data: BodyType<IndustryChecklistInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  adminAddIndustryChecklist(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminAddIndustryChecklistMutationResult = NonNullable<Awaited<ReturnType<typeof adminAddIndustryChecklist>>>
+    export type AdminAddIndustryChecklistMutationBody = BodyType<IndustryChecklistInput>
+    export type AdminAddIndustryChecklistMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Add a checklist to an industry template
+ */
+export const useAdminAddIndustryChecklist = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminAddIndustryChecklist>>, TError,{id: string;data: BodyType<IndustryChecklistInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminAddIndustryChecklist>>,
+        TError,
+        {id: string;data: BodyType<IndustryChecklistInput>},
+        TContext
+      > => {
+      return useMutation(getAdminAddIndustryChecklistMutationOptions(options));
+    }
+
+export const getAdminRemoveIndustryChecklistUrl = (id: string,
+    itemId: string,) => {
+
+
+
+
+  return `/api/v1/admin/industries/${id}/checklists/${itemId}`
+}
+
+/**
+ * @summary Remove a checklist from an industry template
+ */
+export const adminRemoveIndustryChecklist = async (id: string,
+    itemId: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getAdminRemoveIndustryChecklistUrl(id,itemId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getAdminRemoveIndustryChecklistMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminRemoveIndustryChecklist>>, TError,{id: string;itemId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminRemoveIndustryChecklist>>, TError,{id: string;itemId: string}, TContext> => {
+
+const mutationKey = ['adminRemoveIndustryChecklist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminRemoveIndustryChecklist>>, {id: string;itemId: string}> = (props) => {
+          const {id,itemId} = props ?? {};
+
+          return  adminRemoveIndustryChecklist(id,itemId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminRemoveIndustryChecklistMutationResult = NonNullable<Awaited<ReturnType<typeof adminRemoveIndustryChecklist>>>
+
+    export type AdminRemoveIndustryChecklistMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Remove a checklist from an industry template
+ */
+export const useAdminRemoveIndustryChecklist = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminRemoveIndustryChecklist>>, TError,{id: string;itemId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminRemoveIndustryChecklist>>,
+        TError,
+        {id: string;itemId: string},
+        TContext
+      > => {
+      return useMutation(getAdminRemoveIndustryChecklistMutationOptions(options));
+    }
+
+export const getAdminAddIndustryDocumentTemplateUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/admin/industries/${id}/document-templates`
+}
+
+/**
+ * @summary Add a compliance doc template to an industry
+ */
+export const adminAddIndustryDocumentTemplate = async (id: string,
+    industryDocumentTemplateInput: IndustryDocumentTemplateInput, options?: RequestInit): Promise<IndustryDetail> => {
+
+  return customFetch<IndustryDetail>(getAdminAddIndustryDocumentTemplateUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      industryDocumentTemplateInput,)
+  }
+);}
+
+
+
+
+export const getAdminAddIndustryDocumentTemplateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminAddIndustryDocumentTemplate>>, TError,{id: string;data: BodyType<IndustryDocumentTemplateInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminAddIndustryDocumentTemplate>>, TError,{id: string;data: BodyType<IndustryDocumentTemplateInput>}, TContext> => {
+
+const mutationKey = ['adminAddIndustryDocumentTemplate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminAddIndustryDocumentTemplate>>, {id: string;data: BodyType<IndustryDocumentTemplateInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  adminAddIndustryDocumentTemplate(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminAddIndustryDocumentTemplateMutationResult = NonNullable<Awaited<ReturnType<typeof adminAddIndustryDocumentTemplate>>>
+    export type AdminAddIndustryDocumentTemplateMutationBody = BodyType<IndustryDocumentTemplateInput>
+    export type AdminAddIndustryDocumentTemplateMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Add a compliance doc template to an industry
+ */
+export const useAdminAddIndustryDocumentTemplate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminAddIndustryDocumentTemplate>>, TError,{id: string;data: BodyType<IndustryDocumentTemplateInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminAddIndustryDocumentTemplate>>,
+        TError,
+        {id: string;data: BodyType<IndustryDocumentTemplateInput>},
+        TContext
+      > => {
+      return useMutation(getAdminAddIndustryDocumentTemplateMutationOptions(options));
+    }
+
+export const getAdminRemoveIndustryDocumentTemplateUrl = (id: string,
+    itemId: string,) => {
+
+
+
+
+  return `/api/v1/admin/industries/${id}/document-templates/${itemId}`
+}
+
+/**
+ * @summary Remove a compliance doc template from an industry
+ */
+export const adminRemoveIndustryDocumentTemplate = async (id: string,
+    itemId: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getAdminRemoveIndustryDocumentTemplateUrl(id,itemId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getAdminRemoveIndustryDocumentTemplateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminRemoveIndustryDocumentTemplate>>, TError,{id: string;itemId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminRemoveIndustryDocumentTemplate>>, TError,{id: string;itemId: string}, TContext> => {
+
+const mutationKey = ['adminRemoveIndustryDocumentTemplate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminRemoveIndustryDocumentTemplate>>, {id: string;itemId: string}> = (props) => {
+          const {id,itemId} = props ?? {};
+
+          return  adminRemoveIndustryDocumentTemplate(id,itemId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminRemoveIndustryDocumentTemplateMutationResult = NonNullable<Awaited<ReturnType<typeof adminRemoveIndustryDocumentTemplate>>>
+
+    export type AdminRemoveIndustryDocumentTemplateMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Remove a compliance doc template from an industry
+ */
+export const useAdminRemoveIndustryDocumentTemplate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminRemoveIndustryDocumentTemplate>>, TError,{id: string;itemId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminRemoveIndustryDocumentTemplate>>,
+        TError,
+        {id: string;itemId: string},
+        TContext
+      > => {
+      return useMutation(getAdminRemoveIndustryDocumentTemplateMutationOptions(options));
+    }
 
 export const getListTradeCategoriesUrl = () => {
 

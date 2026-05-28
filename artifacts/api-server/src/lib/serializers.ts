@@ -5,6 +5,7 @@ import {
   subscriptionsTable,
   tenantTradeCategoriesTable,
   tradeCategoriesTable,
+  industriesTable,
   type Tenant,
   type User,
   type SubscriptionRow,
@@ -26,6 +27,14 @@ export async function getTradeCategorySlugs(tenantId: string): Promise<string[]>
 
 export async function serializeTenant(t: Tenant) {
   const slugs = await getTradeCategorySlugs(t.id);
+  let industrySlug: string | null = null;
+  if (t.industryId) {
+    const [ind] = await db
+      .select({ slug: industriesTable.slug })
+      .from(industriesTable)
+      .where(eq(industriesTable.id, t.industryId));
+    industrySlug = ind?.slug ?? null;
+  }
   return {
     id: t.id,
     name: t.name,
@@ -37,6 +46,21 @@ export async function serializeTenant(t: Tenant) {
     addressLine1: t.addressLine1,
     city: t.city,
     postcode: t.postcode,
+    industryId: t.industryId ?? null,
+    industrySlug,
+    businessType: t.businessType ?? null,
+    website: t.website ?? null,
+    contactName: t.contactName ?? null,
+    vatNumber: t.vatNumber ?? null,
+    hasTradeShop: t.hasTradeShop,
+    hasMobileWorkforce: t.hasMobileWorkforce,
+    appointmentBookingEnabled: t.appointmentBookingEnabled,
+    multiBranchEnabled: t.multiBranchEnabled,
+    vatRegistered: t.vatRegistered,
+    accountingProvider: t.accountingProvider ?? null,
+    aiModulesEnabled: t.aiModulesEnabled ?? [],
+    communicationChannels: t.communicationChannels ?? [],
+    posEnabled: t.posEnabled,
     brandColor: t.brandColor,
     logoUrl: t.logoUrl,
     logoPortalUrl: t.logoPortalUrl,

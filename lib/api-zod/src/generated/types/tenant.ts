@@ -26,6 +26,28 @@ export interface Tenant {
   /** @nullable */
   postcode?: string | null;
   /** @nullable */
+  industryId?: string | null;
+  /** @nullable */
+  industrySlug?: string | null;
+  /** @nullable */
+  businessType?: string | null;
+  /** @nullable */
+  website?: string | null;
+  /** @nullable */
+  contactName?: string | null;
+  /** @nullable */
+  vatNumber?: string | null;
+  hasTradeShop?: boolean;
+  hasMobileWorkforce?: boolean;
+  appointmentBookingEnabled?: boolean;
+  multiBranchEnabled?: boolean;
+  vatRegistered?: boolean;
+  /** @nullable */
+  accountingProvider?: string | null;
+  aiModulesEnabled?: string[];
+  communicationChannels?: string[];
+  posEnabled?: boolean;
+  /** @nullable */
   brandColor?: string | null;
   /** @nullable */
   logoUrl?: string | null;

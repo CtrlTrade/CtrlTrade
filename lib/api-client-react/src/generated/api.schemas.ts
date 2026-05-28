@@ -46,6 +46,12 @@ export type SignupPayloadCompany = {
   city?: string | null;
   /** @nullable */
   postcode?: string | null;
+  /** @nullable */
+  website?: string | null;
+  /** @nullable */
+  contactName?: string | null;
+  /** @nullable */
+  vatNumber?: string | null;
 };
 
 export interface SignupPayload {
@@ -63,6 +69,17 @@ export interface SignupPayload {
   tills: number;
   tradeCategorySlugs: string[];
   paymentMethodId: string;
+  industrySlug?: string;
+  businessType?: string;
+  hasTradeShop?: boolean;
+  hasMobileWorkforce?: boolean;
+  appointmentBookingEnabled?: boolean;
+  multiBranchEnabled?: boolean;
+  vatRegistered?: boolean;
+  accountingProvider?: string;
+  aiModulesEnabled?: string[];
+  communicationChannels?: string[];
+  posEnabled?: boolean;
 }
 
 export interface LoginCredentials {
@@ -166,6 +183,28 @@ export interface Tenant {
   /** @nullable */
   postcode?: string | null;
   /** @nullable */
+  industryId?: string | null;
+  /** @nullable */
+  industrySlug?: string | null;
+  /** @nullable */
+  businessType?: string | null;
+  /** @nullable */
+  website?: string | null;
+  /** @nullable */
+  contactName?: string | null;
+  /** @nullable */
+  vatNumber?: string | null;
+  hasTradeShop?: boolean;
+  hasMobileWorkforce?: boolean;
+  appointmentBookingEnabled?: boolean;
+  multiBranchEnabled?: boolean;
+  vatRegistered?: boolean;
+  /** @nullable */
+  accountingProvider?: string | null;
+  aiModulesEnabled?: string[];
+  communicationChannels?: string[];
+  posEnabled?: boolean;
+  /** @nullable */
   brandColor?: string | null;
   /** @nullable */
   logoUrl?: string | null;
@@ -205,6 +244,114 @@ export interface Session {
   impersonation?: ImpersonationContext | null;
   twoFactorRequired?: boolean;
   twoFactorSetupRequired?: boolean;
+}
+
+export interface IndustryJobTypeInput {
+  name: string;
+  description?: string;
+  durationHours?: number;
+}
+
+export interface IndustryChecklistInput {
+  name: string;
+  description?: string;
+  items: string[];
+}
+
+export interface IndustryDocumentTemplateInput {
+  name: string;
+  description?: string;
+  documentType: string;
+  required?: boolean;
+}
+
+export interface Industry {
+  id: string;
+  slug: string;
+  name: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  icon?: string | null;
+  sortOrder: number;
+}
+
+export type IndustryDetailJobTypesItem = {
+  id: string;
+  name: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  durationHours?: number | null;
+  sortOrder: number;
+};
+
+export type IndustryDetailCustomFieldsItem = {
+  id: string;
+  label: string;
+  fieldType: string;
+  required: boolean;
+  sortOrder: number;
+};
+
+export type IndustryDetailChecklistsItem = {
+  id: string;
+  name: string;
+  /** @nullable */
+  description?: string | null;
+  items: string[];
+  sortOrder: number;
+};
+
+export type IndustryDetailQuoteTemplatesItem = {
+  id: string;
+  name: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  notes?: string | null;
+  sortOrder: number;
+};
+
+export type IndustryDetailDocumentTemplatesItem = {
+  id: string;
+  name: string;
+  /** @nullable */
+  description?: string | null;
+  documentType: string;
+  required: boolean;
+  sortOrder: number;
+};
+
+export interface IndustryDetail {
+  id: string;
+  slug: string;
+  name: string;
+  /** @nullable */
+  description?: string | null;
+  sortOrder: number;
+  jobTypes: IndustryDetailJobTypesItem[];
+  customFields: IndustryDetailCustomFieldsItem[];
+  checklists: IndustryDetailChecklistsItem[];
+  quoteTemplates: IndustryDetailQuoteTemplatesItem[];
+  documentTemplates: IndustryDetailDocumentTemplatesItem[];
+}
+
+export interface TenantModules {
+  /** @nullable */
+  industrySlug?: string | null;
+  /** @nullable */
+  businessType?: string | null;
+  hasTradeShop?: boolean;
+  hasMobileWorkforce?: boolean;
+  appointmentBookingEnabled?: boolean;
+  multiBranchEnabled?: boolean;
+  vatRegistered?: boolean;
+  /** @nullable */
+  accountingProvider?: string | null;
+  aiModulesEnabled?: string[];
+  communicationChannels?: string[];
+  posEnabled?: boolean;
 }
 
 export interface ResellerProfileInput {
@@ -344,6 +491,20 @@ export interface TenantUpdate {
   addressLine1?: string;
   city?: string;
   postcode?: string;
+  website?: string;
+  contactName?: string;
+  vatNumber?: string;
+  industrySlug?: string;
+  businessType?: string;
+  hasTradeShop?: boolean;
+  hasMobileWorkforce?: boolean;
+  appointmentBookingEnabled?: boolean;
+  multiBranchEnabled?: boolean;
+  vatRegistered?: boolean;
+  accountingProvider?: string;
+  aiModulesEnabled?: string[];
+  communicationChannels?: string[];
+  posEnabled?: boolean;
   brandColor?: string;
   logoUrl?: string;
   logoPortalUrl?: string;

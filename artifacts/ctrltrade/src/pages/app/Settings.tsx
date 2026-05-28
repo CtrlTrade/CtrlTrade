@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useGetTenant, useUpdateTenant, useListTradeCategories, useGetLeadEmbedSnippet } from "@workspace/api-client-react";
+import { BusinessSetupSettings } from "./BusinessSetup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -84,8 +85,9 @@ export function AppSettings() {
     <div className="max-w-5xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold uppercase tracking-tighter">Workspace Settings</h1>
       <Tabs defaultValue={typeof window !== "undefined" && new URLSearchParams(window.location.search).get("tab") === "integrations" ? "integrations" : "company"} className="space-y-6">
-        <TabsList className="rounded-none">
+        <TabsList className="rounded-none flex-wrap h-auto">
           <TabsTrigger value="company" data-testid="tab-company">Company</TabsTrigger>
+          <TabsTrigger value="business-setup" data-testid="tab-business-setup">Business Setup</TabsTrigger>
           <TabsTrigger value="staff" data-testid="tab-staff">Staff</TabsTrigger>
           <TabsTrigger value="security" data-testid="tab-security">Security</TabsTrigger>
           <TabsTrigger value="notifications" data-testid="tab-notifications">Notifications</TabsTrigger>
@@ -95,6 +97,7 @@ export function AppSettings() {
           <TabsTrigger value="booking-widget" data-testid="tab-booking-widget">Booking Widget</TabsTrigger>
         </TabsList>
         <TabsContent value="staff"><AppStaff /></TabsContent>
+        <TabsContent value="business-setup"><BusinessSetupSettings /></TabsContent>
         <TabsContent value="security"><SecuritySettings /></TabsContent>
         <TabsContent value="notifications"><AppNotificationsSettings /></TabsContent>
         <TabsContent value="referrals"><SettingsReferrals /></TabsContent>

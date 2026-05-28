@@ -36,7 +36,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     logout.mutate(undefined, {
       onSuccess: () => {
         setLocation("~/login");
-      }
+      },
     });
   };
 
@@ -44,36 +44,41 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return <div className="p-8"><Skeleton className="h-10 w-full mb-4" /><Skeleton className="h-64 w-full" /></div>;
   }
 
-  const tenant = session.tenant;
+  const tenant = session.tenant as any;
+  const posEnabled: boolean = tenant.posEnabled ?? false;
+  const hasMobileWorkforce: boolean = tenant.hasMobileWorkforce ?? false;
+  const hasTradeShop: boolean = tenant.hasTradeShop ?? false;
+  const multiBranchEnabled: boolean = tenant.multiBranchEnabled ?? false;
 
-  const links = [
-    { href: "/", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/leads", icon: Target, label: "Leads" },
-    { href: "/customers", icon: Users, label: "Customers" },
-    { href: "/inbox", icon: Inbox, label: "Inbox" },
-    { href: "/projects", icon: FolderOpen, label: "Projects" },
-    { href: "/jobs", icon: Briefcase, label: "Jobs" },
-    { href: "/projects", icon: ClipboardList, label: "Projects" },
-    { href: "/quotes", icon: FileText, label: "Quotes" },
-    { href: "/invoices", icon: FileSpreadsheet, label: "Invoices" },
-    { href: "/schedule", icon: Calendar, label: "Schedule" },
-    { href: "/fleet", icon: Truck, label: "Fleet" },
-    { href: "/timesheets", icon: ClipboardList, label: "Timesheets" },
-    { href: "/availability", icon: UserX, label: "Availability" },
-    { href: "/compliance", icon: ShieldCheck, label: "Compliance" },
-    { href: "/pos", icon: ShoppingCart, label: "CtrlTradePos®" },
-    { href: "/products", icon: Package, label: "Products" },
-    { href: "/stock", icon: Warehouse, label: "Stock" },
-    { href: "/suppliers", icon: Truck, label: "Suppliers" },
-    { href: "/trade-accounts", icon: Handshake, label: "Trade Accounts" },
-    { href: "/reports", icon: BarChart, label: "Reports" },
-    { href: "/automation", icon: Zap, label: "CtrlWorkflow" },
-    { href: "/voice", icon: Phone, label: "CtrlVoice" },
-    { href: "/branches", icon: Building2, label: "Branches" },
-    { href: "/area-managers", icon: UserCog, label: "Area Managers" },
-    { href: "/settings", icon: Settings, label: "Settings" },
-    { href: "/billing", icon: CreditCard, label: "Billing" },
+  const allLinks: Array<{ href: string; icon: typeof LayoutDashboard; label: string; always?: boolean; enabled?: boolean }> = [
+    { href: "/", icon: LayoutDashboard, label: "Dashboard", always: true },
+    { href: "/leads", icon: Target, label: "Leads", always: true },
+    { href: "/customers", icon: Users, label: "Customers", always: true },
+    { href: "/inbox", icon: Inbox, label: "Inbox", always: true },
+    { href: "/jobs", icon: Briefcase, label: "Jobs", always: true },
+    { href: "/projects", icon: FolderOpen, label: "Projects", always: true },
+    { href: "/quotes", icon: FileText, label: "Quotes", always: true },
+    { href: "/invoices", icon: FileSpreadsheet, label: "Invoices", always: true },
+    { href: "/schedule", icon: Calendar, label: "Schedule", always: true },
+    { href: "/fleet", icon: Truck, label: "Fleet", always: true },
+    { href: "/timesheets", icon: ClipboardList, label: "Timesheets", enabled: hasMobileWorkforce },
+    { href: "/availability", icon: UserX, label: "Availability", enabled: hasMobileWorkforce },
+    { href: "/compliance", icon: ShieldCheck, label: "Compliance", always: true },
+    { href: "/pos", icon: ShoppingCart, label: "CtrlTradePos®", enabled: posEnabled },
+    { href: "/products", icon: Package, label: "Products", enabled: hasTradeShop || posEnabled },
+    { href: "/stock", icon: Warehouse, label: "Stock", enabled: hasTradeShop || posEnabled },
+    { href: "/suppliers", icon: Truck, label: "Suppliers", enabled: hasTradeShop },
+    { href: "/trade-accounts", icon: Handshake, label: "Trade Accounts", enabled: hasTradeShop },
+    { href: "/reports", icon: BarChart, label: "Reports", always: true },
+    { href: "/automation", icon: Zap, label: "CtrlWorkflow", always: true },
+    { href: "/voice", icon: Phone, label: "CtrlVoice", always: true },
+    { href: "/branches", icon: Building2, label: "Branches", enabled: multiBranchEnabled },
+    { href: "/area-managers", icon: UserCog, label: "Area Managers", enabled: multiBranchEnabled },
+    { href: "/settings", icon: Settings, label: "Settings", always: true },
+    { href: "/billing", icon: CreditCard, label: "Billing", always: true },
   ];
+
+  const links = allLinks.filter((l) => l.always || l.enabled);
 
   return (
     <div className="min-h-screen bg-background flex font-sans">
@@ -90,7 +95,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             const active = location === link.href || (link.href !== "/" && location.startsWith(link.href));
             const showBadge = link.href === "/inbox";
             return (
-              <Link key={link.href} href={link.href} className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent/50'}`} data-testid={`nav-${link.label.toLowerCase()}`}>
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/50"}`}
+                data-testid={`nav-${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+              >
                 <link.icon className="h-4 w-4" />
                 <span className="flex-1">{link.label}</span>
                 {showBadge && <InboxBadge />}
@@ -98,6 +108,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+        {tenant.industrySlug && (
+          <div className="p-4 border-t border-sidebar-border">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Industry</div>
+            <div className="text-xs font-bold uppercase">{(tenant.industrySlug as string).replace(/-/g, " ")}</div>
+          </div>
+        )}
       </aside>
       <div className="flex-1 flex flex-col">
         {failedIntegration && (
@@ -114,7 +130,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         )}
         <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: tenant.brandColor || 'var(--primary)' }} />
+            <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: tenant.brandColor || "var(--primary)" }} />
             <span className="font-bold text-lg uppercase tracking-tight" data-testid="text-tenant-name">{tenant.name}</span>
           </div>
           <div className="flex items-center gap-4">

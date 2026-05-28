@@ -108,6 +108,7 @@ import { MarketplaceListing } from "@/pages/public/MarketplaceListing";
 // Admin
 import { AdminReferrals } from "@/pages/admin/Referrals";
 import { AdminCompliance } from "@/pages/admin/Compliance";
+import { AdminIndustryEditor } from "@/pages/admin/IndustryEditor";
 
 // Tracking
 import { ReferralTracker } from "@/components/ReferralTracker";
@@ -254,6 +255,7 @@ function App() {
                   <Route path="/reports/usage">{() => <AdminUsageReport />}</Route>
                   <Route path="/reports/referrals">{() => <AdminReferralsReport />}</Route>
                   <Route path="/integrations" component={AdminIntegrationCatalogue} />
+                  <Route path="/industries" component={AdminIndustryEditor} />
                   <Route component={NotFound} />
                 </Switch>
               </AdminLayout>
