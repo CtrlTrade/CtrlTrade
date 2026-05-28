@@ -543,7 +543,7 @@ async function applyCalendarChanges(opts: {
 
 // ----- Lead import handlers (MyJobQuote & Checkatrade) ----------------------
 
-async function pullLeadsFromProvider(
+export async function pullLeadsFromProvider(
   tenantId: string,
   provider: "myjobquote" | "checkatrade",
 ): Promise<void> {
@@ -571,45 +571,35 @@ async function pullLeadsFromProvider(
         ? await fetchMyJobQuoteLeads(apiKey, since)
         : await fetchCheckatradeLeads(apiKey, since);
 
-    let imported = 0;
-    let skipped = 0;
-
-    for (const ext of externalLeads) {
-      if (!ext.externalId) continue;
-
-      // Dedup check — if this externalId already exists for this tenant+source, skip.
-      const [existing] = await db
-        .select({ id: leadsTable.id })
-        .from(leadsTable)
-        .where(
-          and(
-            eq(leadsTable.tenantId, tenantId),
-            eq(leadsTable.source, provider),
-            eq(leadsTable.externalId, ext.externalId),
-          ),
-        );
-
-      if (existing) {
-        skipped++;
-        continue;
-      }
-
-      await db.insert(leadsTable).values({
+    const validLeads = externalLeads
+      .filter((ext) => ext.externalId)
+      .map((ext) => ({
         tenantId,
         name: ext.name,
         email: ext.email,
         phone: ext.phone,
         source: provider,
-        externalId: ext.externalId,
-        title: ext.description ? ext.description.slice(0, 120) : `${provider === "myjobquote" ? "MyJobQuote" : "Checkatrade"} enquiry`,
+        externalId: ext.externalId!,
+        title: ext.description
+          ? ext.description.slice(0, 120)
+          : `${provider === "myjobquote" ? "MyJobQuote" : "Checkatrade"} enquiry`,
         message: ext.description,
         valuePence: ext.budgetPence,
         score: 0,
-        status: "new",
+        status: "new" as const,
         followUpDueAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      });
-      imported++;
-    }
+      }));
+
+    // Atomic upsert — ON CONFLICT DO NOTHING is safe under concurrent sync jobs
+    // because the unique index on (tenant_id, source, external_id) is the guard.
+    // The returning clause tells us exactly how many rows were truly inserted vs skipped.
+    const inserted =
+      validLeads.length > 0
+        ? await db.insert(leadsTable).values(validLeads).onConflictDoNothing().returning({ id: leadsTable.id })
+        : [];
+
+    const imported = inserted.length;
+    const skipped = validLeads.length - imported;
 
     // Update lastSyncAt
     await db
