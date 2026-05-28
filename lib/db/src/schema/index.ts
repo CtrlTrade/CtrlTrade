@@ -310,6 +310,7 @@ export const membershipsTable = pgTable(
     defaultHourlyRatePence: integer("default_hourly_rate_pence"),
     invitedAt: timestamp("invited_at", { withTimezone: true }),
     disabledAt: timestamp("disabled_at", { withTimezone: true }),
+    lastNotificationsViewedAt: timestamp("last_notifications_viewed_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
@@ -318,6 +319,7 @@ export const membershipsTable = pgTable(
     userIdx: index("memberships_user_idx").on(t.userId),
   }),
 );
+
 
 // ---- Invitations (magic-link invite to join a tenant) ---------------------
 export const invitationsTable = pgTable(
@@ -2341,3 +2343,21 @@ export const platformSalesLeadMessagesTable = pgTable(
   }),
 );
 export type PlatformSalesLeadMessage = typeof platformSalesLeadMessagesTable.$inferSelect;
+
+// ---- Staff in-app notifications -------------------------------------------
+export const staffNotificationsTable = pgTable(
+  "staff_notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    kind: varchar("kind", { length: 64 }).notNull(), // quote_accepted|quote_declined|invoice_paid|customer_message|review_submitted
+    title: text("title").notNull(),
+    message: text("message").notNull(),
+    linkPath: text("link_path"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    tenantIdx: index("staff_notifications_tenant_idx").on(t.tenantId, t.createdAt),
+  }),
+);
+export type StaffNotification = typeof staffNotificationsTable.$inferSelect;

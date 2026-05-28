@@ -2001,20 +2001,6 @@ export const CreateBillingPaymentMethodSetupResponse = zod.object({
 })
 
 
-export const GetIndustryTourResponse = zod.object({
-  "dismissed": zod.boolean(),
-  "industryName": zod.string().nullish(),
-  "industrySlug": zod.string().nullish(),
-  "enabledModules": zod.array(zod.string()),
-  "quickActions": zod.array(zod.object({
-    "key": zod.string(),
-    "label": zod.string(),
-    "description": zod.string(),
-    "href": zod.string()
-  }))
-})
-
-
 export const GetOnboardingResponse = zod.object({
   "percentComplete": zod.number(),
   "items": zod.array(zod.object({
@@ -2023,6 +2009,20 @@ export const GetOnboardingResponse = zod.object({
   "description": zod.string(),
   "complete": zod.boolean(),
   "href": zod.string().nullish()
+}))
+})
+
+
+export const GetIndustryTourResponse = zod.object({
+  "dismissed": zod.boolean(),
+  "industryName": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "enabledModules": zod.array(zod.string()),
+  "quickActions": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "description": zod.string(),
+  "href": zod.string()
 }))
 })
 
@@ -6134,6 +6134,27 @@ export const UpsertNotificationTemplateBody = zod.object({
 })
 
 export const UpsertNotificationTemplateResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const ListStaffNotificationsResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "kind": zod.string(),
+  "title": zod.string(),
+  "message": zod.string(),
+  "linkPath": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListStaffNotificationsResponse = zod.array(ListStaffNotificationsResponseItem)
+
+
+export const GetStaffNotificationsUnreadCountResponse = zod.object({
+  "count": zod.number()
+})
+
+
+export const MarkStaffNotificationsReadResponse = zod.object({
   "ok": zod.boolean()
 })
 

@@ -133,12 +133,12 @@ import type {
   InboxReplyInput,
   InboxThreadsResponse,
   InboxUnreadCount,
-  IndustryTourState,
   Industry,
   IndustryChecklistInput,
   IndustryDetail,
   IndustryDocumentTemplateInput,
   IndustryJobTypeInput,
+  IndustryTourState,
   IntegrationProvider,
   IntegrationSyncLog,
   InvitationRecord,
@@ -328,6 +328,8 @@ import type {
   SkipContractOccurrence200,
   StaffAvailabilityEntry,
   StaffAvailabilityInput,
+  StaffNotificationsList,
+  StaffNotificationsUnreadCount,
   StockAdjustmentInput,
   StockLocation,
   StockLocationInput,
@@ -5656,113 +5658,6 @@ export const useCreateBillingPaymentMethodSetup = <TError = ErrorType<unknown>,
       return useMutation(getCreateBillingPaymentMethodSetupMutationOptions(options));
     }
 
-export const getGetIndustryTourUrl = () => {
-
-
-
-
-  return `/api/v1/onboarding/industry-tour`
-}
-
-export const getIndustryTour = async ( options?: RequestInit): Promise<IndustryTourState> => {
-
-  return customFetch<IndustryTourState>(getGetIndustryTourUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export const getGetIndustryTourQueryKey = () => {
-    return [
-    `/api/v1/onboarding/industry-tour`
-    ] as const;
-    }
-
-
-export const getGetIndustryTourQueryOptions = <TData = Awaited<ReturnType<typeof getIndustryTour>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIndustryTour>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetIndustryTourQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIndustryTour>>> = ({ signal }) => getIndustryTour({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIndustryTour>>, TError, TData> & { queryKey: QueryKey }
-}
-
-export type GetIndustryTourQueryResult = NonNullable<Awaited<ReturnType<typeof getIndustryTour>>>
-export type GetIndustryTourQueryError = ErrorType<unknown>
-
-
-
-export function useGetIndustryTour<TData = Awaited<ReturnType<typeof getIndustryTour>>, TError = ErrorType<unknown>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIndustryTour>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
-
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-
-  const queryOptions = getGetIndustryTourQueryOptions(options)
-
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-export const dismissIndustryTour = async ( options?: RequestInit): Promise<void> => {
-
-  return customFetch<void>(`/api/v1/onboarding/industry-tour/dismiss`,
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-export const getDismissIndustryTourMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dismissIndustryTour>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof dismissIndustryTour>>, TError,void, TContext> => {
-const {mutation: mutationOptions, request: requestOptions} = options ?? {};
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof dismissIndustryTour>>, void> = () => {
-
-
-          return dismissIndustryTour(requestOptions)
-        }
-
-        
-
-
-   return  { mutationFn, ...mutationOptions}}
-
-    export type DismissIndustryTourMutationResult = NonNullable<Awaited<ReturnType<typeof dismissIndustryTour>>>
-
-    export type DismissIndustryTourMutationError = ErrorType<unknown>
-
-export function useDismissIndustryTour<TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dismissIndustryTour>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
- ) {
-
-      const mutationOptions = getDismissIndustryTourMutationOptions(options);
-
-      return useMutation(mutationOptions);
-    }
-
-
 export const getGetOnboardingUrl = () => {
 
 
@@ -5833,6 +5728,141 @@ export function useGetOnboarding<TData = Awaited<ReturnType<typeof getOnboarding
 
 
 
+
+export const getGetIndustryTourUrl = () => {
+
+
+
+
+  return `/api/v1/onboarding/industry-tour`
+}
+
+export const getIndustryTour = async ( options?: RequestInit): Promise<IndustryTourState> => {
+
+  return customFetch<IndustryTourState>(getGetIndustryTourUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIndustryTourQueryKey = () => {
+    return [
+    `/api/v1/onboarding/industry-tour`
+    ] as const;
+    }
+
+
+export const getGetIndustryTourQueryOptions = <TData = Awaited<ReturnType<typeof getIndustryTour>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIndustryTour>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIndustryTourQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIndustryTour>>> = ({ signal }) => getIndustryTour({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIndustryTour>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIndustryTourQueryResult = NonNullable<Awaited<ReturnType<typeof getIndustryTour>>>
+export type GetIndustryTourQueryError = ErrorType<unknown>
+
+
+
+export function useGetIndustryTour<TData = Awaited<ReturnType<typeof getIndustryTour>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIndustryTour>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIndustryTourQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getDismissIndustryTourUrl = () => {
+
+
+
+
+  return `/api/v1/onboarding/industry-tour/dismiss`
+}
+
+export const dismissIndustryTour = async ( options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDismissIndustryTourUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getDismissIndustryTourMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dismissIndustryTour>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof dismissIndustryTour>>, TError,void, TContext> => {
+
+const mutationKey = ['dismissIndustryTour'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof dismissIndustryTour>>, void> = () => {
+
+
+          return  dismissIndustryTour(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DismissIndustryTourMutationResult = NonNullable<Awaited<ReturnType<typeof dismissIndustryTour>>>
+
+    export type DismissIndustryTourMutationError = ErrorType<unknown>
+
+    export const useDismissIndustryTour = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dismissIndustryTour>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof dismissIndustryTour>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getDismissIndustryTourMutationOptions(options));
+    }
 
 export const getGetAdminDashboardUrl = () => {
 
@@ -17205,6 +17235,212 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getUpsertNotificationTemplateMutationOptions(options));
+    }
+
+export const getListStaffNotificationsUrl = () => {
+
+
+
+
+  return `/api/v1/staff-notifications`
+}
+
+export const listStaffNotifications = async ( options?: RequestInit): Promise<StaffNotificationsList> => {
+
+  return customFetch<StaffNotificationsList>(getListStaffNotificationsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListStaffNotificationsQueryKey = () => {
+    return [
+    `/api/v1/staff-notifications`
+    ] as const;
+    }
+
+
+export const getListStaffNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof listStaffNotifications>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listStaffNotifications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListStaffNotificationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStaffNotifications>>> = ({ signal }) => listStaffNotifications({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listStaffNotifications>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListStaffNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof listStaffNotifications>>>
+export type ListStaffNotificationsQueryError = ErrorType<unknown>
+
+
+
+export function useListStaffNotifications<TData = Awaited<ReturnType<typeof listStaffNotifications>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listStaffNotifications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListStaffNotificationsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetStaffNotificationsUnreadCountUrl = () => {
+
+
+
+
+  return `/api/v1/staff-notifications/unread-count`
+}
+
+export const getStaffNotificationsUnreadCount = async ( options?: RequestInit): Promise<StaffNotificationsUnreadCount> => {
+
+  return customFetch<StaffNotificationsUnreadCount>(getGetStaffNotificationsUnreadCountUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetStaffNotificationsUnreadCountQueryKey = () => {
+    return [
+    `/api/v1/staff-notifications/unread-count`
+    ] as const;
+    }
+
+
+export const getGetStaffNotificationsUnreadCountQueryOptions = <TData = Awaited<ReturnType<typeof getStaffNotificationsUnreadCount>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStaffNotificationsUnreadCount>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetStaffNotificationsUnreadCountQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStaffNotificationsUnreadCount>>> = ({ signal }) => getStaffNotificationsUnreadCount({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStaffNotificationsUnreadCount>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetStaffNotificationsUnreadCountQueryResult = NonNullable<Awaited<ReturnType<typeof getStaffNotificationsUnreadCount>>>
+export type GetStaffNotificationsUnreadCountQueryError = ErrorType<unknown>
+
+
+
+export function useGetStaffNotificationsUnreadCount<TData = Awaited<ReturnType<typeof getStaffNotificationsUnreadCount>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStaffNotificationsUnreadCount>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetStaffNotificationsUnreadCountQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getMarkStaffNotificationsReadUrl = () => {
+
+
+
+
+  return `/api/v1/staff-notifications/mark-read`
+}
+
+export const markStaffNotificationsRead = async ( options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getMarkStaffNotificationsReadUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getMarkStaffNotificationsReadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markStaffNotificationsRead>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof markStaffNotificationsRead>>, TError,void, TContext> => {
+
+const mutationKey = ['markStaffNotificationsRead'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markStaffNotificationsRead>>, void> = () => {
+
+
+          return  markStaffNotificationsRead(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarkStaffNotificationsReadMutationResult = NonNullable<Awaited<ReturnType<typeof markStaffNotificationsRead>>>
+
+    export type MarkStaffNotificationsReadMutationError = ErrorType<unknown>
+
+    export const useMarkStaffNotificationsRead = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markStaffNotificationsRead>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof markStaffNotificationsRead>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getMarkStaffNotificationsReadMutationOptions(options));
     }
 
 export const getListProductsUrl = () => {

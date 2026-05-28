@@ -795,15 +795,6 @@ export interface BillingSetupIntent {
   customerId: string;
 }
 
-export interface OnboardingItem {
-  key: string;
-  label: string;
-  description: string;
-  complete: boolean;
-  /** @nullable */
-  href?: string | null;
-}
-
 export interface IndustryTourQuickAction {
   key: string;
   label: string;
@@ -819,6 +810,15 @@ export interface IndustryTourState {
   industrySlug?: string | null;
   enabledModules: string[];
   quickActions: IndustryTourQuickAction[];
+}
+
+export interface OnboardingItem {
+  key: string;
+  label: string;
+  description: string;
+  complete: boolean;
+  /** @nullable */
+  href?: string | null;
 }
 
 export interface OnboardingState {
@@ -2516,6 +2516,21 @@ export interface NotificationTemplateInput {
   /** @minLength 1 */
   bodyText: string;
   bodyHtml?: string;
+}
+
+export interface StaffNotificationItem {
+  id: string;
+  kind: string;
+  title: string;
+  message: string;
+  linkPath?: string | null;
+  createdAt: string;
+}
+
+export type StaffNotificationsList = StaffNotificationItem[];
+
+export interface StaffNotificationsUnreadCount {
+  count: number;
 }
 
 export interface OkResponse {

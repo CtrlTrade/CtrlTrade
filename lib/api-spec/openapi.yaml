@@ -3899,6 +3899,43 @@ paths:
               schema: { $ref: "#/components/schemas/OkResponse" }
 
   # ============================================================================
+  # Staff in-app notifications (bell feed)
+  # ============================================================================
+
+  /v1/staff-notifications:
+    get:
+      operationId: listStaffNotifications
+      tags: [staff-notifications]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffNotificationsList" }
+
+  /v1/staff-notifications/unread-count:
+    get:
+      operationId: getStaffNotificationsUnreadCount
+      tags: [staff-notifications]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffNotificationsUnreadCount" }
+
+  /v1/staff-notifications/mark-read:
+    post:
+      operationId: markStaffNotificationsRead
+      tags: [staff-notifications]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OkResponse" }
+
+  # ============================================================================
   # POS catalogue / stock / suppliers / trade accounts / till sessions (task 25)
   # ============================================================================
 
@@ -8631,6 +8668,27 @@ components:
         subject: { type: string }
         bodyText: { type: string, minLength: 1 }
         bodyHtml: { type: string }
+
+    StaffNotificationItem:
+      type: object
+      required: [id, kind, title, message, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string }
+        title: { type: string }
+        message: { type: string }
+        linkPath: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    StaffNotificationsList:
+      type: array
+      items: { $ref: "#/components/schemas/StaffNotificationItem" }
+
+    StaffNotificationsUnreadCount:
+      type: object
+      required: [count]
+      properties:
+        count: { type: integer }
 
     OkResponse:
       type: object

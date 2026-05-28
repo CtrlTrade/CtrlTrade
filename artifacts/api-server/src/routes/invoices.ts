@@ -27,6 +27,7 @@ import {
 } from "@workspace/api-zod";
 import { requireTenant } from "../middlewares/auth";
 import { logAudit } from "../lib/audit";
+import { createStaffNotification } from "../lib/staff-notifications";
 import { nextInvoiceNumber } from "../lib/numbering";
 import { isTenantCustomer } from "../lib/tenantGuards";
 import { getAppBaseUrl } from "../lib/email";
@@ -977,6 +978,13 @@ export async function recordInvoicePayment(opts: {
       message: `Invoice ${inv.number} marked paid`,
       metadata: { amountPence: paid, checkoutSessionId: opts.stripeCheckoutSessionId },
     });
+    createStaffNotification({
+      tenantId: inv.tenantId,
+      kind: "invoice_paid",
+      title: "Invoice paid",
+      message: `Invoice #${inv.number} has been paid`,
+      linkPath: `/invoices/${inv.id}`,
+    }).catch(() => {});
   }
   await sendPaymentReceipt(inv.id, opts.amountPence).catch((err) =>
     logger.warn({ err, invoiceId: inv.id }, "Receipt email failed"),

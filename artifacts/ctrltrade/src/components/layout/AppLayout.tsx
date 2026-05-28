@@ -7,6 +7,7 @@ import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar,
 import { useGetInboxUnreadCount } from "@workspace/api-client-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { NotificationBell } from "./NotificationBell";
 
 function InboxBadge() {
   const { data } = useGetInboxUnreadCount({ query: { refetchInterval: 30000 } as any });
@@ -133,7 +134,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: tenant.brandColor || "var(--primary)" }} />
             <span className="font-bold text-lg uppercase tracking-tight" data-testid="text-tenant-name">{tenant.name}</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <NotificationBell />
             <div className="text-sm font-medium text-muted-foreground">{session.user.name}</div>
             <Button variant="ghost" size="sm" onClick={handleLogout} data-testid="button-logout" className="gap-2 uppercase text-xs tracking-wider font-bold">
               <LogOut className="h-4 w-4" />

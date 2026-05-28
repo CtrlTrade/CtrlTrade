@@ -45,6 +45,7 @@ import { dispatchNotification } from "../lib/notifications";
 import { nextJobNumber, nextInvoiceNumber } from "../lib/numbering";
 import { getUncachableStripeClient, isStripeConnected } from "../stripeClient";
 import { logger } from "../lib/logger";
+import { createStaffNotification } from "../lib/staff-notifications";
 
 declare module "express-session" {
   interface SessionData {
@@ -591,6 +592,14 @@ router.post(
       },
     });
 
+    createStaffNotification({
+      tenantId: tenant.id,
+      kind: "quote_accepted",
+      title: "Quote accepted",
+      message: `${customer.name} accepted quote #${ctx.q.number}`,
+      linkPath: `/quotes/${ctx.q.id}`,
+    }).catch(() => {});
+
     const refreshed = await loadPortalQuote(tenant.id, customer.id, ctx.q.id);
     res.json(
       AcceptPortalQuoteResponse.parse({
@@ -637,6 +646,15 @@ router.post(
         ip: req.ip,
       },
     });
+
+    createStaffNotification({
+      tenantId: tenant.id,
+      kind: "quote_declined",
+      title: "Quote declined",
+      message: `${customer.name} declined quote #${ctx.q.number}${parsed.data.reason ? `: ${parsed.data.reason}` : ""}`,
+      linkPath: `/quotes/${ctx.q.id}`,
+    }).catch(() => {});
+
     if (parsed.data.reason) {
       await db.insert(customerMessagesTable).values({
         tenantId: tenant.id,
@@ -913,6 +931,15 @@ router.post(
       message: `Customer ${customer.name} left a ${parsed.data.rating}-star review on job ${job.number}`,
       metadata: { customerId: customer.id, jobId: job.id, rating: parsed.data.rating },
     });
+
+    createStaffNotification({
+      tenantId: tenant.id,
+      kind: "review_submitted",
+      title: "New review",
+      message: `${customer.name} left a ${parsed.data.rating}-star review on job #${job.number}`,
+      linkPath: `/jobs/${job.id}`,
+    }).catch(() => {});
+
     res.json(
       SubmitPortalReviewResponse.parse({
         id: review.id,
@@ -1061,6 +1088,15 @@ router.post(
         body: parsed.data.body,
       })
       .returning();
+
+    createStaffNotification({
+      tenantId: tenant.id,
+      kind: "customer_message",
+      title: "New customer message",
+      message: `${customer.name} sent a message on ${kind} thread`,
+      linkPath: kind === "quote" ? `/quotes/${subjectId}` : kind === "job" ? `/jobs/${subjectId}` : `/inbox`,
+    }).catch(() => {});
+
     res.status(201).json(serializeMessage(row));
   },
 );
