@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, AlertTriangle, ShieldCheck, UserCheck, Download, Trash2, Globe, Building2 } from "lucide-react";
+import { RefreshCw, AlertTriangle, ShieldCheck, UserCheck, Download, Trash2, Globe, Building2, CreditCard } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
@@ -192,7 +192,7 @@ export function AdminTenantDetail() {
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="border-b border-zinc-900 pb-2">
                   <span className="text-zinc-500 uppercase font-bold text-xs block mb-0.5">Branches</span>
-                  <span className="font-mono text-zinc-300 font-bold">{(detail as any).branchCount ?? "—"}</span>
+                  <span className="font-mono text-zinc-300 font-bold">{detail.branchCount}</span>
                 </div>
               </div>
             </CardContent>
@@ -202,28 +202,98 @@ export function AdminTenantDetail() {
 
       {/* Tab: Billing */}
       {activeTab === "billing" && (
-        <Card className="rounded-none border-zinc-800 bg-black shadow-none">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Subscription Details</CardTitle>
-            <Button variant="ghost" size="sm" onClick={openQtyModal}
-              className="h-6 text-xs uppercase font-bold text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-none">
-              Edit Qty
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            {[
-              { label: "MRR",         value: <span className="font-mono text-red-500 font-bold">£{subscription.monthlyTotal}</span> },
-              { label: "Stripe Cust", value: <span className="font-mono text-zinc-300 text-xs truncate" title={subscription.stripeCustomerId}>{subscription.stripeCustomerId}</span> },
-              { label: "Resources",   value: <span className="font-mono text-zinc-300 font-bold">{subscription.controlSeats}C / {subscription.fieldSeats}F / {subscription.tills}T</span> },
-              { label: "Branches",    value: <span className="font-mono text-zinc-300 font-bold">{(detail as any).branchCount ?? "—"}</span> },
-            ].map(({ label, value }) => (
-              <div key={label} className="grid grid-cols-3 gap-2 border-b border-zinc-900 pb-2">
-                <span className="text-zinc-500 uppercase font-bold text-xs">{label}</span>
-                <span className="col-span-2">{value}</span>
+        <div className="space-y-6">
+          {/* Stripe identifiers */}
+          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Stripe Details</CardTitle>
+              <Button variant="ghost" size="sm" onClick={openQtyModal}
+                className="h-6 text-xs uppercase font-bold text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-none">
+                Edit Qty
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              {([
+                { label: "MRR",            node: <span className="font-mono text-red-500 font-bold">£{subscription.monthlyTotal}</span> },
+                { label: "Currency",       node: <span className="font-mono text-zinc-300 uppercase">{subscription.currency}</span> },
+                { label: "Stripe Customer", node: <span className="font-mono text-zinc-300 text-xs break-all" title={subscription.stripeCustomerId}>{subscription.stripeCustomerId}</span> },
+                { label: "Stripe Sub",     node: <span className="font-mono text-zinc-300 text-xs break-all" title={subscription.stripeSubscriptionId}>{subscription.stripeSubscriptionId}</span> },
+                { label: "Resources",      node: <span className="font-mono text-zinc-300 font-bold">{subscription.controlSeats}C / {subscription.fieldSeats}F / {subscription.tills}T</span> },
+              ] as { label: string; node: React.ReactNode }[]).map(({ label, node }) => (
+                <div key={label} className="grid grid-cols-3 gap-2 border-b border-zinc-900 pb-2">
+                  <span className="text-zinc-500 uppercase font-bold text-xs">{label}</span>
+                  <span className="col-span-2">{node}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Upcoming renewal */}
+          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+            <CardHeader className="pb-2">
+              <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Renewal Status</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              {([
+                {
+                  label: "Next Renewal",
+                  node: subscription.currentPeriodEnd
+                    ? <span className="font-mono text-zinc-300">{new Date(subscription.currentPeriodEnd).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                    : <span className="text-zinc-600">—</span>,
+                },
+                {
+                  label: "Trial Ends",
+                  node: subscription.trialEndsAt
+                    ? <span className="font-mono text-blue-400">{new Date(subscription.trialEndsAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                    : <span className="text-zinc-600">Not on trial</span>,
+                },
+                {
+                  label: "Cancel at Period End",
+                  node: subscription.cancelAtPeriodEnd
+                    ? <span className="text-red-500 font-bold uppercase text-xs">Yes — cancels at renewal</span>
+                    : <span className="text-green-500 font-bold uppercase text-xs">No — auto-renews</span>,
+                },
+                {
+                  label: "Sub Status",
+                  node: <span className={`font-bold uppercase text-xs ${
+                    subscription.status === "active"   ? "text-green-500" :
+                    subscription.status === "trialing" ? "text-blue-400"  :
+                    subscription.status === "past_due" ? "text-red-500"   : "text-zinc-400"
+                  }`}>{subscription.status}</span>,
+                },
+              ] as { label: string; node: React.ReactNode }[]).map(({ label, node }) => (
+                <div key={label} className="grid grid-cols-3 gap-2 border-b border-zinc-900 pb-2">
+                  <span className="text-zinc-500 uppercase font-bold text-xs">{label}</span>
+                  <span className="col-span-2">{node}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Payment history */}
+          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+            <CardHeader className="pb-2">
+              <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Payment History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
+                <CreditCard className="h-8 w-8 text-zinc-700" />
+                <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Full invoice history in Stripe</p>
+                <p className="text-[11px] text-zinc-600 max-w-xs">
+                  Payment records are managed directly in Stripe. Use the Customer ID above to view all charges, refunds, and invoices.
+                </p>
+                <a
+                  href={`https://dashboard.stripe.com/customers/${subscription.stripeCustomerId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-bold uppercase tracking-wider text-red-500 hover:underline mt-1"
+                >
+                  Open in Stripe Dashboard →
+                </a>
               </div>
-            ))}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Tab: Team */}
@@ -234,7 +304,7 @@ export function AdminTenantDetail() {
               { label: "Control Seats",  value: subscription.controlSeats, desc: "Admin & office users"  },
               { label: "Field Seats",    value: subscription.fieldSeats,   desc: "Mobile / field workers" },
               { label: "POS Tills",      value: subscription.tills,        desc: "Point-of-sale devices"  },
-              { label: "Branches",       value: (detail as any).branchCount ?? 0, desc: "Locations" },
+              { label: "Branches",       value: detail.branchCount, desc: "Locations" },
             ].map(({ label, value, desc }) => (
               <div key={label} className="border border-zinc-800 bg-zinc-950 p-4 text-center">
                 <div className="text-3xl font-mono font-bold text-zinc-100 mb-1">{value}</div>
