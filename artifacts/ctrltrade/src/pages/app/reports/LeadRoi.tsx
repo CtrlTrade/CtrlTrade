@@ -71,7 +71,7 @@ export function LeadRoiReport({ admin = false }: { admin?: boolean }) {
             <CardContent className="p-0">
               <table className="w-full text-sm">
                 <thead className="bg-muted">
-                  <tr className="text-left uppercase text-[10px] tracking-wider font-bold">
+                  <tr className="text-left text-[10px] font-semibold">
                     <th className="p-3">Source</th>
                     <th className="p-3 text-right">Leads</th>
                     <th className="p-3 text-right">Won</th>
@@ -83,7 +83,7 @@ export function LeadRoiReport({ admin = false }: { admin?: boolean }) {
                 <tbody>
                   {data.rows.map((r) => (
                     <tr key={r.source} className="border-t border-border">
-                      <td className="p-3 font-mono uppercase">{r.source}</td>
+                      <td className="p-3 font-mono">{r.source}</td>
                       <td className="p-3 text-right font-mono">{r.totalLeads}</td>
                       <td className="p-3 text-right font-mono">{r.wonLeads}</td>
                       <td className="p-3 text-right font-mono">{r.conversionPct}%</td>

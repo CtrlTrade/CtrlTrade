@@ -53,7 +53,7 @@ export function DateRangePicker({ range, onChange }: { range: Range; onChange: (
             key={o.label}
             variant={active ? "default" : "outline"}
             size="sm"
-            className="rounded-xl uppercase text-xs font-bold tracking-wider"
+            className="rounded-xl text-xs font-semibold"
             onClick={() => onChange(o)}
             data-testid={`range-${o.label.toLowerCase().replace(/\s+/g, "-")}`}
           >
@@ -130,7 +130,7 @@ export function ExportCsvButton({ filename, rows }: { filename: string; rows: Ar
     <Button
       variant="outline"
       size="sm"
-      className="rounded-xl uppercase text-xs font-bold tracking-wider gap-2"
+      className="rounded-xl text-xs font-semibold gap-2"
       onClick={() => downloadCsv(filename, rows)}
       data-testid="button-export-csv"
     >

@@ -127,7 +127,7 @@ export function AppProducts() {
                   <div><Label>VAT %</Label><Input name="vat" type="number" defaultValue="20" /></div>
                   <div className="flex items-end gap-2 pb-2">
                     <input type="checkbox" name="trackStock" defaultChecked id="trackStock" />
-                    <Label htmlFor="trackStock" className="uppercase text-xs tracking-wider">Track stock</Label>
+                    <Label htmlFor="trackStock" className="text-xs font-semibold">Track stock</Label>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">

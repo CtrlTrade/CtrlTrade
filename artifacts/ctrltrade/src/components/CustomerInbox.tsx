@@ -48,7 +48,7 @@ export function CustomerInbox({ customerId, jobId, title = "Messages" }: Props) 
             <div className="flex items-center justify-between gap-2">
               <div className="text-sm font-medium">{t.subject ?? "(no subject)"}</div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="uppercase">{t.channel}</Badge>
+                <Badge variant="outline" className="">{t.channel}</Badge>
                 {t.unreadCount > 0 && <Badge>{t.unreadCount} new</Badge>}
               </div>
             </div>

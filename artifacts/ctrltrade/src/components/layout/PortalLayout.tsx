@@ -32,7 +32,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link
             href={session ? `/portal/${tenantSlug}/app` : `/portal/${tenantSlug}`}
-            className="font-bold text-xl tracking-tighter uppercase text-foreground flex items-center gap-3"
+            className="font-bold text-xl text-foreground flex items-center gap-3"
             data-testid="link-portal-home"
           >
             <img

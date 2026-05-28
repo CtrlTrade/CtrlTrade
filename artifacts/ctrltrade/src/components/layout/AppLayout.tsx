@@ -175,7 +175,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <NotificationBell />
             <div className="text-sm font-medium text-muted-foreground hidden sm:block truncate max-w-32">{session.user.name}</div>
-            <Button variant="ghost" size="sm" onClick={handleLogout} data-testid="button-logout" className="gap-1 sm:gap-2 uppercase text-xs tracking-wider font-bold px-2 sm:px-3">
+            <Button variant="ghost" size="sm" onClick={handleLogout} data-testid="button-logout" className="gap-1 sm:gap-2 text-xs font-semibold px-2 sm:px-3">
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Log Out</span>
             </Button>

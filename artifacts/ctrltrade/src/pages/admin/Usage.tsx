@@ -48,7 +48,7 @@ export function AdminUsage() {
             {data.byTenant.map(t => (
               <div key={t.tenantId} className="p-4">
                 <div className="flex justify-between items-center mb-2">
-                  <Link href={`/tenants/${t.tenantId}`} className="font-bold text-foreground/90 hover:text-red-500 uppercase text-sm">{t.tenantName}</Link>
+                  <Link href={`/tenants/${t.tenantId}`} className="font-bold text-foreground/90 hover:text-primary text-sm">{t.tenantName}</Link>
                   <div className="font-mono text-foreground font-bold">{t.total.toLocaleString()}</div>
                 </div>
                 <div className="flex flex-wrap gap-2">

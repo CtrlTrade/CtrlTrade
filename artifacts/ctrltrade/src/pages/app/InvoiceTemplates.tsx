@@ -172,7 +172,7 @@ export function AppInvoiceTemplates() {
           <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs uppercase text-muted-foreground">Customer</label>
+                <label className="text-xs text-muted-foreground">Customer</label>
                 <select className="w-full border p-2 bg-background"
                   value={customerId} onChange={(e) => setCustomerId(e.target.value)}
                   disabled={!!editingId}
@@ -182,7 +182,7 @@ export function AppInvoiceTemplates() {
                 </select>
               </div>
               <div>
-                <label className="text-xs uppercase text-muted-foreground">Frequency</label>
+                <label className="text-xs text-muted-foreground">Frequency</label>
                 <select className="w-full border p-2 bg-background"
                   value={frequency} onChange={(e) => setFrequency(e.target.value as typeof frequency)}>
                   <option value="weekly">Weekly</option>
@@ -192,29 +192,29 @@ export function AppInvoiceTemplates() {
                 </select>
               </div>
               <div>
-                <label className="text-xs uppercase text-muted-foreground">Title</label>
+                <label className="text-xs text-muted-foreground">Title</label>
                 <Input className="rounded-xl" value={title} onChange={(e) => setTitle(e.target.value)}
                   data-testid="input-template-title" />
               </div>
               <div>
-                <label className="text-xs uppercase text-muted-foreground">First run date</label>
+                <label className="text-xs text-muted-foreground">First run date</label>
                 <Input className="rounded-xl" type="date" value={nextRun} onChange={(e) => setNextRun(e.target.value)} />
               </div>
               <div>
-                <label className="text-xs uppercase text-muted-foreground">VAT rate %</label>
+                <label className="text-xs text-muted-foreground">VAT rate %</label>
                 <Input className="rounded-xl font-mono" type="number" min={0} max={100} value={vatRatePct}
                   onChange={(e) => setVatRatePct(Number(e.target.value) || 0)}
                   data-testid="input-template-vat" />
               </div>
               <div className="col-span-2">
-                <label className="text-xs uppercase text-muted-foreground">Notes</label>
+                <label className="text-xs text-muted-foreground">Notes</label>
                 <Input className="rounded-xl" value={notes} onChange={(e) => setNotes(e.target.value)}
                   placeholder="Optional notes shown on each generated invoice"
                   data-testid="input-template-notes" />
               </div>
             </div>
             <div>
-              <label className="text-xs uppercase text-muted-foreground">Line items</label>
+              <label className="text-xs text-muted-foreground">Line items</label>
               <div className="space-y-2">
                 {items.map((it, i) => (
                   <div key={i} className="grid grid-cols-12 gap-2">
@@ -275,7 +275,7 @@ export function AppInvoiceTemplates() {
                     <TableRow key={t.id} data-testid={`row-template-${t.id}`}>
                       <TableCell>{t.title}</TableCell>
                       <TableCell>{t.customerName}</TableCell>
-                      <TableCell className="uppercase text-xs">{t.frequency}</TableCell>
+                      <TableCell className="text-xs">{t.frequency}</TableCell>
                       <TableCell className="text-sm">{new Date(t.nextRunAt).toLocaleDateString("en-GB")}</TableCell>
                       <TableCell className="text-right font-mono">{formatGBP(total)}</TableCell>
                       <TableCell className="text-right">

@@ -61,7 +61,7 @@ function VerificationBadgeCard() {
               <div className="flex-1 space-y-1">
                 {s?.verifiedBadge ? (
                   <div className="flex items-center gap-2">
-                    <Badge className="rounded-xl uppercase bg-green-600 text-white gap-1">
+                    <Badge className="rounded-xl bg-green-500/15 text-green-400 gap-1">
                       <CheckCircle className="h-3 w-3" /> Verified
                     </Badge>
                     <span className="text-sm text-muted-foreground">
@@ -70,7 +70,7 @@ function VerificationBadgeCard() {
                   </div>
                 ) : s?.badgeStatus === "under_review" ? (
                   <div className="flex items-center gap-2">
-                    <Badge className="rounded-xl uppercase bg-amber-500 text-white gap-1">
+                    <Badge className="rounded-xl bg-amber-500/15 text-amber-300 gap-1">
                       <Clock className="h-3 w-3" /> Under Review
                     </Badge>
                     <span className="text-sm text-muted-foreground">
@@ -81,7 +81,7 @@ function VerificationBadgeCard() {
                 ) : s?.badgeStatus === "rejected" ? (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Badge variant="destructive" className="rounded-xl uppercase gap-1">
+                      <Badge variant="destructive" className="rounded-xl gap-1">
                         <XCircle className="h-3 w-3" /> Rejected
                       </Badge>
                       <span className="text-sm text-muted-foreground">
@@ -280,9 +280,9 @@ export function AppCompliance() {
                       <TableCell className="font-mono text-sm">{c.issuedAt ? new Date(c.issuedAt).toLocaleDateString() : "—"}</TableCell>
                       <TableCell className="font-mono text-sm">{c.expiresAt ? new Date(c.expiresAt).toLocaleDateString() : "—"}</TableCell>
                       <TableCell>
-                        {expired ? <Badge variant="destructive" className="rounded-xl uppercase"><AlertTriangle className="h-3 w-3 mr-1" />Expired</Badge>
-                          : expiring ? <Badge className="rounded-xl uppercase bg-amber-500 text-white"><AlertTriangle className="h-3 w-3 mr-1" />Expiring</Badge>
-                          : <Badge variant="outline" className="rounded-xl uppercase">Valid</Badge>}
+                        {expired ? <Badge variant="destructive" className="rounded-xl"><AlertTriangle className="h-3 w-3 mr-1" />Expired</Badge>
+                          : expiring ? <Badge className="rounded-xl bg-amber-500/15 text-amber-300"><AlertTriangle className="h-3 w-3 mr-1" />Expiring</Badge>
+                          : <Badge variant="outline" className="rounded-xl">Valid</Badge>}
                       </TableCell>
                     </TableRow>
                   );

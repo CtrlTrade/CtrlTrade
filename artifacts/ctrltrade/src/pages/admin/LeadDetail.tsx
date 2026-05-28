@@ -113,7 +113,7 @@ export function AdminLeadDetail() {
         <Button
           variant="ghost"
           size="sm"
-          className="gap-2 text-muted-foreground hover:text-foreground/90 uppercase text-xs font-bold"
+          className="gap-2 text-muted-foreground hover:text-foreground/90 text-xs font-semibold"
           onClick={() => setLocation("/leads")}
         >
           <ArrowLeft className="h-4 w-4" />
@@ -137,7 +137,7 @@ export function AdminLeadDetail() {
                 </div>
                 <div className="text-right">
                   <div className="text-xs text-muted-foreground font-mono">{new Date(lead.createdAt).toLocaleDateString()}</div>
-                  <div className="text-xs text-muted-foreground uppercase mt-0.5">{lead.source}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{lead.source}</div>
                 </div>
               </div>
             </CardHeader>
@@ -145,14 +145,14 @@ export function AdminLeadDetail() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <a href={`mailto:${lead.email}`} className="text-foreground/80 hover:text-red-500 transition-colors font-mono text-xs">
+                  <a href={`mailto:${lead.email}`} className="text-foreground/80 hover:text-primary transition-colors font-mono text-xs">
                     {lead.email}
                   </a>
                 </div>
                 {lead.phone && (
                   <div className="flex items-center gap-2 text-sm">
                     <Phone className="h-4 w-4 text-muted-foreground" />
-                    <a href={`tel:${lead.phone}`} className="text-foreground/80 hover:text-red-500 transition-colors font-mono text-xs">
+                    <a href={`tel:${lead.phone}`} className="text-foreground/80 hover:text-primary transition-colors font-mono text-xs">
                       {lead.phone}
                     </a>
                   </div>
@@ -174,7 +174,7 @@ export function AdminLeadDetail() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-xs uppercase text-muted-foreground hover:text-foreground/90"
+                  className="text-xs text-muted-foreground hover:text-foreground/90"
                   onClick={() => { setNotesOpen(true); setEditNotes(lead.notes ?? ""); }}
                 >
                   Edit
@@ -182,7 +182,7 @@ export function AdminLeadDetail() {
               ) : (
                 <div className="flex gap-2">
                   <Button size="sm" variant="ghost" className="text-xs text-muted-foreground" onClick={() => { setNotesOpen(false); setEditNotes(null); }}>Cancel</Button>
-                  <Button size="sm" className="text-xs bg-red-600 hover:bg-red-700 text-white rounded-xl" onClick={handleSaveNotes}>Save</Button>
+                  <Button size="sm" className="text-xs bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-xl" onClick={handleSaveNotes}>Save</Button>
                 </div>
               )}
             </CardHeader>
@@ -211,7 +211,7 @@ export function AdminLeadDetail() {
                   <button
                     key={ch}
                     onClick={() => setNoteChannel(ch)}
-                    className={`px-3 py-1.5 text-xs font-bold uppercase border transition-colors flex items-center gap-1.5 ${
+                    className={`px-3 py-1.5 text-xs font-semibold border transition-colors flex items-center gap-1.5 ${
                       noteChannel === ch
                         ? "border-red-500 text-red-500 bg-red-500/10"
                         : "border-border text-muted-foreground hover:border-border"
@@ -239,7 +239,7 @@ export function AdminLeadDetail() {
               />
               <Button
                 size="sm"
-                className="rounded-xl bg-red-600 hover:bg-red-700 text-white uppercase text-xs font-bold gap-2"
+                className="rounded-xl bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs font-semibold gap-2"
                 onClick={handleLogInteraction}
                 disabled={!noteText.trim() || messageMutation.isPending}
               >
@@ -263,7 +263,7 @@ export function AdminLeadDetail() {
                   {lead.messages.map((msg: any) => (
                     <div key={msg.id} className="border-l-2 border-border pl-3 py-1 space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold uppercase text-muted-foreground">
+                        <span className="text-xs font-bold text-muted-foreground">
                           {CHANNEL_LABELS[msg.channel] ?? msg.channel}
                         </span>
                         {msg.authorName && (
@@ -295,7 +295,7 @@ export function AdminLeadDetail() {
                     key={s}
                     onClick={() => !active && handleStatusChange(s)}
                     disabled={updateMutation.isPending}
-                    className={`w-full text-left px-3 py-2 text-xs font-bold uppercase border transition-colors ${
+                    className={`w-full text-left px-3 py-2 text-xs font-semibold border transition-colors ${
                       active
                         ? `border-current bg-current/10 ${STATUS_COLOURS[s]}`
                         : "border-border text-muted-foreground hover:border-border"

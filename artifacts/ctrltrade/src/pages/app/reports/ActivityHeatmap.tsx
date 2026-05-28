@@ -52,7 +52,7 @@ export function ActivityHeatmapReport({ admin = false }: { admin?: boolean }) {
               <tbody>
                 {DAYS.map((d, di) => (
                   <tr key={d}>
-                    <td className="text-[10px] uppercase font-bold tracking-wider pr-2">{d}</td>
+                    <td className="text-[10px] font-semibold pr-2">{d}</td>
                     {grid[di].map((v, hi) => {
                       const intensity = max > 0 ? v / max : 0;
                       const bg = v === 0 ? "transparent" : `rgba(59, 130, 246, ${0.15 + intensity * 0.75})`;

@@ -55,11 +55,11 @@ export function AppInvoices() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-4 text-sm">
-              <div><div className="text-muted-foreground uppercase text-xs">Current</div><div className="font-mono font-bold">{formatGBP(debtors.totals.currentPence)}</div></div>
-              <div><div className="text-muted-foreground uppercase text-xs">1–30</div><div className="font-mono font-bold">{formatGBP(debtors.totals.days30Pence)}</div></div>
-              <div><div className="text-muted-foreground uppercase text-xs">31–60</div><div className="font-mono font-bold">{formatGBP(debtors.totals.days60Pence)}</div></div>
-              <div><div className="text-muted-foreground uppercase text-xs">61–90</div><div className="font-mono font-bold">{formatGBP(debtors.totals.days90Pence)}</div></div>
-              <div><div className="text-muted-foreground uppercase text-xs">Total</div><div className="font-mono font-bold">{formatGBP(debtors.totals.totalOutstandingPence)}</div></div>
+              <div><div className="text-muted-foreground text-xs">Current</div><div className="font-mono font-bold">{formatGBP(debtors.totals.currentPence)}</div></div>
+              <div><div className="text-muted-foreground text-xs">1–30</div><div className="font-mono font-bold">{formatGBP(debtors.totals.days30Pence)}</div></div>
+              <div><div className="text-muted-foreground text-xs">31–60</div><div className="font-mono font-bold">{formatGBP(debtors.totals.days60Pence)}</div></div>
+              <div><div className="text-muted-foreground text-xs">61–90</div><div className="font-mono font-bold">{formatGBP(debtors.totals.days90Pence)}</div></div>
+              <div><div className="text-muted-foreground text-xs">Total</div><div className="font-mono font-bold">{formatGBP(debtors.totals.totalOutstandingPence)}</div></div>
             </div>
             {debtors.rows.length > 0 && (
               <div className="overflow-x-auto"><Table>
@@ -130,7 +130,7 @@ export function AppInvoices() {
                     <TableCell><Link href={`/invoices/${inv.id}`} className="underline font-mono">{inv.number}</Link></TableCell>
                     <TableCell>{inv.customerName}</TableCell>
                     <TableCell className="truncate max-w-xs">{inv.title}</TableCell>
-                    <TableCell><Badge variant={STATUS_VARIANT[inv.status] ?? "outline"} className="uppercase">{inv.status}</Badge></TableCell>
+                    <TableCell><Badge variant={STATUS_VARIANT[inv.status] ?? "outline"} className="">{inv.status}</Badge></TableCell>
                     <TableCell className="text-right font-mono">{formatGBP(inv.totalPence)}</TableCell>
                     <TableCell className="text-right text-sm text-muted-foreground">{inv.dueAt ? new Date(inv.dueAt).toLocaleDateString("en-GB") : "—"}</TableCell>
                   </TableRow>

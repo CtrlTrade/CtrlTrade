@@ -95,7 +95,7 @@ export function AppQuoteDetail() {
           <p className="text-sm mt-1">Customer: <span className="font-medium">{data.customerName}</span></p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge className="uppercase" data-testid="badge-quote-status">{data.status}</Badge>
+          <Badge className="" data-testid="badge-quote-status">{data.status}</Badge>
         </div>
       </div>
 
@@ -145,7 +145,7 @@ export function AppQuoteDetail() {
                 </TableRow>
               ))}
               <TableRow>
-                <TableCell colSpan={3} className="text-right font-bold uppercase">Total</TableCell>
+                <TableCell colSpan={3} className="text-right font-bold">Total</TableCell>
                 <TableCell className="text-right font-mono font-bold">{formatGBP(data.totalPence)}</TableCell>
               </TableRow>
             </TableBody>

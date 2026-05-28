@@ -258,7 +258,7 @@ export function Signup() {
                       >
                         {industrySlug === ind.slug && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
                         <div>
-                          <div className="font-bold uppercase text-sm">{ind.name}</div>
+                          <div className="font-semibold text-sm">{ind.name}</div>
                           {ind.description && <div className="text-xs text-muted-foreground mt-0.5">{ind.description}</div>}
                         </div>
                       </button>
@@ -288,7 +288,7 @@ export function Signup() {
                     >
                       <div className="flex items-center gap-2">
                         {businessType === bt.value && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
-                        <span className="font-bold uppercase text-sm">{bt.label}</span>
+                        <span className="font-semibold text-sm">{bt.label}</span>
                       </div>
                     </button>
                   ))}
@@ -315,7 +315,7 @@ export function Signup() {
                   <div key={mod.id} className="flex items-center gap-4 border border-border p-4">
                     <Checkbox id={mod.id} checked={mod.value} onCheckedChange={(c) => mod.set(!!c)} className="rounded-xl" />
                     <label htmlFor={mod.id} className="flex-1 cursor-pointer">
-                      <div className="font-bold uppercase text-sm">{mod.label}</div>
+                      <div className="font-semibold text-sm">{mod.label}</div>
                       <div className="text-xs text-muted-foreground">{mod.description}</div>
                     </label>
                   </div>
@@ -344,7 +344,7 @@ export function Signup() {
                           }}
                           className="rounded-xl"
                         />
-                        <label htmlFor={`ch-${ch.value}`} className="font-bold uppercase text-sm cursor-pointer">{ch.label}</label>
+                        <label htmlFor={`ch-${ch.value}`} className="font-semibold text-sm cursor-pointer">{ch.label}</label>
                       </div>
                     ))}
                   </div>
@@ -363,7 +363,7 @@ export function Signup() {
                           }}
                           className="rounded-xl"
                         />
-                        <label htmlFor={`ai-${ai.value}`} className="font-bold uppercase text-sm cursor-pointer">{ai.label}</label>
+                        <label htmlFor={`ai-${ai.value}`} className="font-semibold text-sm cursor-pointer">{ai.label}</label>
                       </div>
                     ))}
                   </div>
@@ -391,7 +391,7 @@ export function Signup() {
                           }}
                           className="rounded-xl"
                         />
-                        <label htmlFor={`cat-${cat.slug}`} className="text-sm font-bold uppercase cursor-pointer flex-1">{cat.name}</label>
+                        <label htmlFor={`cat-${cat.slug}`} className="text-sm font-semibold cursor-pointer flex-1">{cat.name}</label>
                       </div>
                     ))}
                   </div>
@@ -428,7 +428,7 @@ export function Signup() {
                       ))}
                     </div>
                     <div className="border-t border-border pt-4 flex justify-between font-bold text-xl">
-                      <span className="uppercase">Monthly Total</span>
+                      Monthly total
                       <span className="font-mono text-primary">£{(controlSeats * pricing.controlSeat.amount) + (fieldSeats * pricing.fieldSeat.amount) + (tills * pricing.till.amount)}</span>
                     </div>
                   </>
@@ -477,7 +477,7 @@ export function Signup() {
                 </div>
                 <div className="flex items-center gap-3 border border-border p-3">
                   <Checkbox id="vat-reg" checked={vatRegistered} onCheckedChange={(c) => setVatRegistered(!!c)} className="rounded-xl" />
-                  <label htmlFor="vat-reg" className="font-bold uppercase text-sm cursor-pointer">VAT Registered</label>
+                  <label htmlFor="vat-reg" className="font-semibold text-sm cursor-pointer">VAT Registered</label>
                 </div>
                 {vatRegistered && (
                   <div className="space-y-2">
@@ -493,7 +493,7 @@ export function Signup() {
                         key={ap.value}
                         type="button"
                         onClick={() => setAccountingProvider(ap.value)}
-                        className={`border p-3 text-left text-sm font-bold uppercase transition-colors flex items-center gap-1.5 ${accountingProvider === ap.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
+                        className={`border p-3 text-left text-sm font-semibold transition-colors flex items-center gap-1.5 ${accountingProvider === ap.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
                       >
                         {accountingProvider === ap.value && <CheckCircle2 className="h-3 w-3 text-primary shrink-0" />}
                         {ap.label}

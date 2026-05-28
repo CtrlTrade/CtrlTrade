@@ -190,7 +190,7 @@ export function AppJobs() {
                     <TableCell>{j.customerName}</TableCell>
                     <TableCell className="font-mono text-sm">{j.scheduledStart ? new Date(j.scheduledStart).toLocaleString() : "—"}</TableCell>
                     <TableCell>{j.assignedUserName ?? "—"}</TableCell>
-                    <TableCell><Badge variant={STATUS_VARIANT[j.status] ?? "outline"} className="uppercase">{j.status.replace("_", " ")}</Badge></TableCell>
+                    <TableCell><Badge variant={STATUS_VARIANT[j.status] ?? "outline"} className="">{j.status.replace("_", " ")}</Badge></TableCell>
                     <TableCell className="text-right font-mono">{formatGBP(j.valuePence)}</TableCell>
                   </TableRow>
                 ))}

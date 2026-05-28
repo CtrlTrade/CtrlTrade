@@ -110,7 +110,7 @@ export function BusinessSetupSettings() {
             <button
               type="button"
               onClick={() => setIndustrySlug("")}
-              className={`border p-3 text-left text-sm font-bold uppercase transition-colors ${!industrySlug ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
+              className={`border p-3 text-left text-sm font-semibold transition-colors ${!industrySlug ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
             >
               None
             </button>
@@ -119,7 +119,7 @@ export function BusinessSetupSettings() {
                 key={ind.slug}
                 type="button"
                 onClick={() => setIndustrySlug(ind.slug)}
-                className={`border p-3 text-left text-sm font-bold uppercase transition-colors flex items-center gap-1.5 ${industrySlug === ind.slug ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
+                className={`border p-3 text-left text-sm font-semibold transition-colors flex items-center gap-1.5 ${industrySlug === ind.slug ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
                 data-testid={`settings-industry-${ind.slug}`}
               >
                 {industrySlug === ind.slug && <CheckCircle2 className="h-3 w-3 text-primary shrink-0" />}
@@ -141,7 +141,7 @@ export function BusinessSetupSettings() {
                 key={bt.value}
                 type="button"
                 onClick={() => setBusinessType(bt.value === businessType ? "" : bt.value)}
-                className={`border p-3 text-left text-sm font-bold uppercase transition-colors flex items-center gap-1.5 ${businessType === bt.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
+                className={`border p-3 text-left text-sm font-semibold transition-colors flex items-center gap-1.5 ${businessType === bt.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
               >
                 {businessType === bt.value && <CheckCircle2 className="h-3 w-3 text-primary shrink-0" />}
                 {bt.label}
@@ -168,7 +168,7 @@ export function BusinessSetupSettings() {
             <div key={mod.id} className="flex items-center gap-4 border border-border p-3">
               <Checkbox id={mod.id} checked={mod.value} onCheckedChange={(c) => mod.set(!!c)} className="rounded-xl" data-testid={`toggle-${mod.id}`} />
               <label htmlFor={mod.id} className="flex-1 cursor-pointer">
-                <div className="font-bold uppercase text-sm">{mod.label}</div>
+                <div className="font-semibold text-sm">{mod.label}</div>
                 <div className="text-xs text-muted-foreground">{mod.description}</div>
               </label>
             </div>
@@ -187,7 +187,7 @@ export function BusinessSetupSettings() {
                 key={ap.value}
                 type="button"
                 onClick={() => setAccountingProvider(ap.value)}
-                className={`border p-3 text-left text-sm font-bold uppercase transition-colors flex items-center gap-1.5 ${accountingProvider === ap.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
+                className={`border p-3 text-left text-sm font-semibold transition-colors flex items-center gap-1.5 ${accountingProvider === ap.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
               >
                 {accountingProvider === ap.value && <CheckCircle2 className="h-3 w-3 text-primary shrink-0" />}
                 {ap.label}
@@ -214,7 +214,7 @@ export function BusinessSetupSettings() {
                   }}
                   className="rounded-xl"
                 />
-                <label htmlFor={`bs-ch-${ch.value}`} className="font-bold uppercase text-sm cursor-pointer">{ch.label}</label>
+                <label htmlFor={`bs-ch-${ch.value}`} className="font-semibold text-sm cursor-pointer">{ch.label}</label>
               </div>
             ))}
           </div>
@@ -238,7 +238,7 @@ export function BusinessSetupSettings() {
                   }}
                   className="rounded-xl"
                 />
-                <label htmlFor={`bs-ai-${ai.value}`} className="font-bold uppercase text-sm cursor-pointer">{ai.label}</label>
+                <label htmlFor={`bs-ai-${ai.value}`} className="font-semibold text-sm cursor-pointer">{ai.label}</label>
               </div>
             ))}
           </div>

@@ -115,9 +115,9 @@ export function AppInvoiceDetail() {
           <h1 className="text-2xl sm:text-3xl font-bold">{data.number}</h1>
           <p className="text-muted-foreground">{data.title}</p>
           <p className="text-sm mt-1">Customer: <span className="font-medium">{data.customerName}</span></p>
-          {data.isDeposit && <Badge variant="secondary" className="uppercase mt-2">Deposit invoice</Badge>}
+          {data.isDeposit && <Badge variant="secondary" className="mt-2">Deposit invoice</Badge>}
         </div>
-        <Badge variant={STATUS_VARIANT[data.status] ?? "outline"} className="uppercase" data-testid="badge-invoice-status">{data.status}</Badge>
+        <Badge variant={STATUS_VARIANT[data.status] ?? "outline"} className="" data-testid="badge-invoice-status">{data.status}</Badge>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -214,15 +214,15 @@ export function AppInvoiceDetail() {
                   </TableRow>
                 ))}
                 <TableRow>
-                  <TableCell colSpan={3} className="text-right uppercase text-muted-foreground">Subtotal</TableCell>
+                  <TableCell colSpan={3} className="text-right text-muted-foreground">Subtotal</TableCell>
                   <TableCell className="text-right font-mono">{formatGBP(data.subtotalPence)}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell colSpan={3} className="text-right uppercase text-muted-foreground">VAT ({data.vatRatePct}%)</TableCell>
+                  <TableCell colSpan={3} className="text-right text-muted-foreground">VAT ({data.vatRatePct}%)</TableCell>
                   <TableCell className="text-right font-mono">{formatGBP(data.taxPence)}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell colSpan={3} className="text-right font-bold uppercase">Total</TableCell>
+                  <TableCell colSpan={3} className="text-right font-bold">Total</TableCell>
                   <TableCell className="text-right font-mono font-bold">{formatGBP(data.totalPence)}</TableCell>
                 </TableRow>
               </TableBody>
@@ -247,8 +247,8 @@ export function AppInvoiceDetail() {
                 {data.payments.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell className="text-sm">{new Date(p.receivedAt).toLocaleString("en-GB")}</TableCell>
-                    <TableCell className="uppercase text-xs">{p.provider}</TableCell>
-                    <TableCell className="uppercase text-xs">{p.status}</TableCell>
+                    <TableCell className="text-xs">{p.provider}</TableCell>
+                    <TableCell className="text-xs">{p.status}</TableCell>
                     <TableCell className="text-right font-mono">{formatGBP(p.amountPence)}</TableCell>
                   </TableRow>
                 ))}

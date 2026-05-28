@@ -18,8 +18,8 @@ type SortDir = "asc" | "desc";
 function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; sortDir: SortDir }) {
   if (col !== sortKey) return <ArrowUpDown className="h-3 w-3 text-muted-foreground ml-1 inline" />;
   return sortDir === "asc"
-    ? <ArrowUp   className="h-3 w-3 text-red-500 ml-1 inline" />
-    : <ArrowDown className="h-3 w-3 text-red-500 ml-1 inline" />;
+    ? <ArrowUp   className="h-3 w-3 text-primary ml-1 inline" />
+    : <ArrowDown className="h-3 w-3 text-primary ml-1 inline" />;
 }
 
 export function AdminTenants() {
@@ -94,7 +94,7 @@ export function AdminTenants() {
 
   const ThBtn = ({ col, label }: { col: SortKey; label: string }) => (
     <button
-      className="flex items-center gap-0.5 font-bold uppercase text-xs tracking-wider text-muted-foreground hover:text-foreground/80 transition-colors"
+      className="flex items-center gap-0.5 font-semibold text-xs text-muted-foreground hover:text-foreground/80 transition-colors"
       onClick={() => handleSort(col)}
     >
       {label}<SortIcon col={col} sortKey={sortKey} sortDir={sortDir} />
@@ -112,12 +112,12 @@ export function AdminTenants() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Tenants Directory"
+        title="Tenants directory"
         subtitle={subtitleText}
         icon={<Users className="h-6 w-6" />}
       />
 
-      <Card className="rounded-xl border-border bg-black shadow-none p-4">
+      <Card className="rounded-xl border-border bg-card shadow-none p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -125,18 +125,18 @@ export function AdminTenants() {
               placeholder="Search by name, email, or ID..."
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10 rounded-xl border-border bg-card text-white placeholder:text-muted-foreground focus:border-red-500"
+              className="pl-10 rounded-xl border-border bg-input text-foreground placeholder:text-muted-foreground focus:border-primary"
             />
           </div>
           <Select value={statusFilter} onValueChange={handleFilter}>
-            <SelectTrigger className="w-full sm:w-[180px] rounded-xl border-border bg-card text-white">
+            <SelectTrigger className="w-full sm:w-[180px] rounded-xl border-border bg-input text-foreground">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent className="rounded-xl border-border bg-card text-white">
-              <SelectItem value="all">All Statuses</SelectItem>
+            <SelectContent className="rounded-xl border-border bg-card text-foreground">
+              <SelectItem value="all">All statuses</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="trial">Trial</SelectItem>
-              <SelectItem value="past_due">Past Due</SelectItem>
+              <SelectItem value="past_due">Past due</SelectItem>
               <SelectItem value="paused">Paused</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
@@ -144,7 +144,7 @@ export function AdminTenants() {
         </div>
       </Card>
 
-      <div className="border border-border bg-black">
+      <div className="border border-border bg-card rounded-xl overflow-hidden">
         <div className="grid grid-cols-12 gap-4 p-4 border-b border-border bg-background">
           <div className="col-span-4"><ThBtn col="name"   label="Tenant"    /></div>
           <div className="col-span-2"><ThBtn col="status" label="Status"    /></div>
@@ -165,7 +165,7 @@ export function AdminTenants() {
             action={
               (search || statusFilter !== "all") ? (
                 <button
-                  className="text-xs text-red-500 uppercase font-bold hover:underline"
+                  className="text-xs text-primary font-semibold hover:underline"
                   onClick={() => { handleSearch(""); handleFilter("all"); }}
                 >
                   Clear filters
@@ -175,23 +175,23 @@ export function AdminTenants() {
           />
         ) : (
           <>
-            <div className="divide-y divide-zinc-800">
+            <div className="divide-y divide-border">
               {pageItems.map((tenant) => (
                 <Link
                   key={tenant.id}
                   href={`/tenants/${tenant.id}`}
-                  className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-card/60 transition-colors cursor-pointer"
+                  className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-muted/40 transition-colors cursor-pointer"
                 >
                   <div className="col-span-4">
-                    <div className="font-bold text-foreground/90 uppercase text-sm truncate">{tenant.name}</div>
+                    <div className="font-semibold text-foreground/90 text-sm truncate">{tenant.name}</div>
                     <div className="text-xs text-muted-foreground font-mono truncate">{tenant.ownerEmail}</div>
                   </div>
                   <div className="col-span-2">
-                    <span className={`px-2 py-1 text-[10px] font-bold border ${
-                      tenant.status === "active"    ? "bg-green-500/10 text-green-500 border-green-500/20" :
-                      tenant.status === "trial"     ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
+                    <span className={`px-2 py-1 rounded-md text-[10px] font-semibold border ${
+                      tenant.status === "active"    ? "bg-green-500/10 text-green-400 border-green-500/20" :
+                      tenant.status === "trial"     ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
                       tenant.status === "cancelled" ? "bg-muted text-muted-foreground border-border" :
-                                                      "bg-red-500/10 text-red-500 border-red-500/20"
+                                                      "bg-amber-500/10 text-amber-400 border-amber-500/20"
                     }`}>
                       {tenant.status}
                     </span>
@@ -202,10 +202,10 @@ export function AdminTenants() {
                   <div className="col-span-2 font-mono text-foreground/80 font-bold flex items-center gap-2">
                     £{tenant.monthlyTotal}
                     {(tenant as any).require2fa && (
-                      <ShieldCheck className="h-3 w-3 text-green-500" aria-label="2FA enforced" />
+                      <ShieldCheck className="h-3 w-3 text-green-400" aria-label="2FA enforced" />
                     )}
                   </div>
-                  <div className="col-span-1 text-right text-xs uppercase font-bold text-red-500">
+                  <div className="col-span-1 text-right text-xs font-semibold text-primary">
                     View →
                   </div>
                 </Link>
@@ -244,9 +244,9 @@ export function AdminTenants() {
                         <button
                           key={item}
                           onClick={() => setPage(item as number)}
-                          className={`w-7 h-7 text-xs font-bold border transition-colors ${
+                          className={`w-7 h-7 text-xs font-semibold rounded-lg border transition-colors ${
                             item === safePage
-                              ? "border-red-500 bg-red-500/10 text-red-500"
+                              ? "border-primary bg-primary/10 text-primary"
                               : "border-border bg-card text-muted-foreground hover:bg-muted"
                           }`}
                         >

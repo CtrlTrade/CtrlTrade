@@ -87,7 +87,7 @@ export function ResellerDashboard() {
           <CardContent className="p-6 text-sm text-foreground/80">
             <p>You do not currently have reseller access. Contact your administrator to be added to a reseller programme.</p>
             <div className="mt-4 flex gap-3">
-              <Link href="~/app" className="text-red-500 hover:text-red-400 text-xs font-semibold">Back to app</Link>
+              <Link href="~/app" className="text-primary hover:text-red-400 text-xs font-semibold">Back to app</Link>
               <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground text-xs font-semibold">Log out</button>
             </div>
           </CardContent>
@@ -102,11 +102,11 @@ export function ResellerDashboard() {
   return (
     <div className="min-h-screen bg-black text-white">
       <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6">
-        <span className="font-bold tracking-tighter uppercase text-red-500">
+        <span className="font-bold tracking-tight text-primary">
           {displayName ?? "Reseller"} • Reseller Console
         </span>
         <div className="flex items-center gap-4">
-          <Link href="~/app" className="text-xs uppercase font-bold text-muted-foreground hover:text-foreground">Main App</Link>
+          <Link href="~/app" className="text-xs font-semibold text-muted-foreground hover:text-foreground">Main App</Link>
           <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2 text-xs font-semibold border-border text-foreground/80 hover:bg-muted hover:text-foreground">
             <LogOut className="h-4 w-4" /> Log Out
           </Button>
@@ -126,16 +126,16 @@ export function ResellerDashboard() {
         {showCreate && (
           <Card className="rounded-xl border-border bg-background">
             <CardHeader>
-              <CardTitle className="uppercase text-sm tracking-wider text-foreground/80">Provision Child Tenant</CardTitle>
+              <CardTitle className="text-sm font-semibold text-foreground/80">Provision Child Tenant</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs uppercase text-muted-foreground">Business name</Label>
+                  <Label className="text-xs text-muted-foreground">Business name</Label>
                   <Input value={childName} onChange={(e) => setChildName(e.target.value)} placeholder="Acme Plumbing" className="rounded-xl border-border bg-black text-white" />
                 </div>
                 <div>
-                  <Label className="text-xs uppercase text-muted-foreground">URL slug (optional)</Label>
+                  <Label className="text-xs text-muted-foreground">URL slug (optional)</Label>
                   <Input value={childSlug} onChange={(e) => setChildSlug(e.target.value)} placeholder="auto-generated from name" className="rounded-xl border-border bg-black text-white font-mono text-xs" />
                 </div>
               </div>
@@ -183,7 +183,7 @@ export function ResellerDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-mono font-bold text-red-500">{formatMoney(expectedPayoutMrr, currency)}</div>
+              <div className="text-3xl font-mono font-bold text-primary">{formatMoney(expectedPayoutMrr, currency)}</div>
               <div className="text-xs text-muted-foreground mt-1">{revenueSharePct}% revenue share</div>
             </CardContent>
           </Card>
@@ -206,7 +206,7 @@ export function ResellerDashboard() {
               {children.map((c) => (
                 <div key={c.id} className="grid grid-cols-12 gap-4 p-4 items-center">
                   <div className="col-span-3">
-                    <div className="font-bold text-foreground uppercase text-sm truncate">{c.name}</div>
+                    <div className="font-bold text-foreground text-sm truncate">{c.name}</div>
                     <div className="text-xs text-muted-foreground font-mono truncate">{c.slug} · {new Date(c.createdAt).toLocaleDateString()}</div>
                   </div>
                   <div className="col-span-1">
@@ -214,7 +214,7 @@ export function ResellerDashboard() {
                       c.status === 'active' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
                       c.status === 'trial' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
                       c.status === 'cancelled' ? 'bg-muted/60 text-muted-foreground border border-border' :
-                      'bg-red-500/10 text-red-500 border border-red-500/20'
+                      'bg-red-500/10 text-primary border border-red-500/20'
                     }`}>{c.status}</span>
                   </div>
                   <div className="col-span-2 text-xs text-muted-foreground font-mono">
@@ -225,7 +225,7 @@ export function ResellerDashboard() {
                   <div className="col-span-2 text-right font-mono text-foreground/80">
                     {formatMoney(c.paidRevenuePence / 100, c.currency ?? currency)}
                   </div>
-                  <div className="col-span-2 text-right font-mono text-red-500 font-bold">
+                  <div className="col-span-2 text-right font-mono text-primary font-bold">
                     {formatMoney(c.mrr, c.currency ?? currency)}
                   </div>
                 </div>

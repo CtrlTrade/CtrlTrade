@@ -148,7 +148,7 @@ function IndustryTourBanner() {
                 data-testid={`industry-tour-action-${action.key}`}
               >
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm font-bold uppercase tracking-wide leading-tight">{action.label}</div>
+                  <div className="text-sm font-bold  leading-tight">{action.label}</div>
                   <div className="text-xs text-muted-foreground mt-1 leading-snug">{action.description}</div>
                 </div>
                 <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary transition-colors mt-0.5" />
@@ -202,7 +202,7 @@ function InboxTile() {
                     </div>
                     <div className="text-xs text-muted-foreground truncate mt-0.5">{t.lastMessagePreview ?? t.subject ?? ""}</div>
                   </div>
-                  <div className="text-[10px] text-muted-foreground shrink-0 font-mono uppercase">
+                  <div className="text-[10px] text-muted-foreground shrink-0 font-mono">
                     {new Date(t.lastMessageAt).toLocaleDateString("en-GB", { month: "short", day: "numeric" })}
                   </div>
                 </div>
@@ -372,16 +372,16 @@ function SubscriptionCard({ subscription }: { subscription: any }) {
           
           <div className="border-t border-border pt-4">
             <div className="flex items-center justify-between">
-              <span className="font-bold uppercase text-sm tracking-wider">Monthly Total</span>
+              <span className="font-bold text-sm font-semibold">Monthly Total</span>
               <span className="text-xl font-bold font-mono text-primary">£{subscription.monthlyTotal}</span>
             </div>
           </div>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button className="w-full uppercase font-bold tracking-wider text-xs" onClick={() => setShowUpdate(true)}>
+          <Button className="w-full font-semibold text-xs" onClick={() => setShowUpdate(true)}>
             Update Quantities
           </Button>
-          <Button variant="ghost" className="w-full uppercase font-bold tracking-wider text-xs text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setShowCancel(true)}>
+          <Button variant="ghost" className="w-full font-semibold text-xs text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setShowCancel(true)}>
             Cancel Subscription
           </Button>
         </CardFooter>
@@ -434,7 +434,7 @@ function UpdateQuantitiesDialog({ subscription, open, onOpenChange }: { subscrip
             <Input id="tills" type="number" min="0" value={tills} onChange={e => setTills(parseInt(e.target.value))} className="col-span-2" />
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={update.isPending} className="rounded-xl uppercase font-bold tracking-wider">
+            <Button type="submit" disabled={update.isPending} className="rounded-xl font-semibold">
               {update.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
@@ -477,10 +477,10 @@ function CancelSubscriptionDialog({ open, onOpenChange }: { open: boolean, onOpe
             <Input id="reason" value={reason} onChange={e => setReason(e.target.value)} placeholder="Required" required className="rounded-xl" />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl uppercase font-bold tracking-wider">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl font-semibold">
               Keep Subscription
             </Button>
-            <Button type="submit" variant="destructive" disabled={cancel.isPending} className="rounded-xl uppercase font-bold tracking-wider">
+            <Button type="submit" variant="destructive" disabled={cancel.isPending} className="rounded-xl font-semibold">
               {cancel.isPending ? "Cancelling..." : "Confirm Cancellation"}
             </Button>
           </DialogFooter>

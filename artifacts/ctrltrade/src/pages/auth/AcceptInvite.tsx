@@ -72,7 +72,7 @@ export function AcceptInvite() {
                 </div>
               </>
             )}
-            <Button type="submit" disabled={accept.isPending} className="w-full uppercase font-bold tracking-wider" data-testid="button-accept-invite">
+            <Button type="submit" disabled={accept.isPending} className="w-full font-semibold" data-testid="button-accept-invite">
               {accept.isPending ? "Joining..." : "Accept & join"}
             </Button>
           </form>

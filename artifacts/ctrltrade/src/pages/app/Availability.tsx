@@ -95,7 +95,7 @@ function AddModal({ open, onClose, teamMembers, currentUserId, currentUserRole, 
         <div className="space-y-4 py-2">
           {canManageOthers && (
             <div className="space-y-1">
-              <Label className="text-xs uppercase tracking-wide">Staff Member</Label>
+              <Label className="text-xs ">Staff Member</Label>
               <Select value={userId} onValueChange={setUserId}>
                 <SelectTrigger className="rounded-xl">
                   <SelectValue />
@@ -113,16 +113,16 @@ function AddModal({ open, onClose, teamMembers, currentUserId, currentUserRole, 
           )}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-xs uppercase tracking-wide">From</Label>
+              <Label className="text-xs ">From</Label>
               <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="rounded-xl" />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs uppercase tracking-wide">To</Label>
+              <Label className="text-xs ">To</Label>
               <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="rounded-xl" />
             </div>
           </div>
           <div className="space-y-1">
-            <Label className="text-xs uppercase tracking-wide">Reason</Label>
+            <Label className="text-xs ">Reason</Label>
             <Select value={reason} onValueChange={setReason}>
               <SelectTrigger className="rounded-xl">
                 <SelectValue />
@@ -135,7 +135,7 @@ function AddModal({ open, onClose, teamMembers, currentUserId, currentUserRole, 
             </Select>
           </div>
           <div className="space-y-1">
-            <Label className="text-xs uppercase tracking-wide">Notes (optional)</Label>
+            <Label className="text-xs ">Notes (optional)</Label>
             <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="rounded-xl text-sm" rows={2} />
           </div>
         </div>
@@ -247,7 +247,7 @@ export function AppAvailability() {
 
       {/* Legend */}
       <div className="flex items-center gap-4 flex-wrap">
-        <span className="text-xs uppercase tracking-wide text-muted-foreground font-bold">Legend:</span>
+        <span className="text-xs  text-muted-foreground font-bold">Legend:</span>
         {REASONS.map((r) => (
           <div key={r.value} className="flex items-center gap-1.5">
             <div className={`w-3 h-3 rounded-sm ${r.color}`} />

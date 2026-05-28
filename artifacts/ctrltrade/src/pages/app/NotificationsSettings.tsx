@@ -85,7 +85,7 @@ export function AppNotificationsSettings() {
                               data-testid={`pref-${e.kind}-${c}`}
                             />
                             <select
-                              className="text-[10px] uppercase border border-border px-1 py-0.5 bg-transparent"
+                              className="text-[10px] border border-border px-1 py-0.5 bg-transparent"
                               disabled={!enabled}
                               value={freq}
                               onChange={(ev) =>

@@ -40,7 +40,7 @@ export function AdminIntegrationCatalogue() {
         </CardHeader>
         <CardContent>
           <table className="w-full text-sm">
-            <thead className="text-xs uppercase text-muted-foreground border-b border-border">
+            <thead className="text-xs text-muted-foreground border-b border-border">
               <tr>
                 <th className="text-left py-2">Provider</th>
                 <th className="text-left">Category</th>
@@ -55,11 +55,11 @@ export function AdminIntegrationCatalogue() {
                     <div className="font-semibold">{c.label}</div>
                     <div className="text-xs text-muted-foreground">{c.description}</div>
                   </td>
-                  <td className="uppercase text-xs">{c.category}</td>
+                  <td className="text-xs">{c.category}</td>
                   <td>
                     <Badge
                       variant="outline"
-                      className={`rounded-xl uppercase text-xs ${c.configured ? "border-green-700 text-green-400" : "border-amber-700 text-amber-400"}`}
+                      className={`rounded-xl text-xs ${c.configured ? "border-green-700 text-green-400" : "border-amber-700 text-amber-400"}`}
                     >
                       {c.configured ? "Configured" : "Not configured"}
                     </Badge>

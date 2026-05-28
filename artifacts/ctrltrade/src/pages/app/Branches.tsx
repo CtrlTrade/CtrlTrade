@@ -32,21 +32,21 @@ function BranchDetailCard({ branchId }: { branchId: string }) {
       <div className="flex items-center gap-2">
         <Briefcase className="h-4 w-4 text-muted-foreground" />
         <div>
-          <div className="text-xs text-muted-foreground uppercase">Active Jobs</div>
+          <div className="text-xs text-muted-foreground">Active Jobs</div>
           <div className="font-bold text-lg">{stats.activeJobs ?? 0}</div>
         </div>
       </div>
       <div className="flex items-center gap-2">
         <Users className="h-4 w-4 text-muted-foreground" />
         <div>
-          <div className="text-xs text-muted-foreground uppercase">Staff</div>
+          <div className="text-xs text-muted-foreground">Staff</div>
           <div className="font-bold text-lg">{stats.staffCount ?? 0}</div>
         </div>
       </div>
       <div className="flex items-center gap-2">
         <DollarSign className="h-4 w-4 text-muted-foreground" />
         <div>
-          <div className="text-xs text-muted-foreground uppercase">Revenue (paid)</div>
+          <div className="text-xs text-muted-foreground">Revenue (paid)</div>
           <div className="font-bold text-lg">{formatGBP(stats.revenuePaidPence ?? 0)}</div>
         </div>
       </div>
@@ -129,7 +129,7 @@ export function AppBranches() {
           <h2 className="text-2xl font-bold">Branches</h2>
           <p className="text-sm text-muted-foreground">Manage your office and site locations.</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="gap-2 uppercase text-xs tracking-wider font-bold" data-testid="button-create-branch">
+        <Button onClick={() => setCreateOpen(true)} className="gap-2 text-xs font-semibold" data-testid="button-create-branch">
           <Plus className="h-4 w-4" />
           New Branch
         </Button>
@@ -141,7 +141,7 @@ export function AppBranches() {
             <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="font-bold mb-1">No branches yet</h3>
             <p className="text-sm text-muted-foreground mb-4">Create your first branch to start partitioning staff, jobs, and customers by location.</p>
-            <Button onClick={() => setCreateOpen(true)} className="gap-2 uppercase text-xs tracking-wider font-bold">
+            <Button onClick={() => setCreateOpen(true)} className="gap-2 text-xs font-semibold">
               <Plus className="h-4 w-4" />
               New Branch
             </Button>
@@ -238,7 +238,7 @@ export function AppBranches() {
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={create.isPending} className="uppercase text-xs tracking-wider font-bold" data-testid="button-submit-branch">
+              <Button type="submit" disabled={create.isPending} className="text-xs font-semibold" data-testid="button-submit-branch">
                 {create.isPending ? "Creating…" : "Create Branch"}
               </Button>
             </DialogFooter>
@@ -279,7 +279,7 @@ export function AppBranches() {
               </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setEditBranch(null)}>Cancel</Button>
-                <Button type="submit" disabled={update.isPending} className="uppercase text-xs tracking-wider font-bold">
+                <Button type="submit" disabled={update.isPending} className="text-xs font-semibold">
                   {update.isPending ? "Saving…" : "Save Changes"}
                 </Button>
               </DialogFooter>

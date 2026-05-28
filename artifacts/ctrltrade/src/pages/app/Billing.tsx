@@ -176,7 +176,7 @@ export function AppBilling() {
                     data-testid={`row-plan-${item.key}`}
                   >
                     <div>
-                      <div className="font-bold uppercase text-sm">{item.label}</div>
+                      <div className="font-semibold text-sm">{item.label}</div>
                       <div className="text-xs text-muted-foreground">
                         {item.quantity} × {formatMoney(item.unitAmount, item.currency)} / mo
                       </div>
@@ -185,7 +185,7 @@ export function AppBilling() {
                   </div>
                 ))}
                 <div className="flex justify-between items-center pt-4">
-                  <div className="font-bold uppercase text-lg">Monthly Total</div>
+                  <div className="font-semibold text-lg">Monthly Total</div>
                   <div
                     className="font-mono font-bold text-2xl text-primary"
                     data-testid="text-billing-total"
@@ -353,7 +353,7 @@ export function AppBilling() {
                     <CreditCard className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div className="min-w-0">
-                    <div className="font-bold uppercase text-sm">
+                    <div className="font-semibold text-sm">
                       {paymentMethod.brand} •••• {paymentMethod.last4}
                     </div>
                     <div className="text-xs text-muted-foreground font-mono">

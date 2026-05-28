@@ -121,10 +121,10 @@ export function AppVoice() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="rounded-xl uppercase text-xs font-bold tracking-wider gap-2" onClick={() => setOutboundOpen(true)}>
+          <Button variant="outline" className="rounded-xl text-xs font-semibold gap-2" onClick={() => setOutboundOpen(true)}>
             <PhoneOutgoing className="h-4 w-4" /> Dial
           </Button>
-          <Button className="rounded-xl uppercase text-xs font-bold tracking-wider gap-2" onClick={() => setProvisionOpen(true)}>
+          <Button className="rounded-xl text-xs font-semibold gap-2" onClick={() => setProvisionOpen(true)}>
             <Plus className="h-4 w-4" /> Add Number
           </Button>
         </div>
@@ -153,9 +153,9 @@ export function AppVoice() {
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="rounded-xl">
-          <TabsTrigger value="numbers" className="rounded-xl uppercase text-xs font-bold tracking-wider">Numbers</TabsTrigger>
-          <TabsTrigger value="calls" className="rounded-xl uppercase text-xs font-bold tracking-wider">Call Log</TabsTrigger>
-          <TabsTrigger value="voicemails" className="rounded-xl uppercase text-xs font-bold tracking-wider">
+          <TabsTrigger value="numbers" className="rounded-xl text-xs font-semibold">Numbers</TabsTrigger>
+          <TabsTrigger value="calls" className="rounded-xl text-xs font-semibold">Call Log</TabsTrigger>
+          <TabsTrigger value="voicemails" className="rounded-xl text-xs font-semibold">
             Voicemails {unheardVoicemails > 0 && <Badge className="ml-1 rounded-xl text-[10px] px-1 h-4">{unheardVoicemails}</Badge>}
           </TabsTrigger>
         </TabsList>
@@ -170,7 +170,7 @@ export function AppVoice() {
                 <Phone className="h-10 w-10 mx-auto mb-3 opacity-30" />
                 <p className="font-medium">No phone numbers yet</p>
                 <p className="text-sm mt-1">Add a number to start receiving calls and voicemails.</p>
-                <Button onClick={() => setProvisionOpen(true)} variant="outline" className="mt-4 rounded-xl uppercase text-xs font-bold tracking-wider gap-2">
+                <Button onClick={() => setProvisionOpen(true)} variant="outline" className="mt-4 rounded-xl text-xs font-semibold gap-2">
                   <Plus className="h-4 w-4" /> Add Number
                 </Button>
               </CardContent>
@@ -305,16 +305,16 @@ export function AppVoice() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase font-bold tracking-wider">Enter number manually</Label>
+              <Label className="text-xs font-semibold">Enter number manually</Label>
               <Input className="rounded-xl font-mono" placeholder="+447700900000" value={manualNumber} onChange={(e) => setManualNumber(e.target.value)} />
               <Input className="rounded-xl" placeholder="Friendly name (optional)" value={manualFriendly} onChange={(e) => setManualFriendly(e.target.value)} />
-              <Button className="w-full rounded-xl uppercase text-xs font-bold tracking-wider" onClick={() => provision.mutate({ data: { phoneNumber: manualNumber, friendlyName: manualFriendly || undefined } })} disabled={!manualNumber || provision.isPending}>
+              <Button className="w-full rounded-xl text-xs font-semibold" onClick={() => provision.mutate({ data: { phoneNumber: manualNumber, friendlyName: manualFriendly || undefined } })} disabled={!manualNumber || provision.isPending}>
                 {provision.isPending ? "Provisioning..." : "Add Number"}
               </Button>
             </div>
             <div className="relative">
               <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
-              <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">or search available</span></div>
+              <div className="relative flex justify-center text-xs"><span className="bg-background px-2 text-muted-foreground">or search available</span></div>
             </div>
             <div className="flex gap-2">
               <Input className="rounded-xl flex-1" placeholder="Country code (GB, US...)" value={searchCountry} onChange={(e) => setSearchCountry(e.target.value.toUpperCase())} maxLength={2} />
@@ -351,13 +351,13 @@ export function AppVoice() {
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase font-bold tracking-wider">Phone number to call</Label>
+              <Label className="text-xs font-semibold">Phone number to call</Label>
               <Input className="rounded-xl font-mono text-lg" placeholder="+447700900000" value={outboundTo} onChange={(e) => setOutboundTo(e.target.value)} />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" className="rounded-xl" onClick={() => setOutboundOpen(false)}>Cancel</Button>
-            <Button className="rounded-xl gap-2 uppercase text-xs font-bold tracking-wider" onClick={() => outboundCall.mutate({ data: { to: outboundTo } })} disabled={!outboundTo || outboundCall.isPending}>
+            <Button className="rounded-xl gap-2 text-xs font-semibold" onClick={() => outboundCall.mutate({ data: { to: outboundTo } })} disabled={!outboundTo || outboundCall.isPending}>
               <Phone className="h-4 w-4" /> Call
             </Button>
           </DialogFooter>

@@ -180,14 +180,14 @@ export function AdminTenantWhiteLabel() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <Link href={`/tenants/${tenantId}`} className="text-xs uppercase font-bold text-muted-foreground hover:text-foreground flex items-center gap-1">
+          <Link href={`/tenants/${tenantId}`} className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1">
             <ArrowLeft className="h-3 w-3" /> Back to tenant
           </Link>
           <h1 className="text-3xl font-bold text-white mt-2">
             White Label · {data.tenant.name}
           </h1>
         </div>
-        <Button onClick={saveConfig} disabled={update.isPending} className="rounded-xl bg-red-600 hover:bg-red-700 text-xs font-semibold tracking-wider">
+        <Button onClick={saveConfig} disabled={update.isPending} className="rounded-xl bg-red-600 hover:bg-red-600 text-xs font-semibold tracking-wider">
           {update.isPending ? "Saving…" : "Save Configuration"}
         </Button>
       </div>
@@ -195,7 +195,7 @@ export function AdminTenantWhiteLabel() {
       {/* Franchise parent */}
       <Card className="rounded-xl border-border bg-card">
         <CardHeader>
-          <CardTitle className="uppercase text-sm tracking-wider text-foreground">Franchise Parent</CardTitle>
+          <CardTitle className="text-sm font-semibold text-foreground">Franchise Parent</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
@@ -218,7 +218,7 @@ export function AdminTenantWhiteLabel() {
       {/* White label */}
       <Card className="rounded-xl border-border bg-card">
         <CardHeader>
-          <CardTitle className="uppercase text-sm tracking-wider text-foreground">White Label Settings</CardTitle>
+          <CardTitle className="text-sm font-semibold text-foreground">White Label Settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between border border-border p-3">
@@ -264,7 +264,7 @@ export function AdminTenantWhiteLabel() {
       {/* Reseller profile */}
       <Card className="rounded-xl border-border bg-card">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="uppercase text-sm tracking-wider text-foreground">Reseller Profile</CardTitle>
+          <CardTitle className="text-sm font-semibold text-foreground">Reseller Profile</CardTitle>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Enabled</span>
             <Switch checked={resellerEnabled} onCheckedChange={setResellerEnabled} />
@@ -293,7 +293,7 @@ export function AdminTenantWhiteLabel() {
                 <div className="flex items-end">
                   <div className="flex items-center gap-2">
                     <Switch checked={reseller.active} onCheckedChange={(v) => setReseller({ ...reseller, active: v })} />
-                    <span className="text-xs uppercase text-muted-foreground">Active</span>
+                    <span className="text-xs text-muted-foreground">Active</span>
                   </div>
                 </div>
                 <div className="md:col-span-2">
@@ -309,7 +309,7 @@ export function AdminTenantWhiteLabel() {
       {/* Child tenants */}
       <Card className="rounded-xl border-border bg-card">
         <CardHeader>
-          <CardTitle className="uppercase text-sm tracking-wider text-foreground">Child Tenants ({children?.length ?? 0})</CardTitle>
+          <CardTitle className="text-sm font-semibold text-foreground">Child Tenants ({children?.length ?? 0})</CardTitle>
         </CardHeader>
         <CardContent>
           {!children || children.length === 0 ? (
@@ -322,7 +322,7 @@ export function AdminTenantWhiteLabel() {
                   <div className="col-span-3 text-xs text-muted-foreground font-mono">{c.status}</div>
                   <div className="col-span-3 font-mono text-foreground">MRR {c.currency ?? "GBP"} {c.mrr.toFixed(2)}</div>
                   <div className="col-span-1 text-right">
-                    <Link href={`/tenants/${c.id}`} className="text-xs uppercase font-bold text-red-500 hover:text-red-400">View</Link>
+                    <Link href={`/tenants/${c.id}`} className="text-xs font-semibold text-primary hover:text-primary/80">View</Link>
                   </div>
                 </div>
               ))}
@@ -334,7 +334,7 @@ export function AdminTenantWhiteLabel() {
       {/* Custom domains */}
       <Card className="rounded-xl border-border bg-card">
         <CardHeader>
-          <CardTitle className="uppercase text-sm tracking-wider text-foreground">Custom Domains</CardTitle>
+          <CardTitle className="text-sm font-semibold text-foreground">Custom Domains</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2 items-end">
@@ -363,7 +363,7 @@ export function AdminTenantWhiteLabel() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-bold text-foreground font-mono">{d.hostname}</div>
-                      <div className="text-[10px] uppercase text-muted-foreground mt-1">{d.kind} domain</div>
+                      <div className="text-[10px] text-muted-foreground mt-1">{d.kind} domain</div>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className={`px-2 py-1 text-[10px] font-bold flex items-center gap-1 ${
@@ -377,7 +377,7 @@ export function AdminTenantWhiteLabel() {
                       <Button size="sm" variant="outline" onClick={() => onVerifyDomain(d.id)} disabled={verifyDomain.isPending} className="rounded-xl border-border text-xs font-semibold gap-1">
                         <RefreshCw className="h-3 w-3" /> Verify
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => onDeleteDomain(d.id, d.hostname)} className="rounded-xl border-border text-xs font-semibold gap-1 text-red-500 hover:text-red-400">
+                      <Button size="sm" variant="outline" onClick={() => onDeleteDomain(d.id, d.hostname)} className="rounded-xl border-border text-xs font-semibold gap-1 text-primary hover:text-primary/80">
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>

@@ -196,7 +196,7 @@ export function AppAutomation() {
           </div>
         </div>
         {tab === "rules" && (
-          <Button onClick={openCreate} className="gap-2 rounded-xl uppercase text-xs font-bold tracking-wider">
+          <Button onClick={openCreate} className="gap-2 rounded-xl text-xs font-semibold">
             <Plus className="h-4 w-4" /> New Rule
           </Button>
         )}
@@ -204,9 +204,9 @@ export function AppAutomation() {
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="rounded-xl">
-          <TabsTrigger value="rules" className="rounded-xl uppercase text-xs font-bold tracking-wider">Rules</TabsTrigger>
-          <TabsTrigger value="runs" className="rounded-xl uppercase text-xs font-bold tracking-wider">Run History</TabsTrigger>
-          <TabsTrigger value="approvals" className="rounded-xl uppercase text-xs font-bold tracking-wider">
+          <TabsTrigger value="rules" className="rounded-xl text-xs font-semibold">Rules</TabsTrigger>
+          <TabsTrigger value="runs" className="rounded-xl text-xs font-semibold">Run History</TabsTrigger>
+          <TabsTrigger value="approvals" className="rounded-xl text-xs font-semibold">
             Approvals {pendingCount > 0 && <Badge className="ml-1 rounded-xl text-[10px] px-1 h-4">{pendingCount}</Badge>}
           </TabsTrigger>
         </TabsList>
@@ -221,7 +221,7 @@ export function AppAutomation() {
                 <Zap className="h-10 w-10 mx-auto mb-3 opacity-30" />
                 <p className="font-medium">No automation rules yet</p>
                 <p className="text-sm mt-1">Create a rule to automate actions when events happen in your CRM.</p>
-                <Button onClick={openCreate} variant="outline" className="mt-4 rounded-xl uppercase text-xs font-bold tracking-wider gap-2">
+                <Button onClick={openCreate} variant="outline" className="mt-4 rounded-xl text-xs font-semibold gap-2">
                   <Plus className="h-4 w-4" /> Create first rule
                 </Button>
               </CardContent>
@@ -346,11 +346,11 @@ export function AppAutomation() {
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase font-bold tracking-wider">Rule Name *</Label>
+                <Label className="text-xs font-semibold">Rule Name *</Label>
                 <Input className="rounded-xl" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="e.g. SMS on quote accepted" />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase font-bold tracking-wider">Trigger Event *</Label>
+                <Label className="text-xs font-semibold">Trigger Event *</Label>
                 <Select value={form.triggerEvent} onValueChange={(v) => setForm((f) => ({ ...f, triggerEvent: v }))}>
                   <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select event..." /></SelectTrigger>
                   <SelectContent>
@@ -362,7 +362,7 @@ export function AppAutomation() {
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase font-bold tracking-wider">Description</Label>
+              <Label className="text-xs font-semibold">Description</Label>
               <Input className="rounded-xl" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="Optional description" />
             </div>
             <div className="flex items-center gap-3">
@@ -373,7 +373,7 @@ export function AppAutomation() {
             {/* Conditions */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label className="text-xs uppercase font-bold tracking-wider">Conditions (all must match)</Label>
+                <Label className="text-xs font-semibold">Conditions (all must match)</Label>
                 <Button size="sm" variant="outline" onClick={addCondition} className="rounded-xl text-xs h-7 gap-1"><Plus className="h-3 w-3" /> Add</Button>
               </div>
               {form.conditions.length === 0 && <p className="text-xs text-muted-foreground">No conditions — rule fires for every matching event.</p>}
@@ -395,7 +395,7 @@ export function AppAutomation() {
             {/* Actions */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label className="text-xs uppercase font-bold tracking-wider">Actions (run in order)</Label>
+                <Label className="text-xs font-semibold">Actions (run in order)</Label>
                 <Button size="sm" variant="outline" onClick={addAction} className="rounded-xl text-xs h-7 gap-1"><Plus className="h-3 w-3" /> Add</Button>
               </div>
               {form.actions.length === 0 && <p className="text-xs text-muted-foreground">Add at least one action.</p>}
@@ -435,7 +435,7 @@ export function AppAutomation() {
           </div>
           <DialogFooter>
             <Button variant="outline" className="rounded-xl" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button className="rounded-xl uppercase text-xs font-bold tracking-wider" onClick={saveRule} disabled={!form.name || !form.triggerEvent || create.isPending || update.isPending}>
+            <Button className="rounded-xl text-xs font-semibold" onClick={saveRule} disabled={!form.name || !form.triggerEvent || create.isPending || update.isPending}>
               {editingId ? "Save Changes" : "Create Rule"}
             </Button>
           </DialogFooter>

@@ -46,7 +46,7 @@ export function JobProfitabilityReport({ admin = false }: { admin?: boolean }) {
             <CardContent className="p-0">
               <table className="w-full text-sm">
                 <thead className="bg-muted">
-                  <tr className="text-left uppercase text-[10px] tracking-wider font-bold">
+                  <tr className="text-left text-[10px] font-semibold">
                     <th className="p-3">Job</th>
                     <th className="p-3">Customer</th>
                     <th className="p-3 text-right">Revenue</th>
@@ -65,7 +65,7 @@ export function JobProfitabilityReport({ admin = false }: { admin?: boolean }) {
                         <span className="font-mono text-xs text-muted-foreground">{r.number}</span>{" "}
                         {r.title}
                         {!(r as any).hasActualCosts && (
-                          <span className="ml-2 text-[10px] text-amber-600 uppercase font-bold border border-amber-300 px-1 rounded">est.</span>
+                          <span className="ml-2 text-[10px] text-amber-600 font-semibold border border-amber-300 px-1 rounded">est.</span>
                         )}
                       </td>
                       <td className="p-3">{r.customerName ?? "—"}</td>
@@ -80,7 +80,7 @@ export function JobProfitabilityReport({ admin = false }: { admin?: boolean }) {
             </CardContent>
           </Card>
           <p className="text-xs text-muted-foreground mt-2">
-            Jobs tagged <span className="text-amber-600 font-bold uppercase">est.</span> use a 60% gross margin estimate — add cost entries on those jobs to see real margin.
+            Jobs tagged <span className="text-amber-400 font-semibold">est.</span> use a 60% gross margin estimate — add cost entries on those jobs to see real margin.
           </p>
         </>
       )}

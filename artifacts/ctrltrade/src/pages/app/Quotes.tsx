@@ -147,7 +147,7 @@ export function AppQuotes() {
                     </TableCell>
                     <TableCell>{q.title}</TableCell>
                     <TableCell>{q.customerName}</TableCell>
-                    <TableCell><Badge variant={STATUS_VARIANT[q.status] ?? "outline"} className="uppercase">{q.status}</Badge></TableCell>
+                    <TableCell><Badge variant={STATUS_VARIANT[q.status] ?? "outline"} className="">{q.status}</Badge></TableCell>
                     <TableCell className="text-right font-mono">{formatGBP(q.totalPence)}</TableCell>
                   </TableRow>
                 ))}

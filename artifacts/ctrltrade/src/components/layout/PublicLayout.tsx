@@ -82,7 +82,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <p className="text-sm text-muted-foreground">The operating system a serious trade business runs on.</p>
           </div>
           <div>
-            <h3 className="font-bold mb-4 uppercase text-xs tracking-wider">Product</h3>
+            <h3 className="font-semibold mb-4 text-xs">Product</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link href="/features" className="hover:text-foreground">Features</Link></li>
               <li><Link href="/pricing" className="hover:text-foreground">Pricing</Link></li>
@@ -90,7 +90,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             </ul>
           </div>
           <div>
-            <h3 className="font-bold mb-4 uppercase text-xs tracking-wider">Company</h3>
+            <h3 className="font-semibold mb-4 text-xs">Company</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link href="/contact" className="hover:text-foreground">Contact</Link></li>
               <li><Link href="/security" className="hover:text-foreground">Security</Link></li>

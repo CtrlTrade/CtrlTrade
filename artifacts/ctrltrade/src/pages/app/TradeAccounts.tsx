@@ -118,7 +118,7 @@ export function AppTradeAccounts() {
                   <TableRow key={t.id} data-testid={`row-trade-${t.id}`}>
                     <TableCell className="font-mono text-xs">{t.accountCode}</TableCell>
                     <TableCell className="font-medium">{t.name}</TableCell>
-                    <TableCell className="uppercase text-xs">{t.pricingTier}</TableCell>
+                    <TableCell className="text-xs">{t.pricingTier}</TableCell>
                     <TableCell className="text-right">{t.discountPct}%</TableCell>
                     <TableCell className="text-right">
                       £{(t.balancePence / 100).toFixed(2)} / £{(t.creditLimitPence / 100).toFixed(2)}

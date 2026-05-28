@@ -155,7 +155,7 @@ export function AdminIndustryEditor() {
                         key={s}
                         variant={activeSection === s ? "default" : "outline"}
                         size="sm"
-                        className="rounded-xl uppercase text-xs tracking-wider font-bold"
+                        className="rounded-xl text-xs font-semibold"
                         onClick={() => setActiveSection(s)}
                       >
                         {s === "job-types" ? "Job Types" : s === "checklists" ? "Checklists" : "Doc Templates"}
@@ -169,7 +169,7 @@ export function AdminIndustryEditor() {
                         {(industry.jobTypes ?? []).map((jt: any) => (
                           <div key={jt.id} className="flex items-center justify-between border border-border p-3">
                             <div>
-                              <div className="font-bold text-sm uppercase">{jt.name}</div>
+                              <div className="font-semibold text-sm">{jt.name}</div>
                               {jt.description && <div className="text-xs text-muted-foreground">{jt.description}</div>}
                               {jt.durationHours && <div className="text-xs text-muted-foreground">{jt.durationHours}h</div>}
                             </div>
@@ -180,13 +180,13 @@ export function AdminIndustryEditor() {
                         ))}
                       </div>
                       <div className="border border-dashed border-border p-4 space-y-3">
-                        <Label className="uppercase text-xs tracking-wider">Add Job Type</Label>
+                        <Label className="text-xs">Add Job Type</Label>
                         <div className="grid grid-cols-3 gap-2">
                           <Input placeholder="Name *" value={jobTypeForm.name} onChange={(e) => setJobTypeForm({ ...jobTypeForm, name: e.target.value })} className="rounded-xl col-span-2" />
                           <Input placeholder="Hours" type="number" value={jobTypeForm.durationHours} onChange={(e) => setJobTypeForm({ ...jobTypeForm, durationHours: e.target.value })} className="rounded-xl" />
                         </div>
                         <Input placeholder="Description" value={jobTypeForm.description} onChange={(e) => setJobTypeForm({ ...jobTypeForm, description: e.target.value })} className="rounded-xl" />
-                        <Button size="sm" className="rounded-xl uppercase text-xs tracking-wider font-bold" onClick={() => handleAddJobType(industry.id)} disabled={addJobType.isPending || !jobTypeForm.name.trim()}>
+                        <Button size="sm" className="rounded-xl text-xs font-semibold" onClick={() => handleAddJobType(industry.id)} disabled={addJobType.isPending || !jobTypeForm.name.trim()}>
                           <Plus className="h-3 w-3 mr-1" /> Add
                         </Button>
                       </div>
@@ -199,7 +199,7 @@ export function AdminIndustryEditor() {
                         {(industry.checklists ?? []).map((cl: any) => (
                           <div key={cl.id} className="flex items-start justify-between border border-border p-3">
                             <div>
-                              <div className="font-bold text-sm uppercase">{cl.name}</div>
+                              <div className="font-semibold text-sm">{cl.name}</div>
                               {cl.description && <div className="text-xs text-muted-foreground">{cl.description}</div>}
                               {(cl.items ?? []).length > 0 && (
                                 <ul className="text-xs text-muted-foreground mt-1 list-disc list-inside">
@@ -215,7 +215,7 @@ export function AdminIndustryEditor() {
                         ))}
                       </div>
                       <div className="border border-dashed border-border p-4 space-y-3">
-                        <Label className="uppercase text-xs tracking-wider">Add Checklist</Label>
+                        <Label className="text-xs">Add Checklist</Label>
                         <Input placeholder="Name *" value={checklistForm.name} onChange={(e) => setChecklistForm({ ...checklistForm, name: e.target.value })} className="rounded-xl" />
                         <Input placeholder="Description" value={checklistForm.description} onChange={(e) => setChecklistForm({ ...checklistForm, description: e.target.value })} className="rounded-xl" />
                         <textarea
@@ -224,7 +224,7 @@ export function AdminIndustryEditor() {
                           onChange={(e) => setChecklistForm({ ...checklistForm, items: e.target.value })}
                           className="w-full border border-input bg-background px-3 py-2 text-sm rounded-xl resize-none h-24"
                         />
-                        <Button size="sm" className="rounded-xl uppercase text-xs tracking-wider font-bold" onClick={() => handleAddChecklist(industry.id)} disabled={addChecklist.isPending || !checklistForm.name.trim()}>
+                        <Button size="sm" className="rounded-xl text-xs font-semibold" onClick={() => handleAddChecklist(industry.id)} disabled={addChecklist.isPending || !checklistForm.name.trim()}>
                           <Plus className="h-3 w-3 mr-1" /> Add
                         </Button>
                       </div>
@@ -237,7 +237,7 @@ export function AdminIndustryEditor() {
                         {(industry.documentTemplates ?? []).map((dt: any) => (
                           <div key={dt.id} className="flex items-center justify-between border border-border p-3">
                             <div>
-                              <div className="font-bold text-sm uppercase">{dt.name}</div>
+                              <div className="font-semibold text-sm">{dt.name}</div>
                               {dt.description && <div className="text-xs text-muted-foreground">{dt.description}</div>}
                               <div className="text-xs font-mono mt-0.5">{dt.documentType}{dt.required ? " · required" : ""}</div>
                             </div>
@@ -248,15 +248,15 @@ export function AdminIndustryEditor() {
                         ))}
                       </div>
                       <div className="border border-dashed border-border p-4 space-y-3">
-                        <Label className="uppercase text-xs tracking-wider">Add Document Template</Label>
+                        <Label className="text-xs">Add Document Template</Label>
                         <Input placeholder="Name *" value={docTemplateForm.name} onChange={(e) => setDocTemplateForm({ ...docTemplateForm, name: e.target.value })} className="rounded-xl" />
                         <Input placeholder="Document Type * (e.g. risk_assessment)" value={docTemplateForm.documentType} onChange={(e) => setDocTemplateForm({ ...docTemplateForm, documentType: e.target.value })} className="rounded-xl" />
                         <Input placeholder="Description" value={docTemplateForm.description} onChange={(e) => setDocTemplateForm({ ...docTemplateForm, description: e.target.value })} className="rounded-xl" />
                         <div className="flex items-center gap-2">
                           <input type="checkbox" id="doc-required" checked={docTemplateForm.required} onChange={(e) => setDocTemplateForm({ ...docTemplateForm, required: e.target.checked })} />
-                          <label htmlFor="doc-required" className="text-sm font-bold uppercase">Required document</label>
+                          <label htmlFor="doc-required" className="text-sm font-bold">Required document</label>
                         </div>
-                        <Button size="sm" className="rounded-xl uppercase text-xs tracking-wider font-bold" onClick={() => handleAddDocTemplate(industry.id)} disabled={addDocTemplate.isPending || !docTemplateForm.name.trim() || !docTemplateForm.documentType.trim()}>
+                        <Button size="sm" className="rounded-xl text-xs font-semibold" onClick={() => handleAddDocTemplate(industry.id)} disabled={addDocTemplate.isPending || !docTemplateForm.name.trim() || !docTemplateForm.documentType.trim()}>
                           <Plus className="h-3 w-3 mr-1" /> Add
                         </Button>
                       </div>

@@ -55,9 +55,9 @@ export function AppStaff() {
           <CardTitle className=" text-base">Seat usage</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-3 gap-4 text-sm">
-          <div><div className="text-xs uppercase text-muted-foreground">Control seats</div><div className="text-2xl font-bold" data-testid="text-control-seat-usage">{usage.controlSeatsUsed} / {usage.controlSeatsLimit}</div></div>
-          <div><div className="text-xs uppercase text-muted-foreground">Field seats</div><div className="text-2xl font-bold" data-testid="text-field-seat-usage">{usage.fieldSeatsUsed} / {usage.fieldSeatsLimit}</div></div>
-          <div><div className="text-xs uppercase text-muted-foreground">Tills</div><div className="text-2xl font-bold">{usage.tillsLimit}</div></div>
+          <div><div className="text-xs text-muted-foreground">Control seats</div><div className="text-2xl font-bold" data-testid="text-control-seat-usage">{usage.controlSeatsUsed} / {usage.controlSeatsLimit}</div></div>
+          <div><div className="text-xs text-muted-foreground">Field seats</div><div className="text-2xl font-bold" data-testid="text-field-seat-usage">{usage.fieldSeatsUsed} / {usage.fieldSeatsLimit}</div></div>
+          <div><div className="text-xs text-muted-foreground">Tills</div><div className="text-2xl font-bold">{usage.tillsLimit}</div></div>
         </CardContent>
       </Card>
 
@@ -102,7 +102,7 @@ export function AppStaff() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" disabled={invite.isPending} className="rounded-xl uppercase font-bold tracking-wider" data-testid="button-send-invite">
+            <Button type="submit" disabled={invite.isPending} className="rounded-xl font-semibold" data-testid="button-send-invite">
               {invite.isPending ? "Sending..." : "Send invite"}
             </Button>
           </form>
@@ -116,7 +116,7 @@ export function AppStaff() {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto"><table className="w-full text-sm">
-              <thead className="text-xs uppercase text-muted-foreground border-b border-border">
+              <thead className="text-xs text-muted-foreground border-b border-border">
                 <tr><th className="text-left py-2">Email</th><th className="text-left">Role</th><th className="text-left">Seat</th><th className="text-left">Expires</th><th className="text-right">Actions</th></tr>
               </thead>
               <tbody>
@@ -144,7 +144,7 @@ export function AppStaff() {
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="overflow-x-auto"><table className="w-full text-sm">
-            <thead className="text-xs uppercase text-muted-foreground border-b border-border">
+            <thead className="text-xs text-muted-foreground border-b border-border">
               <tr>
                 <th className="text-left py-2">Name</th>
                 <th className="text-left">Email</th>
@@ -162,7 +162,7 @@ export function AppStaff() {
                   <td>{m.email}</td>
                   <td>
                     {m.role === "owner" ? (
-                      <span className="uppercase text-xs font-bold">Owner</span>
+                      <span className="text-xs font-semibold">Owner</span>
                     ) : (
                       <Select value={m.role} onValueChange={(v) => update.mutate({ userId: m.userId, data: { role: v } })}>
                         <SelectTrigger className="rounded-xl h-8 w-28"><SelectValue /></SelectTrigger>
@@ -176,7 +176,7 @@ export function AppStaff() {
                   </td>
                   <td>
                     {m.role === "owner" ? (
-                      <span className="uppercase text-xs">{m.seatType}</span>
+                      <span className="text-xs text-muted-foreground">{m.seatType}</span>
                     ) : (
                       <Select value={m.seatType} onValueChange={(v) => update.mutate({ userId: m.userId, data: { seatType: v } })}>
                         <SelectTrigger className="rounded-xl h-8 w-28"><SelectValue /></SelectTrigger>
@@ -235,7 +235,7 @@ export function AppStaff() {
                     )}
                   </td>
                   <td>
-                    <span className={`uppercase text-xs font-bold ${m.status === "active" ? "text-emerald-600" : "text-muted-foreground"}`}>{m.status}</span>
+                    <span className={`text-xs font-semibold ${m.status === "active" ? "text-emerald-600" : "text-muted-foreground"}`}>{m.status}</span>
                   </td>
                   <td className="text-right space-x-1">
                     {m.role !== "owner" && !m.isYou && (

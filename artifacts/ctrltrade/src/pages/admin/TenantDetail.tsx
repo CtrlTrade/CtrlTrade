@@ -156,7 +156,7 @@ export function AdminTenantDetail() {
             ].map(({ label, value }) => (
               <div key={label} className="border border-border bg-card p-4">
                 <div className="text-2xl font-bold text-white font-mono">{value}</div>
-                <div className="text-xs text-muted-foreground uppercase font-bold mt-1">{label}</div>
+                <div className="text-xs text-muted-foreground font-semibold mt-1">{label}</div>
               </div>
             ))}
           </div>
@@ -173,7 +173,7 @@ export function AdminTenantDetail() {
                   { label: "Owner",      value: <span className="font-bold text-foreground">{owner.name}</span> },
                   { label: "Email",      value: <span className="font-mono text-foreground/80">{owner.email}</span> },
                   { label: "2FA",        value: (tenant as any).require2fa
-                    ? <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase bg-green-500/10 text-green-500 border border-green-500/20"><ShieldCheck className="h-3 w-3" /> Enforced</span>
+                    ? <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold bg-green-500/10 text-green-400 border border-green-500/20"><ShieldCheck className="h-3 w-3" /> Enforced</span>
                     : <span className="text-xs text-muted-foreground font-mono">Not enforced</span> },
                 ].map(({ label, value }) => (
                   <div key={label} className="grid grid-cols-3 gap-2 border-b border-border pb-2">
@@ -197,7 +197,7 @@ export function AdminTenantDetail() {
                   ].map(({ label, value }) => (
                     <div key={label} className="border border-border bg-card p-3 text-center">
                       <div className="text-2xl font-mono font-bold text-foreground">{value}</div>
-                      <div className="text-[10px] font-bold uppercase text-muted-foreground mt-1">{label}</div>
+                      <div className="text-[10px] font-bold text-muted-foreground mt-1">{label}</div>
                     </div>
                   ))}
                 </div>
@@ -241,14 +241,14 @@ export function AdminTenantDetail() {
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className=" text-foreground text-sm">Stripe Details</CardTitle>
               <Button variant="ghost" size="sm" onClick={openQtyModal}
-                className="h-6 text-xs uppercase font-bold text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl">
+                className="h-6 text-xs font-semibold text-primary hover:text-primary/80 hover:bg-primary/10 rounded-xl">
                 Edit Qty
               </Button>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               {([
                 { label: "MRR",            node: <span className="font-mono text-red-500 font-bold">£{subscription.monthlyTotal}</span> },
-                { label: "Currency",       node: <span className="font-mono text-foreground/80 uppercase">{subscription.currency}</span> },
+                { label: "Currency",       node: <span className="font-mono text-foreground/80">{subscription.currency}</span> },
                 { label: "Stripe Customer", node: <span className="font-mono text-foreground/80 text-xs break-all" title={subscription.stripeCustomerId}>{subscription.stripeCustomerId}</span> },
                 { label: "Stripe Sub",     node: <span className="font-mono text-foreground/80 text-xs break-all" title={subscription.stripeSubscriptionId}>{subscription.stripeSubscriptionId}</span> },
                 { label: "Resources",      node: <span className="font-mono text-foreground/80 font-bold">{subscription.controlSeats}C / {subscription.fieldSeats}F / {subscription.tills}T</span> },
@@ -288,7 +288,7 @@ export function AdminTenantDetail() {
                 },
                 {
                   label: "Sub Status",
-                  node: <span className={`font-bold uppercase text-xs ${
+                  node: <span className={`font-semibold text-xs ${
                     subscription.status === "active"   ? "text-green-500" :
                     subscription.status === "trialing" ? "text-blue-400"  :
                     subscription.status === "past_due" ? "text-red-500"   : "text-muted-foreground"
@@ -351,7 +351,7 @@ export function AdminTenantDetail() {
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className=" text-foreground text-sm">Seat Allocation</CardTitle>
               <Button variant="ghost" size="sm" onClick={openQtyModal}
-                className="h-6 text-xs uppercase font-bold text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl">
+                className="h-6 text-xs font-semibold text-primary hover:text-primary/80 hover:bg-primary/10 rounded-xl">
                 Adjust Seats
               </Button>
             </CardHeader>
@@ -452,7 +452,7 @@ export function AdminTenantDetail() {
             </div>
             <DialogFooter>
               <Button type="submit" disabled={updateQty.isPending}
-                className="rounded-xl bg-red-600 text-white hover:bg-red-700 uppercase font-bold tracking-wider">
+                className="rounded-xl bg-red-600 text-white hover:bg-red-600 font-semibold">
                 {updateQty.isPending ? "Applying..." : "Force Update"}
               </Button>
             </DialogFooter>
@@ -492,7 +492,7 @@ function AdminTenantTools({ tenantId, status }: { tenantId: string; status: stri
         <CardContent className="space-y-3 text-sm">
           <p className="text-xs text-muted-foreground">Configure branding overrides, custom domains, parent tenant, and reseller programme.</p>
           <Link href={`/tenants/${tenantId}/white-label`}>
-            <Button className="w-full rounded-xl bg-red-600 hover:bg-red-700 text-white uppercase font-bold tracking-wider" data-testid="button-white-label">
+            <Button className="w-full rounded-xl bg-destructive hover:bg-destructive/90 text-destructive-foreground font-semibold" data-testid="button-white-label">
               <Globe className="h-4 w-4 mr-2" /> Manage white label
             </Button>
           </Link>
@@ -503,7 +503,7 @@ function AdminTenantTools({ tenantId, status }: { tenantId: string; status: stri
         <CardHeader><CardTitle className=" text-foreground text-sm">Impersonation</CardTitle></CardHeader>
         <CardContent className="space-y-3 text-sm">
           <p className="text-xs text-muted-foreground">Log into this tenant's workspace as the owner. Audited.</p>
-          <Button onClick={() => impersonate.mutate({ tenantId })} disabled={impersonate.isPending} className="w-full rounded-xl bg-amber-600 hover:bg-amber-700 text-black uppercase font-bold tracking-wider" data-testid="button-impersonate">
+          <Button onClick={() => impersonate.mutate({ tenantId })} disabled={impersonate.isPending} className="w-full rounded-xl bg-amber-600 hover:bg-amber-700 text-black font-semibold" data-testid="button-impersonate">
             <UserCheck className="h-4 w-4 mr-2" /> Impersonate owner
           </Button>
         </CardContent>
@@ -513,23 +513,23 @@ function AdminTenantTools({ tenantId, status }: { tenantId: string; status: stri
         <CardHeader><CardTitle className=" text-foreground text-sm">Billing override</CardTitle></CardHeader>
         <CardContent className="space-y-3 text-sm">
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase">Status</Label>
+            <Label className="text-muted-foreground text-xs">Status</Label>
             <select value={billingStatus} onChange={(e) => setBillingStatus(e.target.value)} className="w-full h-9 rounded-xl border border-border bg-card text-white px-2 text-sm" data-testid="select-billing-override">
               <option value="trial">Trial</option><option value="active">Active</option><option value="past_due">Past due</option><option value="cancelled">Cancelled</option>
             </select>
           </div>
           <Input value={billingReason} onChange={(e) => setBillingReason(e.target.value)} placeholder="Reason (audited)" className="rounded-xl border-border bg-card text-white" data-testid="input-billing-reason" />
-          <Button onClick={() => billing.mutate({ tenantId, data: { status: billingStatus, reason: billingReason || undefined } })} disabled={billing.isPending} className="w-full rounded-xl bg-red-600 hover:bg-red-700 text-white uppercase font-bold tracking-wider" data-testid="button-billing-override">Apply override</Button>
+          <Button onClick={() => billing.mutate({ tenantId, data: { status: billingStatus, reason: billingReason || undefined } })} disabled={billing.isPending} className="w-full rounded-xl bg-destructive hover:bg-destructive/90 text-destructive-foreground font-semibold" data-testid="button-billing-override">Apply override</Button>
         </CardContent>
       </Card>
 
       <Card className="rounded-xl border-border bg-black shadow-none">
         <CardHeader><CardTitle className=" text-foreground text-sm">GDPR</CardTitle></CardHeader>
         <CardContent className="space-y-3 text-sm">
-          <a href={exportUrl} className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-xl border border-border bg-card text-white hover:bg-muted uppercase font-bold tracking-wider text-xs" data-testid="link-gdpr-export"><Download className="h-4 w-4" /> Export data (.zip)</a>
+          <a href={exportUrl} className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-xl border border-border bg-card text-white hover:bg-muted font-semibold text-xs" data-testid="link-gdpr-export"><Download className="h-4 w-4" /> Export data (.zip)</a>
           {deletion && deletion.status === "pending" ? (
             <div className="space-y-2">
-              <div className="text-xs text-amber-400 font-bold uppercase">Deletion scheduled</div>
+              <div className="text-xs text-amber-400 font-bold">Deletion scheduled</div>
               <div className="text-xs text-muted-foreground">Purge at {deletion.scheduledPurgeAt ? new Date(deletion.scheduledPurgeAt).toLocaleString() : "—"}</div>
               <div className="flex gap-2">
                 <Button onClick={() => cancelDel.mutate({ tenantId })} variant="outline" className="flex-1 rounded-xl border-border bg-card text-white hover:bg-muted font-semibold text-xs" data-testid="button-cancel-deletion">Cancel</Button>
@@ -539,7 +539,7 @@ function AdminTenantTools({ tenantId, status }: { tenantId: string; status: stri
           ) : (
             <div className="space-y-2">
               <Input value={delReason} onChange={(e) => setDelReason(e.target.value)} placeholder="Reason for deletion" className="rounded-xl border-border bg-card text-white" data-testid="input-deletion-reason" />
-              <Button onClick={() => { if (confirm("Schedule tenant deletion (30 day cooldown)?")) schedule.mutate({ tenantId, data: { reason: delReason || undefined } }); }} className="w-full rounded-xl bg-red-700 hover:bg-red-800 text-white uppercase font-bold tracking-wider" data-testid="button-schedule-deletion"><Trash2 className="h-4 w-4 mr-2" /> Schedule deletion</Button>
+              <Button onClick={() => { if (confirm("Schedule tenant deletion (30 day cooldown)?")) schedule.mutate({ tenantId, data: { reason: delReason || undefined } }); }} className="w-full rounded-xl bg-red-700 hover:bg-red-800 text-white font-semibold" data-testid="button-schedule-deletion"><Trash2 className="h-4 w-4 mr-2" /> Schedule deletion</Button>
             </div>
           )}
         </CardContent>

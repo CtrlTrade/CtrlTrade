@@ -226,9 +226,9 @@ export function AppBrandingEditor() {
 
       <Tabs defaultValue="visual" className="space-y-4">
         <TabsList className="rounded-xl">
-          <TabsTrigger value="visual" className="rounded-xl uppercase">Visual</TabsTrigger>
-          <TabsTrigger value="logos" className="rounded-xl uppercase">Logos</TabsTrigger>
-          <TabsTrigger value="templates" className="rounded-xl uppercase">Templates</TabsTrigger>
+          <TabsTrigger value="visual" className="rounded-xl">Visual</TabsTrigger>
+          <TabsTrigger value="logos" className="rounded-xl">Logos</TabsTrigger>
+          <TabsTrigger value="templates" className="rounded-xl">Templates</TabsTrigger>
         </TabsList>
 
         <TabsContent value="visual">

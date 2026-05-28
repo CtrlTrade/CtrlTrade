@@ -55,13 +55,13 @@ function getDefaultDateRange() {
 function statusBadge(status: string) {
   switch (status) {
     case "approved":
-      return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 font-mono text-[10px] uppercase tracking-wide"><CheckCircle2 className="h-3 w-3 mr-1" />Approved</Badge>;
+      return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 font-mono text-[10px]"><CheckCircle2 className="h-3 w-3 mr-1" />Approved</Badge>;
     case "submitted":
-      return <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 font-mono text-[10px] uppercase tracking-wide"><Clock3 className="h-3 w-3 mr-1" />Pending</Badge>;
+      return <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 font-mono text-[10px]"><Clock3 className="h-3 w-3 mr-1" />Pending</Badge>;
     case "rejected":
-      return <Badge className="bg-red-500/10 text-red-600 border-red-500/20 font-mono text-[10px] uppercase tracking-wide"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>;
+      return <Badge className="bg-red-500/10 text-red-600 border-red-500/20 font-mono text-[10px]"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>;
     default:
-      return <Badge variant="outline" className="font-mono text-[10px] uppercase tracking-wide"><FileText className="h-3 w-3 mr-1" />Draft</Badge>;
+      return <Badge variant="outline" className="font-mono text-[10px]"><FileText className="h-3 w-3 mr-1" />Draft</Badge>;
   }
 }
 
@@ -81,7 +81,7 @@ function RejectDialog({ entry, onClose, onReject, isLoading }: RejectDialogProps
           <DialogTitle className="">Reject Timesheet Entry</DialogTitle>
         </DialogHeader>
         <div>
-          <Label className="text-xs uppercase tracking-wide">Reason for rejection</Label>
+          <Label className="text-xs ">Reason for rejection</Label>
           <Textarea
             className="mt-1 rounded-xl resize-none"
             rows={3}
@@ -91,12 +91,12 @@ function RejectDialog({ entry, onClose, onReject, isLoading }: RejectDialogProps
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" className="rounded-xl uppercase text-xs tracking-wide" onClick={onClose}>
+          <Button variant="outline" className="rounded-xl text-xs" onClick={onClose}>
             Cancel
           </Button>
           <Button
             variant="destructive"
-            className="rounded-xl uppercase text-xs tracking-wide"
+            className="rounded-xl text-xs"
             disabled={!reason.trim() || isLoading}
             onClick={() => entry && onReject(entry.id, reason)}
           >
@@ -122,7 +122,7 @@ function EntryRow({ entry, canManage, onApprove, onRejectClick, onSubmit, isProc
     <div className="flex items-start gap-4 py-3 border-b border-border last:border-0">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-mono text-xs font-bold uppercase tracking-wide text-foreground">
+          <span className="font-mono text-xs font-bold  text-foreground">
             {entry.userName ?? "Unknown"}
           </span>
           {entry.jobNumber && (
@@ -156,7 +156,7 @@ function EntryRow({ entry, canManage, onApprove, onRejectClick, onSubmit, isProc
           <Button
             variant="outline"
             size="sm"
-            className="rounded-xl uppercase text-[10px] tracking-wide h-6 px-2"
+            className="rounded-xl text-[10px] h-6 px-2"
             disabled={isProcessing}
             onClick={() => onSubmit(entry.id)}
           >
@@ -167,7 +167,7 @@ function EntryRow({ entry, canManage, onApprove, onRejectClick, onSubmit, isProc
           <div className="flex gap-1">
             <Button
               size="sm"
-              className="rounded-xl uppercase text-[10px] tracking-wide h-6 px-2 bg-emerald-600 hover:bg-emerald-700"
+              className="rounded-xl text-[10px] h-6 px-2 bg-emerald-600 hover:bg-emerald-700"
               disabled={isProcessing}
               onClick={() => onApprove(entry.id)}
             >
@@ -176,7 +176,7 @@ function EntryRow({ entry, canManage, onApprove, onRejectClick, onSubmit, isProc
             <Button
               variant="outline"
               size="sm"
-              className="rounded-xl uppercase text-[10px] tracking-wide h-6 px-2 border-red-500 text-red-600 hover:bg-red-50"
+              className="rounded-xl text-[10px] h-6 px-2 border-red-500/40 text-red-400 hover:bg-red-500/10"
               disabled={isProcessing}
               onClick={() => onRejectClick(entry)}
             >
@@ -217,7 +217,7 @@ function DayGroup({ date, entries, canManage, onApprove, onRejectClick, onSubmit
               </Badge>
             )}
             {totalHours > 0 && (
-              <Badge variant="outline" className="font-mono text-xs uppercase">
+              <Badge variant="outline" className="font-mono text-xs">
                 <CheckCircle2 className="h-3 w-3 mr-1 text-emerald-500" />
                 {fmtHours(totalHours)} approved
               </Badge>
@@ -343,15 +343,15 @@ export function AppTimesheets() {
         <CardContent className="pt-4">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
             <div>
-              <Label className="text-xs uppercase tracking-wide">From</Label>
+              <Label className="text-xs ">From</Label>
               <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="rounded-xl" />
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wide">To</Label>
+              <Label className="text-xs ">To</Label>
               <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="rounded-xl" />
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wide">Staff member</Label>
+              <Label className="text-xs ">Staff member</Label>
               <Select value={userId} onValueChange={setUserId}>
                 <SelectTrigger className="rounded-xl">
                   <SelectValue placeholder="All staff" />
@@ -365,7 +365,7 @@ export function AppTimesheets() {
               </Select>
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wide">Status</Label>
+              <Label className="text-xs ">Status</Label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="rounded-xl">
                   <SelectValue placeholder="All statuses" />
@@ -380,7 +380,7 @@ export function AppTimesheets() {
               </Select>
             </div>
             <div className="pb-1">
-              <div className="text-xs uppercase text-muted-foreground tracking-wide">Approved hours</div>
+              <div className="text-xs text-muted-foreground tracking-wide">Approved hours</div>
               <div className="text-2xl font-bold font-mono" data-testid="text-total-hours">
                 {fmtHours(approvedHours)}
               </div>

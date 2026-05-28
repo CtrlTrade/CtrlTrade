@@ -601,7 +601,7 @@ export function AppSupplierOrders() {
                     <TableCell className="font-mono font-bold text-sm">{o.number}</TableCell>
                     <TableCell>{o.supplierName}</TableCell>
                     <TableCell>
-                      <Badge variant={(statusColors[o.status] as any) ?? "outline"} className="rounded-xl uppercase text-xs">
+                      <Badge variant={(statusColors[o.status] as any) ?? "outline"} className="rounded-xl text-xs">
                         {o.status}
                       </Badge>
                     </TableCell>

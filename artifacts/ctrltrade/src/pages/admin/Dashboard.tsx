@@ -38,7 +38,7 @@ function TrendBadge({ value, suffix = "%" }: { value?: number; suffix?: string }
   }
   if (value < 0) {
     return (
-      <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-red-400">
+      <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-amber-400">
         <TrendingDown className="h-3 w-3" />{value}{suffix}
       </span>
     );
@@ -74,7 +74,7 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader title="System Operator Dashboard" />
+      <AdminPageHeader title="System operator dashboard" />
 
       {/* Primary KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -94,14 +94,14 @@ export function AdminDashboard() {
           testId="arr"
         />
         <KpiCard
-          title="Active Tenants"
+          title="Active tenants"
           value={dashboard.activeTenants}
           icon={Users}
           trend={(dashboard as any).tenantGrowthPct as number | undefined}
           testId="active-tenants"
         />
         <KpiCard
-          title="Active Trials"
+          title="Active trials"
           value={dashboard.activeTrials}
           icon={Activity}
           testId="active-trials"
@@ -110,11 +110,11 @@ export function AdminDashboard() {
 
       {/* Secondary KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard title="Control Seats" value={dashboard.activeControlSeats} icon={Users} testId="control-seats" />
-        <KpiCard title="Field Seats" value={dashboard.activeFieldSeats} icon={Users} testId="field-seats" />
-        <KpiCard title="POS Tills" value={dashboard.activeTills} icon={CreditCard} testId="pos-tills" />
+        <KpiCard title="Control seats" value={dashboard.activeControlSeats} icon={Users} testId="control-seats" />
+        <KpiCard title="Field seats" value={dashboard.activeFieldSeats} icon={Users} testId="field-seats" />
+        <KpiCard title="POS tills" value={dashboard.activeTills} icon={CreditCard} testId="pos-tills" />
         <div className="grid grid-cols-2 gap-4">
-          <KpiCard title="Past Due" value={dashboard.pastDue} icon={AlertCircle} danger testId="past-due" />
+          <KpiCard title="Past due" value={dashboard.pastDue} icon={AlertCircle} danger testId="past-due" />
           <KpiCard title="Failed (30d)" value={dashboard.failedPaymentsLast30d} icon={AlertCircle} danger testId="failed-payments" />
         </div>
       </div>
@@ -122,21 +122,21 @@ export function AdminDashboard() {
       {/* Pipeline summary */}
       {pipeline && (
         <Link href="/leads" className="block">
-          <Card className="rounded-xl border-border bg-black shadow-none hover:border-border transition-colors cursor-pointer">
+          <Card className="rounded-xl border-border bg-card shadow-none hover:border-primary/40 transition-colors cursor-pointer">
             <CardHeader className="pb-2">
-              <CardTitle className=" text-foreground flex items-center gap-2 text-sm">
-                <Funnel className="h-4 w-4 text-red-500" /> Pipeline
+              <CardTitle className="text-foreground flex items-center gap-2 text-sm">
+                <Funnel className="h-4 w-4 text-primary" /> Pipeline
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-5 gap-2 mb-3">
                 {(["new", "contacted", "demo_booked", "won", "lost"] as const).map((s) => {
-                  const labels: Record<string, string> = { new: "New", contacted: "Contacted", demo_booked: "Demo Booked", won: "Won", lost: "Lost" };
+                  const labels: Record<string, string> = { new: "New", contacted: "Contacted", demo_booked: "Demo booked", won: "Won", lost: "Lost" };
                   const colours: Record<string, string> = { new: "text-blue-400", contacted: "text-yellow-400", demo_booked: "text-purple-400", won: "text-green-400", lost: "text-muted-foreground" };
                   return (
                     <div key={s} className="text-center">
                       <div className={`text-2xl font-mono font-bold ${colours[s]}`}>{pipeline.byStatus?.[s] ?? 0}</div>
-                      <div className="text-[10px] font-bold uppercase text-muted-foreground mt-0.5">{labels[s]}</div>
+                      <div className="text-[10px] font-semibold text-muted-foreground mt-0.5">{labels[s]}</div>
                     </div>
                   );
                 })}
@@ -151,9 +151,9 @@ export function AdminDashboard() {
       )}
 
       {/* Usage */}
-      <Card className="rounded-xl border-border bg-black shadow-none">
+      <Card className="rounded-xl border-border bg-card shadow-none">
         <CardHeader>
-          <CardTitle className=" text-foreground flex items-center gap-2 text-sm">
+          <CardTitle className="text-foreground flex items-center gap-2 text-sm">
             <Gauge className="h-4 w-4" /> Platform usage this month
           </CardTitle>
         </CardHeader>
@@ -164,10 +164,10 @@ export function AdminDashboard() {
                 <Link
                   key={t.kind}
                   href="/usage"
-                  className="border border-border p-3 bg-background hover:border-red-500/50 transition-colors block"
+                  className="border border-border p-3 bg-background rounded-xl hover:border-primary/50 transition-colors block"
                   data-testid={`admin-usage-${t.kind}`}
                 >
-                  <div className="font-bold text-[10px] text-muted-foreground mb-1">
+                  <div className="font-semibold text-[10px] text-muted-foreground mb-1">
                     {USAGE_KIND_LABELS[t.kind] ?? t.kind}
                   </div>
                   <div className="text-xl font-mono font-bold text-foreground">{t.count.toLocaleString()}</div>
@@ -177,7 +177,7 @@ export function AdminDashboard() {
           ) : (
             <div className="py-8 text-center text-muted-foreground font-mono text-sm">
               No usage recorded yet this month.{" "}
-              <Link href="/usage" className="text-red-500 hover:underline">View breakdown →</Link>
+              <Link href="/usage" className="text-primary hover:underline">View breakdown →</Link>
             </div>
           )}
         </CardContent>
@@ -186,9 +186,9 @@ export function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Revenue Breakdown */}
-          <Card className="rounded-xl border-border bg-black shadow-none">
+          <Card className="rounded-xl border-border bg-card shadow-none">
             <CardHeader>
-              <CardTitle className=" text-foreground text-sm">Revenue Breakdown</CardTitle>
+              <CardTitle className="text-foreground text-sm">Revenue breakdown</CardTitle>
             </CardHeader>
             <CardContent>
               {revenue?.lines && revenue.lines.length > 0 ? (
@@ -200,13 +200,13 @@ export function AdminDashboard() {
                         margin={{ top: 4, right: 4, left: 4, bottom: 4 }}
                       >
                         <Tooltip
-                          contentStyle={{ background: "#09090b", border: "1px solid #27272a", borderRadius: 0, fontSize: 11 }}
+                          contentStyle={{ background: "hsl(220,70%,13%)", border: "1px solid hsl(220,40%,22%)", borderRadius: 8, fontSize: 11 }}
                           formatter={(v: number) => [`£${v.toLocaleString()}`, "Revenue"]}
                           cursor={{ fill: "rgba(255,255,255,0.04)" }}
                         />
                         <Bar dataKey="amount" isAnimationActive={false}>
                           {revenue.lines.map((_, i) => (
-                            <Cell key={i} fill={i % 2 === 0 ? "#ef4444" : "#b91c1c"} />
+                            <Cell key={i} fill={i % 2 === 0 ? "hsl(46,98%,52%)" : "hsl(46,98%,40%)"} />
                           ))}
                         </Bar>
                       </BarChart>
@@ -228,21 +228,21 @@ export function AdminDashboard() {
           </Card>
 
           {/* Upcoming Renewals */}
-          <Card className="rounded-xl border-border bg-black shadow-none">
+          <Card className="rounded-xl border-border bg-card shadow-none">
             <CardHeader>
-              <CardTitle className=" text-foreground flex items-center gap-2 text-sm">
-                <RefreshCw className="h-4 w-4" /> Upcoming Renewals (7d)
+              <CardTitle className="text-foreground flex items-center gap-2 text-sm">
+                <RefreshCw className="h-4 w-4" /> Upcoming renewals (7d)
               </CardTitle>
             </CardHeader>
             <CardContent>
               {renewals && renewals.length > 0 ? (
-                <div className="divide-y divide-zinc-800">
+                <div className="divide-y divide-border">
                   {renewals.map((ren) => (
                     <div key={ren.tenantId} className="py-3 flex justify-between items-center">
                       <div>
                         <Link
                           href={`/tenants/${ren.tenantId}`}
-                          className="font-bold text-foreground/90 hover:text-red-500 uppercase text-sm"
+                          className="font-semibold text-foreground/90 hover:text-primary text-sm"
                         >
                           {ren.tenantName}
                         </Link>
@@ -264,23 +264,23 @@ export function AdminDashboard() {
         </div>
 
         {/* System Activity */}
-        <Card className="rounded-xl border-border bg-black shadow-none">
+        <Card className="rounded-xl border-border bg-card shadow-none">
           <CardHeader>
-            <CardTitle className=" text-foreground flex items-center gap-2 text-sm">
-              <Activity className="h-4 w-4" /> System Activity
+            <CardTitle className="text-foreground flex items-center gap-2 text-sm">
+              <Activity className="h-4 w-4" /> System activity
             </CardTitle>
           </CardHeader>
           <CardContent>
             {activity && activity.length > 0 ? (
               <div className="space-y-4">
                 {activity.map((act) => (
-                  <div key={act.id} className="border-l-2 border-red-500 pl-4 py-1">
+                  <div key={act.id} className="border-l-2 border-primary/40 pl-4 py-1">
                     <div className="text-xs text-muted-foreground font-mono mb-1">
                       {new Date(act.createdAt).toLocaleString()}
                     </div>
                     <div className="text-sm text-foreground/80">{act.message}</div>
                     {act.tenantName && (
-                      <div className="text-xs font-bold uppercase text-red-500/80 mt-1">{act.tenantName}</div>
+                      <div className="text-xs font-semibold text-primary/70 mt-1">{act.tenantName}</div>
                     )}
                   </div>
                 ))}
@@ -309,30 +309,23 @@ function KpiCard({
   className?: string;
 }) {
   const borderCls = danger
-    ? "border-red-900/50 bg-red-950/20"
+    ? "border-red-500/30 bg-red-500/5"
     : highlight
-    ? "border-red-500/50 bg-card"
-    : "border-border bg-black";
-  const valueCls = danger ? "text-red-500" : highlight ? "text-red-500" : "text-foreground";
-  const iconCls = danger ? "text-red-500" : highlight ? "text-red-500" : "text-muted-foreground";
+    ? "border-primary/40 bg-card"
+    : "border-border bg-card";
+  const valueCls = danger ? "text-red-400" : highlight ? "text-primary" : "text-foreground";
+  const iconCls  = danger ? "text-red-400" : highlight ? "text-primary" : "text-muted-foreground";
 
   return (
-    <Card className={`rounded-xl shadow-none ${borderCls} ${className}`}>
-      <CardContent className="p-5">
+    <Card className={`rounded-xl shadow-none ${borderCls} ${className}`} data-testid={testId ? `kpi-${testId}` : undefined}>
+      <CardContent className="p-4">
         <div className="flex justify-between items-start mb-2">
-          <div className="font-bold text-xs text-muted-foreground">{title}</div>
-          <Icon className={`h-4 w-4 shrink-0 ${iconCls}`} />
+          <span className="text-xs text-muted-foreground font-semibold">{title}</span>
+          <Icon className={`h-4 w-4 ${iconCls}`} />
         </div>
-        <div
-          className={`text-2xl md:text-3xl font-mono font-bold ${valueCls}`}
-          data-testid={testId ? `kpi-${testId}` : undefined}
-        >
-          {value}
-        </div>
+        <div className={`text-2xl font-mono font-bold ${valueCls}`}>{value}</div>
         {trend !== undefined && (
-          <div className="mt-2">
-            <TrendBadge value={trend} />
-          </div>
+          <div className="mt-1"><TrendBadge value={trend} /></div>
         )}
       </CardContent>
     </Card>

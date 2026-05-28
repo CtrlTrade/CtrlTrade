@@ -53,10 +53,10 @@ type Submission = {
 
 function statusBadge(status: string) {
   if (status === "approved")
-    return <Badge className="rounded-xl uppercase bg-green-600 text-white"><CheckCircle className="h-3 w-3 mr-1" />Approved</Badge>;
+    return <Badge className="rounded-xl bg-green-500/15 text-green-400"><CheckCircle className="h-3 w-3 mr-1" />Approved</Badge>;
   if (status === "rejected")
-    return <Badge variant="destructive" className="rounded-xl uppercase"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>;
-  return <Badge className="rounded-xl uppercase bg-amber-500 text-white"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
+    return <Badge variant="destructive" className="rounded-xl"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>;
+  return <Badge className="rounded-xl bg-amber-500/15 text-amber-300"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
 }
 
 export function AdminCompliance() {

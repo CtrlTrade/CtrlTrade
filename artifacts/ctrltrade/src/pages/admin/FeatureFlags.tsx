@@ -62,7 +62,7 @@ export function AdminFeatureFlags() {
             <div><Label>Rollout %</Label><Input type="number" min={0} max={100} value={newPct} onChange={(e) => setNewPct(Number(e.target.value))} className="rounded-xl" /></div>
             {newScope === "tenant" && <div className="col-span-3"><Label>Tenant ID</Label><Input value={newTenantId} onChange={(e) => setNewTenantId(e.target.value)} required className="rounded-xl font-mono text-xs" /></div>}
             <div className="flex items-center gap-2"><Switch checked={newEnabled} onCheckedChange={setNewEnabled} /> <span className="text-sm">Enabled</span></div>
-            <Button type="submit" disabled={upsert.isPending} className="rounded-xl uppercase font-bold tracking-wider" data-testid="button-flag-save">Save flag</Button>
+            <Button type="submit" disabled={upsert.isPending} className="rounded-xl font-semibold" data-testid="button-flag-save">Save flag</Button>
           </form>
         </CardContent>
       </Card>
@@ -71,12 +71,12 @@ export function AdminFeatureFlags() {
         <CardHeader><CardTitle className=" text-base">All flags</CardTitle></CardHeader>
         <CardContent>
           <table className="w-full text-sm">
-            <thead className="text-xs uppercase text-muted-foreground border-b border-border"><tr><th className="text-left py-2">Key</th><th className="text-left">Scope</th><th className="text-left">Tenant</th><th className="text-left">Rollout</th><th className="text-left">Enabled</th><th></th></tr></thead>
+            <thead className="text-xs text-muted-foreground border-b border-border"><tr><th className="text-left py-2">Key</th><th className="text-left">Scope</th><th className="text-left">Tenant</th><th className="text-left">Rollout</th><th className="text-left">Enabled</th><th></th></tr></thead>
             <tbody>
               {(data ?? []).map((f) => (
                 <tr key={f.id} className="border-b border-border" data-testid={`row-flag-${f.key}`}>
                   <td className="py-2 font-mono text-xs">{f.key}</td>
-                  <td className="uppercase text-xs">{f.scope}</td>
+                  <td className="text-xs">{f.scope}</td>
                   <td className="text-xs">{f.tenantName ?? "—"}</td>
                   <td><Input type="number" min={0} max={100} defaultValue={f.rolloutPct} className="rounded-xl h-8 w-20" onBlur={(e) => { const v = Number(e.target.value); if (v !== f.rolloutPct) upsert.mutate({ data: { key: f.key, enabled: f.enabled, rolloutPct: v, tenantId: f.tenantId, description: f.description ?? undefined } }); }} /></td>
                   <td><Switch checked={f.enabled} onCheckedChange={(v) => upsert.mutate({ data: { key: f.key, enabled: v, rolloutPct: f.rolloutPct, tenantId: f.tenantId, description: f.description ?? undefined } })} /></td>

@@ -82,7 +82,7 @@ export function AdminWorkers() {
             {data.recent.map(j => (
               <div key={j.id} className="p-3 grid grid-cols-12 gap-2 items-center text-sm">
                 <div className="col-span-3 font-mono text-foreground/90 font-bold truncate">{j.kind}</div>
-                <div className={`col-span-1 text-xs uppercase font-bold tracking-wider ${
+                <div className={`col-span-1 text-xs font-semibold ${
                   j.status === "done" ? "text-green-500" :
                   j.status === "running" ? "text-yellow-500" :
                   j.status === "failed" ? "text-red-400" :
@@ -93,7 +93,7 @@ export function AdminWorkers() {
                 <div className="col-span-2 text-xs font-mono text-muted-foreground">{new Date(j.updatedAt).toLocaleString()}</div>
                 <div className="col-span-1 text-right">
                   {(j.status === "failed" || j.status === "dead") && (
-                    <Button size="sm" variant="outline" disabled={retry.isPending} className="rounded-xl uppercase text-xs font-bold border-border"
+                    <Button size="sm" variant="outline" disabled={retry.isPending} className="rounded-xl text-xs font-semibold border-border"
                       onClick={() => retry.mutate({ jobId: j.id })}
                       data-testid={`button-retry-${j.id}`}>
                       <RefreshCw className="h-3 w-3"/>

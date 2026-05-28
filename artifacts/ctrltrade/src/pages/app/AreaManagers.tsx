@@ -89,7 +89,7 @@ export function AppAreaManagers() {
         </div>
         <Button
           onClick={() => { setSelectedUserId(""); setSelectedBranchIds([]); setCreateOpen(true); }}
-          className="gap-2 uppercase text-xs tracking-wider font-bold"
+          className="gap-2 text-xs font-semibold"
           disabled={branchList.length === 0}
           title={branchList.length === 0 ? "Create at least one branch first" : undefined}
           data-testid="button-assign-area-manager"
@@ -218,7 +218,7 @@ export function AppAreaManagers() {
             <Button
               disabled={!selectedUserId || selectedUserId === "__none__" || create.isPending}
               onClick={() => create.mutate({ data: { userId: selectedUserId, branchIds: selectedBranchIds } })}
-              className="uppercase text-xs tracking-wider font-bold"
+              className="text-xs font-semibold"
               data-testid="button-submit-area-manager"
             >
               {create.isPending ? "Assigning…" : "Assign"}
@@ -260,7 +260,7 @@ export function AppAreaManagers() {
               <Button
                 disabled={update.isPending}
                 onClick={() => update.mutate({ id: editManager.id, data: { userId: editManager.userId, branchIds: selectedBranchIds } })}
-                className="uppercase text-xs tracking-wider font-bold"
+                className="text-xs font-semibold"
               >
                 {update.isPending ? "Saving…" : "Save Changes"}
               </Button>

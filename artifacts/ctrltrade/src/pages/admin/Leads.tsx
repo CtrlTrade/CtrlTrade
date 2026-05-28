@@ -84,14 +84,14 @@ export function AdminLeads() {
             <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
             <Button
               variant="ghost" size="sm"
-              className={`gap-1 uppercase text-xs font-bold ${view === "table" ? "text-red-500" : "text-muted-foreground"}`}
+              className={`gap-1 text-xs font-semibold ${view === "table" ? "text-primary" : "text-muted-foreground"}`}
               onClick={() => setView("table")}
             >
               <LayoutList className="h-3.5 w-3.5" /> Table
             </Button>
             <Button
               variant="ghost" size="sm"
-              className={`gap-1 uppercase text-xs font-bold ${view === "kanban" ? "text-red-500" : "text-muted-foreground"}`}
+              className={`gap-1 text-xs font-semibold ${view === "kanban" ? "text-primary" : "text-muted-foreground"}`}
               onClick={() => setView("kanban")}
             >
               <Columns3 className="h-3.5 w-3.5" /> Kanban
@@ -115,7 +115,7 @@ export function AdminLeads() {
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 text-xs font-bold uppercase border transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold border transition-colors ${
                 statusFilter === s
                   ? "border-red-500 text-red-500 bg-red-500/10"
                   : "border-border text-muted-foreground hover:border-border"
@@ -183,7 +183,7 @@ function TableView({ leads }: { leads: any[] }) {
                 {new Date(lead.createdAt).toLocaleDateString()}
               </td>
               <td className="px-4 py-3">
-                <Link href={`/leads/${lead.id}`} className="text-muted-foreground hover:text-red-500 transition-colors">
+                <Link href={`/leads/${lead.id}`} className="text-muted-foreground hover:text-primary transition-colors">
                   <ChevronRight className="h-4 w-4" />
                 </Link>
               </td>
@@ -241,7 +241,7 @@ function StatusBadge({ status }: { status: string }) {
   const label = STATUS_LABELS[status as LeadStatus] ?? status;
   const cls = STATUS_COLOURS[status as LeadStatus] ?? "bg-muted text-muted-foreground border-border";
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 text-xs font-bold uppercase border rounded-sm ${cls}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 text-xs font-semibold border rounded-sm ${cls}`}>
       {label}
     </span>
   );

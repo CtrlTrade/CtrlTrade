@@ -107,7 +107,7 @@ export function AppStock() {
                 </div>
                 <div className="flex items-center gap-2">
                   <input type="checkbox" name="isDefault" id="isDefault" />
-                  <Label htmlFor="isDefault" className="uppercase text-xs tracking-wider">Default location</Label>
+                  <Label htmlFor="isDefault" className="text-xs font-semibold">Default location</Label>
                 </div>
                 <DialogFooter>
                   <Button type="submit" disabled={createLoc.isPending} className="rounded-xl font-bold">Save</Button>

@@ -80,7 +80,7 @@ export function PortalQuote() {
           <h1 className="text-3xl font-bold">{data.number}</h1>
           <p className="text-muted-foreground">{data.title}</p>
         </div>
-        <Badge className="uppercase rounded-xl">{data.status}</Badge>
+        <Badge className="rounded-xl">{data.status}</Badge>
       </div>
 
       <Card className=" border-border shadow-sm">

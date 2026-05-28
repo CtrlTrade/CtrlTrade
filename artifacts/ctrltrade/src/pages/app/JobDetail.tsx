@@ -245,7 +245,7 @@ export function AppJobDetail() {
             )}
           </p>
         </div>
-        <Badge className="uppercase">{data.status.replace("_", " ")}</Badge>
+        <Badge className="">{data.status.replace("_", " ")}</Badge>
       </div>
 
       {data.status === "completed" && (
@@ -262,11 +262,11 @@ export function AppJobDetail() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="rounded-xl border border-border">
-          <TabsTrigger value="details" className="rounded-xl uppercase text-xs tracking-wider font-bold">Details</TabsTrigger>
-          <TabsTrigger value="costs" className="rounded-xl uppercase text-xs tracking-wider font-bold" data-testid="tab-costs">
+          <TabsTrigger value="details" className="rounded-xl text-xs font-semibold">Details</TabsTrigger>
+          <TabsTrigger value="costs" className="rounded-xl text-xs font-semibold" data-testid="tab-costs">
             Costs {hasActualCosts && <span className="ml-1.5 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-full">{entries.length}</span>}
           </TabsTrigger>
-          <TabsTrigger value="schedule" className="rounded-xl uppercase text-xs tracking-wider font-bold">Schedule</TabsTrigger>
+          <TabsTrigger value="schedule" className="rounded-xl text-xs font-semibold">Schedule</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="space-y-6 mt-4">
@@ -318,7 +318,7 @@ export function AppJobDetail() {
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto"><table className="w-full text-sm">
-                  <thead className="text-xs uppercase text-muted-foreground border-b border-border">
+                  <thead className="text-xs text-muted-foreground border-b border-border">
                     <tr>
                       <th className="text-left py-2">Staff</th>
                       <th className="text-left">Date</th>
@@ -336,7 +336,7 @@ export function AppJobDetail() {
                         <td className="font-mono">{fmtCheckinTime(c.checkedInAt)}</td>
                         <td className="font-mono">
                           {c.checkedOutAt ? fmtCheckinTime(c.checkedOutAt) : (
-                            <Badge variant="outline" className="text-amber-500 border-amber-500 uppercase text-xs">Active</Badge>
+                            <Badge variant="outline" className="text-amber-400 border-amber-500/40 text-xs">Active</Badge>
                           )}
                         </td>
                         <td className="font-mono">{fmtDuration(c.durationMinutes) ?? "—"}</td>
@@ -431,7 +431,7 @@ export function AppJobDetail() {
                   ].map((item) => (
                     <Card key={item.label} className="border-border shadow-sm">
                       <CardContent className="p-4">
-                        <p className="text-xs uppercase text-muted-foreground tracking-wide">{item.label}</p>
+                        <p className="text-xs text-muted-foreground tracking-wide">{item.label}</p>
                         <p className={`text-2xl font-bold font-mono mt-1 ${item.accent ? (item.positive ? "text-emerald-600" : "text-red-600") : ""}`}>
                           {item.value}
                         </p>
@@ -449,7 +449,7 @@ export function AppJobDetail() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="rounded-xl uppercase text-xs font-bold tracking-wider"
+                        className="rounded-xl text-xs font-semibold"
                         onClick={() => importFromQuote.mutate({ jobId: id })}
                         disabled={importFromQuote.isPending}
                         data-testid="button-import-quote-costs"
@@ -458,7 +458,7 @@ export function AppJobDetail() {
                       </Button>
                     )}
                     {!showAddCost && (
-                      <Button size="sm" className="rounded-xl uppercase text-xs font-bold tracking-wider" onClick={() => setShowAddCost(true)} data-testid="button-add-cost">
+                      <Button size="sm" className="rounded-xl text-xs font-semibold" onClick={() => setShowAddCost(true)} data-testid="button-add-cost">
                         <Plus className="h-3 w-3 mr-1" /> Add cost
                       </Button>
                     )}
@@ -467,7 +467,7 @@ export function AppJobDetail() {
                 <CardContent className="p-0">
                   {showAddCost && (
                     <div className="p-4 border-b border-border bg-muted/30 space-y-3">
-                      <p className="text-xs uppercase font-bold tracking-wider text-muted-foreground">New cost entry</p>
+                      <p className="text-xs font-semibold text-muted-foreground">New cost entry</p>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div>
                           <Label className="text-xs">Kind</Label>
@@ -510,7 +510,7 @@ export function AppJobDetail() {
                         )}
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" className="rounded-xl uppercase text-xs font-bold tracking-wider" disabled={createCost.isPending || !costForm.description} onClick={handleAddCost} data-testid="button-save-cost">
+                        <Button size="sm" className="rounded-xl text-xs font-semibold" disabled={createCost.isPending || !costForm.description} onClick={handleAddCost} data-testid="button-save-cost">
                           {createCost.isPending ? "Saving…" : "Save"}
                         </Button>
                         <Button size="sm" variant="outline" className="rounded-xl" onClick={() => { setShowAddCost(false); setCostForm(defaultCostForm); }}>Cancel</Button>
@@ -522,7 +522,7 @@ export function AppJobDetail() {
                     <p className="p-6 text-sm text-muted-foreground">No cost entries yet. Add labour, materials and other costs to track actual job profitability.</p>
                   ) : (
                     <table className="w-full text-sm">
-                      <thead className="bg-muted text-xs uppercase text-muted-foreground">
+                      <thead className="bg-muted text-xs text-muted-foreground">
                         <tr>
                           <th className="text-left p-3">Kind</th>
                           <th className="text-left p-3">Description</th>
@@ -585,7 +585,7 @@ export function AppJobDetail() {
                       {entries.length > 0 && (
                         <tfoot className="border-t-2 border-border bg-muted/50">
                           <tr>
-                            <td className="p-3 text-xs uppercase font-bold text-muted-foreground" colSpan={5}>Total actual cost</td>
+                            <td className="p-3 text-xs font-semibold text-muted-foreground" colSpan={5}>Total actual cost</td>
                             <td className="p-3 text-right font-mono font-bold">{formatGBP(costsData?.actualCostPence ?? 0)}</td>
                             <td></td>
                           </tr>

@@ -179,7 +179,7 @@ export function AppSettings() {
                     }}
                     className="rounded-xl"
                   />
-                  <label htmlFor={`cat-edit-${cat.slug}`} className="text-sm font-bold uppercase cursor-pointer flex-1">
+                  <label htmlFor={`cat-edit-${cat.slug}`} className="text-sm font-semibold cursor-pointer flex-1">
                     {cat.name}
                   </label>
                 </div>
@@ -189,7 +189,7 @@ export function AppSettings() {
         </Card>
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={updateTenant.isPending} className="rounded-xl uppercase font-bold tracking-wider" data-testid="button-settings-save">
+          <Button type="submit" disabled={updateTenant.isPending} className="rounded-xl font-semibold" data-testid="button-settings-save">
             {updateTenant.isPending ? "Saving..." : "Save Settings"}
           </Button>
         </div>

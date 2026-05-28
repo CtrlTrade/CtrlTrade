@@ -52,7 +52,7 @@ export function PortalDashboard() {
                     <div className="font-medium">{q.title}</div>
                   </Link>
                   <span className="font-mono mr-4">{formatGBP(q.totalPence)}</span>
-                  <Badge className="uppercase rounded-xl">{q.status}</Badge>
+                  <Badge className="rounded-xl">{q.status}</Badge>
                 </li>
               ))}
             </ul>
@@ -84,7 +84,7 @@ export function PortalDashboard() {
                       </div>
                     ) : null}
                   </Link>
-                  <Badge className="uppercase rounded-xl">{j.status.replace("_", " ")}</Badge>
+                  <Badge className="rounded-xl">{j.status.replace("_", " ")}</Badge>
                 </li>
               ))}
             </ul>
@@ -110,11 +110,11 @@ export function PortalDashboard() {
                   >
                     <div className="font-mono text-xs text-muted-foreground">{i.number}</div>
                     <div className="font-medium">
-                      {i.title} {i.isDeposit ? <span className="text-xs uppercase text-muted-foreground">(Deposit)</span> : null}
+                      {i.title} {i.isDeposit ? <span className="text-xs text-muted-foreground">(Deposit)</span> : null}
                     </div>
                   </Link>
                   <span className="font-mono mr-4">{formatGBP(i.totalPence)}</span>
-                  <Badge className="uppercase rounded-xl">{i.status}</Badge>
+                  <Badge className="rounded-xl">{i.status}</Badge>
                 </li>
               ))}
             </ul>

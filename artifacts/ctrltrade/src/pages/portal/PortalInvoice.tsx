@@ -62,7 +62,7 @@ export function PortalInvoice() {
             ) : null}
           </p>
         </div>
-        <Badge className="uppercase rounded-xl">{data.status}</Badge>
+        <Badge className="rounded-xl">{data.status}</Badge>
       </div>
 
       <Card className=" border-border shadow-sm">

@@ -59,7 +59,7 @@ export function PortalJob() {
             </p>
           ) : null}
         </div>
-        <Badge className="uppercase rounded-xl">{data.status.replace("_", " ")}</Badge>
+        <Badge className="rounded-xl">{data.status.replace("_", " ")}</Badge>
       </div>
 
       <Card className=" border-border shadow-sm">

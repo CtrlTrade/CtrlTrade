@@ -78,7 +78,7 @@ export function AiPanel({ title, description, buttonLabel = "Ask AI", prompt, en
             size="sm"
             onClick={run}
             disabled={loading}
-            className="rounded-none gap-2 uppercase text-xs font-bold tracking-wider"
+            className="rounded-none gap-2 text-xs font-semibold"
           >
             <Sparkles className="h-3.5 w-3.5" />
             {loading ? "Thinking..." : buttonLabel}

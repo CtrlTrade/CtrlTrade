@@ -30,7 +30,7 @@ export function ForgotPassword() {
                 <Label>Email</Label>
                 <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required className="rounded-xl" data-testid="input-forgot-email" />
               </div>
-              <Button type="submit" disabled={req.isPending} className="w-full uppercase font-bold tracking-wider" data-testid="button-forgot-submit">
+              <Button type="submit" disabled={req.isPending} className="w-full font-semibold" data-testid="button-forgot-submit">
                 {req.isPending ? "Sending..." : "Send reset link"}
               </Button>
             </form>
@@ -68,7 +68,7 @@ export function ResetPassword() {
               <Label>New password (min 8 chars)</Label>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} className="rounded-xl" data-testid="input-reset-password" />
             </div>
-            <Button type="submit" disabled={complete.isPending} className="w-full uppercase font-bold tracking-wider" data-testid="button-reset-submit">
+            <Button type="submit" disabled={complete.isPending} className="w-full font-semibold" data-testid="button-reset-submit">
               {complete.isPending ? "Saving..." : "Set password"}
             </Button>
           </form>

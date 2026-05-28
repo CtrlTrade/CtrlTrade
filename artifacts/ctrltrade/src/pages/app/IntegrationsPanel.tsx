@@ -100,7 +100,7 @@ export function IntegrationsPanel() {
                   </div>
                   <Badge
                     variant="outline"
-                    className={`rounded-xl uppercase text-xs ${status === "connected" ? "border-green-600 text-green-400" : status === "error" ? "border-red-600 text-red-400" : "border-border text-muted-foreground"}`}
+                    className={`rounded-xl text-xs ${status === "connected" ? "border-green-600 text-green-400" : status === "error" ? "border-red-600 text-red-400" : "border-border text-muted-foreground"}`}
                     data-testid={`integration-status-${p.id}`}
                   >
                     {status}
@@ -144,7 +144,7 @@ export function IntegrationsPanel() {
 
                 {isApiKey && status !== "connected" && (
                   <div className="space-y-2">
-                    <Label className="text-xs uppercase font-bold tracking-wider">API Key</Label>
+                    <Label className="text-xs font-semibold">API Key</Label>
                     <Input
                       type="password"
                       placeholder="Paste your API key..."
@@ -160,7 +160,7 @@ export function IntegrationsPanel() {
                   {!isApiKey && status !== "connected" && (
                     <Button
                       size="sm"
-                      className="rounded-xl uppercase font-bold tracking-wider"
+                      className="rounded-xl font-semibold"
                       disabled={!p.enabled || !p.configured || connect.isPending}
                       onClick={() => connect.mutate({ provider: p.id })}
                       data-testid={`button-connect-${p.id}`}
@@ -172,7 +172,7 @@ export function IntegrationsPanel() {
                   {isApiKey && status !== "connected" && (
                     <Button
                       size="sm"
-                      className="rounded-xl uppercase font-bold tracking-wider"
+                      className="rounded-xl font-semibold"
                       disabled={!p.enabled || !apiKeyInputs[p.id]?.trim() || connectApiKey.isPending}
                       onClick={() =>
                         connectApiKey.mutate({
@@ -191,7 +191,7 @@ export function IntegrationsPanel() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="rounded-xl uppercase font-bold tracking-wider"
+                        className="rounded-xl font-semibold"
                         onClick={() => {
                           setSyncingProvider(p.id);
                           setSyncErrors((prev) => { const next = { ...prev }; delete next[p.id]; return next; });
@@ -206,7 +206,7 @@ export function IntegrationsPanel() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="rounded-xl uppercase font-bold tracking-wider"
+                        className="rounded-xl font-semibold"
                         onClick={() => {
                           if (confirm(`Disconnect ${p.label}?`)) disconnect.mutate({ provider: p.id });
                         }}
@@ -219,7 +219,7 @@ export function IntegrationsPanel() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="rounded-xl uppercase font-bold tracking-wider"
+                    className="rounded-xl font-semibold"
                     onClick={() => setLogsFor(logsFor === p.id ? null : p.id)}
                     data-testid={`button-logs-${p.id}`}
                   >
@@ -254,7 +254,7 @@ function SyncLogs({ provider }: { provider: string }) {
               <FileClock className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
             )}
             <span className="text-muted-foreground">{new Date(r.createdAt).toLocaleString()}</span>
-            <span className="uppercase">{r.direction}</span>
+            {r.direction}
             {r.entityKind && <span>{r.entityKind}</span>}
             <span className="truncate">{r.message}</span>
           </li>

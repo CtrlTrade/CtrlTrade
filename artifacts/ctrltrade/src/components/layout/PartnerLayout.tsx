@@ -68,7 +68,7 @@ export function PartnerLayout({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col">
         <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6">
           <span className="font-bold text-lg">Partner Portal</span>
-          <Button variant="ghost" size="sm" onClick={() => logout.mutate()} data-testid="button-partner-logout" className="gap-2 uppercase text-xs tracking-wider font-bold">
+          <Button variant="ghost" size="sm" onClick={() => logout.mutate()} data-testid="button-partner-logout" className="gap-2 text-xs font-semibold">
             <LogOut className="h-4 w-4" />
             Log Out
           </Button>

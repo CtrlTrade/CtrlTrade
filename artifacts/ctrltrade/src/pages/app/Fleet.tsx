@@ -140,7 +140,7 @@ export function AppFleet() {
                       <TableCell className="text-xs">
                         {loc ? <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{Number(loc.lat).toFixed(3)}, {Number(loc.lng).toFixed(3)}</span> : "—"}
                       </TableCell>
-                      <TableCell><Badge variant="outline" className="rounded-xl uppercase">{v.status}</Badge></TableCell>
+                      <TableCell><Badge variant="outline" className="rounded-xl">{v.status}</Badge></TableCell>
                     </TableRow>
                   );
                 })}

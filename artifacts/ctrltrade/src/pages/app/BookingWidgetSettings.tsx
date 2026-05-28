@@ -215,7 +215,7 @@ export function BookingWidgetSettings() {
         <Button
           onClick={handleSave}
           disabled={updateConfig.isPending || !dirty}
-          className="rounded-xl uppercase font-bold tracking-wider"
+          className="rounded-xl font-semibold"
           data-testid="button-save-booking-widget"
         >
           {updateConfig.isPending ? "Saving…" : "Save Widget Settings"}
@@ -245,7 +245,7 @@ export function BookingWidgetSettings() {
               type="button"
               variant="outline"
               size="sm"
-              className="rounded-xl uppercase text-xs font-bold"
+              className="rounded-xl text-xs font-semibold"
               onClick={() => copy(data.iframeCode, "iframe code")}
             >
               <Copy className="h-3 w-3 mr-1" /> Copy iframe
@@ -268,7 +268,7 @@ export function BookingWidgetSettings() {
               type="button"
               variant="outline"
               size="sm"
-              className="rounded-xl uppercase text-xs font-bold"
+              className="rounded-xl text-xs font-semibold"
               onClick={() => copy(data.widgetScriptTag, "Widget script tag")}
             >
               <Copy className="h-3 w-3 mr-1" /> Copy widget script
@@ -291,7 +291,7 @@ export function BookingWidgetSettings() {
               type="button"
               variant="outline"
               size="sm"
-              className="rounded-xl uppercase text-xs font-bold"
+              className="rounded-xl text-xs font-semibold"
               onClick={() => copy(data.embedCode, "Embed code")}
             >
               <Copy className="h-3 w-3 mr-1" /> Copy embed
