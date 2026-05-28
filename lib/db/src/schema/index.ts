@@ -489,6 +489,28 @@ export const quoteLineItemsTable = pgTable(
   }),
 );
 
+// ---- Projects --------------------------------------------------------------
+export const projectsTable = pgTable(
+  "projects",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    status: varchar("status", { length: 24 }).notNull().default("planning"), // planning|active|completed|cancelled
+    description: text("description"),
+    startDate: timestamp("start_date", { withTimezone: true }),
+    endDate: timestamp("end_date", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("projects_tenant_idx").on(t.tenantId),
+    statusIdx: index("projects_status_idx").on(t.status),
+  }),
+);
+
+export type Project = typeof projectsTable.$inferSelect;
+
 // ---- Jobs + scheduling -----------------------------------------------------
 export const jobsTable = pgTable(
   "jobs",
@@ -497,6 +519,7 @@ export const jobsTable = pgTable(
     tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
     customerId: uuid("customer_id").notNull().references(() => customersTable.id, { onDelete: "restrict" }),
     quoteId: uuid("quote_id").references(() => quotesTable.id, { onDelete: "set null" }),
+    projectId: uuid("project_id").references(() => projectsTable.id, { onDelete: "set null" }),
     number: varchar("number", { length: 32 }).notNull(),
     title: text("title").notNull(),
     description: text("description"),
@@ -526,6 +549,7 @@ export const jobsTable = pgTable(
     scheduleIdx: index("jobs_schedule_idx").on(t.tenantId, t.scheduledStart),
     assignedIdx: index("jobs_assigned_idx").on(t.assignedUserId),
     contractIdx: index("jobs_contract_idx").on(t.parentContractId),
+    projectIdx: index("jobs_project_idx").on(t.projectId),
     uniqNum: unique("jobs_tenant_number_uniq").on(t.tenantId, t.number),
     branchIdx: index("jobs_branch_idx").on(t.branchId),
   }),

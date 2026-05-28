@@ -724,6 +724,8 @@ export interface AdminTenantDetail {
   owner: SessionUser;
   recentEvents: AuditLogEntry[];
   branchCount: number;
+  /** Total number of projects for this tenant */
+  projectsCount: number;
 }
 
 export interface TeamMember {
@@ -986,6 +988,29 @@ export interface QuoteConvertInput {
   assignedUserId?: string;
 }
 
+export interface ProjectSummary {
+  id: string;
+  name: string;
+  status: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  startDate?: string | null;
+  /** @nullable */
+  endDate?: string | null;
+  jobCount: number;
+  totalValuePence: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ProjectDetailFinancials = {
+  totalValuePence: number;
+  totalInvoicedPence: number;
+  totalPaidPence: number;
+  outstandingPence: number;
+};
+
 export interface JobSummary {
   id: string;
   number: string;
@@ -1002,7 +1027,45 @@ export interface JobSummary {
   /** @nullable */
   assignedUserName?: string | null;
   valuePence: number;
+  /** @nullable */
+  projectId?: string | null;
   createdAt: string;
+}
+
+export type ProjectDetail = ProjectSummary & {
+  jobs: JobSummary[];
+  financials: ProjectDetailFinancials;
+  progressPct: number;
+};
+
+export interface LinkJobInput {
+  jobId: string;
+}
+
+export interface LinkJobResult {
+  jobId: string;
+  projectId: string;
+}
+
+export interface ProjectInput {
+  /** @minLength 1 */
+  name: string;
+  status?: string;
+  description?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface ProjectUpdateInput {
+  /** @minLength 1 */
+  name?: string;
+  status?: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  startDate?: string | null;
+  /** @nullable */
+  endDate?: string | null;
 }
 
 export interface Job {
@@ -1016,6 +1079,8 @@ export interface Job {
   customerName: string;
   /** @nullable */
   quoteId?: string | null;
+  /** @nullable */
+  projectId?: string | null;
   /** @nullable */
   scheduledStart?: string | null;
   /** @nullable */
@@ -1068,6 +1133,7 @@ export interface JobInput {
   assignedVehicleId?: string;
   /** @minimum 0 */
   valuePence?: number;
+  projectId?: string;
 }
 
 export interface JobAssignmentInput {
@@ -4428,6 +4494,10 @@ tenantId?: string;
 };
 
 export type ListJobsParams = {
+status?: string;
+};
+
+export type ListProjectsParams = {
 status?: string;
 };
 

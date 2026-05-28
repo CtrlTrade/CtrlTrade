@@ -18,6 +18,8 @@ export interface Job {
   /** @nullable */
   quoteId?: string | null;
   /** @nullable */
+  projectId?: string | null;
+  /** @nullable */
   scheduledStart?: Date | null;
   /** @nullable */
   scheduledEnd?: Date | null;

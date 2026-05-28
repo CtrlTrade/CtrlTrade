@@ -177,6 +177,7 @@ function TimesheetModal({
   );
 }
 
+
 interface CheckinCardProps {
   item: JobCheckin;
   colors: ReturnType<typeof useColors>;

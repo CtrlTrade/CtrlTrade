@@ -16,4 +16,6 @@ export interface AdminTenantDetail {
   owner: SessionUser;
   recentEvents: AuditLogEntry[];
   branchCount: number;
+  /** Total number of projects for this tenant */
+  projectsCount: number;
 }

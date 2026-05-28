@@ -21,4 +21,5 @@ export interface JobInput {
   assignedVehicleId?: string;
   /** @minimum 0 */
   valuePence?: number;
+  projectId?: string;
 }

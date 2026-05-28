@@ -1757,7 +1757,8 @@ export const GetAdminTenantResponse = zod.object({
   "actor": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })),
-  "branchCount": zod.number()
+  "branchCount": zod.number(),
+  "projectsCount": zod.number().describe('Total number of projects for this tenant')
 })
 
 
@@ -2704,6 +2705,7 @@ export const ConvertQuoteToJobResponse = zod.object({
   "customerId": zod.string(),
   "customerName": zod.string(),
   "quoteId": zod.string().nullish(),
+  "projectId": zod.string().nullish(),
   "scheduledStart": zod.coerce.date().nullish(),
   "scheduledEnd": zod.coerce.date().nullish(),
   "addressLine1": zod.string().nullish(),
@@ -2738,6 +2740,7 @@ export const ListJobsResponseItem = zod.object({
   "assignedUserId": zod.string().nullish(),
   "assignedUserName": zod.string().nullish(),
   "valuePence": zod.number(),
+  "projectId": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
 export const ListJobsResponse = zod.array(ListJobsResponseItem)
@@ -2760,7 +2763,8 @@ export const CreateJobBody = zod.object({
   "postcode": zod.string().optional(),
   "assignedUserId": zod.string().optional(),
   "assignedVehicleId": zod.string().optional(),
-  "valuePence": zod.number().min(createJobBodyValuePenceMin).optional()
+  "valuePence": zod.number().min(createJobBodyValuePenceMin).optional(),
+  "projectId": zod.string().optional()
 })
 
 
@@ -2777,6 +2781,7 @@ export const GetJobResponse = zod.object({
   "customerId": zod.string(),
   "customerName": zod.string(),
   "quoteId": zod.string().nullish(),
+  "projectId": zod.string().nullish(),
   "scheduledStart": zod.coerce.date().nullish(),
   "scheduledEnd": zod.coerce.date().nullish(),
   "addressLine1": zod.string().nullish(),
@@ -2816,7 +2821,8 @@ export const UpdateJobBody = zod.object({
   "postcode": zod.string().optional(),
   "assignedUserId": zod.string().optional(),
   "assignedVehicleId": zod.string().optional(),
-  "valuePence": zod.number().min(updateJobBodyValuePenceMin).optional()
+  "valuePence": zod.number().min(updateJobBodyValuePenceMin).optional(),
+  "projectId": zod.string().optional()
 })
 
 export const UpdateJobResponse = zod.object({
@@ -2828,6 +2834,7 @@ export const UpdateJobResponse = zod.object({
   "customerId": zod.string(),
   "customerName": zod.string(),
   "quoteId": zod.string().nullish(),
+  "projectId": zod.string().nullish(),
   "scheduledStart": zod.coerce.date().nullish(),
   "scheduledEnd": zod.coerce.date().nullish(),
   "addressLine1": zod.string().nullish(),
@@ -2843,6 +2850,132 @@ export const UpdateJobResponse = zod.object({
   "signoffAt": zod.coerce.date().nullish(),
   "signoffNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
+})
+
+
+export const ListProjectsQueryParams = zod.object({
+  "status": zod.coerce.string().optional()
+})
+
+export const ListProjectsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "status": zod.string(),
+  "description": zod.string().nullish(),
+  "startDate": zod.coerce.date().nullish(),
+  "endDate": zod.coerce.date().nullish(),
+  "jobCount": zod.number(),
+  "totalValuePence": zod.number(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListProjectsResponse = zod.array(ListProjectsResponseItem)
+
+
+
+
+
+export const CreateProjectBody = zod.object({
+  "name": zod.string().min(1),
+  "status": zod.string().optional(),
+  "description": zod.string().optional(),
+  "startDate": zod.coerce.date().optional(),
+  "endDate": zod.coerce.date().optional()
+})
+
+
+export const GetProjectParams = zod.object({
+  "projectId": zod.coerce.string()
+})
+
+export const GetProjectResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "status": zod.string(),
+  "description": zod.string().nullish(),
+  "startDate": zod.coerce.date().nullish(),
+  "endDate": zod.coerce.date().nullish(),
+  "jobCount": zod.number(),
+  "totalValuePence": zod.number(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}).and(zod.object({
+  "jobs": zod.array(zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "title": zod.string(),
+  "status": zod.string(),
+  "customerId": zod.string(),
+  "customerName": zod.string(),
+  "scheduledStart": zod.coerce.date().nullish(),
+  "scheduledEnd": zod.coerce.date().nullish(),
+  "assignedUserId": zod.string().nullish(),
+  "assignedUserName": zod.string().nullish(),
+  "valuePence": zod.number(),
+  "projectId": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})),
+  "financials": zod.object({
+  "totalValuePence": zod.number(),
+  "totalInvoicedPence": zod.number(),
+  "totalPaidPence": zod.number(),
+  "outstandingPence": zod.number()
+}),
+  "progressPct": zod.number()
+}))
+
+
+export const UpdateProjectParams = zod.object({
+  "projectId": zod.coerce.string()
+})
+
+
+
+
+export const UpdateProjectBody = zod.object({
+  "name": zod.string().min(1).optional(),
+  "status": zod.string().optional(),
+  "description": zod.string().nullish(),
+  "startDate": zod.coerce.date().nullish(),
+  "endDate": zod.coerce.date().nullish()
+})
+
+export const UpdateProjectResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "status": zod.string(),
+  "description": zod.string().nullish(),
+  "startDate": zod.coerce.date().nullish(),
+  "endDate": zod.coerce.date().nullish(),
+  "jobCount": zod.number(),
+  "totalValuePence": zod.number(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const DeleteProjectParams = zod.object({
+  "projectId": zod.coerce.string()
+})
+
+
+export const LinkJobToProjectParams = zod.object({
+  "projectId": zod.coerce.string()
+})
+
+export const LinkJobToProjectBody = zod.object({
+  "jobId": zod.string()
+})
+
+export const LinkJobToProjectResponse = zod.object({
+  "jobId": zod.string(),
+  "projectId": zod.string()
+})
+
+
+export const UnlinkJobFromProjectParams = zod.object({
+  "projectId": zod.coerce.string(),
+  "jobId": zod.coerce.string()
 })
 
 
@@ -2866,6 +2999,7 @@ export const AssignJobResponse = zod.object({
   "customerId": zod.string(),
   "customerName": zod.string(),
   "quoteId": zod.string().nullish(),
+  "projectId": zod.string().nullish(),
   "scheduledStart": zod.coerce.date().nullish(),
   "scheduledEnd": zod.coerce.date().nullish(),
   "addressLine1": zod.string().nullish(),
@@ -2906,6 +3040,7 @@ export const CompleteJobResponse = zod.object({
   "customerId": zod.string(),
   "customerName": zod.string(),
   "quoteId": zod.string().nullish(),
+  "projectId": zod.string().nullish(),
   "scheduledStart": zod.coerce.date().nullish(),
   "scheduledEnd": zod.coerce.date().nullish(),
   "addressLine1": zod.string().nullish(),

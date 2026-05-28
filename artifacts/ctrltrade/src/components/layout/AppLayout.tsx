@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useGetSession, useLogout, useStopImpersonation, useListIntegrations } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target, Inbox, Package, Warehouse, Handshake, Zap, Phone, ClipboardList, UserX, Building2, UserCog } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, FileText, FileSpreadsheet, Calendar, Truck, ShieldCheck, ShoppingCart, BarChart, Settings, LogOut, CreditCard, Target, Inbox, Package, Warehouse, Handshake, Zap, Phone, ClipboardList, UserX, Building2, UserCog, FolderOpen } from "lucide-react";
 import { useGetInboxUnreadCount } from "@workspace/api-client-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -51,6 +51,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/leads", icon: Target, label: "Leads" },
     { href: "/customers", icon: Users, label: "Customers" },
     { href: "/inbox", icon: Inbox, label: "Inbox" },
+    { href: "/projects", icon: FolderOpen, label: "Projects" },
     { href: "/jobs", icon: Briefcase, label: "Jobs" },
     { href: "/projects", icon: ClipboardList, label: "Projects" },
     { href: "/quotes", icon: FileText, label: "Quotes" },

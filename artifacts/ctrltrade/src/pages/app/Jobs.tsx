@@ -6,6 +6,7 @@ import {
   useListCustomers,
   useListTeam,
   useListBranches,
+  useListProjects,
   getListJobsQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -38,19 +39,21 @@ export function AppJobs() {
   const { data: customers } = useListCustomers();
   const { data: team } = useListTeam();
   const { data: branches } = useListBranches();
+  const { data: projects } = useListProjects();
   const qc = useQueryClient();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [customerId, setCustomerId] = useState("");
   const [assignedUserId, setAssignedUserId] = useState<string>("");
   const [branchFilter, setBranchFilter] = useState<string>("all");
+  const [projectId, setProjectId] = useState<string>("");
   const create = useCreateJob({
     mutation: {
       onSuccess: () => {
         qc.invalidateQueries({ queryKey: getListJobsQueryKey() });
         toast({ title: "Job created" });
         setOpen(false);
-        setCustomerId(""); setAssignedUserId("");
+        setCustomerId(""); setAssignedUserId(""); setProjectId("");
       },
       onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
     },
@@ -76,7 +79,8 @@ export function AppJobs() {
         postcode: (fd.get("postcode") as string) || undefined,
         assignedUserId: assignedUserId || undefined,
         valuePence: Number(fd.get("valuePence") ?? 0) || 0,
-      },
+        projectId: projectId || undefined,
+      } as any,
     });
   }
 
@@ -139,6 +143,16 @@ export function AppJobs() {
                   </Select>
                 </div>
                 <div><Label>Value (pence)</Label><Input name="valuePence" type="number" min={0} defaultValue={0} /></div>
+              </div>
+              <div>
+                <Label>Project (optional)</Label>
+                <Select value={projectId} onValueChange={setProjectId}>
+                  <SelectTrigger data-testid="select-job-project"><SelectValue placeholder="No project" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_none">No project</SelectItem>
+                    {projects?.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
               <DialogFooter>
                 <Button type="submit" disabled={create.isPending || !customerId} className="rounded-none uppercase tracking-wider font-bold">

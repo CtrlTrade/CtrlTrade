@@ -26,6 +26,7 @@ const CheckoutInput = JobCheckoutBody;
 const CreateEntryInput = CreateTimesheetEntryBody;
 const UpdateEntryInput = UpdateTimesheetEntryBody;
 const RejectEntryInput = RejectTimesheetEntryBody;
+const TimesheetsQuery = ListTimesheetsQueryParams;
 
 function serializeCheckin(
   c: JobCheckin,
@@ -54,11 +55,7 @@ function serializeCheckin(
 
 // POST /v1/jobs/:jobId/checkin — field staff checks in to a job
 router.post("/v1/jobs/:jobId/checkin", requireTenant, async (req, res): Promise<void> => {
-  const parsed = CheckinInput.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
-    return;
-  }
+  const body = parseLocationBody(req.body);
   const tenantId = req.auth!.tenant!.id;
   const userId = req.auth!.user.id;
   const jobId = req.params.jobId as string;
@@ -94,9 +91,9 @@ router.post("/v1/jobs/:jobId/checkin", requireTenant, async (req, res): Promise<
       tenantId,
       jobId,
       userId,
-      checkInLat: parsed.data.lat ?? null,
-      checkInLng: parsed.data.lng ?? null,
-      notes: parsed.data.notes ?? null,
+      checkInLat: body.lat,
+      checkInLng: body.lng,
+      notes: body.notes,
     })
     .returning();
 
@@ -110,11 +107,7 @@ router.post("/v1/jobs/:jobId/checkin", requireTenant, async (req, res): Promise<
 
 // POST /v1/jobs/:jobId/checkout — field staff checks out of a job
 router.post("/v1/jobs/:jobId/checkout", requireTenant, async (req, res): Promise<void> => {
-  const parsed = CheckoutInput.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
-    return;
-  }
+  const body = parseLocationBody(req.body);
   const tenantId = req.auth!.tenant!.id;
   const userId = req.auth!.user.id;
   const jobId = req.params.jobId as string;
@@ -151,9 +144,9 @@ router.post("/v1/jobs/:jobId/checkout", requireTenant, async (req, res): Promise
     .update(jobCheckinsTable)
     .set({
       checkedOutAt,
-      checkOutLat: parsed.data.lat ?? null,
-      checkOutLng: parsed.data.lng ?? null,
-      notes: parsed.data.notes ?? open.notes,
+      checkOutLat: body.lat,
+      checkOutLng: body.lng,
+      notes: body.notes ?? open.notes,
       durationMinutes,
     })
     .where(eq(jobCheckinsTable.id, open.id))
@@ -196,24 +189,20 @@ router.get("/v1/jobs/:jobId/checkins", requireTenant, async (req, res): Promise<
 
 // GET /v1/timesheets — weekly timesheet grouped by user + day
 router.get("/v1/timesheets", requireTenant, async (req, res): Promise<void> => {
-  const parsed = TimesheetsQuery.safeParse(req.query);
-  if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
-    return;
-  }
+  const q = parseTimesheetsQuery(req.query);
   const tenantId = req.auth!.tenant!.id;
   const now = new Date();
   const defaultFrom = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
-  const from = parsed.data.from ? new Date(parsed.data.from) : defaultFrom;
-  const to = parsed.data.to ? new Date(parsed.data.to + "T23:59:59Z") : now;
+  const from = q.from ? new Date(q.from) : defaultFrom;
+  const to = q.to ? new Date(q.to + "T23:59:59Z") : now;
 
   const conditions = [
     eq(jobCheckinsTable.tenantId, tenantId),
     gte(jobCheckinsTable.checkedInAt, from),
     lte(jobCheckinsTable.checkedInAt, to),
   ];
-  if (parsed.data.userId) {
-    conditions.push(eq(jobCheckinsTable.userId, parsed.data.userId));
+  if (q.userId) {
+    conditions.push(eq(jobCheckinsTable.userId, q.userId));
   }
 
   const rows = await db

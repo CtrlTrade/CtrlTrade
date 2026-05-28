@@ -30,6 +30,7 @@ tags:
   - name: integrations
   - name: branches
   - name: area-managers
+  - name: projects
 paths:
   /v1/branches:
     get:
@@ -1713,6 +1714,110 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Job" }
+
+  /v1/projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      parameters:
+        - in: query
+          name: status
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ProjectSummary" }
+    post:
+      operationId: createProject
+      tags: [projects]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProjectInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProjectSummary" }
+
+  /v1/projects/{projectId}:
+    parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getProject
+      tags: [projects]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProjectDetail" }
+    patch:
+      operationId: updateProject
+      tags: [projects]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProjectUpdateInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProjectSummary" }
+    delete:
+      operationId: deleteProject
+      tags: [projects]
+      responses:
+        "204": { description: No content }
+
+  /v1/projects/{projectId}/jobs:
+    parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: linkJobToProject
+      tags: [projects]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LinkJobInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LinkJobResult" }
+
+  /v1/projects/{projectId}/jobs/{jobId}:
+    parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema: { type: string }
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: unlinkJobFromProject
+      tags: [projects]
+      responses:
+        "204": { description: No content }
 
   /v1/jobs/{jobId}/assign:
     parameters:
@@ -6415,7 +6520,7 @@ components:
 
     AdminTenantDetail:
       type: object
-      required: [tenant, subscription, owner, recentEvents, branchCount]
+      required: [tenant, subscription, owner, recentEvents, branchCount, projectsCount]
       properties:
         tenant: { $ref: "#/components/schemas/Tenant" }
         subscription: { $ref: "#/components/schemas/Subscription" }
@@ -6424,6 +6529,7 @@ components:
           type: array
           items: { $ref: "#/components/schemas/AuditLogEntry" }
         branchCount: { type: integer }
+        projectsCount: { type: integer, description: "Total number of projects for this tenant" }
 
     AuditLogEntry:
       type: object
@@ -6711,6 +6817,72 @@ components:
         scheduledEnd: { type: string, format: date-time }
         assignedUserId: { type: string }
 
+    ProjectSummary:
+      type: object
+      required: [id, name, status, jobCount, totalValuePence, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        status: { type: string }
+        description: { type: ["string", "null"] }
+        startDate: { type: ["string", "null"], format: date-time }
+        endDate: { type: ["string", "null"], format: date-time }
+        jobCount: { type: integer }
+        totalValuePence: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    ProjectDetail:
+      allOf:
+        - $ref: "#/components/schemas/ProjectSummary"
+        - type: object
+          required: [jobs, financials, progressPct]
+          properties:
+            jobs:
+              type: array
+              items: { $ref: "#/components/schemas/JobSummary" }
+            financials:
+              type: object
+              required: [totalValuePence, totalInvoicedPence, totalPaidPence, outstandingPence]
+              properties:
+                totalValuePence: { type: integer }
+                totalInvoicedPence: { type: integer }
+                totalPaidPence: { type: integer }
+                outstandingPence: { type: integer }
+            progressPct: { type: integer }
+
+    LinkJobInput:
+      type: object
+      required: [jobId]
+      properties:
+        jobId: { type: string }
+
+    LinkJobResult:
+      type: object
+      required: [jobId, projectId]
+      properties:
+        jobId: { type: string }
+        projectId: { type: string }
+
+    ProjectInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        status: { type: string }
+        description: { type: string }
+        startDate: { type: string, format: date-time }
+        endDate: { type: string, format: date-time }
+
+    ProjectUpdateInput:
+      type: object
+      properties:
+        name: { type: string, minLength: 1 }
+        status: { type: string }
+        description: { type: ["string", "null"] }
+        startDate: { type: ["string", "null"], format: date-time }
+        endDate: { type: ["string", "null"], format: date-time }
+
     JobSummary:
       type: object
       required: [id, number, title, status, customerId, customerName, valuePence, createdAt]
@@ -6726,6 +6898,7 @@ components:
         assignedUserId: { type: ["string", "null"] }
         assignedUserName: { type: ["string", "null"] }
         valuePence: { type: integer }
+        projectId: { type: ["string", "null"] }
         createdAt: { type: string, format: date-time }
 
     Job:
@@ -6740,6 +6913,7 @@ components:
         customerId: { type: string }
         customerName: { type: string }
         quoteId: { type: ["string", "null"] }
+        projectId: { type: ["string", "null"] }
         scheduledStart: { type: ["string", "null"], format: date-time }
         scheduledEnd: { type: ["string", "null"], format: date-time }
         addressLine1: { type: ["string", "null"] }
@@ -6780,6 +6954,7 @@ components:
         assignedUserId: { type: string }
         assignedVehicleId: { type: string }
         valuePence: { type: integer, minimum: 0 }
+        projectId: { type: string }
 
     JobAssignmentInput:
       type: object

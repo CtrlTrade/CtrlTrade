@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useListProjects,
+  useCreateProject,
+  getListProjectsQueryKey,
+} from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,211 +16,111 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, RefreshCw, SkipForward, XCircle, MoreHorizontal, FolderOpen, ChevronRight } from "lucide-react";
+import { Plus, FolderOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import {
-  useListContracts,
-  useCreateContract,
-  useCancelContract,
-  useTriggerContractJob,
-  useSkipContractOccurrence,
-  useListCustomers,
-} from "@workspace/api-client-react";
 
-const STATUS_VARIANT: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
-  active: "default",
-  paused: "secondary",
-  completed: "outline",
-  cancelled: "destructive",
+const STATUS_LABELS: Record<string, string> = {
+  planning: "Planning",
+  active: "Active",
+  completed: "Completed",
+  cancelled: "Cancelled",
 };
 
-const FREQUENCY_LABELS: Record<string, string> = {
-  weekly: "Weekly",
-  fortnightly: "Fortnightly",
-  monthly: "Monthly",
-  quarterly: "Quarterly",
-  annually: "Annually",
+const STATUS_VARIANT: Record<string, "default" | "secondary" | "outline"> = {
+  planning: "secondary",
+  active: "default",
+  completed: "default",
+  cancelled: "outline",
 };
 
 function formatGBP(pence: number) {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(pence / 100);
 }
 
-function formatDate(iso: string | Date | null | undefined) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-GB");
-}
-
 export function AppProjects() {
+  const { data, isLoading } = useListProjects();
   const qc = useQueryClient();
   const { toast } = useToast();
-  const [statusFilter, setStatusFilter] = useState<string>("active");
-  const [createOpen, setCreateOpen] = useState(false);
-  const [customerId, setCustomerId] = useState("");
-  const [frequency, setFrequency] = useState("monthly");
+  const [open, setOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const { data: contracts, isLoading } = useListContracts(
-    statusFilter !== "all" ? { status: statusFilter } : {},
-  );
-  const { data: customers } = useListCustomers();
-
-  function invalidate() {
-    qc.invalidateQueries({ queryKey: ["listContracts"] });
-  }
-
-  const createMutation = useCreateContract({
+  const create = useCreateProject({
     mutation: {
       onSuccess: () => {
-        invalidate();
+        qc.invalidateQueries({ queryKey: getListProjectsQueryKey() });
         toast({ title: "Project created" });
-        setCreateOpen(false);
-        setCustomerId("");
-        setFrequency("monthly");
+        setOpen(false);
       },
       onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
     },
   });
 
-  const cancelMutation = useCancelContract({
-    mutation: {
-      onSuccess: () => { invalidate(); toast({ title: "Project cancelled" }); },
-      onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
-    },
-  });
-
-  const triggerMutation = useTriggerContractJob({
-    mutation: {
-      onSuccess: () => { invalidate(); toast({ title: "Next job generation queued" }); },
-      onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
-    },
-  });
-
-  const skipMutation = useSkipContractOccurrence({
-    mutation: {
-      onSuccess: (data) => {
-        invalidate();
-        toast({ title: "Occurrence skipped", description: `Next due: ${formatDate((data as any).nextDueAt)}` });
-      },
-      onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
-    },
-  });
-
-  function handleCreate(e: React.FormEvent<HTMLFormElement>) {
+  function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    if (!customerId) return;
-    const startDate = fd.get("startDate") as string;
-    const endDate = fd.get("endDate") as string;
-    const occurrences = fd.get("occurrences") as string;
-    createMutation.mutate({
+    create.mutate({
       data: {
-        customerId,
-        title: String(fd.get("title") ?? ""),
-        frequency,
-        startDate: startDate ? new Date(startDate).toISOString() : new Date().toISOString(),
-        endDate: endDate ? new Date(endDate).toISOString() : undefined,
-        occurrences: occurrences ? Number(occurrences) : undefined,
-        pricePence: Math.round(Number(fd.get("price") ?? 0) * 100),
-        notes: (fd.get("notes") as string) || undefined,
-        addressLine1: (fd.get("addressLine1") as string) || undefined,
-        city: (fd.get("city") as string) || undefined,
-        postcode: (fd.get("postcode") as string) || undefined,
+        name: String(fd.get("name") ?? ""),
+        status: (fd.get("status") as string) || "planning",
+        description: (fd.get("description") as string) || undefined,
+        startDate: (fd.get("startDate") as string) ? new Date(fd.get("startDate") as string).toISOString() : undefined,
+        endDate: (fd.get("endDate") as string) ? new Date(fd.get("endDate") as string).toISOString() : undefined,
       },
     });
   }
 
+  const filtered = (data ?? []).filter((p) => statusFilter === "all" || p.status === statusFilter);
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Projects</h1>
-          <p className="text-muted-foreground text-sm mt-1">Recurring service agreements and scheduled job generation</p>
+          <h1 className="text-2xl font-bold tracking-tight">Projects</h1>
+          <p className="text-muted-foreground text-sm">Group related jobs under a single project umbrella</p>
         </div>
-        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button data-testid="button-new-project">
               <Plus className="h-4 w-4 mr-2" />
               New Project
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create Project</DialogTitle>
+              <DialogTitle>New Project</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div>
-                <Label>Customer *</Label>
-                <Select value={customerId} onValueChange={setCustomerId} required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select customer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers?.map((c: any) => (
-                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <form onSubmit={submit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" name="name" required placeholder="e.g. Office Refurbishment 2026" data-testid="input-project-name" />
               </div>
-              <div>
-                <Label htmlFor="title">Project title *</Label>
-                <Input id="title" name="title" placeholder="Annual boiler service" required />
+              <div className="space-y-1.5">
+                <Label>Status</Label>
+                <select name="status" className="w-full border rounded px-3 py-2 text-sm bg-background">
+                  <option value="planning">Planning</option>
+                  <option value="active">Active</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Frequency *</Label>
-                  <Select value={frequency} onValueChange={setFrequency}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(FREQUENCY_LABELS).map(([v, l]) => (
-                        <SelectItem key={v} value={v}>{l}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="price">Price (£)</Label>
-                  <Input id="price" name="price" type="number" min="0" step="0.01" placeholder="0.00" />
-                </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="description">Description</Label>
+                <Textarea id="description" name="description" rows={3} placeholder="Optional project description" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="startDate">Start date *</Label>
-                  <Input id="startDate" name="startDate" type="date" required />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="startDate">Start Date</Label>
+                  <Input id="startDate" name="startDate" type="date" />
                 </div>
-                <div>
-                  <Label htmlFor="endDate">End date</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="endDate">End Date</Label>
                   <Input id="endDate" name="endDate" type="date" />
                 </div>
               </div>
-              <div>
-                <Label htmlFor="occurrences">Max occurrences (optional)</Label>
-                <Input id="occurrences" name="occurrences" type="number" min="1" placeholder="Leave blank for unlimited" />
-              </div>
-              <div>
-                <Label htmlFor="addressLine1">Address</Label>
-                <Input id="addressLine1" name="addressLine1" placeholder="Address line 1" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="city">City</Label>
-                  <Input id="city" name="city" />
-                </div>
-                <div>
-                  <Label htmlFor="postcode">Postcode</Label>
-                  <Input id="postcode" name="postcode" />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="notes">Notes</Label>
-                <Textarea id="notes" name="notes" rows={3} />
-              </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
-                <Button type="submit" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? "Creating…" : "Create Project"}
+                <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={create.isPending} data-testid="button-create-project">
+                  {create.isPending ? "Creating…" : "Create Project"}
                 </Button>
               </DialogFooter>
             </form>
@@ -223,122 +128,74 @@ export function AppProjects() {
         </Dialog>
       </div>
 
-      <div className="flex gap-2">
-        {["active", "paused", "completed", "cancelled", "all"].map((s) => (
-          <Button
-            key={s}
-            variant={statusFilter === s ? "default" : "outline"}
-            size="sm"
-            onClick={() => setStatusFilter(s)}
-            className="capitalize"
-          >
-            {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
-          </Button>
-        ))}
+      <div className="flex items-center gap-3">
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="All statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="planning">Planning</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+        <span className="text-sm text-muted-foreground">{filtered.length} project{filtered.length !== 1 ? "s" : ""}</span>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            {isLoading ? "Loading…" : `${contracts?.length ?? 0} project${contracts?.length === 1 ? "" : "s"}`}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="p-6 space-y-3">
-              {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
-            </div>
-          ) : !contracts?.length ? (
-            <div className="p-12 text-center text-muted-foreground">
-              <FolderOpen className="h-8 w-8 mx-auto mb-3 opacity-40" />
-              <p className="font-medium">No projects found</p>
-              <p className="text-sm mt-1">Create your first project to start generating recurring jobs automatically.</p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Project</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Frequency</TableHead>
-                  <TableHead>Next Due</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead>Jobs</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-12" />
+      {isLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full" />)}
+        </div>
+      ) : filtered.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <FolderOpen className="h-10 w-10 text-muted-foreground mb-3" />
+            <p className="font-medium">No projects yet</p>
+            <p className="text-sm text-muted-foreground mt-1">Create your first project to group related jobs together</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Project</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Jobs</TableHead>
+                <TableHead className="text-right">Total Value</TableHead>
+                <TableHead>Dates</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((project) => (
+                <TableRow key={project.id} data-testid={`row-project-${project.id}`}>
+                  <TableCell>
+                    <Link href={`/projects/${project.id}`} className="font-medium hover:underline text-primary">
+                      {project.name}
+                    </Link>
+                    {project.description && (
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-xs">{project.description}</p>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={STATUS_VARIANT[project.status] ?? "secondary"}>
+                      {STATUS_LABELS[project.status] ?? project.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">{project.jobCount}</TableCell>
+                  <TableCell className="text-right tabular-nums font-medium">{formatGBP(project.totalValuePence)}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {project.startDate ? new Date(project.startDate).toLocaleDateString("en-GB") : "—"}
+                    {project.endDate ? ` → ${new Date(project.endDate).toLocaleDateString("en-GB")}` : ""}
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {contracts.map((c) => (
-                  <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50">
-                    <TableCell className="font-medium">
-                      <Link href={`/projects/${c.id}`} className="hover:underline flex items-center gap-1">
-                        {c.title}
-                        <ChevronRight className="h-3 w-3 text-muted-foreground" />
-                      </Link>
-                    </TableCell>
-                    <TableCell>{c.customerName}</TableCell>
-                    <TableCell>{FREQUENCY_LABELS[c.frequency] ?? c.frequency}</TableCell>
-                    <TableCell>{formatDate(c.nextDueAt)}</TableCell>
-                    <TableCell>{formatGBP(c.pricePence)}</TableCell>
-                    <TableCell>
-                      {c.jobsGenerated}
-                      {c.occurrences ? ` / ${c.occurrences}` : ""}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={STATUS_VARIANT[c.status] ?? "outline"} className="capitalize">
-                        {c.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <Link href={`/projects/${c.id}`}>
-                              <FolderOpen className="h-4 w-4 mr-2" />
-                              View project
-                            </Link>
-                          </DropdownMenuItem>
-                          {c.status === "active" && (
-                            <>
-                              <DropdownMenuItem onClick={() => triggerMutation.mutate({ contractId: c.id })}>
-                                <RefreshCw className="h-4 w-4 mr-2" />
-                                Generate next job now
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => skipMutation.mutate({ contractId: c.id })}>
-                                <SkipForward className="h-4 w-4 mr-2" />
-                                Skip next occurrence
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                          {c.status !== "cancelled" && (
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => {
-                                if (confirm(`Cancel project "${c.title}"? This cannot be undone.`)) {
-                                  cancelMutation.mutate({ contractId: c.id });
-                                }
-                              }}
-                            >
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Cancel project
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+      )}
     </div>
   );
 }

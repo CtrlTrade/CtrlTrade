@@ -149,52 +149,85 @@ export function AdminTenantDetail() {
 
       {/* Tab: Overview */}
       {activeTab === "overview" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
-            <CardHeader>
-              <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Identity & Owner</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              {[
-                { label: "ID",         value: <span className="font-mono text-zinc-300 text-xs">{tenant.id}</span> },
-                { label: "Created",    value: <span className="font-mono text-zinc-300">{new Date(tenant.createdAt).toLocaleString()}</span> },
-                { label: "Owner",      value: <span className="font-bold text-zinc-100">{owner.name}</span> },
-                { label: "Email",      value: <span className="font-mono text-zinc-300">{owner.email}</span> },
-                { label: "2FA",        value: (tenant as any).require2fa
-                  ? <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase bg-green-500/10 text-green-500 border border-green-500/20"><ShieldCheck className="h-3 w-3" /> Enforced</span>
-                  : <span className="text-xs text-zinc-500 font-mono">Not enforced</span> },
-              ].map(({ label, value }) => (
-                <div key={label} className="grid grid-cols-3 gap-2 border-b border-zinc-900 pb-2">
-                  <span className="text-zinc-500 uppercase font-bold text-xs">{label}</span>
-                  <span className="col-span-2">{value}</span>
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+            {[
+              { label: "Projects", value: detail.projectsCount ?? 0 },
+            ].map(({ label, value }) => (
+              <div key={label} className="border border-zinc-800 bg-zinc-950 p-4">
+                <div className="text-2xl font-bold text-white font-mono">{value}</div>
+                <div className="text-xs text-zinc-500 uppercase font-bold mt-1">{label}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+              <CardHeader>
+                <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Identity & Owner</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                {[
+                  { label: "ID",         value: <span className="font-mono text-zinc-300 text-xs">{tenant.id}</span> },
+                  { label: "Created",    value: <span className="font-mono text-zinc-300">{new Date(tenant.createdAt).toLocaleString()}</span> },
+                  { label: "Owner",      value: <span className="font-bold text-zinc-100">{owner.name}</span> },
+                  { label: "Email",      value: <span className="font-mono text-zinc-300">{owner.email}</span> },
+                  { label: "2FA",        value: (tenant as any).require2fa
+                    ? <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase bg-green-500/10 text-green-500 border border-green-500/20"><ShieldCheck className="h-3 w-3" /> Enforced</span>
+                    : <span className="text-xs text-zinc-500 font-mono">Not enforced</span> },
+                ].map(({ label, value }) => (
+                  <div key={label} className="grid grid-cols-3 gap-2 border-b border-zinc-900 pb-2">
+                    <span className="text-zinc-500 uppercase font-bold text-xs">{label}</span>
+                    <span className="col-span-2">{value}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+              <CardHeader>
+                <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Resources</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  {[
+                    { label: "Control Seats", value: subscription.controlSeats },
+                    { label: "Field Seats",   value: subscription.fieldSeats   },
+                    { label: "POS Tills",     value: subscription.tills         },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="border border-zinc-800 bg-zinc-950 p-3 text-center">
+                      <div className="text-2xl font-mono font-bold text-zinc-100">{value}</div>
+                      <div className="text-[10px] font-bold uppercase text-zinc-500 mt-1">{label}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </CardContent>
-          </Card>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="border-b border-zinc-900 pb-2">
+                    <span className="text-zinc-500 uppercase font-bold text-xs block mb-0.5">Branches</span>
+                    <span className="font-mono text-zinc-300 font-bold">{detail.branchCount}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           <Card className="rounded-none border-zinc-800 bg-black shadow-none">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Resources</CardTitle>
+              <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Audit Log</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-4 mb-4">
-                {[
-                  { label: "Control Seats", value: subscription.controlSeats },
-                  { label: "Field Seats",   value: subscription.fieldSeats   },
-                  { label: "POS Tills",     value: subscription.tills         },
-                ].map(({ label, value }) => (
-                  <div key={label} className="border border-zinc-800 bg-zinc-950 p-3 text-center">
-                    <div className="text-2xl font-mono font-bold text-zinc-100">{value}</div>
-                    <div className="text-[10px] font-bold uppercase text-zinc-500 mt-1">{label}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="border-b border-zinc-900 pb-2">
-                  <span className="text-zinc-500 uppercase font-bold text-xs block mb-0.5">Branches</span>
-                  <span className="font-mono text-zinc-300 font-bold">{detail.branchCount}</span>
+              {auditLoading ? <Skeleton className="h-32 bg-zinc-900" /> : (
+                <div className="divide-y divide-zinc-900">
+                  {auditLog?.map(log => (
+                    <div key={log.id} className="py-2 flex gap-4 text-sm">
+                      <div className="w-32 shrink-0 text-zinc-500 font-mono text-xs">{new Date(log.createdAt).toLocaleDateString()}</div>
+                      <div className="w-24 shrink-0 text-red-500/80 font-bold uppercase text-xs">{log.kind}</div>
+                      <div className="flex-1 text-zinc-300">{log.message}</div>
+                      <div className="w-32 shrink-0 text-zinc-600 font-mono text-xs truncate">{log.actor || 'system'}</div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -56,6 +56,7 @@ function serializeJobSummary(j: Job, customerName: string, assignedUserName: str
     assignedUserId: j.assignedUserId,
     assignedUserName,
     valuePence: j.valuePence,
+    projectId: j.projectId ?? null,
     createdAt: j.createdAt.toISOString(),
   };
 }
@@ -157,6 +158,7 @@ router.post("/v1/jobs", requireTenant, async (req, res): Promise<void> => {
       assignedUserId: parsed.data.assignedUserId ?? null,
       assignedVehicleId: parsed.data.assignedVehicleId ?? null,
       valuePence: parsed.data.valuePence ?? 0,
+      projectId: (parsed.data as Record<string, unknown>).projectId as string | null ?? null,
     })
     .returning();
   await logAudit({
@@ -226,6 +228,8 @@ router.patch("/v1/jobs/:jobId", requireTenant, async (req, res): Promise<void> =
   ] as const) {
     if (parsed.data[k] !== undefined) updates[k] = parsed.data[k];
   }
+  const projectId = (parsed.data as Record<string, unknown>).projectId;
+  if (projectId !== undefined) updates.projectId = projectId ?? null;
   const [updated] = await db
     .update(jobsTable)
     .set(updates)

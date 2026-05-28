@@ -22,5 +22,7 @@ export interface JobSummary {
   /** @nullable */
   assignedUserName?: string | null;
   valuePence: number;
+  /** @nullable */
+  projectId?: string | null;
   createdAt: Date;
 }
