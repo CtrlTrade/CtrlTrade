@@ -18,7 +18,7 @@ type LeadStatus = (typeof STATUSES)[number];
 const STATUS_LABELS: Record<LeadStatus, string> = {
   new: "New",
   contacted: "Contacted",
-  demo_booked: "Demo Booked",
+  demo_booked: "Demo booked",
   won: "Won",
   lost: "Lost",
 };
@@ -100,25 +100,25 @@ export function AdminLeads() {
         }
       />
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="flex flex-col gap-3">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            className="pl-9 bg-black border-border text-foreground placeholder:text-muted-foreground focus-visible:border-border rounded-xl"
+            className="pl-9 bg-input border-border text-foreground placeholder:text-muted-foreground focus-visible:border-primary rounded-xl"
             placeholder="Search name, email, company…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex gap-1 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           {["all", ...STATUSES].map((s) => (
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 text-xs font-semibold border transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-xl border transition-colors ${
                 statusFilter === s
-                  ? "border-red-500 text-red-500 bg-red-500/10"
-                  : "border-border text-muted-foreground hover:border-border"
+                  ? "border-primary text-primary bg-primary/10"
+                  : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
               }`}
             >
               {s === "all" ? "All" : STATUS_LABELS[s as LeadStatus]}

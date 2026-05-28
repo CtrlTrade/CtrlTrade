@@ -145,12 +145,12 @@ export function AdminTenants() {
       </Card>
 
       <div className="border border-border bg-card rounded-xl overflow-hidden">
-        <div className="grid grid-cols-12 gap-4 p-4 border-b border-border bg-background">
-          <div className="col-span-4"><ThBtn col="name"   label="Tenant"    /></div>
-          <div className="col-span-2"><ThBtn col="status" label="Status"    /></div>
-          <div className="col-span-3"><ThBtn col="seats"  label="Resources" /></div>
-          <div className="col-span-2"><ThBtn col="mrr"    label="MRR"       /></div>
-          <div className="col-span-1" />
+        <div className="grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-3 px-4 py-3 border-b border-border bg-background">
+          <div><ThBtn col="name"   label="Tenant"    /></div>
+          <div><ThBtn col="status" label="Status"    /></div>
+          <div className="hidden sm:block"><ThBtn col="seats"  label="Resources" /></div>
+          <div><ThBtn col="mrr"    label="MRR"       /></div>
+          <div className="w-10" />
         </div>
 
         {isLoading ? (
@@ -180,14 +180,14 @@ export function AdminTenants() {
                 <Link
                   key={tenant.id}
                   href={`/tenants/${tenant.id}`}
-                  className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-muted/40 transition-colors cursor-pointer"
+                  className="grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-3 px-4 py-3 items-center hover:bg-muted/40 transition-colors cursor-pointer"
                 >
-                  <div className="col-span-4">
+                  <div className="min-w-0">
                     <div className="font-semibold text-foreground/90 text-sm truncate">{tenant.name}</div>
                     <div className="text-xs text-muted-foreground font-mono truncate">{tenant.ownerEmail}</div>
                   </div>
-                  <div className="col-span-2">
-                    <span className={`px-2 py-1 rounded-md text-[10px] font-semibold border ${
+                  <div>
+                    <span className={`px-2 py-1 rounded-md text-[10px] font-semibold border whitespace-nowrap ${
                       tenant.status === "active"    ? "bg-green-500/10 text-green-400 border-green-500/20" :
                       tenant.status === "trial"     ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
                       tenant.status === "cancelled" ? "bg-muted text-muted-foreground border-border" :
@@ -196,16 +196,16 @@ export function AdminTenants() {
                       {tenant.status}
                     </span>
                   </div>
-                  <div className="col-span-3 text-xs text-muted-foreground font-mono">
+                  <div className="hidden sm:block text-xs text-muted-foreground font-mono whitespace-nowrap">
                     {tenant.controlSeats}C / {tenant.fieldSeats}F / {tenant.tills}T
                   </div>
-                  <div className="col-span-2 font-mono text-foreground/80 font-bold flex items-center gap-2">
+                  <div className="font-mono text-foreground/80 font-bold text-sm whitespace-nowrap flex items-center gap-1.5">
                     £{tenant.monthlyTotal}
                     {(tenant as any).require2fa && (
-                      <ShieldCheck className="h-3 w-3 text-green-400" aria-label="2FA enforced" />
+                      <ShieldCheck className="h-3 w-3 text-green-400 shrink-0" aria-label="2FA enforced" />
                     )}
                   </div>
-                  <div className="col-span-1 text-right text-xs font-semibold text-primary">
+                  <div className="w-10 text-right text-xs font-semibold text-primary whitespace-nowrap">
                     View →
                   </div>
                 </Link>

@@ -32,14 +32,14 @@ export function AdminWorkers() {
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader title="Worker Queue" icon={<Cpu className="h-6 w-6" />} />
+      <AdminPageHeader title="Worker queue" icon={<Cpu className="h-6 w-6" />} />
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {(["queued","running","done","failed","dead"] as const).map(s => (
-          <Card key={s} className="rounded-xl border-border bg-black shadow-none">
-            <CardContent className="p-6">
-              <div className="font-bold text-xs text-muted-foreground mb-2">{s}</div>
-              <div className={`text-3xl font-mono font-bold ${s === "failed" || s === "dead" ? "text-red-500" : s === "running" ? "text-yellow-500" : "text-foreground"}`} data-testid={`worker-depth-${s}`}>
+          <Card key={s} className="rounded-xl border-border bg-card shadow-none">
+            <CardContent className="p-5">
+              <div className="font-semibold text-xs text-muted-foreground mb-2 capitalize">{s}</div>
+              <div className={`text-3xl font-mono font-bold ${s === "failed" || s === "dead" ? "text-red-400" : s === "running" ? "text-amber-400" : "text-foreground"}`} data-testid={`worker-depth-${s}`}>
                 {data.depth[s]}
               </div>
             </CardContent>
@@ -47,70 +47,106 @@ export function AdminWorkers() {
         ))}
       </div>
 
-      <Card className="rounded-xl border-border bg-black shadow-none">
-        <CardHeader><CardTitle className=" text-foreground">By Kind</CardTitle></CardHeader>
-        <CardContent>
-          <div className="divide-y divide-zinc-800 border border-border">
-            <div className="grid grid-cols-6 gap-2 p-3 text-xs text-muted-foreground font-bold bg-background">
-              <div>Kind</div><div>Queued</div><div>Running</div><div>Done</div><div>Failed</div><div>Dead</div>
-            </div>
-            {data.byKind.map(k => (
-              <div key={k.kind} className="grid grid-cols-6 gap-2 p-3 text-sm font-mono">
-                <div className="text-foreground/90 font-bold">{k.kind}</div>
-                <div>{k.queued}</div>
-                <div className="text-yellow-500">{k.running}</div>
-                <div className="text-green-500">{k.done}</div>
-                <div className="text-red-400">{k.failed}</div>
-                <div className="text-red-600 font-bold">{k.dead}</div>
-              </div>
-            ))}
-            {data.byKind.length === 0 && (
-              <div className="py-12 flex flex-col items-center gap-3">
-                <Cpu className="h-10 w-10 text-border" />
-                <p className="font-bold text-sm text-muted-foreground">No jobs recorded</p>
-                <p className="text-xs text-muted-foreground font-mono">Background jobs will appear here as they are queued.</p>
-              </div>
-            )}
+      {/* By Kind */}
+      <Card className="rounded-xl border-border bg-card shadow-none">
+        <CardHeader><CardTitle className="text-foreground text-base">By kind</CardTitle></CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-background">
+                  <th className="text-left p-3 text-xs font-semibold text-muted-foreground w-1/2">Kind</th>
+                  <th className="text-center p-3 text-xs font-semibold text-muted-foreground">Queued</th>
+                  <th className="text-center p-3 text-xs font-semibold text-muted-foreground">Running</th>
+                  <th className="text-center p-3 text-xs font-semibold text-muted-foreground">Done</th>
+                  <th className="text-center p-3 text-xs font-semibold text-muted-foreground">Failed</th>
+                  <th className="text-center p-3 text-xs font-semibold text-muted-foreground">Dead</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {data.byKind.map(k => (
+                  <tr key={k.kind} className="hover:bg-muted/30 transition-colors">
+                    <td className="p-3 font-mono text-foreground/90 font-semibold text-xs">{k.kind}</td>
+                    <td className="p-3 text-center font-mono text-xs text-muted-foreground">{k.queued}</td>
+                    <td className="p-3 text-center font-mono text-xs text-amber-400">{k.running}</td>
+                    <td className="p-3 text-center font-mono text-xs text-green-400">{k.done}</td>
+                    <td className="p-3 text-center font-mono text-xs text-red-400">{k.failed}</td>
+                    <td className="p-3 text-center font-mono text-xs text-red-500 font-bold">{k.dead}</td>
+                  </tr>
+                ))}
+                {data.byKind.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center">
+                      <div className="flex flex-col items-center gap-3">
+                        <Cpu className="h-10 w-10 text-border" />
+                        <p className="font-semibold text-sm text-muted-foreground">No jobs recorded</p>
+                        <p className="text-xs text-muted-foreground font-mono">Background jobs will appear here as they are queued.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl border-border bg-black shadow-none">
-        <CardHeader><CardTitle className=" text-foreground">Recent 100 Jobs</CardTitle></CardHeader>
-        <CardContent>
-          <div className="divide-y divide-zinc-800 border border-border max-h-[600px] overflow-y-auto">
-            {data.recent.map(j => (
-              <div key={j.id} className="p-3 grid grid-cols-12 gap-2 items-center text-sm">
-                <div className="col-span-3 font-mono text-foreground/90 font-bold truncate">{j.kind}</div>
-                <div className={`col-span-1 text-xs font-semibold ${
-                  j.status === "done" ? "text-green-500" :
-                  j.status === "running" ? "text-yellow-500" :
-                  j.status === "failed" ? "text-red-400" :
-                  j.status === "dead" ? "text-red-600" : "text-muted-foreground"
-                }`}>{j.status}</div>
-                <div className="col-span-1 font-mono text-xs text-muted-foreground">{j.attempts}/{j.maxAttempts}</div>
-                <div className="col-span-4 text-xs text-muted-foreground truncate">{j.lastError ?? <span className="text-border">—</span>}</div>
-                <div className="col-span-2 text-xs font-mono text-muted-foreground">{new Date(j.updatedAt).toLocaleString()}</div>
-                <div className="col-span-1 text-right">
-                  {(j.status === "failed" || j.status === "dead") && (
-                    <Button size="sm" variant="outline" disabled={retry.isPending} className="rounded-xl text-xs font-semibold border-border"
-                      onClick={() => retry.mutate({ jobId: j.id })}
-                      data-testid={`button-retry-${j.id}`}>
-                      <RefreshCw className="h-3 w-3"/>
-                    </Button>
-                  )}
-                  {j.status === "done" && <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto"/>}
-                  {j.status === "running" && <AlertTriangle className="h-4 w-4 text-yellow-500 ml-auto"/>}
-                </div>
-              </div>
-            ))}
-            {data.recent.length === 0 && (
-              <div className="py-12 flex flex-col items-center gap-3">
-                <Cpu className="h-10 w-10 text-border" />
-                <p className="font-bold text-sm text-muted-foreground">No recent jobs</p>
-                <p className="text-xs text-muted-foreground font-mono">Completed and failed jobs will be listed here.</p>
-              </div>
-            )}
+      {/* Recent jobs */}
+      <Card className="rounded-xl border-border bg-card shadow-none">
+        <CardHeader><CardTitle className="text-foreground text-base">Recent 100 jobs</CardTitle></CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-background border-b border-border">
+                <tr>
+                  <th className="text-left p-3 text-xs font-semibold text-muted-foreground">Kind</th>
+                  <th className="text-left p-3 text-xs font-semibold text-muted-foreground">Status</th>
+                  <th className="text-left p-3 text-xs font-semibold text-muted-foreground">Attempts</th>
+                  <th className="text-left p-3 text-xs font-semibold text-muted-foreground">Last error</th>
+                  <th className="text-left p-3 text-xs font-semibold text-muted-foreground">Updated</th>
+                  <th className="p-3" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {data.recent.map(j => (
+                  <tr key={j.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="p-3 font-mono text-foreground/90 font-semibold text-xs max-w-[160px] truncate">{j.kind}</td>
+                    <td className={`p-3 text-xs font-semibold ${
+                      j.status === "done"    ? "text-green-400" :
+                      j.status === "running" ? "text-amber-400" :
+                      j.status === "failed"  ? "text-red-400"   :
+                      j.status === "dead"    ? "text-red-500"   : "text-muted-foreground"
+                    }`}>{j.status}</td>
+                    <td className="p-3 font-mono text-xs text-muted-foreground">{j.attempts}/{j.maxAttempts}</td>
+                    <td className="p-3 text-xs text-muted-foreground max-w-[200px] truncate">{j.lastError ?? <span className="text-border">—</span>}</td>
+                    <td className="p-3 text-xs font-mono text-muted-foreground whitespace-nowrap">{new Date(j.updatedAt).toLocaleString()}</td>
+                    <td className="p-3 text-right">
+                      {(j.status === "failed" || j.status === "dead") && (
+                        <Button size="sm" variant="outline" disabled={retry.isPending}
+                          className="rounded-xl text-xs font-semibold border-border h-7 w-7 p-0"
+                          onClick={() => retry.mutate({ jobId: j.id })}
+                          data-testid={`button-retry-${j.id}`}>
+                          <RefreshCw className="h-3 w-3"/>
+                        </Button>
+                      )}
+                      {j.status === "done"    && <CheckCircle2 className="h-4 w-4 text-green-400 ml-auto"/>}
+                      {j.status === "running" && <AlertTriangle className="h-4 w-4 text-amber-400 ml-auto"/>}
+                    </td>
+                  </tr>
+                ))}
+                {data.recent.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center">
+                      <div className="flex flex-col items-center gap-3">
+                        <Cpu className="h-10 w-10 text-border" />
+                        <p className="font-semibold text-sm text-muted-foreground">No recent jobs</p>
+                        <p className="text-xs text-muted-foreground font-mono">Completed and failed jobs will be listed here.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>

@@ -107,10 +107,10 @@ export function AdminCompliance() {
                 key={s}
                 variant={statusFilter === s ? "default" : "outline"}
                 size="sm"
-                className="font-bold text-xs rounded-xl"
+                className="font-semibold text-xs rounded-xl"
                 onClick={() => setStatusFilter(s)}
               >
-                {s}
+                {s.charAt(0).toUpperCase() + s.slice(1)}
               </Button>
             ))}
           </div>
