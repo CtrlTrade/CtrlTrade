@@ -4,6 +4,7 @@ import {
   db,
   jobsTable,
   jobCostEntriesTable,
+  quoteLineItemsTable,
   usersTable,
   productsTable,
   membershipsTable,
@@ -121,6 +122,86 @@ router.get("/v1/jobs/:jobId/costs", requireTenant, async (req, res): Promise<voi
     materialCostPence: materialCost,
     otherCostPence: otherCost,
   });
+});
+
+// POST /v1/jobs/:jobId/costs/import-quote — import material costs from the linked quote (idempotent)
+router.post("/v1/jobs/:jobId/costs/import-quote", requireTenant, async (req, res): Promise<void> => {
+  const tenantId = req.auth!.tenant!.id;
+  const jobId = req.params.jobId as string;
+
+  const [job] = await db
+    .select({ id: jobsTable.id, quoteId: jobsTable.quoteId })
+    .from(jobsTable)
+    .where(and(eq(jobsTable.tenantId, tenantId), eq(jobsTable.id, jobId)));
+  if (!job) {
+    res.status(404).json({ error: "Job not found" });
+    return;
+  }
+  if (!job.quoteId) {
+    res.status(404).json({ error: "Job has no linked quote" });
+    return;
+  }
+
+  // Fetch all quote line items, joining products to get cost price
+  const lineItems = await db
+    .select({
+      id: quoteLineItemsTable.id,
+      description: quoteLineItemsTable.description,
+      quantity: quoteLineItemsTable.quantity,
+      unitPricePence: quoteLineItemsTable.unitPricePence,
+      productId: quoteLineItemsTable.productId,
+      productCostPence: productsTable.costPence,
+    })
+    .from(quoteLineItemsTable)
+    .leftJoin(productsTable, eq(productsTable.id, quoteLineItemsTable.productId))
+    .where(eq(quoteLineItemsTable.quoteId, job.quoteId))
+    .orderBy(quoteLineItemsTable.sortOrder);
+
+  if (lineItems.length === 0) {
+    res.json({ created: 0, skipped: 0 });
+    return;
+  }
+
+  // Find already-imported line item IDs for this job to ensure idempotency
+  const existingImports = await db
+    .select({ sourceId: jobCostEntriesTable.sourceQuoteLineItemId })
+    .from(jobCostEntriesTable)
+    .where(and(eq(jobCostEntriesTable.tenantId, tenantId), eq(jobCostEntriesTable.jobId, jobId)));
+
+  const importedIds = new Set(
+    existingImports.map((r) => r.sourceId).filter(Boolean) as string[],
+  );
+
+  let created = 0;
+  let skipped = 0;
+
+  for (const item of lineItems) {
+    if (importedIds.has(item.id)) {
+      skipped++;
+      continue;
+    }
+    // Use product cost price when the line item is linked to a product;
+    // fall back to the quoted unit price when no product link exists.
+    const unitCostPence = item.productId !== null && item.productCostPence !== null
+      ? item.productCostPence
+      : item.unitPricePence;
+    const totalCostPence = computeTotal(item.quantity, unitCostPence);
+    await db.insert(jobCostEntriesTable).values({
+      tenantId,
+      jobId,
+      kind: "material",
+      description: item.description,
+      quantity: String(item.quantity),
+      unitCostPence,
+      totalCostPence,
+      productId: item.productId ?? null,
+      sourceQuoteLineItemId: item.id,
+      createdByUserId: req.auth!.user.id,
+    });
+    created++;
+  }
+
+  res.json({ created, skipped });
 });
 
 // POST /v1/jobs/:jobId/costs — add a cost entry

@@ -187,6 +187,7 @@ export * from './job';
 export * from './jobAssignmentInput';
 export * from './jobCheckin';
 export * from './jobCompleteInput';
+export * from './importQuoteResult';
 export * from './jobCostEntry';
 export * from './jobCostsSummary';
 export * from './jobInput';

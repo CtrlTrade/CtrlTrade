@@ -567,6 +567,7 @@ export const quoteLineItemsTable = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     quoteId: uuid("quote_id").notNull().references(() => quotesTable.id, { onDelete: "cascade" }),
+    productId: uuid("product_id").references(() => productsTable.id, { onDelete: "set null" }),
     description: text("description").notNull(),
     quantity: integer("quantity").notNull().default(1),
     unitPricePence: integer("unit_price_pence").notNull().default(0),
@@ -2181,6 +2182,7 @@ export const jobCostEntriesTable = pgTable(
     productId: uuid("product_id").references(() => productsTable.id, { onDelete: "set null" }),
     userId: uuid("user_id").references(() => usersTable.id, { onDelete: "set null" }), // labour: the staff member
     createdByUserId: uuid("created_by_user_id").references(() => usersTable.id, { onDelete: "set null" }),
+    sourceQuoteLineItemId: uuid("source_quote_line_item_id").references(() => quoteLineItemsTable.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },

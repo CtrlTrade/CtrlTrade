@@ -2269,6 +2269,24 @@ paths:
       responses:
         "204": { description: No content }
 
+  /v1/jobs/{jobId}/costs/import-quote:
+    parameters:
+      - in: path
+        name: jobId
+        required: true
+        schema: { type: string }
+    post:
+      operationId: importJobCostsFromQuote
+      tags: [jobs]
+      summary: Import material cost entries from the job's linked quote line items (idempotent).
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ImportQuoteResult" }
+        "404": { description: Job not found or has no linked quote }
+
   /v1/timesheets:
     get:
       operationId: listTimesheets
@@ -9587,6 +9605,13 @@ components:
               sent: { type: integer }
               accepted: { type: integer }
               converted: { type: integer }
+
+    ImportQuoteResult:
+      type: object
+      required: [created, skipped]
+      properties:
+        created: { type: integer, description: "Number of new cost entries created." }
+        skipped: { type: integer, description: "Number of line items skipped because they were already imported." }
 
     JobCostEntry:
       type: object

@@ -11,6 +11,7 @@ import {
   useCreateJobCostEntry,
   useUpdateJobCostEntry,
   useDeleteJobCostEntry,
+  useImportJobCostsFromQuote,
   getGetJobQueryKey,
   getListJobsQueryKey,
   getListInvoicesQueryKey,
@@ -153,6 +154,21 @@ export function AppJobDetail() {
     mutation: {
       onSuccess: () => { invalidateCosts(); toast({ title: "Cost entry removed" }); },
       onError: (e: Error) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
+    },
+  });
+
+  const importFromQuote = useImportJobCostsFromQuote({
+    mutation: {
+      onSuccess: (result) => {
+        invalidateCosts();
+        toast({
+          title: result.created > 0
+            ? `${result.created} cost ${result.created === 1 ? "entry" : "entries"} imported`
+            : "Nothing new to import",
+          description: result.skipped > 0 ? `${result.skipped} already imported, skipped.` : undefined,
+        });
+      },
+      onError: (e: Error) => toast({ title: "Import failed", description: e.message, variant: "destructive" }),
     },
   });
 
@@ -428,11 +444,25 @@ export function AppJobDetail() {
               <Card className="border-border shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between py-3">
                   <CardTitle className="uppercase tracking-tight text-sm">Cost Entries</CardTitle>
-                  {!showAddCost && (
-                    <Button size="sm" className="rounded-none uppercase text-xs font-bold tracking-wider" onClick={() => setShowAddCost(true)} data-testid="button-add-cost">
-                      <Plus className="h-3 w-3 mr-1" /> Add cost
-                    </Button>
-                  )}
+                  <div className="flex gap-2">
+                    {data.quoteId && !showAddCost && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-none uppercase text-xs font-bold tracking-wider"
+                        onClick={() => importFromQuote.mutate({ jobId: id })}
+                        disabled={importFromQuote.isPending}
+                        data-testid="button-import-quote-costs"
+                      >
+                        {importFromQuote.isPending ? "Importing…" : "Import from quote"}
+                      </Button>
+                    )}
+                    {!showAddCost && (
+                      <Button size="sm" className="rounded-none uppercase text-xs font-bold tracking-wider" onClick={() => setShowAddCost(true)} data-testid="button-add-cost">
+                        <Plus className="h-3 w-3 mr-1" /> Add cost
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent className="p-0">
                   {showAddCost && (

@@ -375,7 +375,8 @@ import type {
   VoiceToken,
   VoicemailsResponse,
   WhiteLabelUpdate,
-  WorkflowEventsResponse
+  WorkflowEventsResponse,
+  ImportQuoteResult
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -9998,6 +9999,59 @@ export const useDeleteJobCostEntry = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getDeleteJobCostEntryMutationOptions(options));
+    }
+
+export const getImportJobCostsFromQuoteUrl = (jobId: string) => {
+  return `/api/v1/jobs/${jobId}/costs/import-quote`
+}
+
+/**
+ * @summary Import material cost entries from the job's linked quote line items (idempotent).
+ */
+export const importJobCostsFromQuote = async (jobId: string, options?: RequestInit): Promise<ImportQuoteResult> => {
+  return customFetch<ImportQuoteResult>(getImportJobCostsFromQuoteUrl(jobId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+  }
+);}
+
+export const getImportJobCostsFromQuoteMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importJobCostsFromQuote>>, TError,{jobId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof importJobCostsFromQuote>>, TError,{jobId: string}, TContext> => {
+
+const mutationKey = ['importJobCostsFromQuote'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof importJobCostsFromQuote>>, {jobId: string}> = (props) => {
+          const {jobId} = props ?? {};
+          return  importJobCostsFromQuote(jobId,requestOptions)
+        }
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ImportJobCostsFromQuoteMutationResult = NonNullable<Awaited<ReturnType<typeof importJobCostsFromQuote>>>
+
+    export type ImportJobCostsFromQuoteMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Import material cost entries from the job's linked quote line items (idempotent).
+ */
+export const useImportJobCostsFromQuote = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importJobCostsFromQuote>>, TError,{jobId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof importJobCostsFromQuote>>,
+        TError,
+        {jobId: string},
+        TContext
+      > => {
+      return useMutation(getImportJobCostsFromQuoteMutationOptions(options));
     }
 
 export const getListTimesheetsUrl = (params?: ListTimesheetsParams,) => {

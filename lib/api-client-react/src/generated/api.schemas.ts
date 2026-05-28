@@ -3713,6 +3713,11 @@ export interface JobCostsSummary {
   otherCostPence?: number;
 }
 
+export interface ImportQuoteResult {
+  created: number;
+  skipped: number;
+}
+
 export interface ReportJobProfitabilityRow {
   jobId: string;
   number: string;
