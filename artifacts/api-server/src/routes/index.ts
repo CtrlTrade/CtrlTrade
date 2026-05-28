@@ -113,10 +113,7 @@ router.use(branchesRouter);
 router.use(areaManagersRouter);
 router.use(jobCostsRouter);
 router.use(adminLeadsRouter);
-<<<<<<< HEAD
 router.use(leadWebhooksRouter);
-=======
 router.use(industriesRouter);
->>>>>>> 6784e9b (Add industry selection and business setup to tenant configuration)
 
 export default router;

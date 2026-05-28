@@ -92,6 +92,65 @@ export type IndustryChecklist = typeof industryChecklistsTable.$inferSelect;
 export type IndustryQuoteTemplate = typeof industryQuoteTemplatesTable.$inferSelect;
 export type IndustryDocumentTemplate = typeof industryDocumentTemplatesTable.$inferSelect;
 
+// ---- Tenant-specific provisioned content (copied from industry templates) --
+export const tenantJobTypesTable = pgTable("tenant_job_types", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  durationHours: integer("duration_hours"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  sourceIndustryJobTypeId: uuid("source_industry_job_type_id").references(() => industryJobTypesTable.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+}, (t) => ({ tenantIdx: index("tenant_job_types_tenant_idx").on(t.tenantId) }));
+
+export const tenantChecklistsTable = pgTable("tenant_checklists", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  items: jsonb("items").notNull().default(sql`'[]'::jsonb`).$type<string[]>(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  sourceIndustryChecklistId: uuid("source_industry_checklist_id").references(() => industryChecklistsTable.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+}, (t) => ({ tenantIdx: index("tenant_checklists_tenant_idx").on(t.tenantId) }));
+
+export const tenantQuoteTemplatesTable = pgTable("tenant_quote_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  header: text("header"),
+  footer: text("footer"),
+  notes: text("notes"),
+  lineItems: jsonb("line_items").notNull().default(sql`'[]'::jsonb`).$type<Array<{ description: string; quantity: number; unitPricePence: number }>>(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  sourceIndustryQuoteTemplateId: uuid("source_industry_quote_template_id").references(() => industryQuoteTemplatesTable.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+}, (t) => ({ tenantIdx: index("tenant_quote_templates_tenant_idx").on(t.tenantId) }));
+
+export const tenantDocumentTemplatesTable = pgTable("tenant_document_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  documentType: varchar("document_type", { length: 64 }).notNull(),
+  templateBody: text("template_body"),
+  required: boolean("required").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+  sourceIndustryDocumentTemplateId: uuid("source_industry_document_template_id").references(() => industryDocumentTemplatesTable.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+}, (t) => ({ tenantIdx: index("tenant_document_templates_tenant_idx").on(t.tenantId) }));
+
+export type TenantJobType = typeof tenantJobTypesTable.$inferSelect;
+export type TenantChecklist = typeof tenantChecklistsTable.$inferSelect;
+export type TenantQuoteTemplate = typeof tenantQuoteTemplatesTable.$inferSelect;
+export type TenantDocumentTemplate = typeof tenantDocumentTemplatesTable.$inferSelect;
+
 // ---- Tenants ---------------------------------------------------------------
 export const tenantsTable = pgTable(
   "tenants",

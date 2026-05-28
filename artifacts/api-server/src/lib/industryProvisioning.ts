@@ -8,6 +8,10 @@ import {
   industryChecklistsTable,
   industryQuoteTemplatesTable,
   industryDocumentTemplatesTable,
+  tenantJobTypesTable,
+  tenantChecklistsTable,
+  tenantQuoteTemplatesTable,
+  tenantDocumentTemplatesTable,
 } from "@workspace/db";
 
 export interface ProvisioningOptions {
@@ -21,6 +25,8 @@ export interface ProvisioningOptions {
   aiModulesEnabled?: string[];
   communicationChannels?: string[];
 }
+
+type Tx = Parameters<Parameters<typeof db["transaction"]>[0]>[0];
 
 export async function getIndustryBySlug(slug: string) {
   const [industry] = await db
@@ -110,6 +116,78 @@ export async function listAllIndustriesWithDetail() {
   }));
 }
 
+async function insertIndustryContentWithExecutor(
+  executor: Tx | typeof db,
+  tenantId: string,
+  detail: NonNullable<Awaited<ReturnType<typeof getIndustryDetailById>>>,
+): Promise<void> {
+  const { jobTypes, checklists, quoteTemplates, documentTemplates } = detail;
+
+  if (jobTypes.length > 0) {
+    await executor.insert(tenantJobTypesTable).values(
+      jobTypes.map((jt) => ({
+        tenantId,
+        name: jt.name,
+        description: jt.description ?? null,
+        durationHours: jt.durationHours ?? null,
+        sortOrder: jt.sortOrder,
+        sourceIndustryJobTypeId: jt.id,
+      })),
+    );
+  }
+
+  if (checklists.length > 0) {
+    await executor.insert(tenantChecklistsTable).values(
+      checklists.map((c) => ({
+        tenantId,
+        name: c.name,
+        description: c.description ?? null,
+        items: (c.items as string[]) ?? [],
+        sortOrder: c.sortOrder,
+        sourceIndustryChecklistId: c.id,
+      })),
+    );
+  }
+
+  if (quoteTemplates.length > 0) {
+    await executor.insert(tenantQuoteTemplatesTable).values(
+      quoteTemplates.map((qt) => ({
+        tenantId,
+        name: qt.name,
+        description: qt.description ?? null,
+        header: qt.header ?? null,
+        footer: qt.footer ?? null,
+        notes: qt.notes ?? null,
+        lineItems: qt.lineItems,
+        sortOrder: qt.sortOrder,
+        sourceIndustryQuoteTemplateId: qt.id,
+      })),
+    );
+  }
+
+  if (documentTemplates.length > 0) {
+    await executor.insert(tenantDocumentTemplatesTable).values(
+      documentTemplates.map((dt) => ({
+        tenantId,
+        name: dt.name,
+        description: dt.description ?? null,
+        documentType: dt.documentType,
+        templateBody: dt.templateBody ?? null,
+        required: dt.required,
+        sortOrder: dt.sortOrder,
+        sourceIndustryDocumentTemplateId: dt.id,
+      })),
+    );
+  }
+}
+
+/**
+ * Copy industry template content (job types, checklists, quote templates,
+ * document templates) into a tenant's own workspace tables.
+ *
+ * Called within the signup transaction via `copyIndustryContentToTenant()`.
+ * Can also be called standalone for re-provisioning when a tenant changes industry.
+ */
 export async function provisionTenantIndustry(opts: ProvisioningOptions): Promise<void> {
   const { tenantId, industrySlug } = opts;
 
@@ -127,6 +205,21 @@ export async function provisionTenantIndustry(opts: ProvisioningOptions): Promis
   await db.update(tenantsTable)
     .set({ industryId: industry.id })
     .where(eq(tenantsTable.id, tenantId));
+
+  await insertIndustryContentWithExecutor(db, tenantId, detail);
+}
+
+/**
+ * Copy industry template content into the tenant's workspace within an existing
+ * Drizzle transaction. The caller is responsible for having already resolved the
+ * industry detail and setting industryId on the tenant within the same transaction.
+ */
+export async function copyIndustryContentToTenant(
+  tx: Tx,
+  tenantId: string,
+  detail: NonNullable<Awaited<ReturnType<typeof getIndustryDetailById>>>,
+): Promise<void> {
+  await insertIndustryContentWithExecutor(tx, tenantId, detail);
 }
 
 export function serializeIndustryDetail(detail: NonNullable<Awaited<ReturnType<typeof getIndustryDetailById>>>) {

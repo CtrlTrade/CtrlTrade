@@ -24,6 +24,7 @@ import { ensurePriceIds, buildLineItems } from "../lib/stripeSubscription";
 import { PRICING } from "../lib/pricing";
 import { logAudit } from "../lib/audit";
 import { platformReferralLinksTable, platformReferralConversionsTable } from "@workspace/db";
+import { getIndustryBySlug, getIndustryDetailById, copyIndustryContentToTenant } from "../lib/industryProvisioning";
 
 function readRefCookie(req: { headers: { cookie?: string } }): string | null {
   const header = req.headers.cookie;
@@ -180,6 +181,11 @@ router.post("/v1/auth/signup", async (req, res): Promise<void> => {
       if (ind) {
         await tx.update(tenantsTable).set({ industryId: ind.id }).where(drizzleEq(tenantsTable.id, tenant.id));
         (tenant as any).industryId = ind.id;
+
+        const industryDetail = await getIndustryDetailById(ind.id);
+        if (industryDetail) {
+          await copyIndustryContentToTenant(tx, tenant.id, industryDetail);
+        }
       }
     }
 
