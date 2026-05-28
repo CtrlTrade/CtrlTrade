@@ -19,7 +19,7 @@ export function Home() {
             The OS a Serious Trade Business Runs On.
           </h1>
           <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto" style={{ color: "hsl(220,25%,62%)" }}>
-            Quotes, jobs, scheduling, fleet, compliance, and point-of-sale. All in one industrial-grade platform. CTRLTRADE® is built for operators who demand control.
+            The all-in-one CRM built for trades — manage leads, jobs, quotes, invoices, and customers in one powerful platform designed to grow your business.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/signup">
