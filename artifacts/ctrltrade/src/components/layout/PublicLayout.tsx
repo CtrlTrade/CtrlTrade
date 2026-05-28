@@ -17,9 +17,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
       <header className="border-b border-border bg-card sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="container mx-auto px-4 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center shrink-0">
-            <img src="/assets/ctrltrade-logo.png" alt="CtrlTrade" className="h-7 w-auto object-contain" />
+            <img src="/assets/ctrltrade-logo-transparent.png" alt="CtrlTrade" className="h-16 w-auto object-contain" />
           </Link>
 
           {/* Desktop nav */}
@@ -77,7 +77,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <div className="mb-4">
-              <img src="/assets/ctrltrade-logo.png" alt="CtrlTrade" className="h-6 w-auto object-contain" />
+              <img src="/assets/ctrltrade-logo-transparent.png" alt="CtrlTrade" className="h-10 w-auto object-contain" />
             </div>
             <p className="text-sm text-muted-foreground">The operating system a serious trade business runs on.</p>
           </div>
