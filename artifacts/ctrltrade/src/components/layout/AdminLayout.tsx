@@ -260,16 +260,16 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         )}
 
         {/* Top header */}
-        <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4 md:px-6 shrink-0">
+        <header className="h-16 border-b border-sidebar-border bg-sidebar flex items-center justify-between px-4 md:px-6 shrink-0">
           <button
-            className="md:hidden p-2 text-zinc-400 hover:text-white"
+            className="md:hidden p-2 text-sidebar-foreground/60 hover:text-sidebar-foreground"
             onClick={() => setMobileOpen(true)}
             data-testid="button-mobile-menu"
           >
             <Menu className="h-5 w-5" />
           </button>
           <div className="flex items-center gap-4 ml-auto">
-            <div className="text-sm font-medium text-muted-foreground hidden sm:block">
+            <div className="text-sm font-medium text-sidebar-foreground/60 hidden sm:block">
               {session.user.email}
             </div>
             <Button
@@ -277,7 +277,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               size="sm"
               onClick={handleLogout}
               data-testid="button-admin-logout"
-              className="gap-2 uppercase text-xs tracking-wider font-bold"
+              className="gap-2 uppercase text-xs tracking-wider font-bold border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             >
               <LogOut className="h-4 w-4" />
               Log Out

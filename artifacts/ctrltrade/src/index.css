@@ -80,7 +80,7 @@
 
   /* Navy backgrounds for light mode */
   --background: 214 40% 97%;             /* near-white with navy tint */
-  --foreground: 217 97% 6%;              /* Primary Navy #010C1E */
+  --foreground: 217 55% 18%;             /* Softened navy — less harsh than pure black */
   --border: 217 30% 88%;
   --card: 0 0% 100%;
   --card-foreground: 217 97% 6%;
@@ -102,7 +102,7 @@
   --secondary: 217 97% 6%;              /* Navy */
   --secondary-foreground: 0 0% 100%;
   --muted: 214 30% 92%;
-  --muted-foreground: 217 30% 45%;
+  --muted-foreground: 217 25% 52%;
   --accent: 46 98% 94%;                  /* Light gold tint */
   --accent-foreground: 46 80% 25%;
   --destructive: 4 86% 58%;             /* Status: error */
@@ -219,10 +219,14 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    font-weight: 400;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--app-font-heading);
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 }
 
