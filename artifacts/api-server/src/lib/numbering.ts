@@ -1,21 +1,34 @@
 import { sql } from "drizzle-orm";
-import { db, quotesTable, jobsTable, invoicesTable } from "@workspace/db";
+import { db } from "@workspace/db";
 
-async function nextSequence(tenantId: string, prefix: string, table: typeof quotesTable | typeof jobsTable | typeof invoicesTable): Promise<string> {
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(table as any)
-    .where(sql`tenant_id = ${tenantId}`);
-  const n = (count ?? 0) + 1;
-  return `${prefix}-${String(n).padStart(4, "0")}`;
-}
-
+/**
+ * Atomic per-tenant quote number sequence.
+ * Increments `tenants.quote_number_seq` and returns the new Q-#### value.
+ */
 export async function nextQuoteNumber(tenantId: string): Promise<string> {
-  return nextSequence(tenantId, "Q", quotesTable);
+  const rows = await db.execute<{ quote_number_seq: number }>(sql`
+    UPDATE tenants
+    SET quote_number_seq = quote_number_seq + 1
+    WHERE id = ${tenantId}
+    RETURNING quote_number_seq
+  `);
+  const n = (rows as any).rows?.[0]?.quote_number_seq ?? (rows as any)[0]?.quote_number_seq ?? 1;
+  return `Q-${String(n).padStart(4, "0")}`;
 }
 
+/**
+ * Atomic per-tenant job number sequence.
+ * Increments `tenants.job_number_seq` and returns the new J-#### value.
+ */
 export async function nextJobNumber(tenantId: string): Promise<string> {
-  return nextSequence(tenantId, "J", jobsTable);
+  const rows = await db.execute<{ job_number_seq: number }>(sql`
+    UPDATE tenants
+    SET job_number_seq = job_number_seq + 1
+    WHERE id = ${tenantId}
+    RETURNING job_number_seq
+  `);
+  const n = (rows as any).rows?.[0]?.job_number_seq ?? (rows as any)[0]?.job_number_seq ?? 1;
+  return `J-${String(n).padStart(4, "0")}`;
 }
 
 /**

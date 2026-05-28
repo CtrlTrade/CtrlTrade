@@ -75,6 +75,8 @@ export const tenantsTable = pgTable(
     }>(),
     vatRatePct: integer("vat_rate_pct").notNull().default(20),
     invoiceNumberSeq: integer("invoice_number_seq").notNull().default(0),
+    quoteNumberSeq: integer("quote_number_seq").notNull().default(0),
+    jobNumberSeq: integer("job_number_seq").notNull().default(0),
     stripeCustomerId: text("stripe_customer_id"),
     stripeSubscriptionId: text("stripe_subscription_id"),
     trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
