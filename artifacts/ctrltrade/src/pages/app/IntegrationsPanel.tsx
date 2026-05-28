@@ -44,8 +44,27 @@ export function IntegrationsPanel() {
   const disconnect = useDisconnectIntegration({
     mutation: { onSuccess: () => { invalidate(); toast({ title: "Disconnected" }); } },
   });
+
+  const [syncingProvider, setSyncingProvider] = useState<string | null>(null);
+  const [syncErrors, setSyncErrors] = useState<Record<string, string>>({});
+
   const sync = useTriggerIntegrationSync({
-    mutation: { onSuccess: () => toast({ title: "Sync queued" }) },
+    mutation: {
+      onSuccess: (_data, variables) => {
+        const provider = variables.provider;
+        setSyncingProvider(null);
+        setSyncErrors((prev) => { const next = { ...prev }; delete next[provider]; return next; });
+        qc.invalidateQueries({ queryKey: getListIntegrationsQueryKey() });
+        qc.invalidateQueries({ queryKey: getGetIntegrationLogsQueryKey(provider) });
+        toast({ title: "Sync queued", description: "Your leads will appear shortly." });
+      },
+      onError: (e: any, variables) => {
+        const provider = variables.provider;
+        const msg: string = e?.response?.data?.error ?? e?.message ?? "Sync failed. Please try again.";
+        setSyncingProvider(null);
+        setSyncErrors((prev) => ({ ...prev, [provider]: msg }));
+      },
+    },
   });
 
   const [logsFor, setLogsFor] = useState<string | null>(null);
@@ -69,6 +88,8 @@ export function IntegrationsPanel() {
           const conn = byProvider.get(p.id);
           const status = conn?.status ?? "disconnected";
           const isApiKey = p.authKind === "apikey";
+          const isSyncing = syncingProvider === p.id;
+          const syncError = syncErrors[p.id];
           return (
             <Card key={p.id} className="border-border" data-testid={`integration-card-${p.id}`}>
               <CardHeader>
@@ -104,7 +125,7 @@ export function IntegrationsPanel() {
                   </div>
                 )}
                 {conn?.lastSyncAt && (
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-muted-foreground" data-testid={`last-sync-${p.id}`}>
                     Last sync: {new Date(conn.lastSyncAt).toLocaleString()}
                   </div>
                 )}
@@ -112,6 +133,12 @@ export function IntegrationsPanel() {
                   <div className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2 flex items-start gap-2">
                     <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
                     <span>{conn.lastError}</span>
+                  </div>
+                )}
+                {syncError && (
+                  <div className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2 flex items-start gap-2" data-testid={`sync-error-${p.id}`}>
+                    <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
+                    <span>{syncError}</span>
                   </div>
                 )}
 
@@ -165,11 +192,16 @@ export function IntegrationsPanel() {
                         size="sm"
                         variant="outline"
                         className="rounded-none uppercase font-bold tracking-wider"
-                        onClick={() => sync.mutate({ provider: p.id })}
-                        disabled={sync.isPending}
+                        onClick={() => {
+                          setSyncingProvider(p.id);
+                          setSyncErrors((prev) => { const next = { ...prev }; delete next[p.id]; return next; });
+                          sync.mutate({ provider: p.id });
+                        }}
+                        disabled={isSyncing}
                         data-testid={`button-sync-${p.id}`}
                       >
-                        <RefreshCw className="h-3 w-3 mr-1" /> Sync now
+                        <RefreshCw className={`h-3 w-3 mr-1 ${isSyncing ? "animate-spin" : ""}`} />
+                        {isSyncing ? "Syncing…" : "Sync now"}
                       </Button>
                       <Button
                         size="sm"
