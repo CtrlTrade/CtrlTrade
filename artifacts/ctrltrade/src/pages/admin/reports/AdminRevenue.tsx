@@ -12,14 +12,14 @@ export function AdminRevenueReport() {
           </button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">Revenue</h1>
+          <h1 className="text-3xl font-bold text-white">Revenue</h1>
           <p className="text-sm text-zinc-500 mt-1">Cross-tenant MRR, ARR, and payment collection over time.</p>
         </div>
       </div>
 
-      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-zinc-100">Cross-Tenant Revenue</CardTitle>
+          <CardTitle className=" text-zinc-100">Cross-Tenant Revenue</CardTitle>
           <CardDescription>Platform-wide billing and collection metrics.</CardDescription>
         </CardHeader>
         <CardContent>

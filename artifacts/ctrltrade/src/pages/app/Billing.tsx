@@ -131,13 +131,13 @@ export function AppBilling() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Billing & Subscription</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Billing & Subscription</h1>
         <Button
           variant="outline"
           size="sm"
           onClick={handleSync}
           disabled={sync.isPending}
-          className="rounded-none uppercase tracking-wider text-xs font-bold"
+          className="rounded-xl text-xs font-bold"
           data-testid="button-billing-sync"
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${sync.isPending ? "animate-spin" : ""}`} /> Sync
@@ -150,11 +150,11 @@ export function AppBilling() {
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="uppercase tracking-tight">Current Plan</CardTitle>
+                  <CardTitle className="">Current Plan</CardTitle>
                   <CardDescription>Your active resource allocation.</CardDescription>
                 </div>
                 <div
-                  className={`px-2 py-1 text-xs font-bold uppercase tracking-wider ${
+                  className={`px-2 py-1 text-xs font-bold ${
                     subscription.status === "trial"
                       ? "bg-primary/20 text-primary"
                       : subscription.status === "active"
@@ -200,7 +200,7 @@ export function AppBilling() {
                       <div className="flex items-start gap-2">
                         <Calendar className="h-4 w-4 mt-0.5 text-muted-foreground" />
                         <div>
-                          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                          <div className="text-xs text-muted-foreground">
                             Trial ends
                           </div>
                           <div
@@ -216,7 +216,7 @@ export function AppBilling() {
                       <div className="flex items-start gap-2">
                         <Calendar className="h-4 w-4 mt-0.5 text-muted-foreground" />
                         <div>
-                          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                          <div className="text-xs text-muted-foreground">
                             {subscription.cancelAtPeriodEnd ? "Cancels on" : "Renews on"}
                           </div>
                           <div
@@ -236,7 +236,7 @@ export function AppBilling() {
 
           <Card className=" border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+              <CardTitle className=" flex items-center gap-2">
                 <Receipt className="h-5 w-5" /> Invoices
               </CardTitle>
               <CardDescription>Past invoices from Stripe.</CardDescription>
@@ -264,7 +264,7 @@ export function AppBilling() {
                       </div>
                       <div className="flex items-center gap-4">
                         <span
-                          className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                          className={`px-2 py-0.5 text-[10px] font-bold ${
                             STATUS_STYLES[inv.status] ?? "bg-muted text-muted-foreground"
                           }`}
                         >
@@ -311,7 +311,7 @@ export function AppBilling() {
         <div className="space-y-8">
           <Card className=" border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+              <CardTitle className=" flex items-center gap-2">
                 <Receipt className="h-5 w-5" /> Next Invoice
               </CardTitle>
             </CardHeader>
@@ -324,7 +324,7 @@ export function AppBilling() {
                   >
                     {formatMoney(upcomingInvoice.amountDue, upcomingInvoice.currency)}
                   </div>
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                  <div className="text-xs text-muted-foreground">
                     Due{" "}
                     <span data-testid="text-upcoming-date">
                       {formatDate(upcomingInvoice.nextPaymentAttempt ?? upcomingInvoice.periodEnd)}
@@ -339,7 +339,7 @@ export function AppBilling() {
 
           <Card className=" border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+              <CardTitle className=" flex items-center gap-2">
                 <CreditCard className="h-5 w-5" /> Payment Method
               </CardTitle>
             </CardHeader>
@@ -370,7 +370,7 @@ export function AppBilling() {
               <Button
                 onClick={handleOpenUpdatePm}
                 disabled={createSetupIntent.isPending || !stripePromise}
-                className="w-full uppercase tracking-wider font-bold text-xs"
+                className="w-full font-bold text-xs"
                 data-testid="button-update-payment-method"
               >
                 {createSetupIntent.isPending
@@ -396,9 +396,9 @@ export function AppBilling() {
           if (!open) setPmClientSecret(null);
         }}
       >
-        <DialogContent className="rounded-none">
+        <DialogContent className="rounded-xl">
           <DialogHeader>
-            <DialogTitle className="uppercase tracking-tight">Update Payment Method</DialogTitle>
+            <DialogTitle className="">Update Payment Method</DialogTitle>
             <DialogDescription>
               Saved cards become the default for future invoices.
             </DialogDescription>
@@ -447,7 +447,7 @@ function UpdatePaymentMethodForm({ onSuccess }: { onSuccess: () => void }) {
       <Button
         type="submit"
         disabled={!stripe || loading}
-        className="w-full font-bold uppercase tracking-wider"
+        className="w-full font-bold"
         data-testid="button-confirm-update-payment-method"
       >
         {loading ? "Saving…" : "Save Card"}

@@ -117,7 +117,7 @@ export function AdminTenants() {
         icon={<Users className="h-6 w-6" />}
       />
 
-      <Card className="rounded-none border-zinc-800 bg-black shadow-none p-4">
+      <Card className="rounded-xl border-zinc-800 bg-black shadow-none p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
@@ -125,14 +125,14 @@ export function AdminTenants() {
               placeholder="Search by name, email, or ID..."
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10 rounded-none border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-red-500"
+              className="pl-10 rounded-xl border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-red-500"
             />
           </div>
           <Select value={statusFilter} onValueChange={handleFilter}>
-            <SelectTrigger className="w-full sm:w-[180px] rounded-none border-zinc-700 bg-zinc-900 text-white">
+            <SelectTrigger className="w-full sm:w-[180px] rounded-xl border-zinc-700 bg-zinc-900 text-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent className="rounded-none border-zinc-700 bg-zinc-900 text-white">
+            <SelectContent className="rounded-xl border-zinc-700 bg-zinc-900 text-white">
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="trial">Trial</SelectItem>
@@ -187,7 +187,7 @@ export function AdminTenants() {
                     <div className="text-xs text-zinc-500 font-mono truncate">{tenant.ownerEmail}</div>
                   </div>
                   <div className="col-span-2">
-                    <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider border ${
+                    <span className={`px-2 py-1 text-[10px] font-bold border ${
                       tenant.status === "active"    ? "bg-green-500/10 text-green-500 border-green-500/20" :
                       tenant.status === "trial"     ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
                       tenant.status === "cancelled" ? "bg-zinc-800 text-zinc-400 border-zinc-700" :
@@ -224,7 +224,7 @@ export function AdminTenants() {
                     size="sm"
                     disabled={safePage <= 1}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    className="rounded-none border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 disabled:opacity-40 h-7 px-2"
+                    className="rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 disabled:opacity-40 h-7 px-2"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -259,7 +259,7 @@ export function AdminTenants() {
                     size="sm"
                     disabled={safePage >= totalPages}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    className="rounded-none border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 disabled:opacity-40 h-7 px-2"
+                    className="rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 disabled:opacity-40 h-7 px-2"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>

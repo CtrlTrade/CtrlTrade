@@ -40,7 +40,7 @@ export function PortalRefer() {
     <div className="space-y-6 max-w-2xl">
       <Card className=" border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">{data.campaignName ?? "Refer a friend"}</CardTitle>
+          <CardTitle className="">{data.campaignName ?? "Refer a friend"}</CardTitle>
           <CardDescription>{data.rewardSummary}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -49,8 +49,8 @@ export function PortalRefer() {
             <div className="space-y-2">
               <Label>Your share link</Label>
               <div className="flex gap-2">
-                <Input readOnly value={data.shareUrl} className="rounded-none font-mono text-xs" />
-                <Button type="button" variant="outline" className="rounded-none" onClick={() => { navigator.clipboard.writeText(data.shareUrl!); toast({ title: "Copied" }); }}>
+                <Input readOnly value={data.shareUrl} className="rounded-xl font-mono text-xs" />
+                <Button type="button" variant="outline" className="rounded-xl" onClick={() => { navigator.clipboard.writeText(data.shareUrl!); toast({ title: "Copied" }); }}>
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -62,16 +62,16 @@ export function PortalRefer() {
 
       <Card className=" border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Tell us who to contact</CardTitle>
+          <CardTitle className="">Tell us who to contact</CardTitle>
           <CardDescription>We'll reach out to your referral on your behalf.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={(e) => { e.preventDefault(); submit.mutate({ tenantSlug, data: form }); }} className="space-y-3">
-            <div className="space-y-2"><Label>Their name</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="rounded-none" data-testid="input-refer-name" /></div>
-            <div className="space-y-2"><Label>Their email (optional)</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="rounded-none" /></div>
-            <div className="space-y-2"><Label>Their phone (optional)</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="rounded-none" /></div>
-            <div className="space-y-2"><Label>Message (optional)</Label><Textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="rounded-none" /></div>
-            <Button type="submit" disabled={submit.isPending} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-submit-referral">Send referral</Button>
+            <div className="space-y-2"><Label>Their name</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="rounded-xl" data-testid="input-refer-name" /></div>
+            <div className="space-y-2"><Label>Their email (optional)</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="rounded-xl" /></div>
+            <div className="space-y-2"><Label>Their phone (optional)</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="rounded-xl" /></div>
+            <div className="space-y-2"><Label>Message (optional)</Label><Textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="rounded-xl" /></div>
+            <Button type="submit" disabled={submit.isPending} className="rounded-xl font-bold" data-testid="button-submit-referral">Send referral</Button>
           </form>
         </CardContent>
       </Card>

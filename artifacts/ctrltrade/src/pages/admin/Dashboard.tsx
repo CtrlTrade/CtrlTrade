@@ -122,9 +122,9 @@ export function AdminDashboard() {
       {/* Pipeline summary */}
       {pipeline && (
         <Link href="/leads" className="block">
-          <Card className="rounded-none border-zinc-800 bg-black shadow-none hover:border-zinc-600 transition-colors cursor-pointer">
+          <Card className="rounded-xl border-zinc-800 bg-black shadow-none hover:border-zinc-600 transition-colors cursor-pointer">
             <CardHeader className="pb-2">
-              <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2 text-sm">
+              <CardTitle className=" text-zinc-100 flex items-center gap-2 text-sm">
                 <Funnel className="h-4 w-4 text-red-500" /> Pipeline
               </CardTitle>
             </CardHeader>
@@ -151,9 +151,9 @@ export function AdminDashboard() {
       )}
 
       {/* Usage */}
-      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2 text-sm">
+          <CardTitle className=" text-zinc-100 flex items-center gap-2 text-sm">
             <Gauge className="h-4 w-4" /> Platform usage this month
           </CardTitle>
         </CardHeader>
@@ -167,7 +167,7 @@ export function AdminDashboard() {
                   className="border border-zinc-800 p-3 bg-zinc-950 hover:border-red-500/50 transition-colors block"
                   data-testid={`admin-usage-${t.kind}`}
                 >
-                  <div className="font-bold uppercase tracking-wider text-[10px] text-zinc-500 mb-1">
+                  <div className="font-bold text-[10px] text-zinc-500 mb-1">
                     {USAGE_KIND_LABELS[t.kind] ?? t.kind}
                   </div>
                   <div className="text-xl font-mono font-bold text-zinc-100">{t.count.toLocaleString()}</div>
@@ -186,9 +186,9 @@ export function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Revenue Breakdown */}
-          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+          <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight text-zinc-100 text-sm">Revenue Breakdown</CardTitle>
+              <CardTitle className=" text-zinc-100 text-sm">Revenue Breakdown</CardTitle>
             </CardHeader>
             <CardContent>
               {revenue?.lines && revenue.lines.length > 0 ? (
@@ -228,9 +228,9 @@ export function AdminDashboard() {
           </Card>
 
           {/* Upcoming Renewals */}
-          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+          <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2 text-sm">
+              <CardTitle className=" text-zinc-100 flex items-center gap-2 text-sm">
                 <RefreshCw className="h-4 w-4" /> Upcoming Renewals (7d)
               </CardTitle>
             </CardHeader>
@@ -264,9 +264,9 @@ export function AdminDashboard() {
         </div>
 
         {/* System Activity */}
-        <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+        <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight text-zinc-100 flex items-center gap-2 text-sm">
+            <CardTitle className=" text-zinc-100 flex items-center gap-2 text-sm">
               <Activity className="h-4 w-4" /> System Activity
             </CardTitle>
           </CardHeader>
@@ -317,10 +317,10 @@ function KpiCard({
   const iconCls = danger ? "text-red-500" : highlight ? "text-red-500" : "text-zinc-600";
 
   return (
-    <Card className={`rounded-none shadow-none ${borderCls} ${className}`}>
+    <Card className={`rounded-xl shadow-none ${borderCls} ${className}`}>
       <CardContent className="p-5">
         <div className="flex justify-between items-start mb-2">
-          <div className="font-bold uppercase tracking-wider text-xs text-zinc-400">{title}</div>
+          <div className="font-bold text-xs text-zinc-400">{title}</div>
           <Icon className={`h-4 w-4 shrink-0 ${iconCls}`} />
         </div>
         <div

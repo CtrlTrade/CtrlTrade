@@ -74,7 +74,7 @@ function statusBadge(status: string) {
     running: "bg-blue-100 text-blue-800",
     pending: "bg-yellow-100 text-yellow-800",
   };
-  return <span className={`text-xs px-2 py-0.5 rounded-none font-mono ${variants[status] ?? "bg-muted"}`}>{status}</span>;
+  return <span className={`text-xs px-2 py-0.5 rounded-xl font-mono ${variants[status] ?? "bg-muted"}`}>{status}</span>;
 }
 
 export function AppAutomation() {
@@ -191,23 +191,23 @@ export function AppAutomation() {
         <div className="flex items-center gap-3">
           <Zap className="h-6 w-6 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold uppercase tracking-tight">CtrlWorkflow</h1>
+            <h1 className="text-2xl font-bold">CtrlWorkflow</h1>
             <p className="text-sm text-muted-foreground">Rule-based automation across your CRM</p>
           </div>
         </div>
         {tab === "rules" && (
-          <Button onClick={openCreate} className="gap-2 rounded-none uppercase text-xs font-bold tracking-wider">
+          <Button onClick={openCreate} className="gap-2 rounded-xl uppercase text-xs font-bold tracking-wider">
             <Plus className="h-4 w-4" /> New Rule
           </Button>
         )}
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="rounded-none">
-          <TabsTrigger value="rules" className="rounded-none uppercase text-xs font-bold tracking-wider">Rules</TabsTrigger>
-          <TabsTrigger value="runs" className="rounded-none uppercase text-xs font-bold tracking-wider">Run History</TabsTrigger>
-          <TabsTrigger value="approvals" className="rounded-none uppercase text-xs font-bold tracking-wider">
-            Approvals {pendingCount > 0 && <Badge className="ml-1 rounded-none text-[10px] px-1 h-4">{pendingCount}</Badge>}
+        <TabsList className="rounded-xl">
+          <TabsTrigger value="rules" className="rounded-xl uppercase text-xs font-bold tracking-wider">Rules</TabsTrigger>
+          <TabsTrigger value="runs" className="rounded-xl uppercase text-xs font-bold tracking-wider">Run History</TabsTrigger>
+          <TabsTrigger value="approvals" className="rounded-xl uppercase text-xs font-bold tracking-wider">
+            Approvals {pendingCount > 0 && <Badge className="ml-1 rounded-xl text-[10px] px-1 h-4">{pendingCount}</Badge>}
           </TabsTrigger>
         </TabsList>
 
@@ -216,12 +216,12 @@ export function AppAutomation() {
           {rulesLoading ? (
             <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}</div>
           ) : !rulesData?.rules?.length ? (
-            <Card className="rounded-none border-dashed">
+            <Card className="rounded-xl border-dashed">
               <CardContent className="py-12 text-center text-muted-foreground">
                 <Zap className="h-10 w-10 mx-auto mb-3 opacity-30" />
                 <p className="font-medium">No automation rules yet</p>
                 <p className="text-sm mt-1">Create a rule to automate actions when events happen in your CRM.</p>
-                <Button onClick={openCreate} variant="outline" className="mt-4 rounded-none uppercase text-xs font-bold tracking-wider gap-2">
+                <Button onClick={openCreate} variant="outline" className="mt-4 rounded-xl uppercase text-xs font-bold tracking-wider gap-2">
                   <Plus className="h-4 w-4" /> Create first rule
                 </Button>
               </CardContent>
@@ -229,15 +229,15 @@ export function AppAutomation() {
           ) : (
             <div className="space-y-3">
               {rulesData.rules.map((rule) => (
-                <Card key={rule.id} className="rounded-none">
+                <Card key={rule.id} className="rounded-xl">
                   <CardContent className="py-4 flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
                       <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${rule.enabled ? "bg-green-500" : "bg-muted-foreground"}`} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-semibold text-sm">{rule.name}</span>
-                          <Badge variant="outline" className="rounded-none text-[10px] font-mono">{rule.triggerEvent}</Badge>
-                          {!rule.enabled && <Badge variant="secondary" className="rounded-none text-[10px]">Disabled</Badge>}
+                          <Badge variant="outline" className="rounded-xl text-[10px] font-mono">{rule.triggerEvent}</Badge>
+                          {!rule.enabled && <Badge variant="secondary" className="rounded-xl text-[10px]">Disabled</Badge>}
                         </div>
                         {rule.description && <p className="text-xs text-muted-foreground mt-0.5">{rule.description}</p>}
                         <p className="text-xs text-muted-foreground mt-1">
@@ -265,14 +265,14 @@ export function AppAutomation() {
           {runsLoading ? (
             <Skeleton className="h-64 w-full" />
           ) : !runsData?.runs?.length ? (
-            <Card className="rounded-none">
+            <Card className="rounded-xl">
               <CardContent className="py-12 text-center text-muted-foreground">
                 <Clock className="h-10 w-10 mx-auto mb-3 opacity-30" />
                 <p>No automation runs yet. Rules will appear here when they execute.</p>
               </CardContent>
             </Card>
           ) : (
-            <Card className="rounded-none">
+            <Card className="rounded-xl">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -302,7 +302,7 @@ export function AppAutomation() {
         {/* Approvals */}
         <TabsContent value="approvals" className="mt-4">
           {!approvalsData?.approvals?.length ? (
-            <Card className="rounded-none">
+            <Card className="rounded-xl">
               <CardContent className="py-12 text-center text-muted-foreground">
                 <Check className="h-10 w-10 mx-auto mb-3 opacity-30" />
                 <p>No pending approvals.</p>
@@ -311,7 +311,7 @@ export function AppAutomation() {
           ) : (
             <div className="space-y-3">
               {approvalsData.approvals.map((a) => (
-                <Card key={a.id} className="rounded-none border-amber-200">
+                <Card key={a.id} className="rounded-xl border-amber-200">
                   <CardContent className="py-4 flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
                       <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
@@ -322,10 +322,10 @@ export function AppAutomation() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <Button size="sm" variant="outline" className="rounded-none gap-1 text-xs" onClick={() => decide.mutate({ id: a.id, data: { decision: "rejected" } })}>
+                      <Button size="sm" variant="outline" className="rounded-xl gap-1 text-xs" onClick={() => decide.mutate({ id: a.id, data: { decision: "rejected" } })}>
                         <X className="h-3 w-3" /> Reject
                       </Button>
-                      <Button size="sm" className="rounded-none gap-1 text-xs" onClick={() => decide.mutate({ id: a.id, data: { decision: "approved" } })}>
+                      <Button size="sm" className="rounded-xl gap-1 text-xs" onClick={() => decide.mutate({ id: a.id, data: { decision: "approved" } })}>
                         <Check className="h-3 w-3" /> Approve
                       </Button>
                     </div>
@@ -339,20 +339,20 @@ export function AppAutomation() {
 
       {/* Rule Builder Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-none">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl">
           <DialogHeader>
-            <DialogTitle className="uppercase tracking-tight">{editingId ? "Edit Rule" : "New Automation Rule"}</DialogTitle>
+            <DialogTitle className="">{editingId ? "Edit Rule" : "New Automation Rule"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-xs uppercase font-bold tracking-wider">Rule Name *</Label>
-                <Input className="rounded-none" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="e.g. SMS on quote accepted" />
+                <Input className="rounded-xl" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="e.g. SMS on quote accepted" />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs uppercase font-bold tracking-wider">Trigger Event *</Label>
                 <Select value={form.triggerEvent} onValueChange={(v) => setForm((f) => ({ ...f, triggerEvent: v }))}>
-                  <SelectTrigger className="rounded-none"><SelectValue placeholder="Select event..." /></SelectTrigger>
+                  <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select event..." /></SelectTrigger>
                   <SelectContent>
                     {(eventsData?.events ?? []).map((e) => (
                       <SelectItem key={e.event} value={e.event}>{e.label} <span className="text-muted-foreground text-xs">({e.category})</span></SelectItem>
@@ -363,7 +363,7 @@ export function AppAutomation() {
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs uppercase font-bold tracking-wider">Description</Label>
-              <Input className="rounded-none" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="Optional description" />
+              <Input className="rounded-xl" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="Optional description" />
             </div>
             <div className="flex items-center gap-3">
               <Switch checked={form.enabled} onCheckedChange={(v) => setForm((f) => ({ ...f, enabled: v }))} />
@@ -374,18 +374,18 @@ export function AppAutomation() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <Label className="text-xs uppercase font-bold tracking-wider">Conditions (all must match)</Label>
-                <Button size="sm" variant="outline" onClick={addCondition} className="rounded-none text-xs h-7 gap-1"><Plus className="h-3 w-3" /> Add</Button>
+                <Button size="sm" variant="outline" onClick={addCondition} className="rounded-xl text-xs h-7 gap-1"><Plus className="h-3 w-3" /> Add</Button>
               </div>
               {form.conditions.length === 0 && <p className="text-xs text-muted-foreground">No conditions — rule fires for every matching event.</p>}
               <div className="space-y-2">
                 {form.conditions.map((cond, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <Input className="rounded-none flex-1 text-xs" placeholder="field (e.g. status)" value={cond.field} onChange={(e) => setForm((f) => { const c = [...f.conditions]; c[i] = { ...c[i], field: e.target.value }; return { ...f, conditions: c }; })} />
+                    <Input className="rounded-xl flex-1 text-xs" placeholder="field (e.g. status)" value={cond.field} onChange={(e) => setForm((f) => { const c = [...f.conditions]; c[i] = { ...c[i], field: e.target.value }; return { ...f, conditions: c }; })} />
                     <Select value={cond.operator} onValueChange={(v) => setForm((f) => { const c = [...f.conditions]; c[i] = { ...c[i], operator: v as AutomationConditionOperator }; return { ...f, conditions: c }; })}>
-                      <SelectTrigger className="rounded-none w-36 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="rounded-xl w-36 text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>{CONDITION_OPERATORS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                     </Select>
-                    <Input className="rounded-none flex-1 text-xs" placeholder="value" value={cond.value ?? ""} onChange={(e) => setForm((f) => { const c = [...f.conditions]; c[i] = { ...c[i], value: e.target.value }; return { ...f, conditions: c }; })} />
+                    <Input className="rounded-xl flex-1 text-xs" placeholder="value" value={cond.value ?? ""} onChange={(e) => setForm((f) => { const c = [...f.conditions]; c[i] = { ...c[i], value: e.target.value }; return { ...f, conditions: c }; })} />
                     <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => removeCondition(i)}><X className="h-3 w-3" /></Button>
                   </div>
                 ))}
@@ -396,7 +396,7 @@ export function AppAutomation() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <Label className="text-xs uppercase font-bold tracking-wider">Actions (run in order)</Label>
-                <Button size="sm" variant="outline" onClick={addAction} className="rounded-none text-xs h-7 gap-1"><Plus className="h-3 w-3" /> Add</Button>
+                <Button size="sm" variant="outline" onClick={addAction} className="rounded-xl text-xs h-7 gap-1"><Plus className="h-3 w-3" /> Add</Button>
               </div>
               {form.actions.length === 0 && <p className="text-xs text-muted-foreground">Add at least one action.</p>}
               <div className="space-y-3">
@@ -404,28 +404,28 @@ export function AppAutomation() {
                   <div key={i} className="border border-border p-3 space-y-2">
                     <div className="flex items-center gap-2">
                       <Select value={action.kind} onValueChange={(v) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], kind: v, params: {} }; return { ...f, actions: a }; })}>
-                        <SelectTrigger className="rounded-none text-xs"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="rounded-xl text-xs"><SelectValue /></SelectTrigger>
                         <SelectContent>{ACTION_KINDS.map((k) => <SelectItem key={k.value} value={k.value}>{k.label}</SelectItem>)}</SelectContent>
                       </Select>
                       <Button size="icon" variant="ghost" className="h-8 w-8 flex-shrink-0" onClick={() => removeAction(i)}><X className="h-3 w-3" /></Button>
                     </div>
                     {action.kind === "send_sms" && (
                       <div className="space-y-1.5">
-                        <Input className="rounded-none text-xs" placeholder="To number (e.g. +447700900000 or use {{phone}})" value={action.params.to ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, to: e.target.value } }; return { ...f, actions: a }; })} />
-                        <Input className="rounded-none text-xs" placeholder="Message text (use {{field}} for variables)" value={action.params.text ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, text: e.target.value } }; return { ...f, actions: a }; })} />
+                        <Input className="rounded-xl text-xs" placeholder="To number (e.g. +447700900000 or use {{phone}})" value={action.params.to ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, to: e.target.value } }; return { ...f, actions: a }; })} />
+                        <Input className="rounded-xl text-xs" placeholder="Message text (use {{field}} for variables)" value={action.params.text ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, text: e.target.value } }; return { ...f, actions: a }; })} />
                       </div>
                     )}
                     {action.kind === "send_email" && (
                       <div className="space-y-1.5">
-                        <Input className="rounded-none text-xs" placeholder="To email (or use {{email}})" value={action.params.to ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, to: e.target.value } }; return { ...f, actions: a }; })} />
-                        <Input className="rounded-none text-xs" placeholder="Subject" value={action.params.subject ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, subject: e.target.value } }; return { ...f, actions: a }; })} />
-                        <Input className="rounded-none text-xs" placeholder="Body text" value={action.params.text ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, text: e.target.value } }; return { ...f, actions: a }; })} />
+                        <Input className="rounded-xl text-xs" placeholder="To email (or use {{email}})" value={action.params.to ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, to: e.target.value } }; return { ...f, actions: a }; })} />
+                        <Input className="rounded-xl text-xs" placeholder="Subject" value={action.params.subject ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, subject: e.target.value } }; return { ...f, actions: a }; })} />
+                        <Input className="rounded-xl text-xs" placeholder="Body text" value={action.params.text ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, text: e.target.value } }; return { ...f, actions: a }; })} />
                       </div>
                     )}
                     {action.kind === "create_approval" && (
                       <div className="space-y-1.5">
-                        <Input className="rounded-none text-xs" placeholder="Approval title" value={action.params.title ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, title: e.target.value } }; return { ...f, actions: a }; })} />
-                        <Input className="rounded-none text-xs" placeholder="Details / instructions" value={action.params.body ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, body: e.target.value } }; return { ...f, actions: a }; })} />
+                        <Input className="rounded-xl text-xs" placeholder="Approval title" value={action.params.title ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, title: e.target.value } }; return { ...f, actions: a }; })} />
+                        <Input className="rounded-xl text-xs" placeholder="Details / instructions" value={action.params.body ?? ""} onChange={(e) => setForm((f) => { const a = [...f.actions]; a[i] = { ...a[i], params: { ...a[i].params, body: e.target.value } }; return { ...f, actions: a }; })} />
                       </div>
                     )}
                   </div>
@@ -434,8 +434,8 @@ export function AppAutomation() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" className="rounded-none" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button className="rounded-none uppercase text-xs font-bold tracking-wider" onClick={saveRule} disabled={!form.name || !form.triggerEvent || create.isPending || update.isPending}>
+            <Button variant="outline" className="rounded-xl" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button className="rounded-xl uppercase text-xs font-bold tracking-wider" onClick={saveRule} disabled={!form.name || !form.triggerEvent || create.isPending || update.isPending}>
               {editingId ? "Save Changes" : "Create Rule"}
             </Button>
           </DialogFooter>
@@ -444,14 +444,14 @@ export function AppAutomation() {
 
       {/* Delete confirm */}
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
-        <AlertDialogContent className="rounded-none">
+        <AlertDialogContent className="rounded-xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete rule?</AlertDialogTitle>
             <AlertDialogDescription>This will permanently delete the automation rule and stop it from firing.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-none">Cancel</AlertDialogCancel>
-            <AlertDialogAction className="rounded-none bg-destructive hover:bg-destructive/90" onClick={() => deleteId && del.mutate({ id: deleteId })}>Delete</AlertDialogAction>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction className="rounded-xl bg-destructive hover:bg-destructive/90" onClick={() => deleteId && del.mutate({ id: deleteId })}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

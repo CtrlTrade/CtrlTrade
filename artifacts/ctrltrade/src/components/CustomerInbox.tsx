@@ -38,8 +38,8 @@ export function CustomerInbox({ customerId, jobId, title = "Messages" }: Props) 
   return (
     <Card className=" border-border shadow-sm" data-testid="card-customer-inbox">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="uppercase tracking-tight">{title}</CardTitle>
-        <Link href="/app/inbox" className="text-xs underline uppercase tracking-wider">Open inbox</Link>
+        <CardTitle className="">{title}</CardTitle>
+        <Link href="/app/inbox" className="text-xs underline ">Open inbox</Link>
       </CardHeader>
       <CardContent className="space-y-3">
         {threads.length === 0 && <p className="text-sm text-muted-foreground">No conversations yet.</p>}
@@ -75,7 +75,7 @@ export function CustomerInbox({ customerId, jobId, title = "Messages" }: Props) 
                 />
                 <Button
                   size="sm"
-                  className="rounded-none uppercase tracking-wider"
+                  className="rounded-none "
                   disabled={!body.trim() || reply.isPending}
                   onClick={() => reply.mutate({ threadId: t.id, data: { body } })}
                   data-testid={`button-send-reply-${t.id}`}

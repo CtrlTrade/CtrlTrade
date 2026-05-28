@@ -111,8 +111,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   const sidebarFooter = tenant.industrySlug ? (
     <div className="p-4 border-t border-sidebar-border">
-      <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Industry</div>
-      <div className="text-xs font-bold uppercase">{(tenant.industrySlug as string).replace(/-/g, " ")}</div>
+      <div className="text-[10px] text-muted-foreground mb-1">Industry</div>
+      <div className="text-xs font-semibold">{(tenant.industrySlug as string).replace(/-/g, " ")}</div>
     </div>
   ) : null;
 
@@ -135,15 +135,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       <div className="flex-1 flex flex-col min-w-0">
         {failedIntegration && (
-          <div className="bg-red-600 text-white px-4 sm:px-6 py-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider gap-2 flex-wrap" data-testid="banner-integration-failure">
+          <div className="bg-red-600 text-white px-4 sm:px-6 py-2 flex items-center justify-between text-xs font-bold gap-2 flex-wrap" data-testid="banner-integration-failure">
             <span>Integration disconnected: {failedIntegration.provider} — {failedIntegration.lastError ?? "sync failed"}</span>
             <Link href="/settings?tab=integrations" className="underline whitespace-nowrap" data-testid="link-reconnect-integration">Reconnect</Link>
           </div>
         )}
         {session.impersonation && (
-          <div className="bg-amber-500 text-black px-4 sm:px-6 py-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider gap-2 flex-wrap" data-testid="banner-impersonation">
+          <div className="bg-amber-500/20 border-b border-amber-500/30 text-amber-300 px-4 sm:px-6 py-2 flex items-center justify-between text-xs font-semibold gap-2 flex-wrap" data-testid="banner-impersonation">
             <span>Impersonating {session.impersonation.tenantName} as {session.impersonation.impersonatorEmail}</span>
-            <Button size="sm" variant="outline" className="h-7 border-black text-black hover:bg-black hover:text-amber-500 shrink-0" onClick={() => stopImp.mutate()} data-testid="button-stop-impersonation">Stop impersonating</Button>
+            <Button size="sm" variant="outline" className="h-7 rounded-xl border-amber-500/50 text-amber-300 hover:bg-amber-500/20 shrink-0" onClick={() => stopImp.mutate()} data-testid="button-stop-impersonation">Stop impersonating</Button>
           </div>
         )}
 
@@ -169,7 +169,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
             <div className="flex items-center gap-2 min-w-0">
               <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-sm shrink-0" style={{ backgroundColor: tenant.brandColor || "var(--primary)" }} />
-              <span className="font-bold text-sm sm:text-lg uppercase tracking-tight truncate" data-testid="text-tenant-name">{tenant.name}</span>
+              <span className="font-bold text-sm sm:text-lg truncate" data-testid="text-tenant-name">{tenant.name}</span>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">

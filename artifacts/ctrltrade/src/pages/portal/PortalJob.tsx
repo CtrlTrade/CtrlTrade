@@ -51,7 +51,7 @@ export function PortalJob() {
 
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
+          <h1 className="text-3xl font-bold">{data.number}</h1>
           <p className="text-muted-foreground">{data.title}</p>
           {data.engineerName ? (
             <p className="text-sm">
@@ -59,12 +59,12 @@ export function PortalJob() {
             </p>
           ) : null}
         </div>
-        <Badge className="uppercase rounded-none">{data.status.replace("_", " ")}</Badge>
+        <Badge className="uppercase rounded-xl">{data.status.replace("_", " ")}</Badge>
       </div>
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Details</CardTitle>
+          <CardTitle className="">Details</CardTitle>
         </CardHeader>
         <CardContent className="text-sm space-y-2">
           {data.description ? <p>{data.description}</p> : null}
@@ -86,7 +86,7 @@ export function PortalJob() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Progress</CardTitle>
+          <CardTitle className="">Progress</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2 text-sm">
@@ -105,7 +105,7 @@ export function PortalJob() {
       {data.status === "completed" ? (
         <Card className=" border-border shadow-sm">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight">Leave a review</CardTitle>
+            <CardTitle className="">Leave a review</CardTitle>
           </CardHeader>
           <CardContent>
             {data.review ? (
@@ -153,13 +153,13 @@ export function PortalJob() {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Tell us how it went (optional)"
-                  className="rounded-none"
+                  className="rounded-xl"
                   data-testid="textarea-portal-review"
                 />
                 <Button
                   type="submit"
                   disabled={!rating || review.isPending}
-                  className="rounded-none uppercase tracking-wider font-bold"
+                  className="rounded-xl font-bold"
                   data-testid="button-portal-submit-review"
                 >
                   {review.isPending ? "Submitting…" : "Submit review"}
@@ -172,7 +172,7 @@ export function PortalJob() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Messages</CardTitle>
+          <CardTitle className="">Messages</CardTitle>
         </CardHeader>
         <CardContent>
           <PortalThread subjectKind="job" subjectId={id} />

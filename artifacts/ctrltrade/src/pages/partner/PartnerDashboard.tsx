@@ -19,31 +19,31 @@ export function PartnerDashboard() {
   ];
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold uppercase tracking-tighter">Partner Dashboard</h1>
+      <h1 className="text-3xl font-bold">Partner Dashboard</h1>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {stats.map((s) => (
           <Card key={s.label} className=" border-border">
-            <CardHeader className="pb-2"><CardTitle className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-xs text-muted-foreground">{s.label}</CardTitle></CardHeader>
             <CardContent><div className="text-2xl font-bold" data-testid={`stat-${s.label.toLowerCase().replace(/\s/g, '-')}`}>{s.value}</div></CardContent>
           </Card>
         ))}
       </div>
 
       <Card className=" border-border">
-        <CardHeader><CardTitle className="uppercase tracking-tight">Recent Conversions</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="">Recent Conversions</CardTitle></CardHeader>
         <CardContent>
           {data.conversions.length === 0 ? (
             <div className="text-sm text-muted-foreground py-6 text-center">No referrals yet — share your link to start tracking.</div>
           ) : (
             <table className="w-full text-sm">
-              <thead className="text-xs uppercase tracking-wider text-muted-foreground">
+              <thead className="text-xs text-muted-foreground">
                 <tr><th className="text-left py-2">Tenant</th><th className="text-left py-2">Status</th><th className="text-left py-2">First paid</th><th className="text-left py-2">Signed up</th></tr>
               </thead>
               <tbody>
                 {data.conversions.map((c) => (
                   <tr key={c.id} className="border-t border-border">
                     <td className="py-2 font-medium">{c.tenantName}</td>
-                    <td className="py-2"><Badge variant={c.status === "paying" ? "default" : "secondary"} className="rounded-none uppercase tracking-wider">{c.status}</Badge></td>
+                    <td className="py-2"><Badge variant={c.status === "paying" ? "default" : "secondary"} className="rounded-xl">{c.status}</Badge></td>
                     <td className="py-2">{c.firstPaidAt ? new Date(c.firstPaidAt).toLocaleDateString() : "—"}</td>
                     <td className="py-2">{new Date(c.createdAt).toLocaleDateString()}</td>
                   </tr>

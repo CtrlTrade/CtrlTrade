@@ -102,7 +102,7 @@ export function BusinessSetupSettings() {
     <div className="space-y-6">
       <Card className="border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Industry</CardTitle>
+          <CardTitle className="">Industry</CardTitle>
           <CardDescription>Set the primary industry for your workspace to enable industry-specific content.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -132,7 +132,7 @@ export function BusinessSetupSettings() {
 
       <Card className="border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Business Type</CardTitle>
+          <CardTitle className="">Business Type</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-3">
@@ -153,7 +153,7 @@ export function BusinessSetupSettings() {
 
       <Card className="border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Platform Modules</CardTitle>
+          <CardTitle className="">Platform Modules</CardTitle>
           <CardDescription>Toggle modules on or off. Changes take effect immediately after saving.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -166,7 +166,7 @@ export function BusinessSetupSettings() {
             { label: "VAT Registered", description: "Apply VAT to invoices and quotes", value: vatRegistered, set: setVatRegistered, id: "bs-vat" },
           ].map((mod) => (
             <div key={mod.id} className="flex items-center gap-4 border border-border p-3">
-              <Checkbox id={mod.id} checked={mod.value} onCheckedChange={(c) => mod.set(!!c)} className="rounded-none" data-testid={`toggle-${mod.id}`} />
+              <Checkbox id={mod.id} checked={mod.value} onCheckedChange={(c) => mod.set(!!c)} className="rounded-xl" data-testid={`toggle-${mod.id}`} />
               <label htmlFor={mod.id} className="flex-1 cursor-pointer">
                 <div className="font-bold uppercase text-sm">{mod.label}</div>
                 <div className="text-xs text-muted-foreground">{mod.description}</div>
@@ -178,7 +178,7 @@ export function BusinessSetupSettings() {
 
       <Card className="border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Accounting Integration</CardTitle>
+          <CardTitle className="">Accounting Integration</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -199,7 +199,7 @@ export function BusinessSetupSettings() {
 
       <Card className="border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Communication Channels</CardTitle>
+          <CardTitle className="">Communication Channels</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-3">
@@ -212,7 +212,7 @@ export function BusinessSetupSettings() {
                     if (c) setCommunicationChannels([...communicationChannels, ch.value]);
                     else setCommunicationChannels(communicationChannels.filter((x) => x !== ch.value));
                   }}
-                  className="rounded-none"
+                  className="rounded-xl"
                 />
                 <label htmlFor={`bs-ch-${ch.value}`} className="font-bold uppercase text-sm cursor-pointer">{ch.label}</label>
               </div>
@@ -223,7 +223,7 @@ export function BusinessSetupSettings() {
 
       <Card className="border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">AI Modules</CardTitle>
+          <CardTitle className="">AI Modules</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-3">
@@ -236,7 +236,7 @@ export function BusinessSetupSettings() {
                     if (c) setAiModulesEnabled([...aiModulesEnabled, ai.value]);
                     else setAiModulesEnabled(aiModulesEnabled.filter((x) => x !== ai.value));
                   }}
-                  className="rounded-none"
+                  className="rounded-xl"
                 />
                 <label htmlFor={`bs-ai-${ai.value}`} className="font-bold uppercase text-sm cursor-pointer">{ai.label}</label>
               </div>
@@ -246,7 +246,7 @@ export function BusinessSetupSettings() {
       </Card>
 
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={updateModules.isPending} className="rounded-none uppercase tracking-wider font-bold" data-testid="btn-save-business-setup">
+        <Button onClick={handleSave} disabled={updateModules.isPending} className="rounded-xl font-bold" data-testid="btn-save-business-setup">
           {updateModules.isPending ? "Saving..." : "Save Business Setup"}
         </Button>
       </div>

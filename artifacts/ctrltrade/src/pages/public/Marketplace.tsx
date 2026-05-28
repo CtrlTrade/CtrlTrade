@@ -16,13 +16,13 @@ export function Marketplace() {
   return (
     <div className="max-w-6xl mx-auto py-12 px-4 space-y-8">
       <header>
-        <h1 className="text-4xl font-bold uppercase tracking-tighter">Trades Marketplace</h1>
+        <h1 className="text-4xl font-bold">Trades Marketplace</h1>
         <p className="text-muted-foreground mt-2">Verified CtrlTrade® contractors and suppliers.</p>
       </header>
       <div className="flex flex-col md:flex-row gap-3">
-        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by keyword" className="rounded-none" data-testid="input-marketplace-search" />
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by keyword" className="rounded-xl" data-testid="input-marketplace-search" />
         <Select value={type} onValueChange={setType}>
-          <SelectTrigger className="rounded-none md:w-56"><SelectValue placeholder="Any type" /></SelectTrigger>
+          <SelectTrigger className="rounded-xl md:w-56"><SelectValue placeholder="Any type" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="any">Any type</SelectItem>
             <SelectItem value="contractor">Contractor</SelectItem>
@@ -38,15 +38,15 @@ export function Marketplace() {
               <Card className=" border-border hover:border-foreground transition-colors cursor-pointer h-full" data-testid={`card-listing-${l.slug}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="uppercase tracking-tight text-lg">{l.tenantName}</CardTitle>
+                    <CardTitle className=" text-lg">{l.tenantName}</CardTitle>
                     {l.verified && <ShieldCheck className="h-4 w-4 text-primary" />}
                   </div>
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground">{l.listingType}</div>
+                  <div className="text-xs text-muted-foreground">{l.listingType}</div>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <p className="text-sm">{l.headline}</p>
                   <div className="flex flex-wrap gap-1">
-                    {l.categorySlugs.slice(0, 3).map((c) => <Badge key={c} variant="secondary" className="rounded-none uppercase tracking-wider text-xs">{c}</Badge>)}
+                    {l.categorySlugs.slice(0, 3).map((c) => <Badge key={c} variant="secondary" className="rounded-xl text-xs">{c}</Badge>)}
                   </div>
                   <div className="flex items-center gap-3 text-sm text-muted-foreground">
                     {l.ratingAverage != null && (

@@ -41,13 +41,13 @@ export function AppInbox() {
   return (
     <div className="max-w-7xl mx-auto space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-y-2">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Inbox</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Inbox</h1>
         <p className="text-sm text-muted-foreground">All customer conversations across email, SMS &amp; WhatsApp.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-4 min-h-[600px]">
         <Card className=" border-border">
           <CardHeader className="py-3">
-            <CardTitle className="text-sm uppercase tracking-wider">Conversations</CardTitle>
+            <CardTitle className="text-sm">Conversations</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {isLoading ? (
@@ -72,7 +72,7 @@ export function AppInbox() {
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <ChannelIcon channel={t.channel} />
-                          <span className="font-bold text-sm truncate uppercase tracking-tight">
+                          <span className="font-bold text-sm truncate">
                             {t.customerName ?? t.customerEmail ?? t.customerPhone ?? "(unknown)"}
                           </span>
                         </div>
@@ -84,7 +84,7 @@ export function AppInbox() {
                           {t.lastMessagePreview ?? "—"}
                         </p>
                         {t.unreadCount > 0 && (
-                          <Badge className="rounded-none bg-primary text-primary-foreground text-[10px]" data-testid={`inbox-unread-${t.id}`}>
+                          <Badge className="rounded-xl bg-primary text-primary-foreground text-[10px]" data-testid={`inbox-unread-${t.id}`}>
                             {t.unreadCount}
                           </Badge>
                         )}
@@ -148,7 +148,7 @@ function ThreadView({ threadId }: { threadId: string | null }) {
   return (
     <Card className=" border-border flex flex-col">
       <CardHeader className="py-3 border-b border-border">
-        <CardTitle className="text-sm uppercase tracking-wider">Conversation</CardTitle>
+        <CardTitle className="text-sm">Conversation</CardTitle>
       </CardHeader>
       <CardContent className="p-0 flex-1 overflow-y-auto max-h-[480px]">
         {isLoading ? (
@@ -168,7 +168,7 @@ function ThreadView({ threadId }: { threadId: string | null }) {
                 }`}
                 data-testid={`inbox-msg-${m.id}`}
               >
-                <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-muted-foreground mb-1 gap-3">
+                <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1 gap-3">
                   <span className="flex items-center gap-1">
                     <ChannelIcon channel={m.channel} />
                     {m.channel} · {m.direction === "out" ? "sent" : "received"} · {m.authorLabel ?? m.fromAddr ?? ""}
@@ -188,14 +188,14 @@ function ThreadView({ threadId }: { threadId: string | null }) {
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder="Type a reply…"
-          className="rounded-none"
+          className="rounded-xl"
           data-testid="inbox-reply-body"
         />
         <div className="flex justify-end">
           <Button
             onClick={submit}
             disabled={!body.trim() || reply.isPending}
-            className="rounded-none uppercase tracking-wider font-bold gap-2"
+            className="rounded-xl font-bold gap-2"
             data-testid="inbox-reply-send"
           >
             <Send className="h-4 w-4" /> {reply.isPending ? "Sending…" : "Send"}

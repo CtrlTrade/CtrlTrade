@@ -95,17 +95,17 @@ export function SettingsMarketplace() {
     <div className="space-y-6">
       <Card className=" border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Marketplace Listing</CardTitle>
+          <CardTitle className="">Marketplace Listing</CardTitle>
           <CardDescription>Get discovered by other CtrlTrade® businesses looking for contractors or suppliers.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={submit} className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2 md:col-span-2"><Label>Headline</Label><Input required value={form.headline} onChange={(e) => setForm({ ...form, headline: e.target.value })} className="rounded-none" data-testid="input-listing-headline" /></div>
-            <div className="space-y-2 md:col-span-2"><Label>Bio</Label><Textarea rows={4} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} className="rounded-none" /></div>
+            <div className="space-y-2 md:col-span-2"><Label>Headline</Label><Input required value={form.headline} onChange={(e) => setForm({ ...form, headline: e.target.value })} className="rounded-xl" data-testid="input-listing-headline" /></div>
+            <div className="space-y-2 md:col-span-2"><Label>Bio</Label><Textarea rows={4} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} className="rounded-xl" /></div>
             <div className="space-y-2">
               <Label>Listing type</Label>
               <Select value={form.listingType} onValueChange={(v: any) => setForm({ ...form, listingType: v })}>
-                <SelectTrigger className="rounded-none"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="contractor">Contractor</SelectItem>
                   <SelectItem value="supplier">Supplier</SelectItem>
@@ -116,7 +116,7 @@ export function SettingsMarketplace() {
             <div className="space-y-2">
               <Label>Status</Label>
               <Select value={form.status} onValueChange={(v: any) => setForm({ ...form, status: v })}>
-                <SelectTrigger className="rounded-none"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="draft">Draft</SelectItem>
                   <SelectItem value="published">Published</SelectItem>
@@ -124,19 +124,19 @@ export function SettingsMarketplace() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 md:col-span-2"><Label>Categories (comma separated slugs)</Label><Input value={form.categorySlugs} onChange={(e) => setForm({ ...form, categorySlugs: e.target.value })} placeholder="plumbing, gas-fitting" className="rounded-none" /></div>
-            <div className="space-y-2"><Label>Service area</Label><Input value={form.serviceArea} onChange={(e) => setForm({ ...form, serviceArea: e.target.value })} className="rounded-none" /></div>
-            <div className="space-y-2"><Label>Regions (comma separated)</Label><Input value={form.regions} onChange={(e) => setForm({ ...form, regions: e.target.value })} placeholder="London, South East" className="rounded-none" /></div>
-            <div className="space-y-2"><Label>Hourly rate (pence)</Label><Input type="number" value={form.hourlyRatePence} onChange={(e) => setForm({ ...form, hourlyRatePence: e.target.value })} className="rounded-none" /></div>
-            <div className="space-y-2"><Label>Min job value (pence)</Label><Input type="number" value={form.minJobValuePence} onChange={(e) => setForm({ ...form, minJobValuePence: e.target.value })} className="rounded-none" /></div>
-            <div className="space-y-2"><Label>Contact email</Label><Input type="email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} className="rounded-none" /></div>
-            <div className="space-y-2"><Label>Contact phone</Label><Input value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} className="rounded-none" /></div>
-            <div className="space-y-2 md:col-span-2"><Label>Website URL</Label><Input value={form.websiteUrl} onChange={(e) => setForm({ ...form, websiteUrl: e.target.value })} className="rounded-none" /></div>
-            <div className="space-y-2 md:col-span-2"><Label>Gallery image URLs (one per line)</Label><Textarea rows={3} value={form.galleryUrls} onChange={(e) => setForm({ ...form, galleryUrls: e.target.value })} className="rounded-none" /></div>
+            <div className="space-y-2 md:col-span-2"><Label>Categories (comma separated slugs)</Label><Input value={form.categorySlugs} onChange={(e) => setForm({ ...form, categorySlugs: e.target.value })} placeholder="plumbing, gas-fitting" className="rounded-xl" /></div>
+            <div className="space-y-2"><Label>Service area</Label><Input value={form.serviceArea} onChange={(e) => setForm({ ...form, serviceArea: e.target.value })} className="rounded-xl" /></div>
+            <div className="space-y-2"><Label>Regions (comma separated)</Label><Input value={form.regions} onChange={(e) => setForm({ ...form, regions: e.target.value })} placeholder="London, South East" className="rounded-xl" /></div>
+            <div className="space-y-2"><Label>Hourly rate (pence)</Label><Input type="number" value={form.hourlyRatePence} onChange={(e) => setForm({ ...form, hourlyRatePence: e.target.value })} className="rounded-xl" /></div>
+            <div className="space-y-2"><Label>Min job value (pence)</Label><Input type="number" value={form.minJobValuePence} onChange={(e) => setForm({ ...form, minJobValuePence: e.target.value })} className="rounded-xl" /></div>
+            <div className="space-y-2"><Label>Contact email</Label><Input type="email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} className="rounded-xl" /></div>
+            <div className="space-y-2"><Label>Contact phone</Label><Input value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} className="rounded-xl" /></div>
+            <div className="space-y-2 md:col-span-2"><Label>Website URL</Label><Input value={form.websiteUrl} onChange={(e) => setForm({ ...form, websiteUrl: e.target.value })} className="rounded-xl" /></div>
+            <div className="space-y-2 md:col-span-2"><Label>Gallery image URLs (one per line)</Label><Textarea rows={3} value={form.galleryUrls} onChange={(e) => setForm({ ...form, galleryUrls: e.target.value })} className="rounded-xl" /></div>
             <div className="md:col-span-2">
-              <Button type="submit" disabled={upsert.isPending} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-save-listing">Save listing</Button>
+              <Button type="submit" disabled={upsert.isPending} className="rounded-xl font-bold" data-testid="button-save-listing">Save listing</Button>
             </div>
-            {data?.verified && <div className="md:col-span-2"><Badge className="rounded-none uppercase tracking-wider">Verified</Badge></div>}
+            {data?.verified && <div className="md:col-span-2"><Badge className="rounded-xl">Verified</Badge></div>}
           </form>
         </CardContent>
       </Card>

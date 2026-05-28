@@ -44,7 +44,7 @@ export function QuoteConversionReport({ admin = false }: { admin?: boolean }) {
           />
           <Card className=" border-border">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight text-sm">Funnel over time</CardTitle>
+              <CardTitle className=" text-sm">Funnel over time</CardTitle>
             </CardHeader>
             <CardContent>
               <div style={{ width: "100%", height: 280 }}>

@@ -42,7 +42,7 @@ function callStatusBadge(status: string) {
     "no-answer": "bg-muted text-muted-foreground",
     initiated: "bg-yellow-100 text-yellow-800",
   };
-  return <span className={`text-xs px-2 py-0.5 rounded-none font-mono ${map[status] ?? "bg-muted"}`}>{status}</span>;
+  return <span className={`text-xs px-2 py-0.5 rounded-xl font-mono ${map[status] ?? "bg-muted"}`}>{status}</span>;
 }
 
 export function AppVoice() {
@@ -116,15 +116,15 @@ export function AppVoice() {
         <div className="flex items-center gap-3">
           <Phone className="h-6 w-6 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold uppercase tracking-tight">CtrlVoice</h1>
+            <h1 className="text-2xl font-bold">CtrlVoice</h1>
             <p className="text-sm text-muted-foreground">Telephony — phone numbers, calls, voicemails & transcription</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="rounded-none uppercase text-xs font-bold tracking-wider gap-2" onClick={() => setOutboundOpen(true)}>
+          <Button variant="outline" className="rounded-xl uppercase text-xs font-bold tracking-wider gap-2" onClick={() => setOutboundOpen(true)}>
             <PhoneOutgoing className="h-4 w-4" /> Dial
           </Button>
-          <Button className="rounded-none uppercase text-xs font-bold tracking-wider gap-2" onClick={() => setProvisionOpen(true)}>
+          <Button className="rounded-xl uppercase text-xs font-bold tracking-wider gap-2" onClick={() => setProvisionOpen(true)}>
             <Plus className="h-4 w-4" /> Add Number
           </Button>
         </div>
@@ -132,18 +132,18 @@ export function AppVoice() {
 
       {/* Active call bar */}
       {callActive && (
-        <Card className="rounded-none border-green-500 bg-green-50">
+        <Card className="rounded-xl border-green-500 bg-green-50">
           <CardContent className="py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <span className="font-semibold text-sm text-green-800">Call active {activeSid && <span className="text-xs font-mono opacity-70">({activeSid.slice(-8)})</span>}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline" className="rounded-none gap-1 text-xs" onClick={() => setMuted((m) => !m)}>
+              <Button size="sm" variant="outline" className="rounded-xl gap-1 text-xs" onClick={() => setMuted((m) => !m)}>
                 {muted ? <MicOff className="h-3 w-3" /> : <Mic className="h-3 w-3" />}
                 {muted ? "Unmute" : "Mute"}
               </Button>
-              <Button size="sm" className="rounded-none gap-1 text-xs bg-red-600 hover:bg-red-700 text-white" onClick={() => { setCallActive(false); setActiveSid(null); }}>
+              <Button size="sm" className="rounded-xl gap-1 text-xs bg-red-600 hover:bg-red-700 text-white" onClick={() => { setCallActive(false); setActiveSid(null); }}>
                 <PhoneOff className="h-3 w-3" /> End
               </Button>
             </div>
@@ -152,11 +152,11 @@ export function AppVoice() {
       )}
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="rounded-none">
-          <TabsTrigger value="numbers" className="rounded-none uppercase text-xs font-bold tracking-wider">Numbers</TabsTrigger>
-          <TabsTrigger value="calls" className="rounded-none uppercase text-xs font-bold tracking-wider">Call Log</TabsTrigger>
-          <TabsTrigger value="voicemails" className="rounded-none uppercase text-xs font-bold tracking-wider">
-            Voicemails {unheardVoicemails > 0 && <Badge className="ml-1 rounded-none text-[10px] px-1 h-4">{unheardVoicemails}</Badge>}
+        <TabsList className="rounded-xl">
+          <TabsTrigger value="numbers" className="rounded-xl uppercase text-xs font-bold tracking-wider">Numbers</TabsTrigger>
+          <TabsTrigger value="calls" className="rounded-xl uppercase text-xs font-bold tracking-wider">Call Log</TabsTrigger>
+          <TabsTrigger value="voicemails" className="rounded-xl uppercase text-xs font-bold tracking-wider">
+            Voicemails {unheardVoicemails > 0 && <Badge className="ml-1 rounded-xl text-[10px] px-1 h-4">{unheardVoicemails}</Badge>}
           </TabsTrigger>
         </TabsList>
 
@@ -165,12 +165,12 @@ export function AppVoice() {
           {numbersLoading ? (
             <div className="space-y-3">{[...Array(2)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}</div>
           ) : !numbersData?.numbers?.length ? (
-            <Card className="rounded-none border-dashed">
+            <Card className="rounded-xl border-dashed">
               <CardContent className="py-12 text-center text-muted-foreground">
                 <Phone className="h-10 w-10 mx-auto mb-3 opacity-30" />
                 <p className="font-medium">No phone numbers yet</p>
                 <p className="text-sm mt-1">Add a number to start receiving calls and voicemails.</p>
-                <Button onClick={() => setProvisionOpen(true)} variant="outline" className="mt-4 rounded-none uppercase text-xs font-bold tracking-wider gap-2">
+                <Button onClick={() => setProvisionOpen(true)} variant="outline" className="mt-4 rounded-xl uppercase text-xs font-bold tracking-wider gap-2">
                   <Plus className="h-4 w-4" /> Add Number
                 </Button>
               </CardContent>
@@ -178,7 +178,7 @@ export function AppVoice() {
           ) : (
             <div className="space-y-3">
               {numbersData.numbers.map((n) => (
-                <Card key={n.id} className="rounded-none">
+                <Card key={n.id} className="rounded-xl">
                   <CardContent className="py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Phone className="h-5 w-5 text-primary" />
@@ -188,7 +188,7 @@ export function AppVoice() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {n.active && <Badge variant="outline" className="rounded-none text-xs text-green-600 border-green-300">Active</Badge>}
+                      {n.active && <Badge variant="outline" className="rounded-xl text-xs text-green-600 border-green-300">Active</Badge>}
                       <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => release.mutate({ id: n.id })}>
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
@@ -205,14 +205,14 @@ export function AppVoice() {
           {callsLoading ? (
             <Skeleton className="h-64 w-full" />
           ) : !callsData?.calls?.length ? (
-            <Card className="rounded-none">
+            <Card className="rounded-xl">
               <CardContent className="py-12 text-center text-muted-foreground">
                 <PhoneCall className="h-10 w-10 mx-auto mb-3 opacity-30" />
                 <p>No calls yet.</p>
               </CardContent>
             </Card>
           ) : (
-            <Card className="rounded-none">
+            <Card className="rounded-xl">
               <div className="overflow-x-auto"><Table>
                 <TableHeader>
                   <TableRow>
@@ -250,7 +250,7 @@ export function AppVoice() {
         {/* Voicemails */}
         <TabsContent value="voicemails" className="mt-4 space-y-3">
           {!voicemailsData?.voicemails?.length ? (
-            <Card className="rounded-none">
+            <Card className="rounded-xl">
               <CardContent className="py-12 text-center text-muted-foreground">
                 <Voicemail className="h-10 w-10 mx-auto mb-3 opacity-30" />
                 <p>No voicemails yet.</p>
@@ -258,7 +258,7 @@ export function AppVoice() {
             </Card>
           ) : (
             voicemailsData.voicemails.map((vm) => (
-              <Card key={vm.id} className={`rounded-none ${!vm.listenedAt ? "border-primary/40" : ""}`}>
+              <Card key={vm.id} className={`rounded-xl ${!vm.listenedAt ? "border-primary/40" : ""}`}>
                 <CardContent className="py-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
@@ -266,7 +266,7 @@ export function AppVoice() {
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-sm font-mono">{vm.fromNumber ?? "Unknown"}</span>
-                          {!vm.listenedAt && <Badge className="rounded-none text-[10px] h-4 px-1">New</Badge>}
+                          {!vm.listenedAt && <Badge className="rounded-xl text-[10px] h-4 px-1">New</Badge>}
                           <span className="text-xs text-muted-foreground">{formatDuration(vm.durationSeconds)}</span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5">{new Date(vm.createdAt).toLocaleString()}</p>
@@ -277,14 +277,14 @@ export function AppVoice() {
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       {vm.recordingUrl && (
-                        <Button size="sm" variant="outline" className="rounded-none gap-1 text-xs" asChild>
+                        <Button size="sm" variant="outline" className="rounded-xl gap-1 text-xs" asChild>
                           <a href={vm.recordingUrl} target="_blank" rel="noreferrer">
                             <Play className="h-3 w-3" /> Play
                           </a>
                         </Button>
                       )}
                       {!vm.listenedAt && (
-                        <Button size="sm" variant="ghost" className="rounded-none text-xs" onClick={() => markListened.mutate({ id: vm.id })}>
+                        <Button size="sm" variant="ghost" className="rounded-xl text-xs" onClick={() => markListened.mutate({ id: vm.id })}>
                           Mark heard
                         </Button>
                       )}
@@ -299,16 +299,16 @@ export function AppVoice() {
 
       {/* Provision dialog */}
       <Dialog open={provisionOpen} onOpenChange={setProvisionOpen}>
-        <DialogContent className="max-w-lg rounded-none">
+        <DialogContent className="max-w-lg rounded-xl">
           <DialogHeader>
-            <DialogTitle className="uppercase tracking-tight">Add Phone Number</DialogTitle>
+            <DialogTitle className="">Add Phone Number</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
               <Label className="text-xs uppercase font-bold tracking-wider">Enter number manually</Label>
-              <Input className="rounded-none font-mono" placeholder="+447700900000" value={manualNumber} onChange={(e) => setManualNumber(e.target.value)} />
-              <Input className="rounded-none" placeholder="Friendly name (optional)" value={manualFriendly} onChange={(e) => setManualFriendly(e.target.value)} />
-              <Button className="w-full rounded-none uppercase text-xs font-bold tracking-wider" onClick={() => provision.mutate({ data: { phoneNumber: manualNumber, friendlyName: manualFriendly || undefined } })} disabled={!manualNumber || provision.isPending}>
+              <Input className="rounded-xl font-mono" placeholder="+447700900000" value={manualNumber} onChange={(e) => setManualNumber(e.target.value)} />
+              <Input className="rounded-xl" placeholder="Friendly name (optional)" value={manualFriendly} onChange={(e) => setManualFriendly(e.target.value)} />
+              <Button className="w-full rounded-xl uppercase text-xs font-bold tracking-wider" onClick={() => provision.mutate({ data: { phoneNumber: manualNumber, friendlyName: manualFriendly || undefined } })} disabled={!manualNumber || provision.isPending}>
                 {provision.isPending ? "Provisioning..." : "Add Number"}
               </Button>
             </div>
@@ -317,7 +317,7 @@ export function AppVoice() {
               <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">or search available</span></div>
             </div>
             <div className="flex gap-2">
-              <Input className="rounded-none flex-1" placeholder="Country code (GB, US...)" value={searchCountry} onChange={(e) => setSearchCountry(e.target.value.toUpperCase())} maxLength={2} />
+              <Input className="rounded-xl flex-1" placeholder="Country code (GB, US...)" value={searchCountry} onChange={(e) => setSearchCountry(e.target.value.toUpperCase())} maxLength={2} />
             </div>
             {availableLoading ? (
               <Skeleton className="h-40 w-full" />
@@ -329,7 +329,7 @@ export function AppVoice() {
                       <p className="font-mono text-sm">{n.phoneNumber}</p>
                       <p className="text-xs text-muted-foreground">{n.friendlyName} {n.region && `· ${n.region}`}</p>
                     </div>
-                    <Button size="sm" className="rounded-none text-xs" onClick={() => provision.mutate({ data: { phoneNumber: n.phoneNumber, friendlyName: n.friendlyName } })} disabled={provision.isPending}>
+                    <Button size="sm" className="rounded-xl text-xs" onClick={() => provision.mutate({ data: { phoneNumber: n.phoneNumber, friendlyName: n.friendlyName } })} disabled={provision.isPending}>
                       Select
                     </Button>
                   </div>
@@ -338,26 +338,26 @@ export function AppVoice() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" className="rounded-none" onClick={() => setProvisionOpen(false)}>Cancel</Button>
+            <Button variant="outline" className="rounded-xl" onClick={() => setProvisionOpen(false)}>Cancel</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Outbound call dialog */}
       <Dialog open={outboundOpen} onOpenChange={setOutboundOpen}>
-        <DialogContent className="max-w-sm rounded-none">
+        <DialogContent className="max-w-sm rounded-xl">
           <DialogHeader>
-            <DialogTitle className="uppercase tracking-tight">Make a Call</DialogTitle>
+            <DialogTitle className="">Make a Call</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
               <Label className="text-xs uppercase font-bold tracking-wider">Phone number to call</Label>
-              <Input className="rounded-none font-mono text-lg" placeholder="+447700900000" value={outboundTo} onChange={(e) => setOutboundTo(e.target.value)} />
+              <Input className="rounded-xl font-mono text-lg" placeholder="+447700900000" value={outboundTo} onChange={(e) => setOutboundTo(e.target.value)} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" className="rounded-none" onClick={() => setOutboundOpen(false)}>Cancel</Button>
-            <Button className="rounded-none gap-2 uppercase text-xs font-bold tracking-wider" onClick={() => outboundCall.mutate({ data: { to: outboundTo } })} disabled={!outboundTo || outboundCall.isPending}>
+            <Button variant="outline" className="rounded-xl" onClick={() => setOutboundOpen(false)}>Cancel</Button>
+            <Button className="rounded-xl gap-2 uppercase text-xs font-bold tracking-wider" onClick={() => outboundCall.mutate({ data: { to: outboundTo } })} disabled={!outboundTo || outboundCall.isPending}>
               <Phone className="h-4 w-4" /> Call
             </Button>
           </DialogFooter>

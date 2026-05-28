@@ -53,10 +53,10 @@ type Submission = {
 
 function statusBadge(status: string) {
   if (status === "approved")
-    return <Badge className="rounded-none uppercase bg-green-600 text-white"><CheckCircle className="h-3 w-3 mr-1" />Approved</Badge>;
+    return <Badge className="rounded-xl uppercase bg-green-600 text-white"><CheckCircle className="h-3 w-3 mr-1" />Approved</Badge>;
   if (status === "rejected")
-    return <Badge variant="destructive" className="rounded-none uppercase"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>;
-  return <Badge className="rounded-none uppercase bg-amber-500 text-white"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
+    return <Badge variant="destructive" className="rounded-xl uppercase"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>;
+  return <Badge className="rounded-xl uppercase bg-amber-500 text-white"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
 }
 
 export function AdminCompliance() {
@@ -107,7 +107,7 @@ export function AdminCompliance() {
                 key={s}
                 variant={statusFilter === s ? "default" : "outline"}
                 size="sm"
-                className="uppercase tracking-wider font-bold text-xs rounded-none"
+                className="font-bold text-xs rounded-xl"
                 onClick={() => setStatusFilter(s)}
               >
                 {s}
@@ -119,7 +119,7 @@ export function AdminCompliance() {
 
       <Card className="border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-sm">
+          <CardTitle className=" text-sm">
             Verification Submissions
           </CardTitle>
         </CardHeader>
@@ -129,7 +129,7 @@ export function AdminCompliance() {
           ) : submissions.length === 0 ? (
             <div className="py-16 flex flex-col items-center gap-3 text-center">
               <ShieldCheck className="h-10 w-10 text-zinc-700" />
-              <p className="font-bold uppercase tracking-wider text-sm text-zinc-400">
+              <p className="font-bold text-sm text-zinc-400">
                 {statusFilter === "pending" ? "Queue is clear" : "No submissions found"}
               </p>
               <p className="text-xs text-zinc-600 font-mono">
@@ -177,7 +177,7 @@ export function AdminCompliance() {
                         <div className="flex gap-2">
                           <Button
                             size="sm"
-                            className="rounded-none uppercase tracking-wider font-bold text-xs bg-green-600 hover:bg-green-700 text-white"
+                            className="rounded-xl font-bold text-xs bg-green-600 hover:bg-green-700 text-white"
                             onClick={() => approve.mutate({ submissionId: sub.id })}
                             disabled={approve.isPending}
                             data-testid={`button-approve-${sub.id}`}
@@ -187,7 +187,7 @@ export function AdminCompliance() {
                           <Button
                             size="sm"
                             variant="destructive"
-                            className="rounded-none uppercase tracking-wider font-bold text-xs"
+                            className="rounded-xl font-bold text-xs"
                             onClick={() => {
                               setSelected(sub);
                               setRejectDialogOpen(true);
@@ -214,9 +214,9 @@ export function AdminCompliance() {
 
       {selected && (
         <Dialog open={!!selected && !rejectDialogOpen} onOpenChange={(open) => { if (!open) setSelected(null); }}>
-          <DialogContent className="rounded-none max-w-2xl">
+          <DialogContent className="rounded-xl max-w-2xl">
             <DialogHeader>
-              <DialogTitle className="uppercase tracking-tighter flex items-center gap-2">
+              <DialogTitle className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5" /> {selected.tenantName} — Submitted Documents
               </DialogTitle>
             </DialogHeader>
@@ -262,7 +262,7 @@ export function AdminCompliance() {
                                 href={doc.documentUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-xs underline uppercase tracking-wider font-bold"
+                                className="text-xs underline font-bold"
                               >
                                 View
                               </a>
@@ -278,7 +278,7 @@ export function AdminCompliance() {
             {selected.status === "pending" && (
               <DialogFooter className="gap-2">
                 <Button
-                  className="rounded-none uppercase tracking-wider font-bold bg-green-600 hover:bg-green-700 text-white"
+                  className="rounded-xl font-bold bg-green-600 hover:bg-green-700 text-white"
                   onClick={() => approve.mutate({ submissionId: selected.id })}
                   disabled={approve.isPending}
                 >
@@ -286,7 +286,7 @@ export function AdminCompliance() {
                 </Button>
                 <Button
                   variant="destructive"
-                  className="rounded-none uppercase tracking-wider font-bold"
+                  className="rounded-xl font-bold"
                   onClick={() => setRejectDialogOpen(true)}
                 >
                   <XCircle className="h-4 w-4 mr-2" /> Reject
@@ -298,9 +298,9 @@ export function AdminCompliance() {
       )}
 
       <Dialog open={rejectDialogOpen} onOpenChange={(open) => { if (!open) { setRejectDialogOpen(false); setRejectReason(""); } }}>
-        <DialogContent className="rounded-none max-w-lg">
+        <DialogContent className="rounded-xl max-w-lg">
           <DialogHeader>
-            <DialogTitle className="uppercase tracking-tighter flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2">
               <ShieldX className="h-5 w-5" /> Reject Application
             </DialogTitle>
           </DialogHeader>
@@ -322,14 +322,14 @@ export function AdminCompliance() {
           <DialogFooter>
             <Button
               variant="outline"
-              className="rounded-none uppercase tracking-wider font-bold text-xs"
+              className="rounded-xl font-bold text-xs"
               onClick={() => { setRejectDialogOpen(false); setRejectReason(""); }}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
-              className="rounded-none uppercase tracking-wider font-bold"
+              className="rounded-xl font-bold"
               disabled={!rejectReason.trim() || reject.isPending}
               onClick={() => {
                 if (!selected) return;

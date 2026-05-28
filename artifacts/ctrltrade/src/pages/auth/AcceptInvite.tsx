@@ -42,7 +42,7 @@ export function AcceptInvite() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
       <Card className="w-full max-w-md  border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tighter">Join {data.tenantName}</CardTitle>
+          <CardTitle className="">Join {data.tenantName}</CardTitle>
           <CardDescription>You've been invited as <strong>{data.role}</strong> ({data.seatType} seat) on CtrlTrade®.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -58,17 +58,17 @@ export function AcceptInvite() {
           >
             <div className="space-y-1">
               <Label>Email</Label>
-              <Input value={data.email} disabled className="rounded-none" />
+              <Input value={data.email} disabled className="rounded-xl" />
             </div>
             {data.requiresPassword && (
               <>
                 <div className="space-y-1">
                   <Label>Full name</Label>
-                  <Input value={name} onChange={(e) => setName(e.target.value)} required className="rounded-none" data-testid="input-accept-name" />
+                  <Input value={name} onChange={(e) => setName(e.target.value)} required className="rounded-xl" data-testid="input-accept-name" />
                 </div>
                 <div className="space-y-1">
                   <Label>Password (min 8 chars)</Label>
-                  <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} className="rounded-none" data-testid="input-accept-password" />
+                  <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} className="rounded-xl" data-testid="input-accept-password" />
                 </div>
               </>
             )}

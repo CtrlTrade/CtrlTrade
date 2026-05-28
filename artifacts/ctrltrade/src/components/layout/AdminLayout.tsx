@@ -87,7 +87,7 @@ function SidebarContent({
         {!collapsed && (
           <>
             <img src="/assets/ctrltrade-logo.png" alt="CtrlTrade" className="h-7 w-auto object-contain" />
-            <span className="text-xs font-bold uppercase tracking-widest text-primary border border-primary/40 rounded px-1.5 py-0.5 ml-1">
+            <span className="text-xs font-bold text-primary border border-primary/40 rounded px-1.5 py-0.5 ml-1">
               Admin
             </span>
           </>
@@ -102,7 +102,7 @@ function SidebarContent({
         {NAV_GROUPS.map((group) => (
           <div key={group.id}>
             {!collapsed && (
-              <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              <div className="px-3 py-1 text-[10px] font-semibold text-muted-foreground">
                 {group.label}
               </div>
             )}
@@ -137,7 +137,7 @@ function SidebarContent({
           <button
             onClick={onToggleCollapse}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-bold uppercase text-zinc-500 hover:text-zinc-300 hover:bg-sidebar-accent/50 transition-colors ${collapsed ? "justify-center" : ""}`}
+            className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground hover:text-zinc-300 hover:bg-sidebar-accent/50 transition-colors ${collapsed ? "justify-center" : ""}`}
             data-testid="button-sidebar-collapse"
           >
             {collapsed ? <ChevronsRight className="h-4 w-4" /> : <><ChevronsLeft className="h-4 w-4" /> Collapse</>}
@@ -215,10 +215,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setMobileOpen(false)} />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
           <aside className="relative z-10 w-64 bg-sidebar border-r border-sidebar-border flex flex-col h-full">
             <button
-              className="absolute top-4 right-4 text-zinc-400 hover:text-white"
+              className="absolute top-4 right-4 text-sidebar-foreground/60 hover:text-sidebar-foreground"
               onClick={() => setMobileOpen(false)}
             >
               <X className="h-5 w-5" />
@@ -235,7 +235,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Impersonation banner */}
         {isImpersonating && (
-          <div className="bg-amber-500 text-black px-4 py-2 flex items-center justify-between text-sm font-bold gap-2 shrink-0">
+          <div className="bg-amber-500/15 border-b border-amber-500/25 text-amber-300 px-4 py-2 flex items-center justify-between text-sm font-semibold gap-2 shrink-0">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 shrink-0" />
               <span>
@@ -249,7 +249,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <Button
               size="sm"
               variant="outline"
-              className="shrink-0 rounded-none border-black bg-transparent text-black hover:bg-black/10 uppercase font-bold text-xs"
+              className="shrink-0 rounded-xl border-amber-500/40 bg-transparent text-amber-300 hover:bg-amber-500/20 font-semibold text-xs"
               onClick={handleStopImpersonation}
               disabled={stopImpersonation.isPending}
               data-testid="button-stop-impersonation"
@@ -277,7 +277,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               size="sm"
               onClick={handleLogout}
               data-testid="button-admin-logout"
-              className="gap-2 uppercase text-xs tracking-wider font-bold border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              className="gap-2 text-xs font-semibold border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             >
               <LogOut className="h-4 w-4" />
               Log Out

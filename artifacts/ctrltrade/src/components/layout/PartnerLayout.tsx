@@ -46,7 +46,7 @@ export function PartnerLayout({ children }: { children: React.ReactNode }) {
       <aside className="w-64 border-r border-border bg-sidebar flex flex-col hidden md:flex">
         <div className="h-16 flex items-center gap-3 px-4 border-b border-sidebar-border bg-sidebar">
           <img src="/assets/ctrltrade-logo.png" alt="CtrlTrade" className="h-7 w-auto object-contain" />
-          <span className="text-xs font-bold uppercase tracking-widest text-sidebar-foreground/60 border border-sidebar-foreground/20 rounded px-1.5 py-0.5">Partners</span>
+          <span className="text-xs font-bold text-sidebar-foreground/60 border border-sidebar-foreground/20 rounded px-1.5 py-0.5">Partners</span>
         </div>
         <nav className="flex-1 overflow-y-auto p-4 space-y-1">
           {links.map((link) => {
@@ -60,14 +60,14 @@ export function PartnerLayout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
         <div className="border-t border-sidebar-border p-4 text-xs text-sidebar-foreground/80">
-          <div className="font-bold uppercase tracking-wider">{partner.name}</div>
+          <div className="font-bold">{partner.name}</div>
           <div className="opacity-70">{partner.email}</div>
-          <div className="mt-2 inline-block bg-sidebar-accent/40 px-2 py-0.5 uppercase tracking-wider">{partner.status}</div>
+          <div className="mt-2 inline-block bg-sidebar-accent/40 px-2 py-0.5">{partner.status}</div>
         </div>
       </aside>
       <div className="flex-1 flex flex-col">
         <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6">
-          <span className="font-bold text-lg uppercase tracking-tight">Partner Portal</span>
+          <span className="font-bold text-lg">Partner Portal</span>
           <Button variant="ghost" size="sm" onClick={() => logout.mutate()} data-testid="button-partner-logout" className="gap-2 uppercase text-xs tracking-wider font-bold">
             <LogOut className="h-4 w-4" />
             Log Out

@@ -173,7 +173,7 @@ export function AdminTenantWhiteLabel() {
   };
 
   if (isLoading || !data) {
-    return <div className="p-8"><Skeleton className="h-96 bg-zinc-900" /></div>;
+    return <div className="p-8"><Skeleton className="h-96 bg-card" /></div>;
   }
 
   return (
@@ -183,28 +183,28 @@ export function AdminTenantWhiteLabel() {
           <Link href={`/tenants/${tenantId}`} className="text-xs uppercase font-bold text-zinc-400 hover:text-white flex items-center gap-1">
             <ArrowLeft className="h-3 w-3" /> Back to tenant
           </Link>
-          <h1 className="text-3xl font-bold uppercase tracking-tighter text-white mt-2">
+          <h1 className="text-3xl font-bold text-white mt-2">
             White Label · {data.tenant.name}
           </h1>
         </div>
-        <Button onClick={saveConfig} disabled={update.isPending} className="rounded-none bg-red-600 hover:bg-red-700 uppercase text-xs font-bold tracking-wider">
+        <Button onClick={saveConfig} disabled={update.isPending} className="rounded-xl bg-red-600 hover:bg-red-700 uppercase text-xs font-bold tracking-wider">
           {update.isPending ? "Saving…" : "Save Configuration"}
         </Button>
       </div>
 
       {/* Franchise parent */}
-      <Card className="rounded-none border-zinc-800 bg-zinc-950">
+      <Card className="rounded-xl border-border bg-card">
         <CardHeader>
-          <CardTitle className="uppercase text-sm tracking-wider text-zinc-300">Franchise Parent</CardTitle>
+          <CardTitle className="uppercase text-sm tracking-wider text-foreground">Franchise Parent</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
-            <Label className="text-xs uppercase text-zinc-500">Parent tenant ID</Label>
+            <Label className="text-xs text-muted-foreground">Parent tenant ID</Label>
             <Input
               value={parentId}
               onChange={(e) => setParentId(e.target.value)}
               placeholder="UUID of the parent (reseller/franchise) tenant — leave empty for none"
-              className="rounded-none border-zinc-700 bg-black text-white font-mono text-xs"
+              className="rounded-xl border-border bg-input text-foreground font-mono text-xs"
             />
             {data.parent && (
               <div className="text-xs text-zinc-400 mt-1">
@@ -216,79 +216,79 @@ export function AdminTenantWhiteLabel() {
       </Card>
 
       {/* White label */}
-      <Card className="rounded-none border-zinc-800 bg-zinc-950">
+      <Card className="rounded-xl border-border bg-card">
         <CardHeader>
-          <CardTitle className="uppercase text-sm tracking-wider text-zinc-300">White Label Settings</CardTitle>
+          <CardTitle className="uppercase text-sm tracking-wider text-foreground">White Label Settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between border border-zinc-800 p-3">
+          <div className="flex items-center justify-between border border-border p-3">
             <div>
               <div className="text-sm font-bold text-zinc-100">Hide CtrlTrade branding</div>
-              <div className="text-xs text-zinc-500">Removes "Powered by CtrlTrade" badges from this tenant's portal and outbound emails.</div>
+              <div className="text-xs text-muted-foreground">Removes "Powered by CtrlTrade" badges from this tenant's portal and outbound emails.</div>
             </div>
             <Switch checked={wl.hideCtrlTradeBranding} onCheckedChange={(v) => setWl({ ...wl, hideCtrlTradeBranding: v })} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs uppercase text-zinc-500">Product name</Label>
-              <Input value={wl.productName} onChange={(e) => setWl({ ...wl, productName: e.target.value })} placeholder="e.g. PlumberOps" className="rounded-none border-zinc-700 bg-black text-white" />
+              <Label className="text-xs text-muted-foreground">Product name</Label>
+              <Input value={wl.productName} onChange={(e) => setWl({ ...wl, productName: e.target.value })} placeholder="e.g. PlumberOps" className="rounded-xl border-border bg-input text-foreground" />
             </div>
             <div>
-              <Label className="text-xs uppercase text-zinc-500">Legal entity</Label>
-              <Input value={wl.legalEntity} onChange={(e) => setWl({ ...wl, legalEntity: e.target.value })} placeholder="Operator Ltd" className="rounded-none border-zinc-700 bg-black text-white" />
+              <Label className="text-xs text-muted-foreground">Legal entity</Label>
+              <Input value={wl.legalEntity} onChange={(e) => setWl({ ...wl, legalEntity: e.target.value })} placeholder="Operator Ltd" className="rounded-xl border-border bg-input text-foreground" />
             </div>
             <div>
-              <Label className="text-xs uppercase text-zinc-500">Support email</Label>
-              <Input value={wl.supportEmail} onChange={(e) => setWl({ ...wl, supportEmail: e.target.value })} placeholder="help@your-brand.com" className="rounded-none border-zinc-700 bg-black text-white" />
+              <Label className="text-xs text-muted-foreground">Support email</Label>
+              <Input value={wl.supportEmail} onChange={(e) => setWl({ ...wl, supportEmail: e.target.value })} placeholder="help@your-brand.com" className="rounded-xl border-border bg-input text-foreground" />
             </div>
             <div>
-              <Label className="text-xs uppercase text-zinc-500">Support phone</Label>
-              <Input value={wl.supportPhone} onChange={(e) => setWl({ ...wl, supportPhone: e.target.value })} className="rounded-none border-zinc-700 bg-black text-white" />
+              <Label className="text-xs text-muted-foreground">Support phone</Label>
+              <Input value={wl.supportPhone} onChange={(e) => setWl({ ...wl, supportPhone: e.target.value })} className="rounded-xl border-border bg-input text-foreground" />
             </div>
             <div>
-              <Label className="text-xs uppercase text-zinc-500">Outbound email domain</Label>
-              <Input value={wl.outboundEmailDomain} onChange={(e) => setWl({ ...wl, outboundEmailDomain: e.target.value })} placeholder="mail.your-brand.com" className="rounded-none border-zinc-700 bg-black text-white" />
+              <Label className="text-xs text-muted-foreground">Outbound email domain</Label>
+              <Input value={wl.outboundEmailDomain} onChange={(e) => setWl({ ...wl, outboundEmailDomain: e.target.value })} placeholder="mail.your-brand.com" className="rounded-xl border-border bg-input text-foreground" />
             </div>
             <div>
-              <Label className="text-xs uppercase text-zinc-500">Outbound "from" name</Label>
-              <Input value={wl.outboundFromName} onChange={(e) => setWl({ ...wl, outboundFromName: e.target.value })} className="rounded-none border-zinc-700 bg-black text-white" />
+              <Label className="text-xs text-muted-foreground">Outbound "from" name</Label>
+              <Input value={wl.outboundFromName} onChange={(e) => setWl({ ...wl, outboundFromName: e.target.value })} className="rounded-xl border-border bg-input text-foreground" />
             </div>
             <div className="md:col-span-2">
-              <Label className="text-xs uppercase text-zinc-500">Outbound "from" email</Label>
-              <Input value={wl.outboundFromEmail} onChange={(e) => setWl({ ...wl, outboundFromEmail: e.target.value })} placeholder="no-reply@your-brand.com" className="rounded-none border-zinc-700 bg-black text-white" />
+              <Label className="text-xs text-muted-foreground">Outbound "from" email</Label>
+              <Input value={wl.outboundFromEmail} onChange={(e) => setWl({ ...wl, outboundFromEmail: e.target.value })} placeholder="no-reply@your-brand.com" className="rounded-xl border-border bg-input text-foreground" />
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Reseller profile */}
-      <Card className="rounded-none border-zinc-800 bg-zinc-950">
+      <Card className="rounded-xl border-border bg-card">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="uppercase text-sm tracking-wider text-zinc-300">Reseller Profile</CardTitle>
+          <CardTitle className="uppercase text-sm tracking-wider text-foreground">Reseller Profile</CardTitle>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-zinc-500 uppercase">Enabled</span>
+            <span className="text-xs text-muted-foreground">Enabled</span>
             <Switch checked={resellerEnabled} onCheckedChange={setResellerEnabled} />
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {!resellerEnabled ? (
-            <p className="text-xs text-zinc-500">When enabled, members of this tenant can access the Reseller console at <code className="text-zinc-300">/reseller</code> and see MRR across child tenants.</p>
+            <p className="text-xs text-muted-foreground">When enabled, members of this tenant can access the Reseller console at <code className="text-foreground">/reseller</code> and see MRR across child tenants.</p>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs uppercase text-zinc-500">Display name</Label>
-                  <Input value={reseller.displayName} onChange={(e) => setReseller({ ...reseller, displayName: e.target.value })} className="rounded-none border-zinc-700 bg-black text-white" />
+                  <Label className="text-xs text-muted-foreground">Display name</Label>
+                  <Input value={reseller.displayName} onChange={(e) => setReseller({ ...reseller, displayName: e.target.value })} className="rounded-xl border-border bg-input text-foreground" />
                 </div>
                 <div>
-                  <Label className="text-xs uppercase text-zinc-500">Contact email</Label>
-                  <Input value={reseller.contactEmail} onChange={(e) => setReseller({ ...reseller, contactEmail: e.target.value })} className="rounded-none border-zinc-700 bg-black text-white" />
+                  <Label className="text-xs text-muted-foreground">Contact email</Label>
+                  <Input value={reseller.contactEmail} onChange={(e) => setReseller({ ...reseller, contactEmail: e.target.value })} className="rounded-xl border-border bg-input text-foreground" />
                 </div>
                 <div>
-                  <Label className="text-xs uppercase text-zinc-500">Revenue share %</Label>
+                  <Label className="text-xs text-muted-foreground">Revenue share %</Label>
                   <Input type="number" min={0} max={100} value={reseller.revenueSharePct}
                     onChange={(e) => setReseller({ ...reseller, revenueSharePct: Number(e.target.value) })}
-                    className="rounded-none border-zinc-700 bg-black text-white font-mono" />
+                    className="rounded-xl border-border bg-input text-foreground font-mono" />
                 </div>
                 <div className="flex items-end">
                   <div className="flex items-center gap-2">
@@ -297,8 +297,8 @@ export function AdminTenantWhiteLabel() {
                   </div>
                 </div>
                 <div className="md:col-span-2">
-                  <Label className="text-xs uppercase text-zinc-500">Notes</Label>
-                  <Textarea value={reseller.notes} onChange={(e) => setReseller({ ...reseller, notes: e.target.value })} className="rounded-none border-zinc-700 bg-black text-white" />
+                  <Label className="text-xs text-muted-foreground">Notes</Label>
+                  <Textarea value={reseller.notes} onChange={(e) => setReseller({ ...reseller, notes: e.target.value })} className="rounded-xl border-border bg-input text-foreground" />
                 </div>
               </div>
             </>
@@ -307,20 +307,20 @@ export function AdminTenantWhiteLabel() {
       </Card>
 
       {/* Child tenants */}
-      <Card className="rounded-none border-zinc-800 bg-zinc-950">
+      <Card className="rounded-xl border-border bg-card">
         <CardHeader>
-          <CardTitle className="uppercase text-sm tracking-wider text-zinc-300">Child Tenants ({children?.length ?? 0})</CardTitle>
+          <CardTitle className="uppercase text-sm tracking-wider text-foreground">Child Tenants ({children?.length ?? 0})</CardTitle>
         </CardHeader>
         <CardContent>
           {!children || children.length === 0 ? (
-            <p className="text-xs text-zinc-500 font-mono">No child tenants yet. Assign this tenant ID as the parent on any child tenant to roll them up here.</p>
+            <p className="text-xs text-muted-foreground font-mono">No child tenants yet. Assign this tenant ID as the parent on any child tenant to roll them up here.</p>
           ) : (
-            <div className="divide-y divide-zinc-800 border border-zinc-800">
+            <div className="divide-y divide-zinc-800 border border-border">
               {children.map((c) => (
                 <div key={c.id} className="grid grid-cols-12 gap-4 p-3 items-center text-sm">
                   <div className="col-span-5 font-bold text-zinc-100">{c.name}</div>
                   <div className="col-span-3 text-xs text-zinc-400 font-mono">{c.status}</div>
-                  <div className="col-span-3 font-mono text-zinc-300">MRR {c.currency ?? "GBP"} {c.mrr.toFixed(2)}</div>
+                  <div className="col-span-3 font-mono text-foreground">MRR {c.currency ?? "GBP"} {c.mrr.toFixed(2)}</div>
                   <div className="col-span-1 text-right">
                     <Link href={`/tenants/${c.id}`} className="text-xs uppercase font-bold text-red-500 hover:text-red-400">View</Link>
                   </div>
@@ -332,59 +332,59 @@ export function AdminTenantWhiteLabel() {
       </Card>
 
       {/* Custom domains */}
-      <Card className="rounded-none border-zinc-800 bg-zinc-950">
+      <Card className="rounded-xl border-border bg-card">
         <CardHeader>
-          <CardTitle className="uppercase text-sm tracking-wider text-zinc-300">Custom Domains</CardTitle>
+          <CardTitle className="uppercase text-sm tracking-wider text-foreground">Custom Domains</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2 items-end">
             <div className="flex-1">
-              <Label className="text-xs uppercase text-zinc-500">Hostname</Label>
-              <Input value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="portal.your-brand.com" className="rounded-none border-zinc-700 bg-black text-white font-mono" />
+              <Label className="text-xs text-muted-foreground">Hostname</Label>
+              <Input value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="portal.your-brand.com" className="rounded-xl border-border bg-input text-foreground font-mono" />
             </div>
             <div>
-              <Label className="text-xs uppercase text-zinc-500">Kind</Label>
-              <select value={newDomainKind} onChange={(e) => setNewDomainKind(e.target.value as "portal" | "app")} className="block w-32 h-10 px-2 border border-zinc-700 bg-black text-white text-sm rounded-none">
+              <Label className="text-xs text-muted-foreground">Kind</Label>
+              <select value={newDomainKind} onChange={(e) => setNewDomainKind(e.target.value as "portal" | "app")} className="block w-32 h-10 px-2 border border-border bg-input text-foreground text-sm rounded-xl">
                 <option value="portal">Portal</option>
                 <option value="app">App</option>
               </select>
             </div>
-            <Button onClick={onAddDomain} disabled={addDomain.isPending} className="rounded-none bg-zinc-800 hover:bg-zinc-700 uppercase text-xs font-bold">Add</Button>
+            <Button onClick={onAddDomain} disabled={addDomain.isPending} className="rounded-xl bg-zinc-800 hover:bg-zinc-700 uppercase text-xs font-bold">Add</Button>
           </div>
 
           {domainsLoading ? (
-            <Skeleton className="h-24 bg-zinc-900" />
+            <Skeleton className="h-24 bg-card" />
           ) : !domains || domains.length === 0 ? (
-            <p className="text-xs text-zinc-500 font-mono">No custom domains configured.</p>
+            <p className="text-xs text-muted-foreground font-mono">No custom domains configured.</p>
           ) : (
             <div className="space-y-3">
               {domains.map((d) => (
-                <div key={d.id} className="border border-zinc-800 p-4 space-y-2">
+                <div key={d.id} className="border border-border p-4 space-y-2">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-bold text-zinc-100 font-mono">{d.hostname}</div>
-                      <div className="text-[10px] uppercase text-zinc-500 mt-1">{d.kind} domain</div>
+                      <div className="text-[10px] uppercase text-muted-foreground mt-1">{d.kind} domain</div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${
+                      <span className={`px-2 py-1 text-[10px] font-bold flex items-center gap-1 ${
                         d.status === 'verified' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
                         d.status === 'failed' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
-                        'bg-zinc-800 text-zinc-300 border border-zinc-700'
+                        'bg-zinc-800 text-foreground border border-zinc-700'
                       }`}>
                         {d.status === 'verified' ? <ShieldCheck className="h-3 w-3" /> : d.status === 'failed' ? <AlertTriangle className="h-3 w-3" /> : null}
                         {d.status}
                       </span>
-                      <Button size="sm" variant="outline" onClick={() => onVerifyDomain(d.id)} disabled={verifyDomain.isPending} className="rounded-none border-zinc-700 uppercase text-xs font-bold gap-1">
+                      <Button size="sm" variant="outline" onClick={() => onVerifyDomain(d.id)} disabled={verifyDomain.isPending} className="rounded-xl border-zinc-700 uppercase text-xs font-bold gap-1">
                         <RefreshCw className="h-3 w-3" /> Verify
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => onDeleteDomain(d.id, d.hostname)} className="rounded-none border-zinc-700 uppercase text-xs font-bold gap-1 text-red-500 hover:text-red-400">
+                      <Button size="sm" variant="outline" onClick={() => onDeleteDomain(d.id, d.hostname)} className="rounded-xl border-zinc-700 uppercase text-xs font-bold gap-1 text-red-500 hover:text-red-400">
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
                   </div>
-                  <div className="text-[11px] font-mono text-zinc-400 bg-black/50 border border-zinc-800 p-2">
+                  <div className="text-[11px] font-mono text-zinc-400 bg-black/50 border border-border p-2">
                     Publish TXT record at <span className="text-zinc-200">{d.hostname}</span>:
-                    <pre className="mt-1 text-zinc-300 whitespace-pre-wrap break-all">{`"ctrltrade-verify=${d.verificationToken}"`}</pre>
+                    <pre className="mt-1 text-foreground whitespace-pre-wrap break-all">{`"ctrltrade-verify=${d.verificationToken}"`}</pre>
                     {d.lastError && <div className="text-red-400 mt-2">Last error: {d.lastError}</div>}
                   </div>
                 </div>

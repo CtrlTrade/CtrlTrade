@@ -77,7 +77,7 @@ export function IntegrationsPanel() {
   return (
     <div className="space-y-4" data-testid="integrations-panel">
       <div>
-        <h2 className="text-xl font-bold uppercase tracking-tight">Integrations</h2>
+        <h2 className="text-xl font-bold">Integrations</h2>
         <p className="text-sm text-muted-foreground">
           Connect accounting, calendar, and lead platforms to automate your workflow.
         </p>
@@ -96,11 +96,11 @@ export function IntegrationsPanel() {
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     {isApiKey && <Key className="h-4 w-4 text-muted-foreground" />}
-                    <CardTitle className="uppercase tracking-tight text-base">{p.label}</CardTitle>
+                    <CardTitle className=" text-base">{p.label}</CardTitle>
                   </div>
                   <Badge
                     variant="outline"
-                    className={`rounded-none uppercase text-xs ${status === "connected" ? "border-green-600 text-green-700" : status === "error" ? "border-red-600 text-red-700" : "border-border text-muted-foreground"}`}
+                    className={`rounded-xl uppercase text-xs ${status === "connected" ? "border-green-600 text-green-700" : status === "error" ? "border-red-600 text-red-700" : "border-border text-muted-foreground"}`}
                     data-testid={`integration-status-${p.id}`}
                   >
                     {status}
@@ -148,7 +148,7 @@ export function IntegrationsPanel() {
                     <Input
                       type="password"
                       placeholder="Paste your API key..."
-                      className="rounded-none text-xs font-mono h-8"
+                      className="rounded-xl text-xs font-mono h-8"
                       value={apiKeyInputs[p.id] ?? ""}
                       onChange={(e) => setApiKeyInputs((prev) => ({ ...prev, [p.id]: e.target.value }))}
                       data-testid={`apikey-input-${p.id}`}
@@ -160,7 +160,7 @@ export function IntegrationsPanel() {
                   {!isApiKey && status !== "connected" && (
                     <Button
                       size="sm"
-                      className="rounded-none uppercase font-bold tracking-wider"
+                      className="rounded-xl uppercase font-bold tracking-wider"
                       disabled={!p.enabled || !p.configured || connect.isPending}
                       onClick={() => connect.mutate({ provider: p.id })}
                       data-testid={`button-connect-${p.id}`}
@@ -172,7 +172,7 @@ export function IntegrationsPanel() {
                   {isApiKey && status !== "connected" && (
                     <Button
                       size="sm"
-                      className="rounded-none uppercase font-bold tracking-wider"
+                      className="rounded-xl uppercase font-bold tracking-wider"
                       disabled={!p.enabled || !apiKeyInputs[p.id]?.trim() || connectApiKey.isPending}
                       onClick={() =>
                         connectApiKey.mutate({
@@ -191,7 +191,7 @@ export function IntegrationsPanel() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="rounded-none uppercase font-bold tracking-wider"
+                        className="rounded-xl uppercase font-bold tracking-wider"
                         onClick={() => {
                           setSyncingProvider(p.id);
                           setSyncErrors((prev) => { const next = { ...prev }; delete next[p.id]; return next; });
@@ -206,7 +206,7 @@ export function IntegrationsPanel() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="rounded-none uppercase font-bold tracking-wider"
+                        className="rounded-xl uppercase font-bold tracking-wider"
                         onClick={() => {
                           if (confirm(`Disconnect ${p.label}?`)) disconnect.mutate({ provider: p.id });
                         }}
@@ -219,7 +219,7 @@ export function IntegrationsPanel() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="rounded-none uppercase font-bold tracking-wider"
+                    className="rounded-xl uppercase font-bold tracking-wider"
                     onClick={() => setLogsFor(logsFor === p.id ? null : p.id)}
                     data-testid={`button-logs-${p.id}`}
                   >

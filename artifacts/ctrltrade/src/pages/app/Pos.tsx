@@ -33,7 +33,7 @@ export function AppPos() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">CtrlTradePos® Control</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">CtrlTradePos® Control</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Manage catalogue, stock, trade accounts and purchase orders. Open the mobile app to take sales.
         </p>
@@ -44,13 +44,13 @@ export function AppPos() {
             <Card className=" border-border shadow-sm hover:bg-muted/30 cursor-pointer transition-colors">
               <CardHeader className="flex flex-row items-center gap-3 pb-2">
                 <t.icon className="h-5 w-5 text-primary" />
-                <CardTitle className="uppercase tracking-tight text-base">{t.label}</CardTitle>
+                <CardTitle className=" text-base">{t.label}</CardTitle>
               </CardHeader>
               <CardContent>
                 {t.count !== null && (
                   <div className="text-3xl font-bold tracking-tighter">{t.count}</div>
                 )}
-                <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">{t.hint}</div>
+                <div className="text-xs text-muted-foreground mt-1">{t.hint}</div>
               </CardContent>
             </Card>
           </Link>

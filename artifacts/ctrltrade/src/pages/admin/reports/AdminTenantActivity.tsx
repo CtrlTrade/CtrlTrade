@@ -12,14 +12,14 @@ export function AdminTenantActivityReport() {
           </button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">Tenant Activity</h1>
+          <h1 className="text-3xl font-bold text-white">Tenant Activity</h1>
           <p className="text-sm text-zinc-500 mt-1">Jobs, quotes, and invoices created per tenant.</p>
         </div>
       </div>
 
-      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-zinc-100">Activity Per Tenant</CardTitle>
+          <CardTitle className=" text-zinc-100">Activity Per Tenant</CardTitle>
           <CardDescription>Volume of key entities created across all tenants.</CardDescription>
         </CardHeader>
         <CardContent>

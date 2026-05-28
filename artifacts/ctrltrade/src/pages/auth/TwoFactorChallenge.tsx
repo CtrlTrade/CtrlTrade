@@ -39,7 +39,7 @@ export function TwoFactorChallenge({ onSuccess, onCancel }: Props) {
         <CardHeader className="space-y-2">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-primary" />
-            <CardTitle className="text-2xl font-bold uppercase tracking-tighter">Two-Factor Authentication</CardTitle>
+            <CardTitle className="text-2xl font-bold">Two-Factor Authentication</CardTitle>
           </div>
           <CardDescription>
             {useRecovery
@@ -58,7 +58,7 @@ export function TwoFactorChallenge({ onSuccess, onCancel }: Props) {
                   onChange={(e) => setRecoveryCode(e.target.value)}
                   placeholder="XXXXX-XXXXX"
                   required
-                  className="rounded-none font-mono"
+                  className="rounded-xl font-mono"
                   data-testid="input-2fa-recovery"
                 />
               </div>
@@ -73,14 +73,14 @@ export function TwoFactorChallenge({ onSuccess, onCancel }: Props) {
                   maxLength={6}
                   inputMode="numeric"
                   required
-                  className="rounded-none font-mono text-center text-2xl tracking-widest"
+                  className="rounded-xl font-mono text-center text-2xl tracking-widest"
                   data-testid="input-2fa-code"
                 />
               </div>
             )}
             <Button
               type="submit"
-              className="w-full font-bold uppercase tracking-wider"
+              className="w-full font-bold"
               disabled={submit.isPending}
               data-testid="button-2fa-verify"
             >

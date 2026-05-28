@@ -74,7 +74,7 @@ export function AdminLeads() {
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 uppercase text-xs font-bold border-zinc-700 text-zinc-300 hover:border-zinc-500 rounded-none"
+              className="gap-2 uppercase text-xs font-bold border-zinc-700 text-zinc-300 hover:border-zinc-500 rounded-xl"
               onClick={() => fileRef.current?.click()}
               disabled={importMutation.isPending}
             >
@@ -84,14 +84,14 @@ export function AdminLeads() {
             <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
             <Button
               variant="ghost" size="sm"
-              className={`gap-1 uppercase text-xs font-bold ${view === "table" ? "text-red-500" : "text-zinc-500"}`}
+              className={`gap-1 uppercase text-xs font-bold ${view === "table" ? "text-red-500" : "text-muted-foreground"}`}
               onClick={() => setView("table")}
             >
               <LayoutList className="h-3.5 w-3.5" /> Table
             </Button>
             <Button
               variant="ghost" size="sm"
-              className={`gap-1 uppercase text-xs font-bold ${view === "kanban" ? "text-red-500" : "text-zinc-500"}`}
+              className={`gap-1 uppercase text-xs font-bold ${view === "kanban" ? "text-red-500" : "text-muted-foreground"}`}
               onClick={() => setView("kanban")}
             >
               <Columns3 className="h-3.5 w-3.5" /> Kanban
@@ -102,9 +102,9 @@ export function AdminLeads() {
 
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            className="pl-9 bg-black border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-zinc-600 rounded-none"
+            className="pl-9 bg-black border-zinc-800 text-zinc-100 placeholder:text-muted-foreground focus-visible:border-zinc-600 rounded-xl"
             placeholder="Search name, email, company…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -118,7 +118,7 @@ export function AdminLeads() {
               className={`px-3 py-1.5 text-xs font-bold uppercase border transition-colors ${
                 statusFilter === s
                   ? "border-red-500 text-red-500 bg-red-500/10"
-                  : "border-zinc-800 text-zinc-500 hover:border-zinc-600"
+                  : "border-zinc-800 text-muted-foreground hover:border-zinc-600"
               }`}
             >
               {s === "all" ? "All" : STATUS_LABELS[s as LeadStatus]}
@@ -158,13 +158,13 @@ function TableView({ leads }: { leads: any[] }) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-zinc-800 bg-zinc-950">
-            <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-zinc-500">Name</th>
-            <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-zinc-500 hidden md:table-cell">Company</th>
-            <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-zinc-500 hidden lg:table-cell">Trade</th>
-            <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-zinc-500 hidden sm:table-cell">Email</th>
-            <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-zinc-500 hidden md:table-cell">Source</th>
-            <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-zinc-500">Status</th>
-            <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-zinc-500 hidden lg:table-cell">Received</th>
+            <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground">Name</th>
+            <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground hidden md:table-cell">Company</th>
+            <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground hidden lg:table-cell">Trade</th>
+            <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground hidden sm:table-cell">Email</th>
+            <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground hidden md:table-cell">Source</th>
+            <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground">Status</th>
+            <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground hidden lg:table-cell">Received</th>
             <th className="w-8"></th>
           </tr>
         </thead>
@@ -175,15 +175,15 @@ function TableView({ leads }: { leads: any[] }) {
               <td className="px-4 py-3 text-zinc-400 hidden md:table-cell">{lead.company ?? "—"}</td>
               <td className="px-4 py-3 text-zinc-400 hidden lg:table-cell">{lead.trade ?? "—"}</td>
               <td className="px-4 py-3 text-zinc-400 font-mono text-xs hidden sm:table-cell">{lead.email}</td>
-              <td className="px-4 py-3 text-zinc-500 text-xs hidden md:table-cell uppercase">{lead.source}</td>
+              <td className="px-4 py-3 text-muted-foreground text-xs hidden md:table-cell ">{lead.source}</td>
               <td className="px-4 py-3">
                 <StatusBadge status={lead.status} />
               </td>
-              <td className="px-4 py-3 text-zinc-500 text-xs font-mono hidden lg:table-cell">
+              <td className="px-4 py-3 text-muted-foreground text-xs font-mono hidden lg:table-cell">
                 {new Date(lead.createdAt).toLocaleDateString()}
               </td>
               <td className="px-4 py-3">
-                <Link href={`/leads/${lead.id}`} className="text-zinc-600 hover:text-red-500 transition-colors">
+                <Link href={`/leads/${lead.id}`} className="text-muted-foreground hover:text-red-500 transition-colors">
                   <ChevronRight className="h-4 w-4" />
                 </Link>
               </td>
@@ -208,8 +208,8 @@ function KanbanView({ leads }: { leads: any[] }) {
       {STATUSES.map((status) => (
         <div key={status} className="flex-shrink-0 w-64">
           <div className="flex items-center justify-between mb-2 px-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">{STATUS_LABELS[status]}</span>
-            <span className="text-xs font-mono text-zinc-600">{grouped[status].length}</span>
+            <span className="text-xs font-bold text-zinc-400">{STATUS_LABELS[status]}</span>
+            <span className="text-xs font-mono text-muted-foreground">{grouped[status].length}</span>
           </div>
           <div className="space-y-2">
             {grouped[status].length === 0 && (
@@ -219,13 +219,13 @@ function KanbanView({ leads }: { leads: any[] }) {
             )}
             {grouped[status].map((lead) => (
               <Link key={lead.id} href={`/leads/${lead.id}`}>
-                <Card className="rounded-none border-zinc-800 bg-zinc-950 hover:border-zinc-600 cursor-pointer transition-colors shadow-none">
+                <Card className="rounded-xl border-zinc-800 bg-zinc-950 hover:border-zinc-600 cursor-pointer transition-colors shadow-none">
                   <CardContent className="p-3 space-y-1">
                     <div className="font-semibold text-zinc-100 text-sm">{lead.name}</div>
                     {lead.company && <div className="text-xs text-zinc-400">{lead.company}</div>}
-                    {lead.trade && <div className="text-xs text-zinc-500">{lead.trade}</div>}
-                    <div className="text-xs font-mono text-zinc-500">{lead.email}</div>
-                    <div className="text-xs text-zinc-600 uppercase">{lead.source}</div>
+                    {lead.trade && <div className="text-xs text-muted-foreground">{lead.trade}</div>}
+                    <div className="text-xs font-mono text-muted-foreground">{lead.email}</div>
+                    <div className="text-xs text-muted-foreground ">{lead.source}</div>
                   </CardContent>
                 </Card>
               </Link>

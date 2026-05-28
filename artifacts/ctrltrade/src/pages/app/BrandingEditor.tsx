@@ -94,7 +94,7 @@ function LogoUpload({
             const url = (result.successful?.[0] as { uploadURL?: string } | undefined)?.uploadURL;
             if (url) onChange(url);
           }}
-          buttonClassName="inline-flex items-center gap-2 uppercase tracking-wider font-bold bg-secondary text-secondary-foreground px-3 py-2 text-xs hover:opacity-90"
+          buttonClassName="inline-flex items-center gap-2 font-bold bg-secondary text-secondary-foreground px-3 py-2 text-xs hover:opacity-90"
         >
           <Upload className="h-3 w-3" /> Upload
         </ObjectUploader>
@@ -103,7 +103,7 @@ function LogoUpload({
             type="button"
             variant="ghost"
             size="sm"
-            className="rounded-none text-xs"
+            className="rounded-xl text-xs"
             onClick={() => onChange("")}
           >
             Remove
@@ -209,7 +209,7 @@ export function AppBrandingEditor() {
     <form onSubmit={submit} className="space-y-6 max-w-5xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Branding</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">Branding</h1>
           <p className="text-muted-foreground text-sm">
             Logos, colours, fonts and document templates applied across CRM, portal, PDFs, emails and POS.
           </p>
@@ -217,7 +217,7 @@ export function AppBrandingEditor() {
         <Button
           type="submit"
           disabled={update.isPending}
-          className="rounded-none uppercase tracking-wider font-bold"
+          className="rounded-xl font-bold"
           data-testid="button-save-branding"
         >
           {update.isPending ? "Saving…" : "Save branding"}
@@ -225,16 +225,16 @@ export function AppBrandingEditor() {
       </div>
 
       <Tabs defaultValue="visual" className="space-y-4">
-        <TabsList className="rounded-none">
-          <TabsTrigger value="visual" className="rounded-none uppercase">Visual</TabsTrigger>
-          <TabsTrigger value="logos" className="rounded-none uppercase">Logos</TabsTrigger>
-          <TabsTrigger value="templates" className="rounded-none uppercase">Templates</TabsTrigger>
+        <TabsList className="rounded-xl">
+          <TabsTrigger value="visual" className="rounded-xl uppercase">Visual</TabsTrigger>
+          <TabsTrigger value="logos" className="rounded-xl uppercase">Logos</TabsTrigger>
+          <TabsTrigger value="templates" className="rounded-xl uppercase">Templates</TabsTrigger>
         </TabsList>
 
         <TabsContent value="visual">
           <Card className=" border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight">Colours & Typography</CardTitle>
+              <CardTitle className="">Colours & Typography</CardTitle>
               <CardDescription>All values are GBP-priced, ® branding preserved.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -272,7 +272,7 @@ export function AppBrandingEditor() {
         <TabsContent value="logos">
           <Card className=" border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight">Logos & Favicon</CardTitle>
+              <CardTitle className="">Logos & Favicon</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-6">
               <LogoUpload label="CRM logo" value={form.logoUrl} onChange={(v) => set("logoUrl", v)} />
@@ -292,7 +292,7 @@ export function AppBrandingEditor() {
           ] as const).map((block) => (
             <Card key={block.k} className=" border-border shadow-sm">
               <CardHeader>
-                <CardTitle className="uppercase tracking-tight">{block.title}</CardTitle>
+                <CardTitle className="">{block.title}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {block.fields.map((field) => {

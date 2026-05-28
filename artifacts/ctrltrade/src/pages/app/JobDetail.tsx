@@ -233,7 +233,7 @@ export function AppJobDetail() {
       </Link>
       <div className="flex flex-wrap gap-y-3 justify-between items-start">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">{data.number}</h1>
           <p className="text-muted-foreground">{data.title}</p>
           <p className="text-sm mt-1">
             Customer: <span className="font-medium">{data.customerName}</span> · Value: <span className="font-mono">{formatGBP(data.valuePence)}</span>
@@ -252,7 +252,7 @@ export function AppJobDetail() {
         <Button
           onClick={() => generateInvoice.mutate({ jobId: id })}
           disabled={generateInvoice.isPending}
-          className="rounded-none uppercase tracking-wider font-bold"
+          className="rounded-xl font-bold"
           data-testid="button-generate-invoice"
         >
           <Receipt className="h-4 w-4 mr-2" />
@@ -261,17 +261,17 @@ export function AppJobDetail() {
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="rounded-none border border-border">
-          <TabsTrigger value="details" className="rounded-none uppercase text-xs tracking-wider font-bold">Details</TabsTrigger>
-          <TabsTrigger value="costs" className="rounded-none uppercase text-xs tracking-wider font-bold" data-testid="tab-costs">
+        <TabsList className="rounded-xl border border-border">
+          <TabsTrigger value="details" className="rounded-xl uppercase text-xs tracking-wider font-bold">Details</TabsTrigger>
+          <TabsTrigger value="costs" className="rounded-xl uppercase text-xs tracking-wider font-bold" data-testid="tab-costs">
             Costs {hasActualCosts && <span className="ml-1.5 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-full">{entries.length}</span>}
           </TabsTrigger>
-          <TabsTrigger value="schedule" className="rounded-none uppercase text-xs tracking-wider font-bold">Schedule</TabsTrigger>
+          <TabsTrigger value="schedule" className="rounded-xl uppercase text-xs tracking-wider font-bold">Schedule</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="space-y-6 mt-4">
           <Card className="border-border shadow-sm">
-            <CardHeader><CardTitle className="uppercase tracking-tight">Details</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="">Details</CardTitle></CardHeader>
             <CardContent className="space-y-2 text-sm">
               {data.description && <p>{data.description}</p>}
               {(data.addressLine1 || data.city) && (
@@ -311,7 +311,7 @@ export function AppJobDetail() {
           {checkins && checkins.length > 0 && (
             <Card className="border-border shadow-sm">
               <CardHeader>
-                <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+                <CardTitle className=" flex items-center gap-2">
                   <Clock className="h-4 w-4" />
                   Check-in History
                 </CardTitle>
@@ -370,7 +370,7 @@ export function AppJobDetail() {
           {(data as any).signoffAt && (
             <Card className="border-border shadow-sm">
               <CardHeader>
-                <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+                <CardTitle className=" flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
                   Job Completion Sign-off
                 </CardTitle>
@@ -378,23 +378,23 @@ export function AppJobDetail() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Signed by</p>
+                    <p className="text-muted-foreground text-xs mb-1">Signed by</p>
                     <p className="font-semibold">{(data as any).signoffName}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Signed at</p>
+                    <p className="text-muted-foreground text-xs mb-1">Signed at</p>
                     <p className="font-semibold">{new Date((data as any).signoffAt).toLocaleString("en-GB")}</p>
                   </div>
                   {(data as any).signoffNote && (
                     <div className="col-span-2">
-                      <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Work done notes</p>
+                      <p className="text-muted-foreground text-xs mb-1">Work done notes</p>
                       <p className="whitespace-pre-wrap">{(data as any).signoffNote}</p>
                     </div>
                   )}
                 </div>
                 {(data as any).signoffImageUrl && (
                   <div>
-                    <p className="text-muted-foreground text-xs uppercase tracking-wider mb-2">Customer Signature</p>
+                    <p className="text-muted-foreground text-xs mb-2">Customer Signature</p>
                     <div className="border border-border rounded p-3 bg-white inline-block">
                       <img
                         src={(data as any).signoffImageUrl}
@@ -443,13 +443,13 @@ export function AppJobDetail() {
 
               <Card className="border-border shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between py-3">
-                  <CardTitle className="uppercase tracking-tight text-sm">Cost Entries</CardTitle>
+                  <CardTitle className=" text-sm">Cost Entries</CardTitle>
                   <div className="flex gap-2">
                     {data.quoteId && !showAddCost && (
                       <Button
                         size="sm"
                         variant="outline"
-                        className="rounded-none uppercase text-xs font-bold tracking-wider"
+                        className="rounded-xl uppercase text-xs font-bold tracking-wider"
                         onClick={() => importFromQuote.mutate({ jobId: id })}
                         disabled={importFromQuote.isPending}
                         data-testid="button-import-quote-costs"
@@ -458,7 +458,7 @@ export function AppJobDetail() {
                       </Button>
                     )}
                     {!showAddCost && (
-                      <Button size="sm" className="rounded-none uppercase text-xs font-bold tracking-wider" onClick={() => setShowAddCost(true)} data-testid="button-add-cost">
+                      <Button size="sm" className="rounded-xl uppercase text-xs font-bold tracking-wider" onClick={() => setShowAddCost(true)} data-testid="button-add-cost">
                         <Plus className="h-3 w-3 mr-1" /> Add cost
                       </Button>
                     )}
@@ -472,7 +472,7 @@ export function AppJobDetail() {
                         <div>
                           <Label className="text-xs">Kind</Label>
                           <Select value={costForm.kind} onValueChange={(v) => setCostForm({ ...costForm, kind: v })}>
-                            <SelectTrigger className="rounded-none h-8"><SelectValue /></SelectTrigger>
+                            <SelectTrigger className="rounded-xl h-8"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="labour">Labour</SelectItem>
                               <SelectItem value="material">Material</SelectItem>
@@ -482,23 +482,23 @@ export function AppJobDetail() {
                         </div>
                         <div className="md:col-span-2">
                           <Label className="text-xs">Description</Label>
-                          <Input className="rounded-none h-8" value={costForm.description} onChange={(e) => setCostForm({ ...costForm, description: e.target.value })} placeholder="e.g. Boiler part, labour hours…" data-testid="input-cost-description" />
+                          <Input className="rounded-xl h-8" value={costForm.description} onChange={(e) => setCostForm({ ...costForm, description: e.target.value })} placeholder="e.g. Boiler part, labour hours…" data-testid="input-cost-description" />
                         </div>
                         <div>
                           <Label className="text-xs">Qty</Label>
-                          <Input className="rounded-none h-8 font-mono" type="number" min="0" step="0.5" value={costForm.quantity} onChange={(e) => setCostForm({ ...costForm, quantity: e.target.value })} />
+                          <Input className="rounded-xl h-8 font-mono" type="number" min="0" step="0.5" value={costForm.quantity} onChange={(e) => setCostForm({ ...costForm, quantity: e.target.value })} />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <Label className="text-xs">Unit cost (£)</Label>
-                          <Input className="rounded-none h-8 font-mono" type="number" min="0" step="0.01" value={costForm.unitCostPence} onChange={(e) => setCostForm({ ...costForm, unitCostPence: e.target.value })} data-testid="input-cost-unit" />
+                          <Input className="rounded-xl h-8 font-mono" type="number" min="0" step="0.01" value={costForm.unitCostPence} onChange={(e) => setCostForm({ ...costForm, unitCostPence: e.target.value })} data-testid="input-cost-unit" />
                         </div>
                         {costForm.kind === "labour" && (
                           <div>
                             <Label className="text-xs">Staff member</Label>
                             <Select value={costForm.userId} onValueChange={(v) => handleCostFormUserChange(v, costForm, setCostForm)}>
-                              <SelectTrigger className="rounded-none h-8"><SelectValue placeholder="Optional" /></SelectTrigger>
+                              <SelectTrigger className="rounded-xl h-8"><SelectValue placeholder="Optional" /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="">— none —</SelectItem>
                                 {team?.members?.map((m: any) => (
@@ -510,10 +510,10 @@ export function AppJobDetail() {
                         )}
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" className="rounded-none uppercase text-xs font-bold tracking-wider" disabled={createCost.isPending || !costForm.description} onClick={handleAddCost} data-testid="button-save-cost">
+                        <Button size="sm" className="rounded-xl uppercase text-xs font-bold tracking-wider" disabled={createCost.isPending || !costForm.description} onClick={handleAddCost} data-testid="button-save-cost">
                           {createCost.isPending ? "Saving…" : "Save"}
                         </Button>
-                        <Button size="sm" variant="outline" className="rounded-none" onClick={() => { setShowAddCost(false); setCostForm(defaultCostForm); }}>Cancel</Button>
+                        <Button size="sm" variant="outline" className="rounded-xl" onClick={() => { setShowAddCost(false); setCostForm(defaultCostForm); }}>Cancel</Button>
                       </div>
                     </div>
                   )}
@@ -540,7 +540,7 @@ export function AppJobDetail() {
                               <>
                                 <td className="p-2">
                                   <Select value={editForm.kind} onValueChange={(v) => setEditForm({ ...editForm, kind: v })}>
-                                    <SelectTrigger className="rounded-none h-7 w-24"><SelectValue /></SelectTrigger>
+                                    <SelectTrigger className="rounded-xl h-7 w-24"><SelectValue /></SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="labour">Labour</SelectItem>
                                       <SelectItem value="material">Material</SelectItem>
@@ -549,13 +549,13 @@ export function AppJobDetail() {
                                   </Select>
                                 </td>
                                 <td className="p-2" colSpan={2}>
-                                  <Input className="rounded-none h-7" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
+                                  <Input className="rounded-xl h-7" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
                                 </td>
                                 <td className="p-2">
-                                  <Input className="rounded-none h-7 w-16 font-mono text-right" type="number" value={editForm.quantity} onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })} />
+                                  <Input className="rounded-xl h-7 w-16 font-mono text-right" type="number" value={editForm.quantity} onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })} />
                                 </td>
                                 <td className="p-2">
-                                  <Input className="rounded-none h-7 w-20 font-mono text-right" type="number" step="0.01" value={editForm.unitCostPence} onChange={(e) => setEditForm({ ...editForm, unitCostPence: e.target.value })} />
+                                  <Input className="rounded-xl h-7 w-20 font-mono text-right" type="number" step="0.01" value={editForm.unitCostPence} onChange={(e) => setEditForm({ ...editForm, unitCostPence: e.target.value })} />
                                 </td>
                                 <td className="p-2 text-right font-mono text-xs text-muted-foreground">
                                   {formatGBP(Math.round((parseFloat(editForm.quantity) || 0) * (parseFloat(editForm.unitCostPence) || 0) * 100))}
@@ -601,7 +601,7 @@ export function AppJobDetail() {
 
         <TabsContent value="schedule" className="space-y-4 mt-4">
           <Card className="border-border shadow-sm">
-            <CardHeader><CardTitle className="uppercase tracking-tight">Schedule & Assignment</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="">Schedule & Assignment</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Start</Label><Input type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} /></div>
@@ -624,7 +624,7 @@ export function AppJobDetail() {
                 </div>
               </div>
               <Button
-                className="rounded-none uppercase tracking-wider font-bold"
+                className="rounded-xl font-bold"
                 disabled={assign.isPending}
                 data-testid="button-save-assignment"
                 onClick={() => assign.mutate({

@@ -23,7 +23,7 @@ export function AppDashboard() {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
-      <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Command Center</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold">Command Center</h1>
       
       <IndustryTourBanner />
 
@@ -36,7 +36,7 @@ export function AppDashboard() {
           {onboarding && (
             <Card className=" border-border shadow-sm">
               <CardHeader>
-                <CardTitle className="uppercase tracking-tight">Onboarding Protocol</CardTitle>
+                <CardTitle className="">Onboarding Protocol</CardTitle>
                 <CardDescription>Complete these steps to fully activate your tenant workspace.</CardDescription>
               </CardHeader>
               <CardContent>
@@ -61,7 +61,7 @@ export function AppDashboard() {
                       </div>
                       {!item.complete && item.href && (
                         <Link href={item.href}>
-                          <Button variant="outline" size="sm" className="rounded-none uppercase tracking-wider text-xs font-bold shrink-0">
+                          <Button variant="outline" size="sm" className="rounded-xl text-xs font-bold shrink-0">
                             Action
                           </Button>
                         </Link>
@@ -104,7 +104,7 @@ function IndustryTourBanner() {
           <div className="flex items-start gap-3">
             <Sparkles className="h-5 w-5 text-primary shrink-0 mt-0.5" />
             <div>
-              <CardTitle className="uppercase tracking-tight text-lg">
+              <CardTitle className=" text-lg">
                 Your workspace is ready
                 {tour.industryName && (
                   <span className="ml-2 text-sm font-mono text-primary bg-primary/10 px-2 py-0.5 border border-primary/20">
@@ -118,7 +118,7 @@ function IndustryTourBanner() {
               {tour.enabledModules.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {tour.enabledModules.map((mod: string) => (
-                    <span key={mod} className="text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground border border-border px-1.5 py-0.5 font-mono">
+                    <span key={mod} className="text-[10px] font-bold bg-muted text-muted-foreground border border-border px-1.5 py-0.5 font-mono">
                       {mod}
                     </span>
                   ))}
@@ -129,7 +129,7 @@ function IndustryTourBanner() {
           <Button
             variant="ghost"
             size="sm"
-            className="shrink-0 h-8 w-8 p-0 rounded-none hover:bg-primary/10"
+            className="shrink-0 h-8 w-8 p-0 rounded-xl hover:bg-primary/10"
             onClick={handleDismiss}
             disabled={dismiss.isPending}
             aria-label="Dismiss onboarding tour"
@@ -172,7 +172,7 @@ function InboxTile() {
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+            <CardTitle className=" flex items-center gap-2">
               <Inbox className="h-5 w-5" /> Inbox
             </CardTitle>
             <CardDescription>
@@ -180,7 +180,7 @@ function InboxTile() {
             </CardDescription>
           </div>
           <Link href="/app/inbox">
-            <Button variant="outline" size="sm" className="rounded-none uppercase tracking-wider text-xs font-bold" data-testid="link-inbox-open">Open inbox</Button>
+            <Button variant="outline" size="sm" className="rounded-xl text-xs font-bold" data-testid="link-inbox-open">Open inbox</Button>
           </Link>
         </div>
       </CardHeader>
@@ -192,7 +192,7 @@ function InboxTile() {
                 <div className="flex items-center justify-between gap-3 p-3 hover:bg-muted/40 cursor-pointer" data-testid={`row-inbox-${t.id}`}>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 text-sm font-bold truncate">
-                      <span className="uppercase tracking-wider text-xs text-muted-foreground">{t.channel}</span>
+                      <span className="text-xs text-muted-foreground">{t.channel}</span>
                       <span className="truncate">{t.customerName ?? t.customerEmail ?? "(unknown)"}</span>
                       {t.unreadCount > 0 && (
                         <span className="ml-auto inline-flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground px-1.5 py-0.5">
@@ -225,7 +225,7 @@ function LeadSourceRoiCard() {
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+            <CardTitle className=" flex items-center gap-2">
               <Target className="h-5 w-5" /> Lead Source ROI
             </CardTitle>
             <CardDescription>
@@ -233,7 +233,7 @@ function LeadSourceRoiCard() {
             </CardDescription>
           </div>
           <Link href="/app/leads">
-            <Button variant="outline" size="sm" className="rounded-none uppercase tracking-wider text-xs font-bold">All leads</Button>
+            <Button variant="outline" size="sm" className="rounded-xl text-xs font-bold">All leads</Button>
           </Link>
         </div>
       </CardHeader>
@@ -241,7 +241,7 @@ function LeadSourceRoiCard() {
         <div className="divide-y divide-border border border-border bg-background">
           {data.rows.map((r) => (
             <div key={r.source} className="grid grid-cols-12 gap-2 p-3 text-sm items-center">
-              <div className="col-span-3 uppercase tracking-wider font-mono font-bold">{r.source}</div>
+              <div className="col-span-3 font-mono font-bold">{r.source}</div>
               <div className="col-span-2 text-muted-foreground">{r.totalLeads} leads</div>
               <div className="col-span-2 text-muted-foreground">{r.wonLeads} won</div>
               <div className="col-span-2 font-mono">{r.conversionPct}%</div>
@@ -259,11 +259,11 @@ function AttentionRequiredCard() {
   if (isLoading || !data) return null;
   if (data.expiredCount === 0 && data.expiringCount === 0) return null;
   return (
-    <Card className="rounded-none border-destructive/40 shadow-sm bg-destructive/5">
+    <Card className="rounded-xl border-destructive/40 shadow-sm bg-destructive/5">
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+            <CardTitle className=" flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-destructive" /> Attention Required
             </CardTitle>
             <CardDescription>
@@ -271,10 +271,10 @@ function AttentionRequiredCard() {
             </CardDescription>
           </div>
           <div className="flex gap-2 shrink-0">
-            <div className="px-2 py-1 text-xs font-bold uppercase tracking-wider bg-destructive/20 text-destructive font-mono">
+            <div className="px-2 py-1 text-xs font-bold bg-destructive/20 text-destructive font-mono">
               {data.expiredCount} expired
             </div>
-            <div className="px-2 py-1 text-xs font-bold uppercase tracking-wider bg-primary/20 text-primary font-mono">
+            <div className="px-2 py-1 text-xs font-bold bg-primary/20 text-primary font-mono">
               {data.expiringCount} expiring
             </div>
           </div>
@@ -314,12 +314,12 @@ function AttentionRequiredCard() {
       </CardContent>
       <CardFooter className="gap-2">
         <Link href="/app/compliance">
-          <Button variant="outline" size="sm" className="rounded-none uppercase tracking-wider text-xs font-bold">
+          <Button variant="outline" size="sm" className="rounded-xl text-xs font-bold">
             Compliance
           </Button>
         </Link>
         <Link href="/app/fleet">
-          <Button variant="outline" size="sm" className="rounded-none uppercase tracking-wider text-xs font-bold">
+          <Button variant="outline" size="sm" className="rounded-xl text-xs font-bold">
             Fleet
           </Button>
         </Link>
@@ -337,8 +337,8 @@ function SubscriptionCard({ subscription }: { subscription: any }) {
       <Card className=" border-border shadow-sm">
         <CardHeader>
           <div className="flex justify-between items-start">
-            <CardTitle className="uppercase tracking-tight">Subscription</CardTitle>
-            <div className={`px-2 py-1 text-xs font-bold uppercase tracking-wider ${
+            <CardTitle className="">Subscription</CardTitle>
+            <div className={`px-2 py-1 text-xs font-bold ${
               subscription.status === 'trial' ? 'bg-primary/20 text-primary' : 
               subscription.status === 'active' ? 'bg-green-500/20 text-green-500' : 
               'bg-destructive/20 text-destructive'
@@ -417,7 +417,7 @@ function UpdateQuantitiesDialog({ subscription, open, onOpenChange }: { subscrip
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className=" border-border sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="uppercase tracking-tight">Update Quantities</DialogTitle>
+          <DialogTitle className="">Update Quantities</DialogTitle>
           <DialogDescription>Adjust the number of seats and tills for your tenant.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
@@ -434,7 +434,7 @@ function UpdateQuantitiesDialog({ subscription, open, onOpenChange }: { subscrip
             <Input id="tills" type="number" min="0" value={tills} onChange={e => setTills(parseInt(e.target.value))} className="col-span-2" />
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={update.isPending} className="rounded-none uppercase font-bold tracking-wider">
+            <Button type="submit" disabled={update.isPending} className="rounded-xl uppercase font-bold tracking-wider">
               {update.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
@@ -466,21 +466,21 @@ function CancelSubscriptionDialog({ open, onOpenChange }: { open: boolean, onOpe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-none border-destructive sm:max-w-[425px]">
+      <DialogContent className="rounded-xl border-destructive sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="uppercase tracking-tight text-destructive">Cancel Subscription</DialogTitle>
+          <DialogTitle className=" text-destructive">Cancel Subscription</DialogTitle>
           <DialogDescription>This action will terminate your subscription at the end of the current billing period.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleCancel} className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="reason">Reason for cancellation</Label>
-            <Input id="reason" value={reason} onChange={e => setReason(e.target.value)} placeholder="Required" required className="rounded-none" />
+            <Input id="reason" value={reason} onChange={e => setReason(e.target.value)} placeholder="Required" required className="rounded-xl" />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="rounded-none uppercase font-bold tracking-wider">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl uppercase font-bold tracking-wider">
               Keep Subscription
             </Button>
-            <Button type="submit" variant="destructive" disabled={cancel.isPending} className="rounded-none uppercase font-bold tracking-wider">
+            <Button type="submit" variant="destructive" disabled={cancel.isPending} className="rounded-xl uppercase font-bold tracking-wider">
               {cancel.isPending ? "Cancelling..." : "Confirm Cancellation"}
             </Button>
           </DialogFooter>

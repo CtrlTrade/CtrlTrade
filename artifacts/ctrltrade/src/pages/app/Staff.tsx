@@ -46,13 +46,13 @@ export function AppStaff() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h2 className="text-2xl font-bold uppercase tracking-tighter">Staff</h2>
+        <h2 className="text-2xl font-bold">Staff</h2>
         <p className="text-sm text-muted-foreground">Invite teammates, manage roles, and toggle access.</p>
       </div>
 
       <Card className=" border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-base">Seat usage</CardTitle>
+          <CardTitle className=" text-base">Seat usage</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-3 gap-4 text-sm">
           <div><div className="text-xs uppercase text-muted-foreground">Control seats</div><div className="text-2xl font-bold" data-testid="text-control-seat-usage">{usage.controlSeatsUsed} / {usage.controlSeatsLimit}</div></div>
@@ -63,7 +63,7 @@ export function AppStaff() {
 
       <Card className=" border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-base">Invite teammate</CardTitle>
+          <CardTitle className=" text-base">Invite teammate</CardTitle>
           <CardDescription>They'll get a magic link to set up their account.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -79,12 +79,12 @@ export function AppStaff() {
           >
             <div>
               <Label>Email</Label>
-              <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required className="rounded-none" data-testid="input-invite-email" />
+              <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required className="rounded-xl" data-testid="input-invite-email" />
             </div>
             <div>
               <Label>Role</Label>
               <Select value={role} onValueChange={(v) => setRole(v as any)}>
-                <SelectTrigger className="rounded-none" data-testid="select-invite-role"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="rounded-xl" data-testid="select-invite-role"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="manager">Manager</SelectItem>
@@ -95,14 +95,14 @@ export function AppStaff() {
             <div>
               <Label>Seat type</Label>
               <Select value={seatType} onValueChange={(v) => setSeatType(v as any)}>
-                <SelectTrigger className="rounded-none" data-testid="select-invite-seat"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="rounded-xl" data-testid="select-invite-seat"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="control">Control (£40)</SelectItem>
                   <SelectItem value="field">Field (£20)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" disabled={invite.isPending} className="rounded-none uppercase font-bold tracking-wider" data-testid="button-send-invite">
+            <Button type="submit" disabled={invite.isPending} className="rounded-xl uppercase font-bold tracking-wider" data-testid="button-send-invite">
               {invite.isPending ? "Sending..." : "Send invite"}
             </Button>
           </form>
@@ -112,7 +112,7 @@ export function AppStaff() {
       {data.invitations.length > 0 && (
         <Card className=" border-border">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight text-base">Pending invitations</CardTitle>
+            <CardTitle className=" text-base">Pending invitations</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto"><table className="w-full text-sm">
@@ -127,8 +127,8 @@ export function AppStaff() {
                     <td>{inv.seatType}</td>
                     <td>{new Date(inv.expiresAt).toLocaleDateString()}</td>
                     <td className="text-right space-x-2">
-                      <Button size="sm" variant="outline" className="rounded-none" onClick={() => resend.mutate({ invitationId: inv.id })}><RotateCw className="h-3 w-3 mr-1" />Resend</Button>
-                      <Button size="sm" variant="outline" className="rounded-none" onClick={() => revoke.mutate({ invitationId: inv.id })}><Trash2 className="h-3 w-3 mr-1" />Revoke</Button>
+                      <Button size="sm" variant="outline" className="rounded-xl" onClick={() => resend.mutate({ invitationId: inv.id })}><RotateCw className="h-3 w-3 mr-1" />Resend</Button>
+                      <Button size="sm" variant="outline" className="rounded-xl" onClick={() => revoke.mutate({ invitationId: inv.id })}><Trash2 className="h-3 w-3 mr-1" />Revoke</Button>
                     </td>
                   </tr>
                 ))}
@@ -140,7 +140,7 @@ export function AppStaff() {
 
       <Card className=" border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-base">Members</CardTitle>
+          <CardTitle className=" text-base">Members</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="overflow-x-auto"><table className="w-full text-sm">
@@ -165,7 +165,7 @@ export function AppStaff() {
                       <span className="uppercase text-xs font-bold">Owner</span>
                     ) : (
                       <Select value={m.role} onValueChange={(v) => update.mutate({ userId: m.userId, data: { role: v } })}>
-                        <SelectTrigger className="rounded-none h-8 w-28"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="rounded-xl h-8 w-28"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="admin">Admin</SelectItem>
                           <SelectItem value="manager">Manager</SelectItem>
@@ -179,7 +179,7 @@ export function AppStaff() {
                       <span className="uppercase text-xs">{m.seatType}</span>
                     ) : (
                       <Select value={m.seatType} onValueChange={(v) => update.mutate({ userId: m.userId, data: { seatType: v } })}>
-                        <SelectTrigger className="rounded-none h-8 w-28"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="rounded-xl h-8 w-28"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="control">Control</SelectItem>
                           <SelectItem value="field">Field</SelectItem>
@@ -192,7 +192,7 @@ export function AppStaff() {
                       <div className="flex items-center gap-1">
                         <span className="text-xs text-muted-foreground">£</span>
                         <Input
-                          className="rounded-none h-7 w-20 font-mono text-sm"
+                          className="rounded-xl h-7 w-20 font-mono text-sm"
                           type="number"
                           min="0"
                           step="0.01"
@@ -240,9 +240,9 @@ export function AppStaff() {
                   <td className="text-right space-x-1">
                     {m.role !== "owner" && !m.isYou && (
                       <>
-                        <Button size="sm" variant="outline" className="rounded-none" title="Send password reset" onClick={() => pwReset.mutate({ userId: m.userId })}><KeyRound className="h-3 w-3" /></Button>
-                        <Button size="sm" variant="outline" className="rounded-none" title={m.status === "active" ? "Disable" : "Reactivate"} onClick={() => update.mutate({ userId: m.userId, data: { status: m.status === "active" ? "disabled" : "active" } })}><Power className="h-3 w-3" /></Button>
-                        <Button size="sm" variant="outline" className="rounded-none" title="Remove" onClick={() => { if (confirm(`Remove ${m.email}?`)) remove.mutate({ userId: m.userId }); }}><Trash2 className="h-3 w-3" /></Button>
+                        <Button size="sm" variant="outline" className="rounded-xl" title="Send password reset" onClick={() => pwReset.mutate({ userId: m.userId })}><KeyRound className="h-3 w-3" /></Button>
+                        <Button size="sm" variant="outline" className="rounded-xl" title={m.status === "active" ? "Disable" : "Reactivate"} onClick={() => update.mutate({ userId: m.userId, data: { status: m.status === "active" ? "disabled" : "active" } })}><Power className="h-3 w-3" /></Button>
+                        <Button size="sm" variant="outline" className="rounded-xl" title="Remove" onClick={() => { if (confirm(`Remove ${m.email}?`)) remove.mutate({ userId: m.userId }); }}><Trash2 className="h-3 w-3" /></Button>
                       </>
                     )}
                   </td>

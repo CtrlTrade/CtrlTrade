@@ -83,9 +83,9 @@ export function AppSettings() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Workspace Settings</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold">Workspace Settings</h1>
       <Tabs defaultValue={typeof window !== "undefined" && new URLSearchParams(window.location.search).get("tab") === "integrations" ? "integrations" : "company"} className="space-y-6">
-        <TabsList className="rounded-none flex-wrap h-auto">
+        <TabsList className="rounded-xl flex-wrap h-auto">
           <TabsTrigger value="company" data-testid="tab-company">Company</TabsTrigger>
           <TabsTrigger value="business-setup" data-testid="tab-business-setup">Business Setup</TabsTrigger>
           <TabsTrigger value="staff" data-testid="tab-staff">Staff</TabsTrigger>
@@ -108,36 +108,36 @@ export function AppSettings() {
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className=" border-border shadow-sm">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight">Company Profile</CardTitle>
+            <CardTitle className="">Company Profile</CardTitle>
             <CardDescription>Core business details and contact information.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Company Name</Label>
-              <Input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required className="rounded-none" data-testid="input-settings-name"/>
+              <Input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required className="rounded-xl" data-testid="input-settings-name"/>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Phone</Label>
-                <Input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="rounded-none" />
+                <Input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="rounded-xl" />
               </div>
               <div className="space-y-2">
                 <Label>Country</Label>
-                <Input value={formData.country} onChange={e => setFormData({...formData, country: e.target.value})} className="rounded-none" />
+                <Input value={formData.country} onChange={e => setFormData({...formData, country: e.target.value})} className="rounded-xl" />
               </div>
             </div>
             <div className="space-y-2">
               <Label>Address</Label>
-              <Input value={formData.addressLine1} onChange={e => setFormData({...formData, addressLine1: e.target.value})} className="rounded-none" />
+              <Input value={formData.addressLine1} onChange={e => setFormData({...formData, addressLine1: e.target.value})} className="rounded-xl" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>City</Label>
-                <Input value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="rounded-none" />
+                <Input value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="rounded-xl" />
               </div>
               <div className="space-y-2">
                 <Label>Postcode</Label>
-                <Input value={formData.postcode} onChange={e => setFormData({...formData, postcode: e.target.value})} className="rounded-none" />
+                <Input value={formData.postcode} onChange={e => setFormData({...formData, postcode: e.target.value})} className="rounded-xl" />
               </div>
             </div>
           </CardContent>
@@ -145,7 +145,7 @@ export function AppSettings() {
 
         <Card className=" border-border shadow-sm">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight">Brand Identity</CardTitle>
+            <CardTitle className="">Brand Identity</CardTitle>
             <CardDescription>
               Logos, colours, fonts and document templates are managed in the dedicated branding editor — applied across CRM, customer portal, PDFs, emails and POS.
             </CardDescription>
@@ -153,7 +153,7 @@ export function AppSettings() {
           <CardContent>
             <Link
               href="/app/settings/branding"
-              className="inline-flex items-center gap-2 uppercase tracking-wider font-bold bg-primary text-primary-foreground px-4 py-2 text-sm hover:opacity-90"
+              className="inline-flex items-center gap-2 font-bold bg-primary text-primary-foreground px-4 py-2 text-sm hover:opacity-90"
               data-testid="link-branding-editor"
             >
               <Palette className="h-4 w-4" /> Open branding editor
@@ -163,7 +163,7 @@ export function AppSettings() {
 
         <Card className=" border-border shadow-sm">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight">Trade Categories</CardTitle>
+            <CardTitle className="">Trade Categories</CardTitle>
             <CardDescription>Select the specific industries your company operates in.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -177,7 +177,7 @@ export function AppSettings() {
                       if (checked) setFormData({...formData, tradeCategorySlugs: [...formData.tradeCategorySlugs, cat.slug]});
                       else setFormData({...formData, tradeCategorySlugs: formData.tradeCategorySlugs.filter(s => s !== cat.slug)});
                     }}
-                    className="rounded-none"
+                    className="rounded-xl"
                   />
                   <label htmlFor={`cat-edit-${cat.slug}`} className="text-sm font-bold uppercase cursor-pointer flex-1">
                     {cat.name}
@@ -189,7 +189,7 @@ export function AppSettings() {
         </Card>
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={updateTenant.isPending} className="rounded-none uppercase font-bold tracking-wider" data-testid="button-settings-save">
+          <Button type="submit" disabled={updateTenant.isPending} className="rounded-xl uppercase font-bold tracking-wider" data-testid="button-settings-save">
             {updateTenant.isPending ? "Saving..." : "Save Settings"}
           </Button>
         </div>
@@ -197,7 +197,7 @@ export function AppSettings() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Lead Capture — Allowed Domains</CardTitle>
+          <CardTitle className="">Lead Capture — Allowed Domains</CardTitle>
           <CardDescription>
             One domain per line (e.g. <code>example.com</code>, <code>www.example.com</code>). Subdomains are included automatically. Leave empty to accept submissions from any origin (server-to-server and form posts without an Origin header are always accepted).
           </CardDescription>
@@ -208,7 +208,7 @@ export function AppSettings() {
             value={formData.leadCaptureAllowedOrigins}
             onChange={(e) => setFormData({ ...formData, leadCaptureAllowedOrigins: e.target.value })}
             placeholder={"example.com\nstaging.example.com"}
-            className="rounded-none font-mono text-xs"
+            className="rounded-xl font-mono text-xs"
             data-testid="textarea-allowed-origins"
           />
           <p className="text-xs text-muted-foreground mt-2">Use the Save Settings button above to apply changes.</p>
@@ -236,7 +236,7 @@ function LeadCaptureSnippetCard() {
   return (
     <Card className=" border-border shadow-sm" data-testid="card-lead-snippet">
       <CardHeader>
-        <CardTitle className="uppercase tracking-tight">Website Lead Capture</CardTitle>
+        <CardTitle className="">Website Lead Capture</CardTitle>
         <CardDescription>
           Paste this snippet on any web page to send enquiries straight into CTRLTRADE® leads.
         </CardDescription>
@@ -245,16 +245,16 @@ function LeadCaptureSnippetCard() {
         <div className="space-y-2">
           <Label>Endpoint</Label>
           <div className="flex gap-2">
-            <Input value={data.endpoint} readOnly className="rounded-none font-mono text-xs" data-testid="input-snippet-endpoint" />
-            <Button type="button" variant="outline" className="rounded-none" onClick={() => copy(data.endpoint, "Endpoint")}>
+            <Input value={data.endpoint} readOnly className="rounded-xl font-mono text-xs" data-testid="input-snippet-endpoint" />
+            <Button type="button" variant="outline" className="rounded-xl" onClick={() => copy(data.endpoint, "Endpoint")}>
               <Copy className="h-4 w-4" />
             </Button>
           </div>
         </div>
         <div className="space-y-2">
           <Label>HTML snippet</Label>
-          <Textarea value={combined} readOnly rows={10} className="rounded-none font-mono text-xs" data-testid="textarea-snippet" />
-          <Button type="button" variant="outline" className="rounded-none uppercase tracking-wider text-xs font-bold" onClick={() => copy(combined, "Snippet")}>
+          <Textarea value={combined} readOnly rows={10} className="rounded-xl font-mono text-xs" data-testid="textarea-snippet" />
+          <Button type="button" variant="outline" className="rounded-xl text-xs font-bold" onClick={() => copy(combined, "Snippet")}>
             <Copy className="h-4 w-4 mr-2" /> Copy snippet
           </Button>
         </div>

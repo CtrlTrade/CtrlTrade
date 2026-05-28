@@ -77,15 +77,15 @@ export function PortalQuote() {
 
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
+          <h1 className="text-3xl font-bold">{data.number}</h1>
           <p className="text-muted-foreground">{data.title}</p>
         </div>
-        <Badge className="uppercase rounded-none">{data.status}</Badge>
+        <Badge className="uppercase rounded-xl">{data.status}</Badge>
       </div>
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Line items</CardTitle>
+          <CardTitle className="">Line items</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           {data.items.map((i) => (
@@ -118,7 +118,7 @@ export function PortalQuote() {
       {canRespond ? (
         <Card className=" border-border shadow-sm">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight">Accept this quote</CardTitle>
+            <CardTitle className="">Accept this quote</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div>
@@ -126,7 +126,7 @@ export function PortalQuote() {
               <Input
                 value={signatureName}
                 onChange={(e) => setSignatureName(e.target.value)}
-                className="rounded-none"
+                className="rounded-xl"
                 data-testid="input-portal-signature"
               />
             </div>
@@ -136,7 +136,7 @@ export function PortalQuote() {
                 onClick={() =>
                   accept.mutate({ quoteId: id, data: { signatureName: signatureName.trim() } })
                 }
-                className="rounded-none uppercase tracking-wider font-bold"
+                className="rounded-xl font-bold"
                 data-testid="button-portal-accept-quote"
               >
                 {accept.isPending ? "Accepting…" : "Accept & continue"}
@@ -148,7 +148,7 @@ export function PortalQuote() {
                 value={declineReason}
                 onChange={(e) => setDeclineReason(e.target.value)}
                 placeholder="Reason or requested changes (optional)"
-                className="rounded-none"
+                className="rounded-xl"
                 data-testid="textarea-portal-decline"
               />
               <Button
@@ -157,7 +157,7 @@ export function PortalQuote() {
                 onClick={() =>
                   decline.mutate({ quoteId: id, data: { reason: declineReason || undefined } })
                 }
-                className="rounded-none uppercase tracking-wider font-bold"
+                className="rounded-xl font-bold"
                 data-testid="button-portal-decline-quote"
               >
                 {decline.isPending ? "Sending…" : "Decline / request changes"}
@@ -177,7 +177,7 @@ export function PortalQuote() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Messages</CardTitle>
+          <CardTitle className="">Messages</CardTitle>
         </CardHeader>
         <CardContent>
           <PortalThread subjectKind="quote" subjectId={id} />

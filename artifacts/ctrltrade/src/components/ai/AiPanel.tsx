@@ -61,7 +61,7 @@ export function AiPanel({ title, description, buttonLabel = "Ask AI", prompt, en
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Bot className="h-4 w-4 text-primary" />
-            <CardTitle className="text-sm uppercase tracking-wider font-bold">{title}</CardTitle>
+            <CardTitle className="text-sm  font-bold">{title}</CardTitle>
             {badgeLabel && <Badge variant="outline" className="rounded-none text-[10px] h-4 px-1 border-primary/30 text-primary">{badgeLabel}</Badge>}
           </div>
           {result && (

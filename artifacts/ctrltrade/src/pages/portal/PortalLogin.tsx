@@ -24,7 +24,7 @@ export function PortalLogin() {
     <div className="max-w-md mx-auto">
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tighter">Customer sign-in</CardTitle>
+          <CardTitle className="">Customer sign-in</CardTitle>
         </CardHeader>
         <CardContent>
           {submitted ? (
@@ -35,7 +35,7 @@ export function PortalLogin() {
               </p>
               {devLink ? (
                 <div className="border border-dashed border-border p-3 text-xs space-y-2">
-                  <p className="font-bold uppercase tracking-wider text-muted-foreground">
+                  <p className="font-bold text-muted-foreground">
                     Dev preview link
                   </p>
                   <a
@@ -67,14 +67,14 @@ export function PortalLogin() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="rounded-none"
+                  className="rounded-xl"
                   data-testid="input-portal-email"
                 />
               </div>
               <Button
                 type="submit"
                 disabled={mut.isPending}
-                className="rounded-none uppercase tracking-wider font-bold w-full"
+                className="rounded-xl font-bold w-full"
                 data-testid="button-portal-magic-link"
               >
                 {mut.isPending ? "Sending…" : "Send sign-in link"}

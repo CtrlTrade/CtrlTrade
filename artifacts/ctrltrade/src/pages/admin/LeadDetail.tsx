@@ -123,11 +123,11 @@ export function AdminLeadDetail() {
 
       <div className="flex flex-col md:flex-row gap-6">
         <div className="flex-1 space-y-4">
-          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+          <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <CardTitle className="text-xl font-bold text-zinc-100 uppercase tracking-tight">{lead.name}</CardTitle>
+                  <CardTitle className="text-xl font-bold text-zinc-100">{lead.name}</CardTitle>
                   {lead.company && (
                     <div className="flex items-center gap-1.5 mt-1 text-sm text-zinc-400">
                       <Building2 className="h-3.5 w-3.5" />
@@ -167,9 +167,9 @@ export function AdminLeadDetail() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+          <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
             <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-bold uppercase tracking-wider text-zinc-400">Notes</CardTitle>
+              <CardTitle className="text-sm font-bold text-zinc-400">Notes</CardTitle>
               {!notesOpen ? (
                 <Button
                   variant="ghost"
@@ -182,14 +182,14 @@ export function AdminLeadDetail() {
               ) : (
                 <div className="flex gap-2">
                   <Button size="sm" variant="ghost" className="text-xs text-zinc-500" onClick={() => { setNotesOpen(false); setEditNotes(null); }}>Cancel</Button>
-                  <Button size="sm" className="text-xs bg-red-600 hover:bg-red-700 text-white rounded-none" onClick={handleSaveNotes}>Save</Button>
+                  <Button size="sm" className="text-xs bg-red-600 hover:bg-red-700 text-white rounded-xl" onClick={handleSaveNotes}>Save</Button>
                 </div>
               )}
             </CardHeader>
             <CardContent>
               {notesOpen ? (
                 <Textarea
-                  className="bg-zinc-950 border-zinc-700 text-zinc-100 resize-none rounded-none text-sm min-h-[100px]"
+                  className="bg-zinc-950 border-zinc-700 text-zinc-100 resize-none rounded-xl text-sm min-h-[100px]"
                   value={editNotes ?? ""}
                   onChange={(e) => setEditNotes(e.target.value)}
                 />
@@ -201,9 +201,9 @@ export function AdminLeadDetail() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+          <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-bold uppercase tracking-wider text-zinc-400">Log Interaction</CardTitle>
+              <CardTitle className="text-sm font-bold text-zinc-400">Log Interaction</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex gap-2">
@@ -225,7 +225,7 @@ export function AdminLeadDetail() {
                 ))}
               </div>
               <Textarea
-                className="bg-zinc-950 border-zinc-700 text-zinc-100 resize-none rounded-none text-sm"
+                className="bg-zinc-950 border-zinc-700 text-zinc-100 resize-none rounded-xl text-sm"
                 placeholder={
                   noteChannel === "note"
                     ? "Add a note…"
@@ -239,7 +239,7 @@ export function AdminLeadDetail() {
               />
               <Button
                 size="sm"
-                className="rounded-none bg-red-600 hover:bg-red-700 text-white uppercase text-xs font-bold gap-2"
+                className="rounded-xl bg-red-600 hover:bg-red-700 text-white uppercase text-xs font-bold gap-2"
                 onClick={handleLogInteraction}
                 disabled={!noteText.trim() || messageMutation.isPending}
               >
@@ -249,9 +249,9 @@ export function AdminLeadDetail() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+          <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-bold uppercase tracking-wider text-zinc-400">
+              <CardTitle className="text-sm font-bold text-zinc-400">
                 Outreach Thread ({lead.messages?.length ?? 0})
               </CardTitle>
             </CardHeader>
@@ -283,9 +283,9 @@ export function AdminLeadDetail() {
         </div>
 
         <div className="w-full md:w-56 space-y-4">
-          <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+          <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-400">Pipeline Stage</CardTitle>
+              <CardTitle className="text-xs font-bold text-zinc-400">Pipeline Stage</CardTitle>
             </CardHeader>
             <CardContent className="space-y-1.5">
               {STATUSES.map((s) => {

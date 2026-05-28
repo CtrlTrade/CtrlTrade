@@ -189,7 +189,7 @@ export function Signup() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4 py-12">
       <div className="w-full max-w-2xl">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold tracking-tighter uppercase">CTRLTRADE® Setup</h1>
+          <h1 className="text-2xl font-bold ">CTRLTRADE® Setup</h1>
           <div className="text-sm font-mono text-muted-foreground">STEP {step}/{TOTAL_STEPS}</div>
         </div>
 
@@ -199,7 +199,7 @@ export function Signup() {
 
         <Card className="border-border shadow-xl">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight">{stepTitles[step - 1]}</CardTitle>
+            <CardTitle className="">{stepTitles[step - 1]}</CardTitle>
             <CardDescription>{stepDescriptions[step - 1]}</CardDescription>
           </CardHeader>
           <CardContent>
@@ -209,34 +209,34 @@ export function Signup() {
               <form onSubmit={(e) => { e.preventDefault(); nextStep(); }} className="space-y-4">
                 <div className="space-y-2">
                   <Label>Company Name *</Label>
-                  <Input required value={company.name} onChange={(e) => setCompany({ ...company, name: e.target.value })} className="rounded-none" data-testid="input-signup-company-name" />
+                  <Input required value={company.name} onChange={(e) => setCompany({ ...company, name: e.target.value })} className="rounded-xl" data-testid="input-signup-company-name" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Country</Label>
-                    <Input value={company.country} onChange={(e) => setCompany({ ...company, country: e.target.value })} className="rounded-none" />
+                    <Input value={company.country} onChange={(e) => setCompany({ ...company, country: e.target.value })} className="rounded-xl" />
                   </div>
                   <div className="space-y-2">
                     <Label>Phone</Label>
-                    <Input value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} className="rounded-none" />
+                    <Input value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} className="rounded-xl" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Address</Label>
-                  <Input value={company.addressLine1} onChange={(e) => setCompany({ ...company, addressLine1: e.target.value })} className="rounded-none" />
+                  <Input value={company.addressLine1} onChange={(e) => setCompany({ ...company, addressLine1: e.target.value })} className="rounded-xl" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>City</Label>
-                    <Input value={company.city} onChange={(e) => setCompany({ ...company, city: e.target.value })} className="rounded-none" />
+                    <Input value={company.city} onChange={(e) => setCompany({ ...company, city: e.target.value })} className="rounded-xl" />
                   </div>
                   <div className="space-y-2">
                     <Label>Postcode</Label>
-                    <Input value={company.postcode} onChange={(e) => setCompany({ ...company, postcode: e.target.value })} className="rounded-none" />
+                    <Input value={company.postcode} onChange={(e) => setCompany({ ...company, postcode: e.target.value })} className="rounded-xl" />
                   </div>
                 </div>
                 <div className="flex justify-end pt-4">
-                  <Button type="submit" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-1">
+                  <Button type="submit" className="rounded-xl font-bold" data-testid="button-signup-next-1">
                     Next <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
@@ -266,8 +266,8 @@ export function Signup() {
                   </div>
                 )}
                 <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-2">
+                  <Button variant="outline" onClick={prevStep} className="rounded-xl font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-xl font-bold" data-testid="button-signup-next-2">
                     {industrySlug ? "Next" : "Skip for now"} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
@@ -294,8 +294,8 @@ export function Signup() {
                   ))}
                 </div>
                 <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-3">
+                  <Button variant="outline" onClick={prevStep} className="rounded-xl font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-xl font-bold" data-testid="button-signup-next-3">
                     {businessType ? "Next" : "Skip for now"} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
@@ -313,7 +313,7 @@ export function Signup() {
                   { label: "Multi-Branch", description: "Enable branch management and area managers", value: multiBranchEnabled, set: setMultiBranchEnabled, id: "mod-multi-branch" },
                 ].map((mod) => (
                   <div key={mod.id} className="flex items-center gap-4 border border-border p-4">
-                    <Checkbox id={mod.id} checked={mod.value} onCheckedChange={(c) => mod.set(!!c)} className="rounded-none" />
+                    <Checkbox id={mod.id} checked={mod.value} onCheckedChange={(c) => mod.set(!!c)} className="rounded-xl" />
                     <label htmlFor={mod.id} className="flex-1 cursor-pointer">
                       <div className="font-bold uppercase text-sm">{mod.label}</div>
                       <div className="text-xs text-muted-foreground">{mod.description}</div>
@@ -321,8 +321,8 @@ export function Signup() {
                   </div>
                 ))}
                 <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-4">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                  <Button variant="outline" onClick={prevStep} className="rounded-xl font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-xl font-bold" data-testid="button-signup-next-4">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </div>
             )}
@@ -331,7 +331,7 @@ export function Signup() {
             {step === 5 && (
               <div className="space-y-6">
                 <div>
-                  <Label className="uppercase tracking-wider text-xs mb-3 block">Communication Channels</Label>
+                  <Label className="text-xs mb-3 block">Communication Channels</Label>
                   <div className="grid grid-cols-2 gap-3">
                     {COMMUNICATION_CHANNELS.map((ch) => (
                       <div key={ch.value} className="flex items-center gap-3 border border-border p-3">
@@ -342,7 +342,7 @@ export function Signup() {
                             if (c) setCommunicationChannels([...communicationChannels, ch.value]);
                             else setCommunicationChannels(communicationChannels.filter((x) => x !== ch.value));
                           }}
-                          className="rounded-none"
+                          className="rounded-xl"
                         />
                         <label htmlFor={`ch-${ch.value}`} className="font-bold uppercase text-sm cursor-pointer">{ch.label}</label>
                       </div>
@@ -350,7 +350,7 @@ export function Signup() {
                   </div>
                 </div>
                 <div>
-                  <Label className="uppercase tracking-wider text-xs mb-3 block">AI Modules</Label>
+                  <Label className="text-xs mb-3 block">AI Modules</Label>
                   <div className="grid grid-cols-2 gap-3">
                     {AI_MODULES.map((ai) => (
                       <div key={ai.value} className="flex items-center gap-3 border border-border p-3">
@@ -361,7 +361,7 @@ export function Signup() {
                             if (c) setAiModulesEnabled([...aiModulesEnabled, ai.value]);
                             else setAiModulesEnabled(aiModulesEnabled.filter((x) => x !== ai.value));
                           }}
-                          className="rounded-none"
+                          className="rounded-xl"
                         />
                         <label htmlFor={`ai-${ai.value}`} className="font-bold uppercase text-sm cursor-pointer">{ai.label}</label>
                       </div>
@@ -369,8 +369,8 @@ export function Signup() {
                   </div>
                 </div>
                 <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-5">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                  <Button variant="outline" onClick={prevStep} className="rounded-xl font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-xl font-bold" data-testid="button-signup-next-5">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </div>
             )}
@@ -389,7 +389,7 @@ export function Signup() {
                             if (checked) setTradeCategorySlugs([...tradeCategorySlugs, cat.slug]);
                             else setTradeCategorySlugs(tradeCategorySlugs.filter((s) => s !== cat.slug));
                           }}
-                          className="rounded-none"
+                          className="rounded-xl"
                         />
                         <label htmlFor={`cat-${cat.slug}`} className="text-sm font-bold uppercase cursor-pointer flex-1">{cat.name}</label>
                       </div>
@@ -397,8 +397,8 @@ export function Signup() {
                   </div>
                 )}
                 <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-6">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                  <Button variant="outline" onClick={prevStep} className="rounded-xl font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-xl font-bold" data-testid="button-signup-next-6">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </div>
             )}
@@ -416,13 +416,13 @@ export function Signup() {
                       ].map((item) => (
                         <div key={item.label} className="flex items-center justify-between border border-border p-4 bg-background">
                           <div>
-                            <div className="font-bold uppercase">{item.label}</div>
+                            <div className="font-semibold">{item.label}</div>
                             <div className="text-sm text-muted-foreground font-mono">£{item.price}/mo</div>
                           </div>
                           <div className="flex items-center gap-4 bg-card border border-border p-1">
-                            <Button variant="ghost" size="icon" className="rounded-none h-8 w-8" onClick={() => item.set(Math.max(item.min, item.value - 1))} disabled={item.value <= item.min}><Minus className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8" onClick={() => item.set(Math.max(item.min, item.value - 1))} disabled={item.value <= item.min}><Minus className="h-4 w-4" /></Button>
                             <span className="w-8 text-center font-bold font-mono">{item.value}</span>
-                            <Button variant="ghost" size="icon" className="rounded-none h-8 w-8" onClick={() => item.set(item.value + 1)}><Plus className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8" onClick={() => item.set(item.value + 1)}><Plus className="h-4 w-4" /></Button>
                           </div>
                         </div>
                       ))}
@@ -434,8 +434,8 @@ export function Signup() {
                   </>
                 )}
                 <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-7">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                  <Button variant="outline" onClick={prevStep} className="rounded-xl font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-xl font-bold" data-testid="button-signup-next-7">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </div>
             )}
@@ -445,19 +445,19 @@ export function Signup() {
               <form onSubmit={handleOwnerSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label>Your Full Name *</Label>
-                  <Input required value={owner.name} onChange={(e) => setOwner({ ...owner, name: e.target.value })} className="rounded-none" data-testid="input-signup-owner-name" />
+                  <Input required value={owner.name} onChange={(e) => setOwner({ ...owner, name: e.target.value })} className="rounded-xl" data-testid="input-signup-owner-name" />
                 </div>
                 <div className="space-y-2">
                   <Label>Email Address *</Label>
-                  <Input required type="email" value={owner.email} onChange={(e) => setOwner({ ...owner, email: e.target.value })} className="rounded-none" data-testid="input-signup-owner-email" />
+                  <Input required type="email" value={owner.email} onChange={(e) => setOwner({ ...owner, email: e.target.value })} className="rounded-xl" data-testid="input-signup-owner-email" />
                 </div>
                 <div className="space-y-2">
                   <Label>Password * (min 8 chars)</Label>
-                  <Input required type="password" minLength={8} value={owner.password} onChange={(e) => setOwner({ ...owner, password: e.target.value })} className="rounded-none" data-testid="input-signup-owner-password" />
+                  <Input required type="password" minLength={8} value={owner.password} onChange={(e) => setOwner({ ...owner, password: e.target.value })} className="rounded-xl" data-testid="input-signup-owner-password" />
                 </div>
                 <div className="flex justify-between pt-4">
-                  <Button type="button" variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button type="submit" disabled={createSetupIntent.isPending} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-8">
+                  <Button type="button" variant="outline" onClick={prevStep} className="rounded-xl font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button type="submit" disabled={createSetupIntent.isPending} className="rounded-xl font-bold" data-testid="button-signup-next-8">
                     {createSetupIntent.isPending ? "Preparing..." : <>Next <ArrowRight className="ml-2 h-4 w-4" /></>}
                   </Button>
                 </div>
@@ -469,24 +469,24 @@ export function Signup() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Contact Name</Label>
-                  <Input value={contactDetails.contactName} onChange={(e) => setContactDetails({ ...contactDetails, contactName: e.target.value })} className="rounded-none" placeholder="Primary contact person" />
+                  <Input value={contactDetails.contactName} onChange={(e) => setContactDetails({ ...contactDetails, contactName: e.target.value })} className="rounded-xl" placeholder="Primary contact person" />
                 </div>
                 <div className="space-y-2">
                   <Label>Website</Label>
-                  <Input value={contactDetails.website} onChange={(e) => setContactDetails({ ...contactDetails, website: e.target.value })} className="rounded-none" placeholder="https://yourcompany.com" />
+                  <Input value={contactDetails.website} onChange={(e) => setContactDetails({ ...contactDetails, website: e.target.value })} className="rounded-xl" placeholder="https://yourcompany.com" />
                 </div>
                 <div className="flex items-center gap-3 border border-border p-3">
-                  <Checkbox id="vat-reg" checked={vatRegistered} onCheckedChange={(c) => setVatRegistered(!!c)} className="rounded-none" />
+                  <Checkbox id="vat-reg" checked={vatRegistered} onCheckedChange={(c) => setVatRegistered(!!c)} className="rounded-xl" />
                   <label htmlFor="vat-reg" className="font-bold uppercase text-sm cursor-pointer">VAT Registered</label>
                 </div>
                 {vatRegistered && (
                   <div className="space-y-2">
                     <Label>VAT Number</Label>
-                    <Input value={contactDetails.vatNumber} onChange={(e) => setContactDetails({ ...contactDetails, vatNumber: e.target.value })} className="rounded-none" placeholder="GB123456789" />
+                    <Input value={contactDetails.vatNumber} onChange={(e) => setContactDetails({ ...contactDetails, vatNumber: e.target.value })} className="rounded-xl" placeholder="GB123456789" />
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label className="uppercase tracking-wider text-xs">Accounting Software</Label>
+                  <Label className="text-xs">Accounting Software</Label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {ACCOUNTING_PROVIDERS.map((ap) => (
                       <button
@@ -502,8 +502,8 @@ export function Signup() {
                   </div>
                 </div>
                 <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-                  <Button onClick={nextStep} className="rounded-none uppercase tracking-wider font-bold" data-testid="button-signup-next-9">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                  <Button variant="outline" onClick={prevStep} className="rounded-xl font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                  <Button onClick={nextStep} className="rounded-xl font-bold" data-testid="button-signup-next-9">Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
                 </div>
               </div>
             )}
@@ -516,9 +516,9 @@ export function Signup() {
                 ) : !stripePromise ? (
                   <div className="border border-destructive/50 bg-destructive/10 p-6 text-center">
                     <CreditCard className="h-10 w-10 text-destructive mx-auto mb-4" />
-                    <h3 className="font-bold uppercase tracking-tight text-destructive mb-2">Stripe Not Connected</h3>
+                    <h3 className="font-bold text-destructive mb-2">Stripe Not Connected</h3>
                     <p className="text-sm text-destructive/80 mb-6">Payment capture is disabled in this environment. You can connect Stripe later via Integrations.</p>
-                    <Button onClick={() => finishSignup("pm_fallback_skipped")} disabled={signup.isPending} className="rounded-none font-bold uppercase tracking-wider w-full" data-testid="button-signup-skip-payment">
+                    <Button onClick={() => finishSignup("pm_fallback_skipped")} disabled={signup.isPending} className="rounded-xl font-bold w-full" data-testid="button-signup-skip-payment">
                       {signup.isPending ? "Deploying workspace..." : "Continue Without Payment Method"}
                     </Button>
                   </div>
@@ -531,7 +531,7 @@ export function Signup() {
                 )}
                 {stripePromise && (
                   <div className="flex justify-start pt-4 border-t border-border mt-6">
-                    <Button type="button" variant="outline" onClick={prevStep} className="rounded-none uppercase tracking-wider font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+                    <Button type="button" variant="outline" onClick={prevStep} className="rounded-xl font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
                   </div>
                 )}
               </div>
@@ -571,7 +571,7 @@ function StripePaymentForm({ onSuccess, onBack, isSignupPending }: { onSuccess: 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <PaymentElement />
-      <Button type="submit" disabled={!stripe || loading || isSignupPending} className="w-full font-bold uppercase tracking-wider h-12" data-testid="button-signup-submit-stripe">
+      <Button type="submit" disabled={!stripe || loading || isSignupPending} className="w-full font-bold h-12" data-testid="button-signup-submit-stripe">
         {loading || isSignupPending ? "Deploying workspace..." : "Save Payment Method & Deploy Workspace"}
       </Button>
     </form>

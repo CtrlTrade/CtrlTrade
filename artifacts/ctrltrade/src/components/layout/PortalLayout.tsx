@@ -44,7 +44,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
           </Link>
           {branding?.verifiedBadge ? (
             <span
-              className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-primary border border-primary/40 px-2 py-0.5 rounded"
+              className="inline-flex items-center gap-1 text-xs font-bold text-primary border border-primary/40 px-2 py-0.5 rounded"
               title="This business is CtrlTrade Verified"
               data-testid="badge-ctrltrade-verified"
             >
@@ -59,7 +59,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
               <Button
                 variant="outline"
                 size="sm"
-                className="uppercase tracking-wider font-bold text-xs"
+                className="font-bold text-xs"
                 onClick={() => logout.mutate()}
                 data-testid="button-portal-logout"
               >

@@ -42,7 +42,7 @@ export function PortalThread({ subjectKind, subjectId }: Props) {
               }`}
               data-testid={`portal-message-${m.id}`}
             >
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">
+              <div className="text-xs text-muted-foreground">
                 {m.authorLabel ?? m.fromRole} · {new Date(m.createdAt).toLocaleString("en-GB")}
               </div>
               <div className="whitespace-pre-wrap">{m.body}</div>
@@ -62,13 +62,13 @@ export function PortalThread({ subjectKind, subjectId }: Props) {
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder="Send a message…"
-          className="rounded-none"
+          className="rounded-xl"
           data-testid="textarea-portal-message"
         />
         <Button
           type="submit"
           disabled={post.isPending || !body.trim()}
-          className="rounded-none uppercase tracking-wider font-bold"
+          className="rounded-xl font-bold"
           data-testid="button-portal-send-message"
         >
           {post.isPending ? "Sending…" : "Send"}

@@ -72,7 +72,7 @@ function PlatformBadge({ source }: { source: string }) {
   if (source === "myjobquote") {
     return (
       <Badge
-        className="rounded-none uppercase tracking-wider font-bold text-[10px] bg-orange-600 hover:bg-orange-600 text-white"
+        className="rounded-xl font-bold text-[10px] bg-orange-600 hover:bg-orange-600 text-white"
         data-testid="badge-myjobquote"
       >
         MyJobQuote
@@ -82,7 +82,7 @@ function PlatformBadge({ source }: { source: string }) {
   if (source === "checkatrade") {
     return (
       <Badge
-        className="rounded-none uppercase tracking-wider font-bold text-[10px] bg-teal-600 hover:bg-teal-600 text-white"
+        className="rounded-xl font-bold text-[10px] bg-teal-600 hover:bg-teal-600 text-white"
         data-testid="badge-checkatrade"
       >
         Checkatrade
@@ -109,7 +109,7 @@ function timeAgo(dateStr: string): string {
 function TabBadge({ count }: { count: number }) {
   if (count === 0) return null;
   return (
-    <span className="ml-1.5 inline-flex items-center justify-center rounded-full bg-foreground text-background text-[10px] font-bold min-w-[18px] h-[18px] px-1">
+    <span className="ml-1.5 inline-flex items-center justify-center rounded-full bg-primary/20 text-primary text-[10px] font-bold min-w-[18px] h-[18px] px-1">
       {count > 99 ? "99+" : count}
     </span>
   );
@@ -164,13 +164,13 @@ function LeadTableRows({ leads, showImportTime }: { leads: Lead[]; showImportTim
                 </div>
               ) : (
                 <div>
-                  <div className="text-sm uppercase tracking-wider font-mono">{l.source}</div>
+                  <div className="text-sm font-mono">{l.source}</div>
                   {l.sourceDetail && <div className="text-xs text-muted-foreground">{l.sourceDetail}</div>}
                 </div>
               )}
             </TableCell>
             <TableCell>
-              <Badge variant={STATUS_VARIANT[l.status] ?? "default"} className="rounded-none uppercase tracking-wider font-bold text-[10px]">
+              <Badge variant={STATUS_VARIANT[l.status] ?? "default"} className="rounded-xl font-bold text-[10px]">
                 {STATUS_LABEL[l.status] ?? l.status}
               </Badge>
             </TableCell>
@@ -190,7 +190,7 @@ function LeadTableRows({ leads, showImportTime }: { leads: Lead[]; showImportTim
             ) : (
               <TableCell>
                 {l.followUpOverdue ? (
-                  <span className="inline-flex items-center gap-1 text-destructive text-xs font-bold uppercase tracking-wider">
+                  <span className="inline-flex items-center gap-1 text-destructive text-xs font-bold">
                     <AlertCircle className="h-3 w-3" /> Overdue
                   </span>
                 ) : l.followUpDueAt ? (
@@ -288,16 +288,16 @@ export function AppLeads() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Leads</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Leads</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-lead">
+            <Button className="rounded-xl font-bold" data-testid="button-new-lead">
               <Plus className="h-4 w-4 mr-2" /> New Lead
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-none">
+          <DialogContent className="rounded-xl">
             <DialogHeader>
-              <DialogTitle className="uppercase tracking-tighter">New Lead</DialogTitle>
+              <DialogTitle className="">New Lead</DialogTitle>
             </DialogHeader>
             <form onSubmit={onSubmit} className="space-y-3">
               <div><Label>Name</Label><Input name="name" required data-testid="input-lead-name" /></div>
@@ -310,7 +310,7 @@ export function AppLeads() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>Source</Label>
-                  <select name="source" defaultValue="manual" className="rounded-none border border-input bg-background h-10 w-full px-3 text-sm" data-testid="select-lead-source">
+                  <select name="source" defaultValue="manual" className="rounded-xl border border-input bg-background h-10 w-full px-3 text-sm" data-testid="select-lead-source">
                     <option value="manual">manual</option>
                     <option value="website">website</option>
                     <option value="referral">referral</option>
@@ -322,7 +322,7 @@ export function AppLeads() {
               <div><Label>Estimated value (£)</Label><Input name="value" type="number" step="0.01" min="0" /></div>
               <div><Label>Message</Label><Textarea name="message" rows={3} /></div>
               <DialogFooter>
-                <Button type="submit" disabled={create.isPending} className="rounded-none uppercase tracking-wider font-bold">
+                <Button type="submit" disabled={create.isPending} className="rounded-xl font-bold">
                   {create.isPending ? "Saving…" : "Save"}
                 </Button>
               </DialogFooter>
@@ -333,9 +333,9 @@ export function AppLeads() {
 
       <div className="flex items-center gap-3">
         <div className="w-48">
-          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Status</Label>
+          <Label className="text-xs text-muted-foreground">Status</Label>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="rounded-none" data-testid="filter-status"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="rounded-xl" data-testid="filter-status"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="new">New</SelectItem>
@@ -349,7 +349,7 @@ export function AppLeads() {
         {uncontactedPlatformCount > 0 && activeTab !== "platform" && (
           <button
             onClick={() => setActiveTab("platform")}
-            className="mt-5 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700 border border-amber-300 bg-amber-50 px-2.5 py-1.5 hover:bg-amber-100 transition-colors"
+            className="mt-5 inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 border border-amber-300 bg-amber-50 px-2.5 py-1.5 hover:bg-amber-100 transition-colors"
             data-testid="alert-uncontacted-platform"
           >
             <span className="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
@@ -359,10 +359,10 @@ export function AppLeads() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} data-testid="leads-tabs">
-        <TabsList className="rounded-none h-auto p-0 bg-transparent border-b border-border w-full justify-start gap-0">
+        <TabsList className="rounded-xl h-auto p-0 bg-transparent border-b border-border w-full justify-start gap-0">
           <TabsTrigger
             value="all"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-5 py-2.5 text-xs uppercase tracking-wider font-bold"
+            className="rounded-xl border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-5 py-2.5 text-xs font-bold"
             data-testid="tab-all"
           >
             All
@@ -370,7 +370,7 @@ export function AppLeads() {
           </TabsTrigger>
           <TabsTrigger
             value="platform"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-5 py-2.5 text-xs uppercase tracking-wider font-bold"
+            className="rounded-xl border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-5 py-2.5 text-xs font-bold"
             data-testid="tab-platform"
           >
             Platform
@@ -378,7 +378,7 @@ export function AppLeads() {
           </TabsTrigger>
           <TabsTrigger
             value="manual"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-5 py-2.5 text-xs uppercase tracking-wider font-bold"
+            className="rounded-xl border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-5 py-2.5 text-xs font-bold"
             data-testid="tab-manual"
           >
             Manual
@@ -389,7 +389,7 @@ export function AppLeads() {
         <TabsContent value="all" className="mt-0 pt-4">
           <Card className="border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+              <CardTitle className=" flex items-center gap-2">
                 <Target className="h-5 w-5" /> All Leads
               </CardTitle>
             </CardHeader>
@@ -409,7 +409,7 @@ export function AppLeads() {
         <TabsContent value="platform" className="mt-0 pt-4">
           <Card className="border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+              <CardTitle className=" flex items-center gap-2">
                 <Target className="h-5 w-5" /> Platform Inbox
                 {uncontactedPlatformCount > 0 && (
                   <span className="ml-auto text-xs font-bold normal-case tracking-normal text-amber-700 flex items-center gap-1">
@@ -430,7 +430,7 @@ export function AppLeads() {
               ) : (
                 <>
                   {uncontactedPlatformCount > 0 && (
-                    <div className="mb-4 flex items-start gap-2 rounded-none border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-300">
+                    <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-300">
                       <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
                       <span>
                         <span className="font-bold">{uncontactedPlatformCount} uncontacted</span>{" "}
@@ -453,7 +453,7 @@ export function AppLeads() {
         <TabsContent value="manual" className="mt-0 pt-4">
           <Card className="border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+              <CardTitle className=" flex items-center gap-2">
                 <Target className="h-5 w-5" /> Manual Pipeline
               </CardTitle>
             </CardHeader>

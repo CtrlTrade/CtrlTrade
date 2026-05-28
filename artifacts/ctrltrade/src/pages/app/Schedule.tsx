@@ -40,14 +40,14 @@ export function AppSchedule() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter flex items-center gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
           <CalIcon className="h-7 w-7" /> Schedule
         </h1>
         <div className="flex gap-2 items-center">
-          <Button variant="outline" size="icon" className="rounded-none" onClick={() => { const d = new Date(anchor); d.setDate(d.getDate() - 7); setAnchor(d); }}><ChevronLeft className="h-4 w-4" /></Button>
+          <Button variant="outline" size="icon" className="rounded-xl" onClick={() => { const d = new Date(anchor); d.setDate(d.getDate() - 7); setAnchor(d); }}><ChevronLeft className="h-4 w-4" /></Button>
           <span className="font-mono text-sm">{from.toLocaleDateString()} – {new Date(to.getTime() - 1).toLocaleDateString()}</span>
-          <Button variant="outline" size="icon" className="rounded-none" onClick={() => { const d = new Date(anchor); d.setDate(d.getDate() + 7); setAnchor(d); }}><ChevronRight className="h-4 w-4" /></Button>
-          <Button variant="outline" className="rounded-none uppercase tracking-wider font-bold" onClick={() => setAnchor(startOfWeek(new Date()))}>Today</Button>
+          <Button variant="outline" size="icon" className="rounded-xl" onClick={() => { const d = new Date(anchor); d.setDate(d.getDate() + 7); setAnchor(d); }}><ChevronRight className="h-4 w-4" /></Button>
+          <Button variant="outline" className="rounded-xl font-bold" onClick={() => setAnchor(startOfWeek(new Date()))}>Today</Button>
         </div>
       </div>
 
@@ -58,7 +58,7 @@ export function AppSchedule() {
             return (
               <Card key={d.toISOString()} className=" border-border shadow-sm min-h-[200px]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="uppercase tracking-tight text-xs">
+                  <CardTitle className=" text-xs">
                     {d.toLocaleDateString(undefined, { weekday: "short" })} {d.getDate()}
                   </CardTitle>
                 </CardHeader>
@@ -71,11 +71,11 @@ export function AppSchedule() {
                         <div className="text-xs font-bold truncate">{e.title}</div>
                         <div className="text-xs text-muted-foreground truncate">{e.customerName}</div>
                         <div className="flex items-center gap-1 mt-1 flex-wrap">
-                          {e.assignedUserName && <Badge variant="outline" className="rounded-none text-[10px]">{e.assignedUserName}</Badge>}
+                          {e.assignedUserName && <Badge variant="outline" className="rounded-xl text-[10px]">{e.assignedUserName}</Badge>}
                           {e.assignedUserConflict && (
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Badge variant="destructive" className="rounded-none text-[10px] gap-1 cursor-default" data-testid={`badge-conflict-${e.jobId}`}>
+                                <Badge variant="destructive" className="rounded-xl text-[10px] gap-1 cursor-default" data-testid={`badge-conflict-${e.jobId}`}>
                                   <AlertTriangle className="h-2.5 w-2.5" /> Unavailable
                                 </Badge>
                               </TooltipTrigger>

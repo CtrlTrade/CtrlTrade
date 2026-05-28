@@ -43,7 +43,7 @@ export function AgedDebtorsReport({ admin = false }: { admin?: boolean }) {
           />
           <Card className=" border-border">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight text-sm">Outstanding by bucket</CardTitle>
+              <CardTitle className=" text-sm">Outstanding by bucket</CardTitle>
             </CardHeader>
             <CardContent>
               <div style={{ width: "100%", height: 240 }}>

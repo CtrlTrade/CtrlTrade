@@ -85,7 +85,7 @@ export function BookingWidgetSettings() {
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-y-3">
             <div>
-              <CardTitle className="uppercase tracking-tight">Booking Widget</CardTitle>
+              <CardTitle className="">Booking Widget</CardTitle>
               <CardDescription>
                 Give customers a way to submit job enquiries directly from your website. Submissions create a lead in the CRM automatically.
               </CardDescription>
@@ -106,7 +106,7 @@ export function BookingWidgetSettings() {
 
       <Card className="border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-sm">Booking Page URL</CardTitle>
+          <CardTitle className=" text-sm">Booking Page URL</CardTitle>
           <CardDescription>Share this link with customers or use it as the iframe source.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -114,13 +114,13 @@ export function BookingWidgetSettings() {
             <Input
               value={data.bookingPageUrl}
               readOnly
-              className="rounded-none font-mono text-xs"
+              className="rounded-xl font-mono text-xs"
               data-testid="input-booking-page-url"
             />
             <Button
               type="button"
               variant="outline"
-              className="rounded-none"
+              className="rounded-xl"
               onClick={() => copy(data.bookingPageUrl, "Booking page URL")}
             >
               <Copy className="h-4 w-4" />
@@ -128,7 +128,7 @@ export function BookingWidgetSettings() {
             <Button
               type="button"
               variant="outline"
-              className="rounded-none"
+              className="rounded-xl"
               onClick={() => window.open(data.bookingPageUrl, "_blank")}
             >
               <ExternalLink className="h-4 w-4" />
@@ -139,7 +139,7 @@ export function BookingWidgetSettings() {
 
       <Card className="border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-sm">Form Configuration</CardTitle>
+          <CardTitle className=" text-sm">Form Configuration</CardTitle>
           <CardDescription>Customise what appears on the booking form.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -162,7 +162,7 @@ export function BookingWidgetSettings() {
               onChange={(e) => { setThankYouMessage(e.target.value); markDirty(); }}
               rows={2}
               maxLength={500}
-              className="rounded-none text-sm"
+              className="rounded-xl text-sm"
               data-testid="textarea-thank-you"
               placeholder="We'll be in touch shortly."
             />
@@ -176,7 +176,7 @@ export function BookingWidgetSettings() {
             </p>
             <div className="flex flex-wrap gap-2">
               {jobTypes.map((jt) => (
-                <Badge key={jt} variant="secondary" className="rounded-none text-xs gap-1 pr-1">
+                <Badge key={jt} variant="secondary" className="rounded-xl text-xs gap-1 pr-1">
                   {jt}
                   <button
                     type="button"
@@ -194,13 +194,13 @@ export function BookingWidgetSettings() {
                 onChange={(e) => setNewJobType(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addJobType(); }}}
                 placeholder="e.g. Boiler repair"
-                className="rounded-none text-sm max-w-xs"
+                className="rounded-xl text-sm max-w-xs"
                 data-testid="input-new-job-type"
               />
               <Button
                 type="button"
                 variant="outline"
-                className="rounded-none"
+                className="rounded-xl"
                 onClick={addJobType}
                 disabled={!newJobType.trim()}
               >
@@ -215,7 +215,7 @@ export function BookingWidgetSettings() {
         <Button
           onClick={handleSave}
           disabled={updateConfig.isPending || !dirty}
-          className="rounded-none uppercase font-bold tracking-wider"
+          className="rounded-xl uppercase font-bold tracking-wider"
           data-testid="button-save-booking-widget"
         >
           {updateConfig.isPending ? "Saving…" : "Save Widget Settings"}
@@ -224,7 +224,7 @@ export function BookingWidgetSettings() {
 
       <Card className="border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-sm">Embed on Your Website</CardTitle>
+          <CardTitle className=" text-sm">Embed on Your Website</CardTitle>
           <CardDescription>
             Copy one of these snippets and paste it into any page on your website.
           </CardDescription>
@@ -237,7 +237,7 @@ export function BookingWidgetSettings() {
                 value={data.iframeCode}
                 readOnly
                 rows={2}
-                className="rounded-none font-mono text-xs pr-10"
+                className="rounded-xl font-mono text-xs pr-10"
                 data-testid="textarea-iframe-code"
               />
             </div>
@@ -245,7 +245,7 @@ export function BookingWidgetSettings() {
               type="button"
               variant="outline"
               size="sm"
-              className="rounded-none uppercase text-xs font-bold"
+              className="rounded-xl uppercase text-xs font-bold"
               onClick={() => copy(data.iframeCode, "iframe code")}
             >
               <Copy className="h-3 w-3 mr-1" /> Copy iframe
@@ -261,14 +261,14 @@ export function BookingWidgetSettings() {
               value={data.widgetScriptTag}
               readOnly
               rows={3}
-              className="rounded-none font-mono text-xs"
+              className="rounded-xl font-mono text-xs"
               data-testid="textarea-widget-script"
             />
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="rounded-none uppercase text-xs font-bold"
+              className="rounded-xl uppercase text-xs font-bold"
               onClick={() => copy(data.widgetScriptTag, "Widget script tag")}
             >
               <Copy className="h-3 w-3 mr-1" /> Copy widget script
@@ -284,14 +284,14 @@ export function BookingWidgetSettings() {
               value={data.embedCode}
               readOnly
               rows={12}
-              className="rounded-none font-mono text-xs"
+              className="rounded-xl font-mono text-xs"
               data-testid="textarea-embed-code"
             />
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="rounded-none uppercase text-xs font-bold"
+              className="rounded-xl uppercase text-xs font-bold"
               onClick={() => copy(data.embedCode, "Embed code")}
             >
               <Copy className="h-3 w-3 mr-1" /> Copy embed

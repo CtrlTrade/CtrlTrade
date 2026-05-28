@@ -90,7 +90,7 @@ export function AppQuoteDetail() {
       </Link>
       <div className="flex flex-wrap gap-y-3 justify-between items-start">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">{data.number}</h1>
           <p className="text-muted-foreground">{data.title}</p>
           <p className="text-sm mt-1">Customer: <span className="font-medium">{data.customerName}</span></p>
         </div>
@@ -101,34 +101,34 @@ export function AppQuoteDetail() {
 
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => send.mutate({ quoteId: id })} disabled={data.status === "converted" || send.isPending}
-          variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-send-quote">
+          variant="outline" className="rounded-xl font-bold" data-testid="button-send-quote">
           <Send className="h-4 w-4 mr-2" /> Send
         </Button>
         <Button onClick={() => accept.mutate({ quoteId: id })} disabled={data.status === "converted" || accept.isPending}
-          variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-accept-quote">
+          variant="outline" className="rounded-xl font-bold" data-testid="button-accept-quote">
           <Check className="h-4 w-4 mr-2" /> Accept
         </Button>
         <Button onClick={() => convert.mutate({ quoteId: id, data: {} })} disabled={data.status === "converted" || convert.isPending}
-          className="rounded-none uppercase tracking-wider font-bold" data-testid="button-convert-quote">
+          className="rounded-xl font-bold" data-testid="button-convert-quote">
           <ArrowRightCircle className="h-4 w-4 mr-2" /> Convert to job
         </Button>
         {canDeposit && (
           <Button onClick={requestDeposit} disabled={depositInvoice.isPending}
-            variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-deposit-invoice">
+            variant="outline" className="rounded-xl font-bold" data-testid="button-deposit-invoice">
             <Percent className="h-4 w-4 mr-2" /> Deposit invoice
           </Button>
         )}
         {canInvoice && (
           <Button onClick={() => generateInvoice.mutate({ quoteId: id })}
             disabled={generateInvoice.isPending}
-            className="rounded-none uppercase tracking-wider font-bold" data-testid="button-generate-invoice-quote">
+            className="rounded-xl font-bold" data-testid="button-generate-invoice-quote">
             <Receipt className="h-4 w-4 mr-2" /> Generate invoice
           </Button>
         )}
       </div>
 
       <Card className=" border-border shadow-sm">
-        <CardHeader><CardTitle className="uppercase tracking-tight">Line items</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="">Line items</CardTitle></CardHeader>
         <CardContent>
           <div className="overflow-x-auto"><Table>
             <TableHeader><TableRow>

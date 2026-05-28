@@ -12,14 +12,14 @@ export function AdminReferralsReport() {
           </button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">Referrals & Growth</h1>
+          <h1 className="text-3xl font-bold text-white">Referrals & Growth</h1>
           <p className="text-sm text-zinc-500 mt-1">Referral conversions, partner-driven signups, and growth trends.</p>
         </div>
       </div>
 
-      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-zinc-100">Referral & Growth Metrics</CardTitle>
+          <CardTitle className=" text-zinc-100">Referral & Growth Metrics</CardTitle>
           <CardDescription>Track partner conversions and new tenant acquisition over time.</CardDescription>
         </CardHeader>
         <CardContent>

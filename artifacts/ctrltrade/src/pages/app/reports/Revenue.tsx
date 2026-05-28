@@ -57,7 +57,7 @@ export function RevenueReport({ admin = false }: { admin?: boolean }) {
           />
           <Card className=" border-border">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight text-sm">Daily timeline</CardTitle>
+              <CardTitle className=" text-sm">Daily timeline</CardTitle>
             </CardHeader>
             <CardContent>
               <div style={{ width: "100%", height: 280 }}>
@@ -83,7 +83,7 @@ export function RevenueReport({ admin = false }: { admin?: boolean }) {
           </Card>
           <Card className=" border-border">
             <CardHeader>
-              <CardTitle className="uppercase tracking-tight text-sm">By month</CardTitle>
+              <CardTitle className=" text-sm">By month</CardTitle>
             </CardHeader>
             <CardContent>
               <div style={{ width: "100%", height: 240 }}>

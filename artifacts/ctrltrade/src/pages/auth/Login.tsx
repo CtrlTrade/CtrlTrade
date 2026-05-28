@@ -153,7 +153,7 @@ export function Login() {
           <button
             type="submit"
             disabled={login.isPending}
-            className="w-full rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all hover:brightness-110 disabled:opacity-50 mt-1"
+            className="w-full rounded-lg py-3 text-sm font-bold transition-all hover:brightness-110 disabled:opacity-50 mt-1"
             style={{ background: "hsl(46,98%,52%)", color: "hsl(220,90%,8%)" }}
             data-testid="button-login-submit"
           >

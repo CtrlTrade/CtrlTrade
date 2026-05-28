@@ -198,7 +198,7 @@ export function AppProjectDetail() {
       {/* Progress bar */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Overall Progress</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">Overall Progress</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
@@ -215,25 +215,25 @@ export function AppProjectDetail() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Value</p>
+            <p className="text-xs text-muted-foreground">Total Value</p>
             <p className="text-xl font-bold mt-1" data-testid="text-total-value">{formatGBP(financials.totalValuePence)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Invoiced</p>
+            <p className="text-xs text-muted-foreground">Invoiced</p>
             <p className="text-xl font-bold mt-1">{formatGBP(financials.totalInvoicedPence)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Paid</p>
+            <p className="text-xs text-muted-foreground">Paid</p>
             <p className="text-xl font-bold mt-1 text-green-600">{formatGBP(financials.totalPaidPence)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Outstanding</p>
+            <p className="text-xs text-muted-foreground">Outstanding</p>
             <p className="text-xl font-bold mt-1 text-amber-600">{formatGBP(financials.outstandingPence)}</p>
           </CardContent>
         </Card>

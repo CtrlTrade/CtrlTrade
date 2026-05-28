@@ -70,15 +70,15 @@ export function AppFleet() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Fleet</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Fleet</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-vehicle">
+            <Button className="rounded-xl font-bold" data-testid="button-new-vehicle">
               <Plus className="h-4 w-4 mr-2" /> New Vehicle
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-none max-w-xl">
-            <DialogHeader><DialogTitle className="uppercase tracking-tighter">New Vehicle</DialogTitle></DialogHeader>
+          <DialogContent className="rounded-xl max-w-xl">
+            <DialogHeader><DialogTitle className="">New Vehicle</DialogTitle></DialogHeader>
             <form onSubmit={submit} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Label</Label><Input name="label" required placeholder="Van 1" /></div>
@@ -102,7 +102,7 @@ export function AppFleet() {
                 </Select>
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={create.isPending} className="rounded-none uppercase tracking-wider font-bold">
+                <Button type="submit" disabled={create.isPending} className="rounded-xl font-bold">
                   {create.isPending ? "Saving…" : "Save"}
                 </Button>
               </DialogFooter>
@@ -113,7 +113,7 @@ export function AppFleet() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight flex items-center gap-2"><Truck className="h-5 w-5" /> Vehicles</CardTitle>
+          <CardTitle className=" flex items-center gap-2"><Truck className="h-5 w-5" /> Vehicles</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? <Skeleton className="h-48" /> : !data || data.length === 0 ? (
@@ -140,7 +140,7 @@ export function AppFleet() {
                       <TableCell className="text-xs">
                         {loc ? <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{Number(loc.lat).toFixed(3)}, {Number(loc.lng).toFixed(3)}</span> : "—"}
                       </TableCell>
-                      <TableCell><Badge variant="outline" className="rounded-none uppercase">{v.status}</Badge></TableCell>
+                      <TableCell><Badge variant="outline" className="rounded-xl uppercase">{v.status}</Badge></TableCell>
                     </TableRow>
                   );
                 })}

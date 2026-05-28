@@ -92,7 +92,7 @@ function PlatformLeadBanner({ source, message, valuePence, sourceDetail }: {
       data-testid="platform-lead-banner"
     >
       <div className="flex items-center gap-2">
-        <span className={`text-xs font-bold uppercase tracking-widest ${meta.colorClass}`}>
+        <span className={`text-xs font-bold ${meta.colorClass}`}>
           {meta.label} Import
         </span>
         {sourceDetail && (
@@ -101,13 +101,13 @@ function PlatformLeadBanner({ source, message, valuePence, sourceDetail }: {
       </div>
       {message && (
         <div>
-          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Lead description from {meta.label}</div>
+          <div className="text-xs text-muted-foreground mb-1">Lead description from {meta.label}</div>
           <div className="text-sm whitespace-pre-wrap">{message}</div>
         </div>
       )}
       {valuePence > 0 && (
         <div className="flex items-center gap-2">
-          <span className="text-xs uppercase tracking-wider text-muted-foreground">Customer budget:</span>
+          <span className="text-xs text-muted-foreground">Customer budget:</span>
           <span className={`text-sm font-bold font-mono ${meta.colorClass}`}>{fmtGbp(valuePence)}</span>
         </div>
       )}
@@ -120,7 +120,7 @@ function SourceBadge({ source }: { source: string }) {
   if (meta) {
     return (
       <Badge
-        className={`rounded-none uppercase tracking-wider text-[10px] font-bold border ${meta.borderClass} ${meta.bgClass} ${meta.colorClass} hover:${meta.bgClass}`}
+        className={`rounded-xl text-[10px] font-bold border ${meta.borderClass} ${meta.bgClass} ${meta.colorClass} hover:${meta.bgClass}`}
         data-testid={`badge-source-${source}`}
       >
         {meta.label}
@@ -128,7 +128,7 @@ function SourceBadge({ source }: { source: string }) {
     );
   }
   return (
-    <Badge variant="outline" className="rounded-none uppercase tracking-wider text-[10px] font-bold">
+    <Badge variant="outline" className="rounded-xl text-[10px] font-bold">
       {source}
     </Badge>
   );
@@ -216,7 +216,7 @@ export function AppLeadDetail() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <div className="flex flex-wrap items-center justify-between gap-y-3">
-        <Link href="/leads" className="inline-flex items-center gap-2 text-sm uppercase tracking-wider font-bold text-muted-foreground hover:text-foreground">
+        <Link href="/leads" className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> All leads
         </Link>
         <div className="flex gap-2">
@@ -224,18 +224,18 @@ export function AppLeadDetail() {
             <>
               <Dialog open={convertOpen} onOpenChange={setConvertOpen}>
                 <DialogTrigger asChild>
-                  <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-convert-lead">
+                  <Button className="rounded-xl font-bold" data-testid="button-convert-lead">
                     <ArrowRight className="h-4 w-4 mr-2" /> Convert to quote
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="rounded-none">
-                  <DialogHeader><DialogTitle className="uppercase tracking-tighter">Convert lead</DialogTitle></DialogHeader>
+                <DialogContent className="rounded-xl">
+                  <DialogHeader><DialogTitle className="">Convert lead</DialogTitle></DialogHeader>
                   <form onSubmit={handleConvertSubmit} className="space-y-3">
                     <div><Label>Quote title</Label><Input name="quoteTitle" defaultValue={lead.title ?? `Quote for ${lead.name}`} /></div>
                     <div><Label>Estimated value (£)</Label><Input name="value" type="number" step="0.01" defaultValue={lead.valuePence > 0 ? (lead.valuePence / 100).toFixed(2) : ""} /></div>
                     <p className="text-xs text-muted-foreground">A customer record will be reused if their email matches, otherwise created.</p>
                     <DialogFooter>
-                      <Button type="submit" disabled={convert.isPending} className="rounded-none uppercase tracking-wider font-bold">
+                      <Button type="submit" disabled={convert.isPending} className="rounded-xl font-bold">
                         {convert.isPending ? "Working…" : "Create quote"}
                       </Button>
                     </DialogFooter>
@@ -244,16 +244,16 @@ export function AppLeadDetail() {
               </Dialog>
               <Dialog open={loseOpen} onOpenChange={setLoseOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-lose-lead">
+                  <Button variant="outline" className="rounded-xl font-bold" data-testid="button-lose-lead">
                     <XCircle className="h-4 w-4 mr-2" /> Mark lost
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="rounded-none">
-                  <DialogHeader><DialogTitle className="uppercase tracking-tighter">Mark lead lost</DialogTitle></DialogHeader>
+                <DialogContent className="rounded-xl">
+                  <DialogHeader><DialogTitle className="">Mark lead lost</DialogTitle></DialogHeader>
                   <div className="space-y-3">
                     <div><Label>Reason</Label><Textarea value={loseReason} onChange={(e) => setLoseReason(e.target.value)} rows={3} /></div>
                     <DialogFooter>
-                      <Button onClick={() => lose.mutate({ leadId, data: { reason: loseReason || undefined } })} disabled={lose.isPending} className="rounded-none uppercase tracking-wider font-bold">
+                      <Button onClick={() => lose.mutate({ leadId, data: { reason: loseReason || undefined } })} disabled={lose.isPending} className="rounded-xl font-bold">
                         {lose.isPending ? "Saving…" : "Confirm"}
                       </Button>
                     </DialogFooter>
@@ -262,7 +262,7 @@ export function AppLeadDetail() {
               </Dialog>
             </>
           )}
-          <Button variant="ghost" size="icon" className="rounded-none" onClick={() => { if (confirm("Delete this lead?")) del.mutate({ leadId }); }} data-testid="button-delete-lead">
+          <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => { if (confirm("Delete this lead?")) del.mutate({ leadId }); }} data-testid="button-delete-lead">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -272,20 +272,20 @@ export function AppLeadDetail() {
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
-              <CardTitle className="text-2xl uppercase tracking-tighter">{lead.name}</CardTitle>
+              <CardTitle className="text-2xl">{lead.name}</CardTitle>
               <div className="flex gap-2 mt-2 flex-wrap">
                 <SourceBadge source={lead.source} />
-                <Badge className="rounded-none uppercase tracking-wider text-[10px] font-bold">{lead.status}</Badge>
-                <Badge variant="secondary" className="rounded-none uppercase tracking-wider text-[10px] font-bold">Score {lead.score}/100</Badge>
+                <Badge className="rounded-xl text-[10px] font-bold">{lead.status}</Badge>
+                <Badge variant="secondary" className="rounded-xl text-[10px] font-bold">Score {lead.score}/100</Badge>
                 {lead.convertedQuoteId && (
                   <Link href={`/quotes/${lead.convertedQuoteId}`}>
-                    <Badge variant="outline" className="rounded-none uppercase tracking-wider text-[10px] font-bold hover:bg-muted cursor-pointer">View quote</Badge>
+                    <Badge variant="outline" className="rounded-xl text-[10px] font-bold hover:bg-muted cursor-pointer">View quote</Badge>
                   </Link>
                 )}
               </div>
             </div>
             <div className="text-right">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">Est. value</div>
+              <div className="text-xs text-muted-foreground">Est. value</div>
               <div className="text-2xl font-bold font-mono">{lead.valuePence > 0 ? fmtGbp(lead.valuePence) : "—"}</div>
             </div>
           </div>
@@ -305,11 +305,11 @@ export function AppLeadDetail() {
             <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" />{lead.phone ?? "—"}</div>
             <div className="flex items-center gap-2"><Building className="h-4 w-4 text-muted-foreground" />{lead.company ?? "—"}</div>
           </div>
-          {lead.title && <div className="text-sm"><span className="text-muted-foreground uppercase tracking-wider text-xs mr-2">Need:</span>{lead.title}</div>}
+          {lead.title && <div className="text-sm"><span className="text-muted-foreground text-xs mr-2">Need:</span>{lead.title}</div>}
           {!platformLead && lead.message && (
             <div className="text-sm whitespace-pre-wrap bg-muted/30 p-3 border border-border">{lead.message}</div>
           )}
-          {lead.lostReason && <div className="text-sm"><span className="text-destructive uppercase tracking-wider text-xs font-bold mr-2">Lost reason:</span>{lead.lostReason}</div>}
+          {lead.lostReason && <div className="text-sm"><span className="text-destructive text-xs font-bold mr-2">Lost reason:</span>{lead.lostReason}</div>}
           {lead.followUpDueAt && lead.status !== "won" && lead.status !== "lost" && (
             <div className={`text-sm flex items-center gap-2 ${lead.followUpOverdue ? "text-destructive font-bold" : "text-muted-foreground"}`}>
               <Clock className="h-4 w-4" /> Follow-up due {new Date(lead.followUpDueAt).toLocaleString("en-GB")}
@@ -318,9 +318,9 @@ export function AppLeadDetail() {
 
           {lead.status !== "won" && lead.status !== "lost" && (
             <div className="flex gap-2 pt-2 border-t border-border">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground self-center">Move to:</Label>
+              <Label className="text-xs text-muted-foreground self-center">Move to:</Label>
               {(["new", "contacted", "qualified"] as const).filter((s) => s !== lead.status).map((s) => (
-                <Button key={s} size="sm" variant="outline" className="rounded-none uppercase tracking-wider text-xs font-bold" onClick={() => handleStatus(s)} data-testid={`status-${s}`}>
+                <Button key={s} size="sm" variant="outline" className="rounded-xl text-xs font-bold" onClick={() => handleStatus(s)} data-testid={`status-${s}`}>
                   {s}
                 </Button>
               ))}
@@ -328,7 +328,7 @@ export function AppLeadDetail() {
           )}
 
           <div className="flex items-center gap-3 pt-2 border-t border-border">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Assignee:</Label>
+            <Label className="text-xs text-muted-foreground">Assignee:</Label>
             <Select
               value={lead.ownerUserId ?? "__unassigned__"}
               onValueChange={(v) =>
@@ -338,7 +338,7 @@ export function AppLeadDetail() {
                 })
               }
             >
-              <SelectTrigger className="rounded-none w-64" data-testid="select-lead-owner">
+              <SelectTrigger className="rounded-xl w-64" data-testid="select-lead-owner">
                 <SelectValue placeholder="Unassigned" />
               </SelectTrigger>
               <SelectContent>
@@ -357,12 +357,12 @@ export function AppLeadDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className=" border-border shadow-sm">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight flex items-center gap-2"><StickyNote className="h-5 w-5" /> Notes</CardTitle>
+            <CardTitle className=" flex items-center gap-2"><StickyNote className="h-5 w-5" /> Notes</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex gap-2">
               <Textarea value={noteBody} onChange={(e) => setNoteBody(e.target.value)} placeholder="Add a note…" rows={2} data-testid="input-lead-note" />
-              <Button onClick={() => addNote.mutate({ leadId, data: { body: noteBody } })} disabled={!noteBody.trim() || addNote.isPending} className="rounded-none uppercase tracking-wider text-xs font-bold">
+              <Button onClick={() => addNote.mutate({ leadId, data: { body: noteBody } })} disabled={!noteBody.trim() || addNote.isPending} className="rounded-xl text-xs font-bold">
                 Add
               </Button>
             </div>
@@ -383,13 +383,13 @@ export function AppLeadDetail() {
 
         <Card className=" border-border shadow-sm">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight flex items-center gap-2"><CheckCircle2 className="h-5 w-5" /> Activity</CardTitle>
+            <CardTitle className=" flex items-center gap-2"><CheckCircle2 className="h-5 w-5" /> Activity</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex gap-2 flex-wrap">
               <div className="w-32">
                 <Select value={actKind} onValueChange={setActKind}>
-                  <SelectTrigger className="rounded-none"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="call">Call</SelectItem>
                     <SelectItem value="email">Email</SelectItem>
@@ -399,7 +399,7 @@ export function AppLeadDetail() {
                 </Select>
               </div>
               <Input value={actSubject} onChange={(e) => setActSubject(e.target.value)} placeholder="Brief summary" className="flex-1" />
-              <Button onClick={() => logAct.mutate({ leadId, data: { kind: actKind as any, subject: actSubject || undefined } })} disabled={!actSubject.trim() || logAct.isPending} className="rounded-none uppercase tracking-wider text-xs font-bold">
+              <Button onClick={() => logAct.mutate({ leadId, data: { kind: actKind as any, subject: actSubject || undefined } })} disabled={!actSubject.trim() || logAct.isPending} className="rounded-xl text-xs font-bold">
                 Log
               </Button>
             </div>
@@ -409,7 +409,7 @@ export function AppLeadDetail() {
               ) : lead.activities.map((a) => (
                 <div key={a.id} className="text-sm border border-border p-3 bg-background">
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="rounded-none uppercase tracking-wider text-[10px] font-bold">{a.kind}</Badge>
+                    <Badge variant="outline" className="rounded-xl text-[10px] font-bold">{a.kind}</Badge>
                     <span className="font-medium">{a.subject ?? ""}</span>
                   </div>
                   {a.body && <div className="whitespace-pre-wrap mt-1">{a.body}</div>}
@@ -425,16 +425,16 @@ export function AppLeadDetail() {
 
       <Card className=" border-border shadow-sm" data-testid="card-lead-files">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight flex items-center gap-2"><Paperclip className="h-5 w-5" /> Files</CardTitle>
+          <CardTitle className=" flex items-center gap-2"><Paperclip className="h-5 w-5" /> Files</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-2">
-            <Input value={fileName} onChange={(e) => setFileName(e.target.value)} placeholder="File label (e.g. Site photo)" className="rounded-none" data-testid="input-file-name" />
-            <Input value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="https://… (link to PDF, image, drive, etc.)" className="rounded-none" data-testid="input-file-url" />
+            <Input value={fileName} onChange={(e) => setFileName(e.target.value)} placeholder="File label (e.g. Site photo)" className="rounded-xl" data-testid="input-file-name" />
+            <Input value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} placeholder="https://… (link to PDF, image, drive, etc.)" className="rounded-xl" data-testid="input-file-url" />
             <Button
               onClick={() => addFile.mutate({ leadId, data: { name: fileName.trim(), url: fileUrl.trim() } })}
               disabled={!fileName.trim() || !fileUrl.trim() || addFile.isPending}
-              className="rounded-none uppercase tracking-wider text-xs font-bold"
+              className="rounded-xl text-xs font-bold"
               data-testid="button-add-file"
             >
               Attach
@@ -457,7 +457,7 @@ export function AppLeadDetail() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-none"
+                    className="rounded-xl"
                     onClick={() => { if (confirm(`Remove "${f.name}"?`)) delFile.mutate({ leadId, fileId: f.id }); }}
                     data-testid={`button-delete-file-${f.id}`}
                   >

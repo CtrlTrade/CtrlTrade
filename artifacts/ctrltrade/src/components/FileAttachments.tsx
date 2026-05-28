@@ -79,7 +79,7 @@ export function FileAttachments({
   return (
     <Card className=" border-border shadow-sm">
       <CardHeader>
-        <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+        <CardTitle className=" flex items-center gap-2">
           <Paperclip className="h-5 w-5" /> {title}
         </CardTitle>
       </CardHeader>
@@ -114,7 +114,7 @@ export function FileAttachments({
               toast({ title: "Uploaded", description: `${result.successful?.length ?? 0} file(s)` });
             }
           }}
-          buttonClassName="inline-flex items-center justify-center gap-2 rounded-none uppercase tracking-wider font-bold bg-primary text-primary-foreground px-4 py-2 text-sm hover:opacity-90"
+          buttonClassName="inline-flex items-center justify-center gap-2 rounded-none  font-bold bg-primary text-primary-foreground px-4 py-2 text-sm hover:opacity-90"
         >
           <Upload className="h-4 w-4" />
           Upload files

@@ -126,7 +126,7 @@ export function AppBranches() {
     <div className="space-y-6 max-w-5xl">
       <div className="flex flex-wrap items-center justify-between gap-y-3">
         <div>
-          <h2 className="text-2xl font-bold uppercase tracking-tighter">Branches</h2>
+          <h2 className="text-2xl font-bold">Branches</h2>
           <p className="text-sm text-muted-foreground">Manage your office and site locations.</p>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="gap-2 uppercase text-xs tracking-wider font-bold" data-testid="button-create-branch">
@@ -139,7 +139,7 @@ export function AppBranches() {
         <Card className="border-border">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="font-bold uppercase tracking-tight mb-1">No branches yet</h3>
+            <h3 className="font-bold mb-1">No branches yet</h3>
             <p className="text-sm text-muted-foreground mb-4">Create your first branch to start partitioning staff, jobs, and customers by location.</p>
             <Button onClick={() => setCreateOpen(true)} className="gap-2 uppercase text-xs tracking-wider font-bold">
               <Plus className="h-4 w-4" />
@@ -156,7 +156,7 @@ export function AppBranches() {
                   <div className="flex items-center gap-3">
                     <Building2 className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <CardTitle className="text-base uppercase tracking-tight">{branch.name}</CardTitle>
+                      <CardTitle className="text-base">{branch.name}</CardTitle>
                       <CardDescription className="text-xs">
                         {[branch.addressLine1, branch.city, branch.postcode].filter(Boolean).join(", ")}
                         {branch.region ? ` · ${branch.region}` : ""}
@@ -208,33 +208,33 @@ export function AppBranches() {
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle className="uppercase tracking-tight">New Branch</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="">New Branch</DialogTitle></DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4">
             <div>
               <Label>Name *</Label>
-              <Input name="name" required className="rounded-none" placeholder="e.g. North London Office" data-testid="input-branch-name" />
+              <Input name="name" required className="rounded-xl" placeholder="e.g. North London Office" data-testid="input-branch-name" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Address</Label>
-                <Input name="addressLine1" className="rounded-none" placeholder="123 Main St" />
+                <Input name="addressLine1" className="rounded-xl" placeholder="123 Main St" />
               </div>
               <div>
                 <Label>City</Label>
-                <Input name="city" className="rounded-none" placeholder="London" />
+                <Input name="city" className="rounded-xl" placeholder="London" />
               </div>
               <div>
                 <Label>Postcode</Label>
-                <Input name="postcode" className="rounded-none" placeholder="EC1A 1BB" />
+                <Input name="postcode" className="rounded-xl" placeholder="EC1A 1BB" />
               </div>
               <div>
                 <Label>Phone</Label>
-                <Input name="phone" className="rounded-none" placeholder="+44 20 1234 5678" />
+                <Input name="phone" className="rounded-xl" placeholder="+44 20 1234 5678" />
               </div>
             </div>
             <div>
               <Label>Region</Label>
-              <Input name="region" className="rounded-none" placeholder="e.g. South East" />
+              <Input name="region" className="rounded-xl" placeholder="e.g. South East" />
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
@@ -249,33 +249,33 @@ export function AppBranches() {
       {editBranch && (
         <Dialog open onOpenChange={() => setEditBranch(null)}>
           <DialogContent>
-            <DialogHeader><DialogTitle className="uppercase tracking-tight">Edit Branch</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle className="">Edit Branch</DialogTitle></DialogHeader>
             <form onSubmit={handleUpdate} className="space-y-4">
               <div>
                 <Label>Name *</Label>
-                <Input name="name" required defaultValue={editBranch.name} className="rounded-none" />
+                <Input name="name" required defaultValue={editBranch.name} className="rounded-xl" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>Address</Label>
-                  <Input name="addressLine1" defaultValue={editBranch.addressLine1 ?? ""} className="rounded-none" />
+                  <Input name="addressLine1" defaultValue={editBranch.addressLine1 ?? ""} className="rounded-xl" />
                 </div>
                 <div>
                   <Label>City</Label>
-                  <Input name="city" defaultValue={editBranch.city ?? ""} className="rounded-none" />
+                  <Input name="city" defaultValue={editBranch.city ?? ""} className="rounded-xl" />
                 </div>
                 <div>
                   <Label>Postcode</Label>
-                  <Input name="postcode" defaultValue={editBranch.postcode ?? ""} className="rounded-none" />
+                  <Input name="postcode" defaultValue={editBranch.postcode ?? ""} className="rounded-xl" />
                 </div>
                 <div>
                   <Label>Phone</Label>
-                  <Input name="phone" defaultValue={editBranch.phone ?? ""} className="rounded-none" />
+                  <Input name="phone" defaultValue={editBranch.phone ?? ""} className="rounded-xl" />
                 </div>
               </div>
               <div>
                 <Label>Region</Label>
-                <Input name="region" defaultValue={editBranch.region ?? ""} className="rounded-none" />
+                <Input name="region" defaultValue={editBranch.region ?? ""} className="rounded-xl" />
               </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setEditBranch(null)}>Cancel</Button>

@@ -14,13 +14,13 @@ export function MarketplaceListing() {
     <div className="max-w-4xl mx-auto py-12 px-4 space-y-6">
       <header className="space-y-2">
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold uppercase tracking-tighter">{data.tenantName}</h1>
+          <h1 className="text-3xl font-bold">{data.tenantName}</h1>
           {data.verified && <ShieldCheck className="h-6 w-6 text-primary" />}
         </div>
-        <div className="text-sm uppercase tracking-wider text-muted-foreground">{data.listingType}</div>
+        <div className="text-sm text-muted-foreground">{data.listingType}</div>
         <p className="text-lg">{data.headline}</p>
         <div className="flex flex-wrap gap-2">
-          {data.categorySlugs.map((c) => <Badge key={c} variant="secondary" className="rounded-none uppercase tracking-wider">{c}</Badge>)}
+          {data.categorySlugs.map((c) => <Badge key={c} variant="secondary" className="rounded-xl">{c}</Badge>)}
         </div>
         {data.ratingAverage != null && (
           <div className="inline-flex items-center gap-1 text-sm"><Star className="h-4 w-4 fill-current" />{data.ratingAverage.toFixed(1)} · {data.reviewCount} reviews</div>
@@ -29,27 +29,27 @@ export function MarketplaceListing() {
 
       {data.bio && (
         <Card className=" border-border">
-          <CardHeader><CardTitle className="uppercase tracking-tight">About</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="">About</CardTitle></CardHeader>
           <CardContent className="whitespace-pre-wrap text-sm">{data.bio}</CardContent>
         </Card>
       )}
 
       <Card className=" border-border">
-        <CardHeader><CardTitle className="uppercase tracking-tight">Service details</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="">Service details</CardTitle></CardHeader>
         <CardContent className="grid sm:grid-cols-2 gap-3 text-sm">
-          {data.serviceArea && <div><div className="text-xs uppercase tracking-wider text-muted-foreground">Service area</div>{data.serviceArea}</div>}
-          {data.regions && data.regions.length > 0 && <div><div className="text-xs uppercase tracking-wider text-muted-foreground">Regions</div>{data.regions.join(", ")}</div>}
-          {data.hourlyRatePence != null && <div><div className="text-xs uppercase tracking-wider text-muted-foreground">Hourly rate</div>£{(data.hourlyRatePence/100).toFixed(2)}</div>}
-          {data.minJobValuePence != null && <div><div className="text-xs uppercase tracking-wider text-muted-foreground">Min job value</div>£{(data.minJobValuePence/100).toFixed(2)}</div>}
-          {data.contactEmail && <div><div className="text-xs uppercase tracking-wider text-muted-foreground">Email</div><a className="underline" href={`mailto:${data.contactEmail}`}>{data.contactEmail}</a></div>}
-          {data.contactPhone && <div><div className="text-xs uppercase tracking-wider text-muted-foreground">Phone</div>{data.contactPhone}</div>}
-          {data.websiteUrl && <div className="sm:col-span-2"><div className="text-xs uppercase tracking-wider text-muted-foreground">Website</div><a className="underline" href={data.websiteUrl} target="_blank" rel="noreferrer">{data.websiteUrl}</a></div>}
+          {data.serviceArea && <div><div className="text-xs text-muted-foreground">Service area</div>{data.serviceArea}</div>}
+          {data.regions && data.regions.length > 0 && <div><div className="text-xs text-muted-foreground">Regions</div>{data.regions.join(", ")}</div>}
+          {data.hourlyRatePence != null && <div><div className="text-xs text-muted-foreground">Hourly rate</div>£{(data.hourlyRatePence/100).toFixed(2)}</div>}
+          {data.minJobValuePence != null && <div><div className="text-xs text-muted-foreground">Min job value</div>£{(data.minJobValuePence/100).toFixed(2)}</div>}
+          {data.contactEmail && <div><div className="text-xs text-muted-foreground">Email</div><a className="underline" href={`mailto:${data.contactEmail}`}>{data.contactEmail}</a></div>}
+          {data.contactPhone && <div><div className="text-xs text-muted-foreground">Phone</div>{data.contactPhone}</div>}
+          {data.websiteUrl && <div className="sm:col-span-2"><div className="text-xs text-muted-foreground">Website</div><a className="underline" href={data.websiteUrl} target="_blank" rel="noreferrer">{data.websiteUrl}</a></div>}
         </CardContent>
       </Card>
 
       {data.galleryUrls && data.galleryUrls.length > 0 && (
         <Card className=" border-border">
-          <CardHeader><CardTitle className="uppercase tracking-tight">Gallery</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="">Gallery</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {data.galleryUrls.map((url) => <img key={url} src={url} alt="" className="w-full h-40 object-cover" />)}
           </CardContent>
@@ -57,7 +57,7 @@ export function MarketplaceListing() {
       )}
 
       <Card className=" border-border">
-        <CardHeader><CardTitle className="uppercase tracking-tight">Reviews</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="">Reviews</CardTitle></CardHeader>
         <CardContent>
           {!data.reviews || data.reviews.length === 0 ? (
             <div className="text-sm text-muted-foreground py-6 text-center">No reviews yet.</div>

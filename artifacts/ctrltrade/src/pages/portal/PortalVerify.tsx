@@ -33,7 +33,7 @@ export function PortalVerify() {
         <CardContent className="py-12 text-center text-sm">
           {error ? (
             <div className="space-y-2">
-              <p className="text-destructive font-bold uppercase tracking-tighter">
+              <p className="text-destructive font-bold">
                 Sign-in failed
               </p>
               <p className="text-muted-foreground">{error}</p>

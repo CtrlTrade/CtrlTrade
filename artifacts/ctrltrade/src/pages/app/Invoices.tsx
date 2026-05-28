@@ -40,9 +40,9 @@ export function AppInvoices() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Invoices</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Invoices</h1>
         <Link href="/invoice-templates">
-          <Button variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="link-invoice-templates">
+          <Button variant="outline" className="rounded-xl font-bold" data-testid="link-invoice-templates">
             <Repeat className="h-4 w-4 mr-2" /> Recurring templates
           </Button>
         </Link>
@@ -51,7 +51,7 @@ export function AppInvoices() {
       {debtors && (
         <Card className=" border-border shadow-sm">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight">Aged debtors</CardTitle>
+            <CardTitle className="">Aged debtors</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-4 text-sm">
@@ -92,7 +92,7 @@ export function AppInvoices() {
       <Card className=" border-border shadow-sm">
         <CardHeader>
           <div className="flex flex-wrap justify-between items-center gap-y-2">
-            <CardTitle className="uppercase tracking-tight">All invoices</CardTitle>
+            <CardTitle className="">All invoices</CardTitle>
             <div className="flex gap-1">
               {FILTERS.map((f) => (
                 <Button
@@ -100,7 +100,7 @@ export function AppInvoices() {
                   variant={statusFilter === f.value ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter(f.value)}
-                  className="rounded-none uppercase tracking-wider text-xs font-bold"
+                  className="rounded-xl text-xs font-bold"
                   data-testid={`filter-invoice-${f.value || "all"}`}
                 >
                   {f.label}

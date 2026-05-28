@@ -38,15 +38,15 @@ export function AppSuppliers() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Suppliers</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Suppliers</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-supplier">
+            <Button className="rounded-xl font-bold" data-testid="button-new-supplier">
               <Plus className="h-4 w-4 mr-2" /> New Supplier
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-none">
-            <DialogHeader><DialogTitle className="uppercase tracking-tighter">New Supplier</DialogTitle></DialogHeader>
+          <DialogContent className="rounded-xl">
+            <DialogHeader><DialogTitle className="">New Supplier</DialogTitle></DialogHeader>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -77,7 +77,7 @@ export function AppSuppliers() {
               <div><Label>Payment terms (days)</Label><Input name="paymentTermsDays" type="number" defaultValue="30" /></div>
               <div><Label>Notes</Label><Textarea name="notes" /></div>
               <DialogFooter>
-                <Button type="submit" disabled={create.isPending} className="rounded-none uppercase tracking-wider font-bold">Save</Button>
+                <Button type="submit" disabled={create.isPending} className="rounded-xl font-bold">Save</Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -86,7 +86,7 @@ export function AppSuppliers() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+          <CardTitle className=" flex items-center gap-2">
             <Truck className="h-5 w-5" /> Supply partners
           </CardTitle>
         </CardHeader>

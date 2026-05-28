@@ -15,7 +15,7 @@ export function ForgotPassword() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
       <Card className="w-full max-w-md  border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tighter">Reset your password</CardTitle>
+          <CardTitle className="">Reset your password</CardTitle>
           <CardDescription>Enter your email and we'll send a reset link.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -28,7 +28,7 @@ export function ForgotPassword() {
             >
               <div className="space-y-1">
                 <Label>Email</Label>
-                <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required className="rounded-none" data-testid="input-forgot-email" />
+                <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required className="rounded-xl" data-testid="input-forgot-email" />
               </div>
               <Button type="submit" disabled={req.isPending} className="w-full uppercase font-bold tracking-wider" data-testid="button-forgot-submit">
                 {req.isPending ? "Sending..." : "Send reset link"}
@@ -57,7 +57,7 @@ export function ResetPassword() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
       <Card className="w-full max-w-md  border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tighter">Set new password</CardTitle>
+          <CardTitle className="">Set new password</CardTitle>
         </CardHeader>
         <CardContent>
           <form
@@ -66,7 +66,7 @@ export function ResetPassword() {
           >
             <div className="space-y-1">
               <Label>New password (min 8 chars)</Label>
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} className="rounded-none" data-testid="input-reset-password" />
+              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} className="rounded-xl" data-testid="input-reset-password" />
             </div>
             <Button type="submit" disabled={complete.isPending} className="w-full uppercase font-bold tracking-wider" data-testid="button-reset-submit">
               {complete.isPending ? "Saving..." : "Set password"}

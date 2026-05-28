@@ -84,7 +84,7 @@ export function AppAreaManagers() {
     <div className="space-y-6 max-w-5xl">
       <div className="flex flex-wrap items-center justify-between gap-y-3">
         <div>
-          <h2 className="text-2xl font-bold uppercase tracking-tighter">Area Managers</h2>
+          <h2 className="text-2xl font-bold">Area Managers</h2>
           <p className="text-sm text-muted-foreground">Assign Control Seat staff to oversee one or more branches.</p>
         </div>
         <Button
@@ -111,7 +111,7 @@ export function AppAreaManagers() {
         <Card className="border-border">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <UserCog className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="font-bold uppercase tracking-tight mb-1">No area managers yet</h3>
+            <h3 className="font-bold mb-1">No area managers yet</h3>
             <p className="text-sm text-muted-foreground">Assign a staff member as an area manager to give them scoped visibility over specific branches.</p>
           </CardContent>
         </Card>
@@ -124,7 +124,7 @@ export function AppAreaManagers() {
                   <div className="flex items-center gap-3">
                     <UserCog className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <CardTitle className="text-base uppercase tracking-tight">{am.userName ?? am.userEmail ?? am.userId}</CardTitle>
+                      <CardTitle className="text-base">{am.userName ?? am.userEmail ?? am.userId}</CardTitle>
                       <CardDescription className="text-xs">{am.userEmail}</CardDescription>
                     </div>
                   </div>
@@ -174,12 +174,12 @@ export function AppAreaManagers() {
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle className="uppercase tracking-tight">Assign Area Manager</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="">Assign Area Manager</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div>
               <Label>Staff Member (Control Seat)</Label>
               <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                <SelectTrigger className="rounded-none" data-testid="select-area-manager-user">
+                <SelectTrigger className="rounded-xl" data-testid="select-area-manager-user">
                   <SelectValue placeholder="Select a staff member" />
                 </SelectTrigger>
                 <SelectContent>
@@ -231,7 +231,7 @@ export function AppAreaManagers() {
         <Dialog open onOpenChange={() => setEditManager(null)}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle className="uppercase tracking-tight">Edit Branch Assignments</DialogTitle>
+              <DialogTitle className="">Edit Branch Assignments</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">

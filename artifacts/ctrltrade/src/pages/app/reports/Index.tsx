@@ -30,7 +30,7 @@ export function ReportsIndex() {
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Reports & Analytics</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Reports & Analytics</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Aggregated insights across leads, quotes, jobs and invoices.
         </p>
@@ -47,7 +47,7 @@ export function ReportsIndex() {
             >
               <CardHeader>
                 <div className="flex items-start justify-between gap-2">
-                  <CardTitle className="uppercase tracking-tight text-lg">{c.title}</CardTitle>
+                  <CardTitle className=" text-lg">{c.title}</CardTitle>
                   <c.Icon className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <CardDescription className="text-sm">{c.description}</CardDescription>
@@ -64,9 +64,9 @@ function InsightsCard() {
   const { data, isLoading } = useGetReportInsights();
   if (isLoading || !data || data.items.length === 0) return null;
   return (
-    <Card className="rounded-none border-primary/40 bg-primary/5" data-testid="card-insights">
+    <Card className="rounded-xl border-primary/40 bg-primary/5" data-testid="card-insights">
       <CardHeader>
-        <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+        <CardTitle className=" flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" /> AI Insights
         </CardTitle>
         <CardDescription>
@@ -77,7 +77,7 @@ function InsightsCard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {data.items.map((it, i) => (
             <div key={i} className="border border-border bg-background p-3" data-testid={`insight-${i}`}>
-              <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-tight">
+              <div className="flex items-center gap-2 text-sm font-bold">
                 {it.direction === "up" && <TrendingUp className="h-4 w-4 text-green-600" />}
                 {it.direction === "down" && <TrendingDown className="h-4 w-4 text-destructive" />}
                 {it.direction === "flat" && <Minus className="h-4 w-4 text-muted-foreground" />}

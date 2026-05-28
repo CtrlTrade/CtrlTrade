@@ -88,16 +88,16 @@ function AddModal({ open, onClose, teamMembers, currentUserId, currentUserRole, 
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="rounded-none max-w-md">
+      <DialogContent className="rounded-xl max-w-md">
         <DialogHeader>
-          <DialogTitle className="uppercase tracking-tighter font-bold">Add Unavailability</DialogTitle>
+          <DialogTitle className="font-bold">Add Unavailability</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           {canManageOthers && (
             <div className="space-y-1">
               <Label className="text-xs uppercase tracking-wide">Staff Member</Label>
               <Select value={userId} onValueChange={setUserId}>
-                <SelectTrigger className="rounded-none">
+                <SelectTrigger className="rounded-xl">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -114,17 +114,17 @@ function AddModal({ open, onClose, teamMembers, currentUserId, currentUserRole, 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label className="text-xs uppercase tracking-wide">From</Label>
-              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="rounded-none" />
+              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="rounded-xl" />
             </div>
             <div className="space-y-1">
               <Label className="text-xs uppercase tracking-wide">To</Label>
-              <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="rounded-none" />
+              <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="rounded-xl" />
             </div>
           </div>
           <div className="space-y-1">
             <Label className="text-xs uppercase tracking-wide">Reason</Label>
             <Select value={reason} onValueChange={setReason}>
-              <SelectTrigger className="rounded-none">
+              <SelectTrigger className="rounded-xl">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -136,13 +136,13 @@ function AddModal({ open, onClose, teamMembers, currentUserId, currentUserRole, 
           </div>
           <div className="space-y-1">
             <Label className="text-xs uppercase tracking-wide">Notes (optional)</Label>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="rounded-none text-sm" rows={2} />
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="rounded-xl text-sm" rows={2} />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" className="rounded-none" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" className="rounded-xl" onClick={onClose}>Cancel</Button>
           <Button
-            className="rounded-none uppercase tracking-wider font-bold"
+            className="rounded-xl font-bold"
             onClick={handleSubmit}
             disabled={create.isPending || !startDate || !endDate || startDate > endDate}
           >
@@ -229,7 +229,7 @@ export function AppAvailability() {
     <div className="space-y-6 max-w-7xl">
       <div className="flex flex-wrap items-center justify-between gap-y-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter flex items-center gap-2">
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
             <CalendarX className="h-7 w-7" /> Availability
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -237,7 +237,7 @@ export function AppAvailability() {
           </p>
         </div>
         <Button
-          className="rounded-none uppercase tracking-wider font-bold gap-2"
+          className="rounded-xl font-bold gap-2"
           onClick={() => setShowAdd(true)}
           data-testid="button-add-availability"
         >
@@ -258,16 +258,16 @@ export function AppAvailability() {
 
       {/* Calendar navigation */}
       <div className="flex items-center gap-3">
-        <Button variant="outline" size="icon" className="rounded-none" onClick={prevMonth}>
+        <Button variant="outline" size="icon" className="rounded-xl" onClick={prevMonth}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span className="font-bold uppercase tracking-tight text-lg min-w-48 text-center">{monthLabel}</span>
-        <Button variant="outline" size="icon" className="rounded-none" onClick={nextMonth}>
+        <span className="font-bold text-lg min-w-48 text-center">{monthLabel}</span>
+        <Button variant="outline" size="icon" className="rounded-xl" onClick={nextMonth}>
           <ChevronRight className="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
-          className="rounded-none uppercase tracking-wider font-bold text-xs"
+          className="rounded-xl font-bold text-xs"
           onClick={() => setAnchor(startOfMonth(new Date()))}
         >
           Today
@@ -282,7 +282,7 @@ export function AppAvailability() {
           {/* Day headers */}
           <div className="grid grid-cols-7 border-b border-border">
             {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-              <div key={d} className="py-2 text-center text-xs font-bold uppercase tracking-widest text-muted-foreground border-r border-border last:border-r-0">
+              <div key={d} className="py-2 text-center text-xs font-bold text-muted-foreground border-r border-border last:border-r-0">
                 {d}
               </div>
             ))}
@@ -347,7 +347,7 @@ export function AppAvailability() {
       {myUpcoming.length > 0 && (
         <Card className="border-border">
           <CardHeader className="pb-2">
-            <CardTitle className="uppercase tracking-tight text-sm">Your Upcoming Blocks</CardTitle>
+            <CardTitle className=" text-sm">Your Upcoming Blocks</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -365,7 +365,7 @@ export function AppAvailability() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 rounded-none text-destructive hover:text-destructive"
+                      className="h-7 rounded-xl text-destructive hover:text-destructive"
                       onClick={() => deleteMutation.mutate({ id: e.id })}
                       data-testid={`button-delete-avail-${e.id}`}
                     >

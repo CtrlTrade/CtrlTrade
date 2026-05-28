@@ -53,7 +53,7 @@ export function DateRangePicker({ range, onChange }: { range: Range; onChange: (
             key={o.label}
             variant={active ? "default" : "outline"}
             size="sm"
-            className="rounded-none uppercase text-xs font-bold tracking-wider"
+            className="rounded-xl uppercase text-xs font-bold tracking-wider"
             onClick={() => onChange(o)}
             data-testid={`range-${o.label.toLowerCase().replace(/\s+/g, "-")}`}
           >
@@ -63,26 +63,26 @@ export function DateRangePicker({ range, onChange }: { range: Range; onChange: (
       })}
       <div className="flex items-end gap-2 ml-2">
         <div>
-          <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">From</Label>
+          <Label className="text-[10px] text-muted-foreground">From</Label>
           <Input
             type="date"
             value={range.from.toISOString().slice(0, 10)}
             onChange={(e) =>
               onChange({ from: new Date(e.target.value), to: range.to, label: "Custom" })
             }
-            className="rounded-none h-9 text-xs"
+            className="rounded-xl h-9 text-xs"
             data-testid="range-from"
           />
         </div>
         <div>
-          <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">To</Label>
+          <Label className="text-[10px] text-muted-foreground">To</Label>
           <Input
             type="date"
             value={range.to.toISOString().slice(0, 10)}
             onChange={(e) =>
               onChange({ from: range.from, to: new Date(e.target.value), label: "Custom" })
             }
-            className="rounded-none h-9 text-xs"
+            className="rounded-xl h-9 text-xs"
             data-testid="range-to"
           />
         </div>
@@ -130,7 +130,7 @@ export function ExportCsvButton({ filename, rows }: { filename: string; rows: Ar
     <Button
       variant="outline"
       size="sm"
-      className="rounded-none uppercase text-xs font-bold tracking-wider gap-2"
+      className="rounded-xl uppercase text-xs font-bold tracking-wider gap-2"
       onClick={() => downloadCsv(filename, rows)}
       data-testid="button-export-csv"
     >
@@ -163,7 +163,7 @@ export function ReportShell({
         <CardHeader>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <CardTitle className="uppercase tracking-tight">{title}</CardTitle>
+              <CardTitle className="">{title}</CardTitle>
               {description && <CardDescription>{description}</CardDescription>}
             </div>
             <ExportCsvButton filename={exportFilename} rows={exportRows} />
@@ -192,7 +192,7 @@ export function KpiRow({ items }: { items: Array<{ label: string; value: string 
       {items.map((it) => (
         <Card key={it.label} className=" border-border">
           <CardContent className="p-4">
-            <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1">
+            <div className="text-[10px] font-bold text-muted-foreground mb-1">
               {it.label}
             </div>
             <div className="text-xl font-mono font-bold" data-testid={`kpi-${it.label.toLowerCase().replace(/\s+/g, "-")}`}>{it.value}</div>

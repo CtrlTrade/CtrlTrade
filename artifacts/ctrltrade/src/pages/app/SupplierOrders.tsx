@@ -306,7 +306,7 @@ export function AppSupplierOrders() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Purchase Orders</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Purchase Orders</h1>
 
         <Dialog
           open={open}
@@ -317,28 +317,28 @@ export function AppSupplierOrders() {
         >
           <DialogTrigger asChild>
             <Button
-              className="rounded-none uppercase tracking-wider font-bold"
+              className="rounded-xl font-bold"
               data-testid="button-new-po"
             >
               <Plus className="h-4 w-4 mr-2" /> New PO
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="rounded-none max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="rounded-xl max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="uppercase tracking-tighter">New Purchase Order</DialogTitle>
+              <DialogTitle className="">New Purchase Order</DialogTitle>
             </DialogHeader>
 
             {/* Scan receipt banner */}
             <div className="border border-dashed border-border p-4 bg-muted/30 space-y-2">
-              <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">
+              <p className="text-xs font-bold text-muted-foreground">
                 Scan receipt to auto-fill
               </p>
               <div className="flex items-center gap-3">
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-none uppercase tracking-wider font-bold"
+                  className="rounded-xl font-bold"
                   onClick={handleScanClick}
                   disabled={scanning}
                   data-testid="button-scan-receipt"
@@ -458,7 +458,7 @@ export function AppSupplierOrders() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="rounded-none uppercase tracking-wider font-bold text-xs"
+                    className="rounded-xl font-bold text-xs"
                     onClick={addLineItem}
                   >
                     <Plus className="h-3 w-3 mr-1" /> Add item
@@ -484,7 +484,7 @@ export function AppSupplierOrders() {
                                 value={item.description}
                                 onChange={(e) => updateLineItem(i, "description", e.target.value)}
                                 placeholder="Description"
-                                className="rounded-none border-0 focus-visible:ring-0 px-2"
+                                className="rounded-xl border-0 focus-visible:ring-0 px-2"
                                 data-testid={`input-line-desc-${i}`}
                               />
                             </ConfidenceField>
@@ -496,7 +496,7 @@ export function AppSupplierOrders() {
                                 min={1}
                                 value={item.quantity}
                                 onChange={(e) => updateLineItem(i, "quantity", parseFloat(e.target.value) || 1)}
-                                className="rounded-none border-0 focus-visible:ring-0 px-2 text-right"
+                                className="rounded-xl border-0 focus-visible:ring-0 px-2 text-right"
                                 data-testid={`input-line-qty-${i}`}
                               />
                             </ConfidenceField>
@@ -511,7 +511,7 @@ export function AppSupplierOrders() {
                                 onChange={(e) =>
                                   updateLineItem(i, "unitCostPence", Math.round(parseFloat(e.target.value || "0") * 100))
                                 }
-                                className="rounded-none border-0 focus-visible:ring-0 px-2 text-right"
+                                className="rounded-xl border-0 focus-visible:ring-0 px-2 text-right"
                                 data-testid={`input-line-cost-${i}`}
                               />
                             </ConfidenceField>
@@ -521,7 +521,7 @@ export function AppSupplierOrders() {
                               type="button"
                               variant="ghost"
                               size="sm"
-                              className="rounded-none h-7 w-7 p-0"
+                              className="rounded-xl h-7 w-7 p-0"
                               onClick={() => removeLineItem(i)}
                               disabled={lineItems.length === 1}
                             >
@@ -548,7 +548,7 @@ export function AppSupplierOrders() {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  className="rounded-none"
+                  className="rounded-xl"
                 />
               </div>
 
@@ -556,7 +556,7 @@ export function AppSupplierOrders() {
                 <Button
                   type="submit"
                   disabled={create.isPending}
-                  className="rounded-none uppercase tracking-wider font-bold"
+                  className="rounded-xl font-bold"
                   data-testid="button-create-po"
                 >
                   {create.isPending ? (
@@ -572,7 +572,7 @@ export function AppSupplierOrders() {
 
       <Card className="border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+          <CardTitle className=" flex items-center gap-2">
             <ClipboardList className="h-5 w-5" /> Orders
           </CardTitle>
         </CardHeader>
@@ -601,7 +601,7 @@ export function AppSupplierOrders() {
                     <TableCell className="font-mono font-bold text-sm">{o.number}</TableCell>
                     <TableCell>{o.supplierName}</TableCell>
                     <TableCell>
-                      <Badge variant={(statusColors[o.status] as any) ?? "outline"} className="rounded-none uppercase text-xs">
+                      <Badge variant={(statusColors[o.status] as any) ?? "outline"} className="rounded-xl uppercase text-xs">
                         {o.status}
                       </Badge>
                     </TableCell>

@@ -33,7 +33,7 @@ export function TenantThread({ subjectKind, subjectId }: Props) {
   return (
     <Card className=" border-border shadow-sm">
       <CardHeader>
-        <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+        <CardTitle className=" flex items-center gap-2">
           <MessageSquare className="h-5 w-5" /> Customer messages
         </CardTitle>
       </CardHeader>
@@ -50,7 +50,7 @@ export function TenantThread({ subjectKind, subjectId }: Props) {
                 }`}
                 data-testid={`tenant-message-${m.id}`}
               >
-                <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                <div className="text-xs  text-muted-foreground">
                   {m.authorLabel ?? m.fromRole} · {new Date(m.createdAt).toLocaleString("en-GB")}
                 </div>
                 <div className="whitespace-pre-wrap">{m.body}</div>
@@ -76,7 +76,7 @@ export function TenantThread({ subjectKind, subjectId }: Props) {
           <Button
             type="submit"
             disabled={post.isPending || !body.trim()}
-            className="rounded-none uppercase tracking-wider font-bold"
+            className="rounded-none  font-bold"
             data-testid="button-tenant-send-message"
           >
             {post.isPending ? "Sending…" : "Send"}

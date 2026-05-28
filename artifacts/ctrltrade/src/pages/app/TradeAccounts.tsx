@@ -37,15 +37,15 @@ export function AppTradeAccounts() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Trade Accounts</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Trade Accounts</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-trade-account">
+            <Button className="rounded-xl font-bold" data-testid="button-new-trade-account">
               <Plus className="h-4 w-4 mr-2" /> New Trade Account
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-none">
-            <DialogHeader><DialogTitle className="uppercase tracking-tighter">New Trade Account</DialogTitle></DialogHeader>
+          <DialogContent className="rounded-xl">
+            <DialogHeader><DialogTitle className="">New Trade Account</DialogTitle></DialogHeader>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -88,7 +88,7 @@ export function AppTradeAccounts() {
                 <div><Label>Terms (days)</Label><Input name="paymentTermsDays" type="number" defaultValue="30" /></div>
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={create.isPending} className="rounded-none uppercase tracking-wider font-bold">Save</Button>
+                <Button type="submit" disabled={create.isPending} className="rounded-xl font-bold">Save</Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -97,7 +97,7 @@ export function AppTradeAccounts() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+          <CardTitle className=" flex items-center gap-2">
             <Users className="h-5 w-5" /> Accounts
           </CardTitle>
         </CardHeader>

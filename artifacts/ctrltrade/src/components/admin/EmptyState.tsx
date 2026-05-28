@@ -13,7 +13,7 @@ export function EmptyState({ icon, heading, subtext, action }: EmptyStateProps) 
       {icon && (
         <div className="text-zinc-700 mb-1">{icon}</div>
       )}
-      <p className="font-bold uppercase tracking-wider text-sm text-zinc-400">{heading}</p>
+      <p className="font-bold text-sm text-zinc-400">{heading}</p>
       {subtext && (
         <p className="text-xs text-zinc-600 font-mono max-w-xs">{subtext}</p>
       )}

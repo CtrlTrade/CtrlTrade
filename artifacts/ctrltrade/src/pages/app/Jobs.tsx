@@ -92,11 +92,11 @@ export function AppJobs() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Jobs</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Jobs</h1>
         <div className="flex items-center gap-3">
           {branchList.length > 0 && (
             <Select value={branchFilter} onValueChange={setBranchFilter}>
-              <SelectTrigger className="w-44 rounded-none text-xs" data-testid="select-branch-filter-jobs">
+              <SelectTrigger className="w-44 rounded-xl text-xs" data-testid="select-branch-filter-jobs">
                 <SelectValue placeholder="All branches" />
               </SelectTrigger>
               <SelectContent>
@@ -109,12 +109,12 @@ export function AppJobs() {
           )}
           <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-job">
+            <Button className="rounded-xl font-bold" data-testid="button-new-job">
               <Plus className="h-4 w-4 mr-2" /> New Job
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-none max-w-2xl">
-            <DialogHeader><DialogTitle className="uppercase tracking-tighter">New Job</DialogTitle></DialogHeader>
+          <DialogContent className="rounded-xl max-w-2xl">
+            <DialogHeader><DialogTitle className="">New Job</DialogTitle></DialogHeader>
             <form onSubmit={submit} className="space-y-3">
               <div>
                 <Label>Customer</Label>
@@ -155,7 +155,7 @@ export function AppJobs() {
                 </Select>
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={create.isPending || !customerId} className="rounded-none uppercase tracking-wider font-bold">
+                <Button type="submit" disabled={create.isPending || !customerId} className="rounded-xl font-bold">
                   {create.isPending ? "Saving…" : "Save job"}
                 </Button>
               </DialogFooter>
@@ -167,7 +167,7 @@ export function AppJobs() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight flex items-center gap-2"><Briefcase className="h-5 w-5" /> All jobs</CardTitle>
+          <CardTitle className=" flex items-center gap-2"><Briefcase className="h-5 w-5" /> All jobs</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? <Skeleton className="h-48" /> : filteredJobs.length === 0 ? (

@@ -61,16 +61,16 @@ export function AppStock() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Stock</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Stock</h1>
         <div className="flex gap-2">
           <Dialog open={locOpen} onOpenChange={setLocOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-location">
+              <Button variant="outline" className="rounded-xl font-bold" data-testid="button-new-location">
                 <Plus className="h-4 w-4 mr-2" /> Location
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-none">
-              <DialogHeader><DialogTitle className="uppercase tracking-tighter">New Location</DialogTitle></DialogHeader>
+            <DialogContent className="rounded-xl">
+              <DialogHeader><DialogTitle className="">New Location</DialogTitle></DialogHeader>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -110,7 +110,7 @@ export function AppStock() {
                   <Label htmlFor="isDefault" className="uppercase text-xs tracking-wider">Default location</Label>
                 </div>
                 <DialogFooter>
-                  <Button type="submit" disabled={createLoc.isPending} className="rounded-none uppercase tracking-wider font-bold">Save</Button>
+                  <Button type="submit" disabled={createLoc.isPending} className="rounded-xl font-bold">Save</Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -118,12 +118,12 @@ export function AppStock() {
 
           <Dialog open={adjOpen} onOpenChange={setAdjOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-adjust-stock">
+              <Button variant="outline" className="rounded-xl font-bold" data-testid="button-adjust-stock">
                 <Settings2 className="h-4 w-4 mr-2" /> Adjust
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-none">
-              <DialogHeader><DialogTitle className="uppercase tracking-tighter">Adjust Stock</DialogTitle></DialogHeader>
+            <DialogContent className="rounded-xl">
+              <DialogHeader><DialogTitle className="">Adjust Stock</DialogTitle></DialogHeader>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -166,7 +166,7 @@ export function AppStock() {
                 </div>
                 <div><Label>Note</Label><Input name="note" /></div>
                 <DialogFooter>
-                  <Button type="submit" disabled={adjust.isPending} className="rounded-none uppercase tracking-wider font-bold">Apply</Button>
+                  <Button type="submit" disabled={adjust.isPending} className="rounded-xl font-bold">Apply</Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -174,12 +174,12 @@ export function AppStock() {
 
           <Dialog open={transferOpen} onOpenChange={setTransferOpen}>
             <DialogTrigger asChild>
-              <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-transfer-stock">
+              <Button className="rounded-xl font-bold" data-testid="button-transfer-stock">
                 <ArrowLeftRight className="h-4 w-4 mr-2" /> Transfer
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-none">
-              <DialogHeader><DialogTitle className="uppercase tracking-tighter">Transfer Stock</DialogTitle></DialogHeader>
+            <DialogContent className="rounded-xl">
+              <DialogHeader><DialogTitle className="">Transfer Stock</DialogTitle></DialogHeader>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -221,7 +221,7 @@ export function AppStock() {
                 <div><Label>Qty</Label><Input name="qty" type="number" required defaultValue="1" /></div>
                 <div><Label>Note</Label><Input name="note" /></div>
                 <DialogFooter>
-                  <Button type="submit" disabled={transfer.isPending} className="rounded-none uppercase tracking-wider font-bold">Transfer</Button>
+                  <Button type="submit" disabled={transfer.isPending} className="rounded-xl font-bold">Transfer</Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -230,9 +230,9 @@ export function AppStock() {
       </div>
 
       {low && low.length > 0 && (
-        <Card className="rounded-none border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
+        <Card className="rounded-xl border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight flex items-center gap-2 text-amber-700 dark:text-amber-400">
+            <CardTitle className=" flex items-center gap-2 text-amber-700 dark:text-amber-400">
               <AlertTriangle className="h-5 w-5" /> Low stock — {low.length}
             </CardTitle>
           </CardHeader>
@@ -259,7 +259,7 @@ export function AppStock() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+          <CardTitle className=" flex items-center gap-2">
             <Warehouse className="h-5 w-5" /> Stock by location
           </CardTitle>
         </CardHeader>

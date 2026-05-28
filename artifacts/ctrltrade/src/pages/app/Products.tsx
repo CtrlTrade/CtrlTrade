@@ -76,16 +76,16 @@ export function AppProducts() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Products</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Products</h1>
         <div className="flex gap-2">
           <Dialog open={catOpen} onOpenChange={setCatOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-category">
+              <Button variant="outline" className="rounded-xl font-bold" data-testid="button-new-category">
                 <Tag className="h-4 w-4 mr-2" /> Category
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-none">
-              <DialogHeader><DialogTitle className="uppercase tracking-tighter">New Category</DialogTitle></DialogHeader>
+            <DialogContent className="rounded-xl">
+              <DialogHeader><DialogTitle className="">New Category</DialogTitle></DialogHeader>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -96,7 +96,7 @@ export function AppProducts() {
               >
                 <div><Label>Name</Label><Input name="name" required data-testid="input-category-name" /></div>
                 <DialogFooter>
-                  <Button type="submit" disabled={createCat.isPending} className="rounded-none uppercase tracking-wider font-bold">Save</Button>
+                  <Button type="submit" disabled={createCat.isPending} className="rounded-xl font-bold">Save</Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -104,12 +104,12 @@ export function AppProducts() {
 
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-product">
+              <Button className="rounded-xl font-bold" data-testid="button-new-product">
                 <Plus className="h-4 w-4 mr-2" /> New Product
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-none max-w-2xl">
-              <DialogHeader><DialogTitle className="uppercase tracking-tighter">New Product</DialogTitle></DialogHeader>
+            <DialogContent className="rounded-xl max-w-2xl">
+              <DialogHeader><DialogTitle className="">New Product</DialogTitle></DialogHeader>
               <form onSubmit={onSubmit} className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>SKU</Label><Input name="sku" required data-testid="input-product-sku" /></div>
@@ -151,7 +151,7 @@ export function AppProducts() {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit" disabled={create.isPending} className="rounded-none uppercase tracking-wider font-bold">
+                  <Button type="submit" disabled={create.isPending} className="rounded-xl font-bold">
                     {create.isPending ? "Saving…" : "Save"}
                   </Button>
                 </DialogFooter>
@@ -163,7 +163,7 @@ export function AppProducts() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+          <CardTitle className=" flex items-center gap-2">
             <Package className="h-5 w-5" /> Catalogue
           </CardTitle>
         </CardHeader>

@@ -112,7 +112,7 @@ export function AppInvoiceDetail() {
       </Link>
       <div className="flex flex-wrap gap-y-3 justify-between items-start">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">{data.number}</h1>
           <p className="text-muted-foreground">{data.title}</p>
           <p className="text-sm mt-1">Customer: <span className="font-medium">{data.customerName}</span></p>
           {data.isDeposit && <Badge variant="secondary" className="uppercase mt-2">Deposit invoice</Badge>}
@@ -122,23 +122,23 @@ export function AppInvoiceDetail() {
 
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => send.mutate({ invoiceId: id })} disabled={!canSend || send.isPending}
-          variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-send-invoice">
+          variant="outline" className="rounded-xl font-bold" data-testid="button-send-invoice">
           <Send className="h-4 w-4 mr-2" /> Send & request payment
         </Button>
         {data.paymentLinkUrl && (
           <a href={data.paymentLinkUrl} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-payment-link">
+            <Button variant="outline" className="rounded-xl font-bold" data-testid="button-payment-link">
               <ExternalLink className="h-4 w-4 mr-2" /> Open payment link
             </Button>
           </a>
         )}
         <Button onClick={handleMarkPaid} disabled={!canMarkPaid || markPaid.isPending}
-          variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-mark-paid">
+          variant="outline" className="rounded-xl font-bold" data-testid="button-mark-paid">
           <Check className="h-4 w-4 mr-2" /> Mark paid
         </Button>
         <Button onClick={() => { if (confirm("Void this invoice?")) voidInv.mutate({ invoiceId: id }); }}
           disabled={!canVoid || voidInv.isPending}
-          variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-void-invoice">
+          variant="outline" className="rounded-xl font-bold" data-testid="button-void-invoice">
           <Ban className="h-4 w-4 mr-2" /> Void
         </Button>
       </div>
@@ -146,10 +146,10 @@ export function AppInvoiceDetail() {
       <Card className=" border-border shadow-sm">
         <CardHeader>
           <div className="flex flex-wrap gap-y-2 justify-between items-center">
-            <CardTitle className="uppercase tracking-tight">Line items</CardTitle>
+            <CardTitle className="">Line items</CardTitle>
             {canEdit && !editing && (
               <Button variant="outline" size="sm" onClick={startEdit}
-                className="rounded-none uppercase tracking-wider text-xs font-bold" data-testid="button-edit-items">
+                className="rounded-xl text-xs font-bold" data-testid="button-edit-items">
                 <Pencil className="h-4 w-4 mr-2" /> Edit
               </Button>
             )}
@@ -160,14 +160,14 @@ export function AppInvoiceDetail() {
             <div className="space-y-3">
               {draftItems.map((it, i) => (
                 <div key={i} className="grid grid-cols-12 gap-2 items-center">
-                  <Input className="rounded-none col-span-7" value={it.description}
+                  <Input className="rounded-xl col-span-7" value={it.description}
                     placeholder="Description"
                     onChange={(e) => updateDraft(i, { description: e.target.value })}
                     data-testid={`input-item-desc-${i}`} />
-                  <Input className="rounded-none col-span-2 font-mono" type="number" min={1} value={it.quantity}
+                  <Input className="rounded-xl col-span-2 font-mono" type="number" min={1} value={it.quantity}
                     onChange={(e) => updateDraft(i, { quantity: Number(e.target.value) || 0 })}
                     data-testid={`input-item-qty-${i}`} />
-                  <Input className="rounded-none col-span-2 font-mono" type="number" min={0} value={it.unitPricePence}
+                  <Input className="rounded-xl col-span-2 font-mono" type="number" min={0} value={it.unitPricePence}
                     onChange={(e) => updateDraft(i, { unitPricePence: Number(e.target.value) || 0 })}
                     placeholder="Pence"
                     data-testid={`input-item-price-${i}`} />
@@ -177,7 +177,7 @@ export function AppInvoiceDetail() {
                 </div>
               ))}
               <Button variant="outline" size="sm" onClick={addRow}
-                className="rounded-none uppercase tracking-wider text-xs font-bold" data-testid="button-add-item">
+                className="rounded-xl text-xs font-bold" data-testid="button-add-item">
                 <Plus className="h-4 w-4 mr-2" /> Add line
               </Button>
               <div className="text-sm text-muted-foreground border-t pt-2 space-y-1">
@@ -187,11 +187,11 @@ export function AppInvoiceDetail() {
               </div>
               <div className="flex gap-2">
                 <Button onClick={saveItems} disabled={replaceItems.isPending}
-                  className="rounded-none uppercase tracking-wider font-bold" data-testid="button-save-items">
+                  className="rounded-xl font-bold" data-testid="button-save-items">
                   Save
                 </Button>
                 <Button variant="outline" onClick={() => setEditing(false)}
-                  className="rounded-none uppercase tracking-wider font-bold">
+                  className="rounded-xl font-bold">
                   Cancel
                 </Button>
               </div>
@@ -234,7 +234,7 @@ export function AppInvoiceDetail() {
 
       {data.payments.length > 0 && (
         <Card className=" border-border shadow-sm">
-          <CardHeader><CardTitle className="uppercase tracking-tight">Payments</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="">Payments</CardTitle></CardHeader>
           <CardContent>
             <Table>
               <TableHeader><TableRow>

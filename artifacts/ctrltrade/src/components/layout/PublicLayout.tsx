@@ -34,7 +34,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2 sm:gap-4">
             <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground">Log in</Link>
             <Link href="/signup">
-              <Button className="uppercase tracking-wider font-bold text-xs whitespace-nowrap" data-testid="link-signup">
+              <Button className="font-bold text-xs whitespace-nowrap" data-testid="link-signup">
                 <span className="hidden sm:inline">Start 1 month free trial</span>
                 <span className="sm:hidden">Free trial</span>
               </Button>

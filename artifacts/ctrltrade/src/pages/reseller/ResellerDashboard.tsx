@@ -82,8 +82,8 @@ export function ResellerDashboard() {
   if (error || !data) {
     return (
       <div className="min-h-screen bg-black text-white p-8 max-w-2xl mx-auto space-y-4">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Reseller Portal</h1>
-        <Card className="rounded-none border-zinc-800 bg-zinc-950">
+        <h1 className="text-3xl font-bold">Reseller Portal</h1>
+        <Card className="rounded-xl border-zinc-800 bg-zinc-950">
           <CardContent className="p-6 text-sm text-zinc-300">
             <p>You do not currently have reseller access. Contact your administrator to be added to a reseller programme.</p>
             <div className="mt-4 flex gap-3">
@@ -114,17 +114,17 @@ export function ResellerDashboard() {
       </header>
       <main className="p-8 space-y-8 max-w-7xl mx-auto">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold uppercase tracking-tighter">Reseller Dashboard</h1>
+          <h1 className="text-3xl font-bold">Reseller Dashboard</h1>
           <Button
             onClick={() => setShowCreate((v) => !v)}
-            className="rounded-none bg-red-600 hover:bg-red-700 uppercase text-xs font-bold tracking-wider gap-2"
+            className="rounded-xl bg-red-600 hover:bg-red-700 uppercase text-xs font-bold tracking-wider gap-2"
           >
             <Plus className="h-3 w-3" /> {showCreate ? "Cancel" : "New Child Tenant"}
           </Button>
         </div>
 
         {showCreate && (
-          <Card className="rounded-none border-zinc-800 bg-zinc-950">
+          <Card className="rounded-xl border-zinc-800 bg-zinc-950">
             <CardHeader>
               <CardTitle className="uppercase text-sm tracking-wider text-zinc-300">Provision Child Tenant</CardTitle>
             </CardHeader>
@@ -132,11 +132,11 @@ export function ResellerDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label className="text-xs uppercase text-zinc-500">Business name</Label>
-                  <Input value={childName} onChange={(e) => setChildName(e.target.value)} placeholder="Acme Plumbing" className="rounded-none border-zinc-700 bg-black text-white" />
+                  <Input value={childName} onChange={(e) => setChildName(e.target.value)} placeholder="Acme Plumbing" className="rounded-xl border-zinc-700 bg-black text-white" />
                 </div>
                 <div>
                   <Label className="text-xs uppercase text-zinc-500">URL slug (optional)</Label>
-                  <Input value={childSlug} onChange={(e) => setChildSlug(e.target.value)} placeholder="auto-generated from name" className="rounded-none border-zinc-700 bg-black text-white font-mono text-xs" />
+                  <Input value={childSlug} onChange={(e) => setChildSlug(e.target.value)} placeholder="auto-generated from name" className="rounded-xl border-zinc-700 bg-black text-white font-mono text-xs" />
                 </div>
               </div>
               <div className="flex items-center gap-3 border border-zinc-800 p-3">
@@ -146,7 +146,7 @@ export function ResellerDashboard() {
                   <div className="text-xs text-zinc-500">Copy your brand colors, logo, and white-label config onto the new tenant.</div>
                 </div>
               </div>
-              <Button onClick={handleCreateChild} disabled={createChild.isPending} className="rounded-none bg-red-600 hover:bg-red-700 uppercase text-xs font-bold">
+              <Button onClick={handleCreateChild} disabled={createChild.isPending} className="rounded-xl bg-red-600 hover:bg-red-700 uppercase text-xs font-bold">
                 {createChild.isPending ? "Creating…" : "Create child tenant"}
               </Button>
             </CardContent>
@@ -154,9 +154,9 @@ export function ResellerDashboard() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="rounded-none border-zinc-800 bg-zinc-950">
+          <Card className="rounded-xl border-zinc-800 bg-zinc-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs uppercase tracking-wider text-zinc-500 flex items-center gap-2">
+              <CardTitle className="text-xs text-zinc-500 flex items-center gap-2">
                 <Users className="h-3 w-3" /> Active Child Tenants
               </CardTitle>
             </CardHeader>
@@ -165,9 +165,9 @@ export function ResellerDashboard() {
               <div className="text-xs text-zinc-500 mt-1">{children.length} total</div>
             </CardContent>
           </Card>
-          <Card className="rounded-none border-zinc-800 bg-zinc-950">
+          <Card className="rounded-xl border-zinc-800 bg-zinc-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs uppercase tracking-wider text-zinc-500 flex items-center gap-2">
+              <CardTitle className="text-xs text-zinc-500 flex items-center gap-2">
                 <TrendingUp className="h-3 w-3" /> Network MRR
               </CardTitle>
             </CardHeader>
@@ -176,9 +176,9 @@ export function ResellerDashboard() {
               <div className="text-xs text-zinc-500 mt-1">Across all child tenants</div>
             </CardContent>
           </Card>
-          <Card className="rounded-none border-zinc-800 bg-zinc-950">
+          <Card className="rounded-xl border-zinc-800 bg-zinc-950">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs uppercase tracking-wider text-zinc-500 flex items-center gap-2">
+              <CardTitle className="text-xs text-zinc-500 flex items-center gap-2">
                 <Wallet className="h-3 w-3" /> Expected Payout
               </CardTitle>
             </CardHeader>
@@ -210,7 +210,7 @@ export function ResellerDashboard() {
                     <div className="text-xs text-zinc-500 font-mono truncate">{c.slug} · {new Date(c.createdAt).toLocaleDateString()}</div>
                   </div>
                   <div className="col-span-1">
-                    <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                    <span className={`px-2 py-1 text-[10px] font-bold ${
                       c.status === 'active' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
                       c.status === 'trial' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
                       c.status === 'cancelled' ? 'bg-zinc-800 text-zinc-400 border border-zinc-700' :

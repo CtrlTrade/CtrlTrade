@@ -28,13 +28,13 @@ export function PortalDashboard() {
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Your account</h1>
-        <Link href={`/portal/${tenantSlug}/refer`} className="text-xs uppercase tracking-wider font-bold underline" data-testid="link-portal-refer">Refer a friend →</Link>
+        <h1 className="text-3xl font-bold">Your account</h1>
+        <Link href={`/portal/${tenantSlug}/refer`} className="text-xs font-bold underline" data-testid="link-portal-refer">Refer a friend →</Link>
       </div>
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Quotes</CardTitle>
+          <CardTitle className="">Quotes</CardTitle>
         </CardHeader>
         <CardContent>
           {data.quotes.length === 0 ? (
@@ -52,7 +52,7 @@ export function PortalDashboard() {
                     <div className="font-medium">{q.title}</div>
                   </Link>
                   <span className="font-mono mr-4">{formatGBP(q.totalPence)}</span>
-                  <Badge className="uppercase rounded-none">{q.status}</Badge>
+                  <Badge className="uppercase rounded-xl">{q.status}</Badge>
                 </li>
               ))}
             </ul>
@@ -62,7 +62,7 @@ export function PortalDashboard() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Jobs</CardTitle>
+          <CardTitle className="">Jobs</CardTitle>
         </CardHeader>
         <CardContent>
           {data.jobs.length === 0 ? (
@@ -84,7 +84,7 @@ export function PortalDashboard() {
                       </div>
                     ) : null}
                   </Link>
-                  <Badge className="uppercase rounded-none">{j.status.replace("_", " ")}</Badge>
+                  <Badge className="uppercase rounded-xl">{j.status.replace("_", " ")}</Badge>
                 </li>
               ))}
             </ul>
@@ -94,7 +94,7 @@ export function PortalDashboard() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Invoices</CardTitle>
+          <CardTitle className="">Invoices</CardTitle>
         </CardHeader>
         <CardContent>
           {data.invoices.length === 0 ? (
@@ -114,7 +114,7 @@ export function PortalDashboard() {
                     </div>
                   </Link>
                   <span className="font-mono mr-4">{formatGBP(i.totalPence)}</span>
-                  <Badge className="uppercase rounded-none">{i.status}</Badge>
+                  <Badge className="uppercase rounded-xl">{i.status}</Badge>
                 </li>
               ))}
             </ul>

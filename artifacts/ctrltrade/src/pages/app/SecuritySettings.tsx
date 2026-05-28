@@ -143,7 +143,7 @@ export function SecuritySettings() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-primary" />
-            <CardTitle className="uppercase tracking-tight">Two-Factor Authentication</CardTitle>
+            <CardTitle className="">Two-Factor Authentication</CardTitle>
           </div>
           <CardDescription>
             Add an extra layer of security to your account using an authenticator app (Google Authenticator, Authy, 1Password, etc).
@@ -153,9 +153,9 @@ export function SecuritySettings() {
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium">Status:</span>
             {totpEnabled ? (
-              <Badge className="bg-green-600 text-white rounded-none uppercase text-xs">Enabled</Badge>
+              <Badge className="bg-green-600 text-white rounded-xl uppercase text-xs">Enabled</Badge>
             ) : (
-              <Badge variant="outline" className="rounded-none uppercase text-xs text-muted-foreground">Not enabled</Badge>
+              <Badge variant="outline" className="rounded-xl uppercase text-xs text-muted-foreground">Not enabled</Badge>
             )}
           </div>
 
@@ -167,7 +167,7 @@ export function SecuritySettings() {
               <Button
                 onClick={handleStartSetup}
                 disabled={fetchingSetup}
-                className="rounded-none uppercase font-bold tracking-wider"
+                className="rounded-xl uppercase font-bold tracking-wider"
                 data-testid="button-2fa-enable"
               >
                 <QrCode className="h-4 w-4 mr-2" />
@@ -199,18 +199,18 @@ export function SecuritySettings() {
                     placeholder="000000"
                     maxLength={6}
                     inputMode="numeric"
-                    className="rounded-none font-mono text-center text-xl tracking-widest w-40"
+                    className="rounded-xl font-mono text-center text-xl tracking-widest w-40"
                     data-testid="input-2fa-enrol-code"
                   />
                   <Button
                     onClick={handleVerifyEnrol}
                     disabled={verifyEnrol.isPending || enrolCode.length !== 6}
-                    className="rounded-none uppercase font-bold tracking-wider"
+                    className="rounded-xl uppercase font-bold tracking-wider"
                     data-testid="button-2fa-confirm-enrol"
                   >
                     {verifyEnrol.isPending ? "Verifying..." : "Confirm"}
                   </Button>
-                  <Button variant="outline" className="rounded-none" onClick={() => { setStep("idle"); setQrDataUrl(""); setSetupSecret(""); }}>
+                  <Button variant="outline" className="rounded-xl" onClick={() => { setStep("idle"); setQrDataUrl(""); setSetupSecret(""); }}>
                     Cancel
                   </Button>
                 </div>
@@ -234,10 +234,10 @@ export function SecuritySettings() {
                 ))}
               </div>
               <div className="flex gap-2 flex-wrap">
-                <Button variant="outline" className="rounded-none uppercase text-xs font-bold" onClick={downloadRecoveryCodes}>
+                <Button variant="outline" className="rounded-xl uppercase text-xs font-bold" onClick={downloadRecoveryCodes}>
                   <Download className="h-4 w-4 mr-2" /> Download codes
                 </Button>
-                <Button className="rounded-none uppercase text-xs font-bold" onClick={() => { setStep("idle"); setRecoveryCodes([]); }} data-testid="button-2fa-done">
+                <Button className="rounded-xl uppercase text-xs font-bold" onClick={() => { setStep("idle"); setRecoveryCodes([]); }} data-testid="button-2fa-done">
                   Done
                 </Button>
               </div>
@@ -248,7 +248,7 @@ export function SecuritySettings() {
             <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
-                className="rounded-none uppercase text-xs font-bold"
+                className="rounded-xl uppercase text-xs font-bold"
                 onClick={handleViewRecoveryCodes}
                 disabled={fetchingRecoveryCodes}
               >
@@ -257,7 +257,7 @@ export function SecuritySettings() {
               </Button>
               <Button
                 variant="destructive"
-                className="rounded-none uppercase text-xs font-bold"
+                className="rounded-xl uppercase text-xs font-bold"
                 onClick={() => setStep("disable")}
                 data-testid="button-2fa-disable"
               >
@@ -277,19 +277,19 @@ export function SecuritySettings() {
                   placeholder="000000"
                   maxLength={6}
                   inputMode="numeric"
-                  className="rounded-none font-mono text-center text-xl tracking-widest w-40"
+                  className="rounded-xl font-mono text-center text-xl tracking-widest w-40"
                   data-testid="input-2fa-disable-code"
                 />
                 <Button
                   variant="destructive"
                   onClick={handleDisable}
                   disabled={disable2fa.isPending || disableCode.length !== 6}
-                  className="rounded-none uppercase font-bold tracking-wider"
+                  className="rounded-xl uppercase font-bold tracking-wider"
                   data-testid="button-2fa-confirm-disable"
                 >
                   {disable2fa.isPending ? "Disabling..." : "Confirm disable"}
                 </Button>
-                <Button variant="outline" className="rounded-none" onClick={() => { setStep("idle"); setDisableCode(""); }}>
+                <Button variant="outline" className="rounded-xl" onClick={() => { setStep("idle"); setDisableCode(""); }}>
                   Cancel
                 </Button>
               </div>
@@ -310,11 +310,11 @@ export function SecuritySettings() {
               )}
               <div className="flex gap-2 flex-wrap">
                 {recoveryCodes.length > 0 && (
-                  <Button variant="outline" className="rounded-none uppercase text-xs font-bold" onClick={downloadRecoveryCodes}>
+                  <Button variant="outline" className="rounded-xl uppercase text-xs font-bold" onClick={downloadRecoveryCodes}>
                     <Download className="h-4 w-4 mr-2" /> Download codes
                   </Button>
                 )}
-                <Button className="rounded-none uppercase text-xs font-bold" onClick={() => { setStep("idle"); setRecoveryCodes([]); }}>
+                <Button className="rounded-xl uppercase text-xs font-bold" onClick={() => { setStep("idle"); setRecoveryCodes([]); }}>
                   Done
                 </Button>
               </div>
@@ -327,7 +327,7 @@ export function SecuritySettings() {
       {canEnforce && tenant && (
         <Card className="border-border shadow-sm">
           <CardHeader>
-            <CardTitle className="uppercase tracking-tight">Team 2FA Policy</CardTitle>
+            <CardTitle className="">Team 2FA Policy</CardTitle>
             <CardDescription>
               Require all team members to enrol in two-factor authentication. Members without 2FA will be redirected to set it up on next login.
             </CardDescription>

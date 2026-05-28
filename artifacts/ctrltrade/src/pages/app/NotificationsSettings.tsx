@@ -42,7 +42,7 @@ export function AppNotificationsSettings() {
     <div className="space-y-6">
       <Card className=" border-border">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Notification Preferences</CardTitle>
+          <CardTitle className="">Notification Preferences</CardTitle>
           <CardDescription>
             Choose which channels deliver each event to you. Customer-facing transactional messages always send
             (using each customer&apos;s contact details).
@@ -53,9 +53,9 @@ export function AppNotificationsSettings() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left p-2 uppercase tracking-wider text-xs font-bold">Event</th>
+                  <th className="text-left p-2 text-xs font-bold">Event</th>
                   {channels.map((c) => (
-                    <th key={c} className="text-center p-2 uppercase tracking-wider text-xs font-bold w-24">
+                    <th key={c} className="text-center p-2 text-xs font-bold w-24">
                       {c}
                     </th>
                   ))}

@@ -73,15 +73,15 @@ export function AppQuotes() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Quotes</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Quotes</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-quote">
+            <Button className="rounded-xl font-bold" data-testid="button-new-quote">
               <Plus className="h-4 w-4 mr-2" /> New Quote
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-none max-w-2xl">
-            <DialogHeader><DialogTitle className="uppercase tracking-tighter">New Quote</DialogTitle></DialogHeader>
+          <DialogContent className="rounded-xl max-w-2xl">
+            <DialogHeader><DialogTitle className="">New Quote</DialogTitle></DialogHeader>
             <form onSubmit={submit} className="space-y-3">
               <div>
                 <Label>Customer</Label>
@@ -107,14 +107,14 @@ export function AppQuotes() {
                       <Button type="button" variant="ghost" size="icon" onClick={() => setItems((s) => s.filter((_, i) => i !== idx))}><X className="h-4 w-4" /></Button>
                     </div>
                   ))}
-                  <Button type="button" variant="outline" size="sm" onClick={() => setItems((s) => [...s, { description: "", quantity: 1, unitPricePence: 0 }])} className="rounded-none">
+                  <Button type="button" variant="outline" size="sm" onClick={() => setItems((s) => [...s, { description: "", quantity: 1, unitPricePence: 0 }])} className="rounded-xl">
                     + Add item
                   </Button>
                 </div>
               </div>
               <div><Label>Notes</Label><Textarea value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
               <DialogFooter>
-                <Button type="submit" disabled={create.isPending || !customerId} className="rounded-none uppercase tracking-wider font-bold">
+                <Button type="submit" disabled={create.isPending || !customerId} className="rounded-xl font-bold">
                   {create.isPending ? "Saving…" : "Save quote"}
                 </Button>
               </DialogFooter>
@@ -125,7 +125,7 @@ export function AppQuotes() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight flex items-center gap-2"><FileText className="h-5 w-5" /> All quotes</CardTitle>
+          <CardTitle className=" flex items-center gap-2"><FileText className="h-5 w-5" /> All quotes</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? <Skeleton className="h-48" /> : !data || data.length === 0 ? (

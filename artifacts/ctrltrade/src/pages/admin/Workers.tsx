@@ -36,9 +36,9 @@ export function AdminWorkers() {
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {(["queued","running","done","failed","dead"] as const).map(s => (
-          <Card key={s} className="rounded-none border-zinc-800 bg-black shadow-none">
+          <Card key={s} className="rounded-xl border-zinc-800 bg-black shadow-none">
             <CardContent className="p-6">
-              <div className="font-bold uppercase tracking-wider text-xs text-zinc-400 mb-2">{s}</div>
+              <div className="font-bold text-xs text-zinc-400 mb-2">{s}</div>
               <div className={`text-3xl font-mono font-bold ${s === "failed" || s === "dead" ? "text-red-500" : s === "running" ? "text-yellow-500" : "text-zinc-100"}`} data-testid={`worker-depth-${s}`}>
                 {data.depth[s]}
               </div>
@@ -47,11 +47,11 @@ export function AdminWorkers() {
         ))}
       </div>
 
-      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
-        <CardHeader><CardTitle className="uppercase tracking-tight text-zinc-100">By Kind</CardTitle></CardHeader>
+      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
+        <CardHeader><CardTitle className=" text-zinc-100">By Kind</CardTitle></CardHeader>
         <CardContent>
           <div className="divide-y divide-zinc-800 border border-zinc-800">
-            <div className="grid grid-cols-6 gap-2 p-3 text-xs uppercase tracking-wider text-zinc-500 font-bold bg-zinc-950">
+            <div className="grid grid-cols-6 gap-2 p-3 text-xs text-zinc-500 font-bold bg-zinc-950">
               <div>Kind</div><div>Queued</div><div>Running</div><div>Done</div><div>Failed</div><div>Dead</div>
             </div>
             {data.byKind.map(k => (
@@ -67,7 +67,7 @@ export function AdminWorkers() {
             {data.byKind.length === 0 && (
               <div className="py-12 flex flex-col items-center gap-3">
                 <Cpu className="h-10 w-10 text-zinc-700" />
-                <p className="font-bold uppercase tracking-wider text-sm text-zinc-400">No jobs recorded</p>
+                <p className="font-bold text-sm text-zinc-400">No jobs recorded</p>
                 <p className="text-xs text-zinc-600 font-mono">Background jobs will appear here as they are queued.</p>
               </div>
             )}
@@ -75,8 +75,8 @@ export function AdminWorkers() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
-        <CardHeader><CardTitle className="uppercase tracking-tight text-zinc-100">Recent 100 Jobs</CardTitle></CardHeader>
+      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
+        <CardHeader><CardTitle className=" text-zinc-100">Recent 100 Jobs</CardTitle></CardHeader>
         <CardContent>
           <div className="divide-y divide-zinc-800 border border-zinc-800 max-h-[600px] overflow-y-auto">
             {data.recent.map(j => (
@@ -93,7 +93,7 @@ export function AdminWorkers() {
                 <div className="col-span-2 text-xs font-mono text-zinc-600">{new Date(j.updatedAt).toLocaleString()}</div>
                 <div className="col-span-1 text-right">
                   {(j.status === "failed" || j.status === "dead") && (
-                    <Button size="sm" variant="outline" disabled={retry.isPending} className="rounded-none uppercase text-xs font-bold border-zinc-700"
+                    <Button size="sm" variant="outline" disabled={retry.isPending} className="rounded-xl uppercase text-xs font-bold border-zinc-700"
                       onClick={() => retry.mutate({ jobId: j.id })}
                       data-testid={`button-retry-${j.id}`}>
                       <RefreshCw className="h-3 w-3"/>
@@ -107,7 +107,7 @@ export function AdminWorkers() {
             {data.recent.length === 0 && (
               <div className="py-12 flex flex-col items-center gap-3">
                 <Cpu className="h-10 w-10 text-zinc-700" />
-                <p className="font-bold uppercase tracking-wider text-sm text-zinc-400">No recent jobs</p>
+                <p className="font-bold text-sm text-zinc-400">No recent jobs</p>
                 <p className="text-xs text-zinc-600 font-mono">Completed and failed jobs will be listed here.</p>
               </div>
             )}

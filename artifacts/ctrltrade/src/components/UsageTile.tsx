@@ -37,7 +37,7 @@ export function UsageTile() {
   return (
     <Card className=" border-border shadow-sm" data-testid="card-usage">
       <CardHeader>
-        <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+        <CardTitle className=" flex items-center gap-2">
           <Activity className="h-5 w-5" /> Usage this month
         </CardTitle>
         <CardDescription>
@@ -53,7 +53,7 @@ export function UsageTile() {
             const over = limit > 0 && used > limit;
             return (
               <div key={kind} className="border border-border p-3 bg-background">
-                <div className="font-bold uppercase tracking-wider text-[10px] text-muted-foreground mb-1">
+                <div className="font-bold  text-[10px] text-muted-foreground mb-1">
                   {KIND_LABELS[kind] ?? kind}
                 </div>
                 <div className="text-xl font-mono font-bold" data-testid={`usage-${kind}`}>

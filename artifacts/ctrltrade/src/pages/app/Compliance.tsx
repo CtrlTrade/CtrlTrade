@@ -48,7 +48,7 @@ function VerificationBadgeCard() {
   return (
     <Card className="border-border shadow-sm" data-testid="card-verification-badge">
       <CardHeader>
-        <CardTitle className="uppercase tracking-tight flex items-center gap-2">
+        <CardTitle className=" flex items-center gap-2">
           <ShieldCheck className="h-5 w-5" /> CtrlTrade Verified Badge
         </CardTitle>
       </CardHeader>
@@ -61,7 +61,7 @@ function VerificationBadgeCard() {
               <div className="flex-1 space-y-1">
                 {s?.verifiedBadge ? (
                   <div className="flex items-center gap-2">
-                    <Badge className="rounded-none uppercase bg-green-600 text-white gap-1">
+                    <Badge className="rounded-xl uppercase bg-green-600 text-white gap-1">
                       <CheckCircle className="h-3 w-3" /> Verified
                     </Badge>
                     <span className="text-sm text-muted-foreground">
@@ -70,7 +70,7 @@ function VerificationBadgeCard() {
                   </div>
                 ) : s?.badgeStatus === "under_review" ? (
                   <div className="flex items-center gap-2">
-                    <Badge className="rounded-none uppercase bg-amber-500 text-white gap-1">
+                    <Badge className="rounded-xl uppercase bg-amber-500 text-white gap-1">
                       <Clock className="h-3 w-3" /> Under Review
                     </Badge>
                     <span className="text-sm text-muted-foreground">
@@ -81,7 +81,7 @@ function VerificationBadgeCard() {
                 ) : s?.badgeStatus === "rejected" ? (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Badge variant="destructive" className="rounded-none uppercase gap-1">
+                      <Badge variant="destructive" className="rounded-xl uppercase gap-1">
                         <XCircle className="h-3 w-3" /> Rejected
                       </Badge>
                       <span className="text-sm text-muted-foreground">
@@ -110,7 +110,7 @@ function VerificationBadgeCard() {
             </div>
             {(s?.badgeStatus === "not_applied" || s?.badgeStatus === "rejected") && (
               <Button
-                className="rounded-none uppercase tracking-wider font-bold gap-2"
+                className="rounded-xl font-bold gap-2"
                 onClick={() => request.mutate()}
                 disabled={request.isPending}
                 data-testid="button-apply-verification"
@@ -191,15 +191,15 @@ export function AppCompliance() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <VerificationBadgeCard />
       <div className="flex flex-wrap justify-between items-center gap-y-3">
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Compliance</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Compliance</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-certificate">
+            <Button className="rounded-xl font-bold" data-testid="button-new-certificate">
               <Plus className="h-4 w-4 mr-2" /> New Certificate
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-none max-w-xl">
-            <DialogHeader><DialogTitle className="uppercase tracking-tighter">New Certificate</DialogTitle></DialogHeader>
+          <DialogContent className="rounded-xl max-w-xl">
+            <DialogHeader><DialogTitle className="">New Certificate</DialogTitle></DialogHeader>
             <form onSubmit={submit} className="space-y-3">
               <div><Label>Kind</Label><Input name="kind" required placeholder="Gas Safe / NICEIC / Insurance" /></div>
               <div className="grid grid-cols-2 gap-3">
@@ -228,7 +228,7 @@ export function AppCompliance() {
                       const url = (result.successful?.[0] as { uploadURL?: string } | undefined)?.uploadURL;
                       if (url) setDocumentUrl(url);
                     }}
-                    buttonClassName="inline-flex items-center gap-2 uppercase tracking-wider font-bold bg-secondary text-secondary-foreground px-3 py-2 text-xs hover:opacity-90"
+                    buttonClassName="inline-flex items-center gap-2 font-bold bg-secondary text-secondary-foreground px-3 py-2 text-xs hover:opacity-90"
                   >
                     <Upload className="h-3 w-3" /> Upload document
                   </ObjectUploader>
@@ -244,7 +244,7 @@ export function AppCompliance() {
               </div>
               <div><Label>Notes</Label><Textarea name="notes" /></div>
               <DialogFooter>
-                <Button type="submit" disabled={create.isPending} className="rounded-none uppercase tracking-wider font-bold">
+                <Button type="submit" disabled={create.isPending} className="rounded-xl font-bold">
                   {create.isPending ? "Saving…" : "Save"}
                 </Button>
               </DialogFooter>
@@ -255,7 +255,7 @@ export function AppCompliance() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight flex items-center gap-2"><ShieldCheck className="h-5 w-5" /> Certificates</CardTitle>
+          <CardTitle className=" flex items-center gap-2"><ShieldCheck className="h-5 w-5" /> Certificates</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? <Skeleton className="h-48" /> : !data || data.length === 0 ? (
@@ -280,9 +280,9 @@ export function AppCompliance() {
                       <TableCell className="font-mono text-sm">{c.issuedAt ? new Date(c.issuedAt).toLocaleDateString() : "—"}</TableCell>
                       <TableCell className="font-mono text-sm">{c.expiresAt ? new Date(c.expiresAt).toLocaleDateString() : "—"}</TableCell>
                       <TableCell>
-                        {expired ? <Badge variant="destructive" className="rounded-none uppercase"><AlertTriangle className="h-3 w-3 mr-1" />Expired</Badge>
-                          : expiring ? <Badge className="rounded-none uppercase bg-amber-500 text-white"><AlertTriangle className="h-3 w-3 mr-1" />Expiring</Badge>
-                          : <Badge variant="outline" className="rounded-none uppercase">Valid</Badge>}
+                        {expired ? <Badge variant="destructive" className="rounded-xl uppercase"><AlertTriangle className="h-3 w-3 mr-1" />Expired</Badge>
+                          : expiring ? <Badge className="rounded-xl uppercase bg-amber-500 text-white"><AlertTriangle className="h-3 w-3 mr-1" />Expiring</Badge>
+                          : <Badge variant="outline" className="rounded-xl uppercase">Valid</Badge>}
                       </TableCell>
                     </TableRow>
                   );

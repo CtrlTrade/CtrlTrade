@@ -34,9 +34,9 @@ export function AdminIntegrationCatalogue() {
         icon={<Plug className="h-6 w-6" />}
       />
 
-      <Card className="rounded-none border-zinc-800 bg-zinc-900 text-zinc-100">
+      <Card className="rounded-xl border-zinc-800 bg-zinc-900 text-zinc-100">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-base">Providers</CardTitle>
+          <CardTitle className=" text-base">Providers</CardTitle>
         </CardHeader>
         <CardContent>
           <table className="w-full text-sm">
@@ -59,7 +59,7 @@ export function AdminIntegrationCatalogue() {
                   <td>
                     <Badge
                       variant="outline"
-                      className={`rounded-none uppercase text-xs ${c.configured ? "border-green-700 text-green-400" : "border-amber-700 text-amber-400"}`}
+                      className={`rounded-xl uppercase text-xs ${c.configured ? "border-green-700 text-green-400" : "border-amber-700 text-amber-400"}`}
                     >
                       {c.configured ? "Configured" : "Not configured"}
                     </Badge>

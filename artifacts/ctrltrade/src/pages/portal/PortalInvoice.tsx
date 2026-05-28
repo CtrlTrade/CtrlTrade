@@ -54,20 +54,20 @@ export function PortalInvoice() {
 
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
+          <h1 className="text-3xl font-bold">{data.number}</h1>
           <p className="text-muted-foreground">
             {data.title}
             {data.isDeposit ? (
-              <span className="ml-2 text-xs uppercase tracking-wider">(Deposit)</span>
+              <span className="ml-2 text-xs">(Deposit)</span>
             ) : null}
           </p>
         </div>
-        <Badge className="uppercase rounded-none">{data.status}</Badge>
+        <Badge className="uppercase rounded-xl">{data.status}</Badge>
       </div>
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight">Items</CardTitle>
+          <CardTitle className="">Items</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           {data.items.map((i) => (
@@ -99,7 +99,7 @@ export function PortalInvoice() {
         <Button
           onClick={() => pay.mutate({ invoiceId: id })}
           disabled={pay.isPending}
-          className="rounded-none uppercase tracking-wider font-bold"
+          className="rounded-xl font-bold"
           data-testid="button-portal-pay-invoice"
         >
           <CreditCard className="h-4 w-4 mr-2" />

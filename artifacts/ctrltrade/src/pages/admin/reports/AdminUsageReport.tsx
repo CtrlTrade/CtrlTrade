@@ -12,14 +12,14 @@ export function AdminUsageReport() {
           </button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold uppercase tracking-tighter text-white">Usage</h1>
+          <h1 className="text-3xl font-bold text-white">Usage</h1>
           <p className="text-sm text-zinc-500 mt-1">AI, voice, and SMS consumption across all tenants.</p>
         </div>
       </div>
 
-      <Card className="rounded-none border-zinc-800 bg-black shadow-none">
+      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
         <CardHeader>
-          <CardTitle className="uppercase tracking-tight text-zinc-100">Platform Usage Breakdown</CardTitle>
+          <CardTitle className=" text-zinc-100">Platform Usage Breakdown</CardTitle>
           <CardDescription>Metered AI tokens, voice minutes, and SMS units per tenant.</CardDescription>
         </CardHeader>
         <CardContent>
