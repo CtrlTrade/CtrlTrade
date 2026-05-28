@@ -83,18 +83,21 @@ export function AdminDashboard() {
           value={`£${dashboard.mrr.toLocaleString()}`}
           icon={CreditCard}
           highlight
+          trend={(dashboard as any).mrrGrowthPct as number | undefined}
           testId="mrr"
         />
         <KpiCard
           title="ARR"
           value={`£${dashboard.arr.toLocaleString()}`}
           icon={CreditCard}
+          trend={(dashboard as any).arrGrowthPct as number | undefined}
           testId="arr"
         />
         <KpiCard
           title="Active Tenants"
           value={dashboard.activeTenants}
           icon={Users}
+          trend={(dashboard as any).tenantGrowthPct as number | undefined}
           testId="active-tenants"
         />
         <KpiCard

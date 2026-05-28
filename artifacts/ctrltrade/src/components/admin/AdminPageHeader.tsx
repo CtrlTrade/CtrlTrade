@@ -1,16 +1,27 @@
 import type { ReactNode } from "react";
+import { Link } from "wouter";
+import { ArrowLeft } from "lucide-react";
 
 interface AdminPageHeaderProps {
   title: string;
   subtitle?: string;
   icon?: ReactNode;
   actions?: ReactNode;
+  backHref?: string;
 }
 
-export function AdminPageHeader({ title, subtitle, icon, actions }: AdminPageHeaderProps) {
+export function AdminPageHeader({ title, subtitle, icon, actions, backHref }: AdminPageHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-6 border-b border-zinc-800 mb-6">
       <div className="flex items-center gap-3 min-w-0">
+        {backHref && (
+          <Link
+            href={backHref}
+            className="p-2 border border-zinc-800 bg-black text-zinc-400 hover:text-white transition-colors shrink-0"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        )}
         {icon && (
           <div className="shrink-0 text-red-500">{icon}</div>
         )}

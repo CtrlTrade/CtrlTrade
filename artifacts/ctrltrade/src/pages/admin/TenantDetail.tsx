@@ -22,8 +22,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, RefreshCw, AlertTriangle, ShieldCheck, UserCheck, Download, Trash2, Globe, Building2 } from "lucide-react";
+import { RefreshCw, AlertTriangle, ShieldCheck, UserCheck, Download, Trash2, Globe, Building2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 type Tab = "overview" | "billing" | "team" | "settings";
 
@@ -97,39 +98,34 @@ export function AdminTenantDetail() {
 
   return (
     <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex items-center gap-3 pb-6 border-b border-zinc-800">
-        <Link href="/tenants" className="p-2 border border-zinc-800 bg-black text-zinc-400 hover:text-white transition-colors shrink-0">
-          <ArrowLeft className="h-4 w-4" />
-        </Link>
-        <Building2 className="h-6 w-6 text-red-500 shrink-0" />
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl md:text-3xl font-bold uppercase tracking-tighter text-white truncate">{tenant.name}</h1>
-          <p className="text-xs text-zinc-500 font-mono mt-0.5">{owner.email}</p>
-        </div>
-        <span className={`px-2 py-1 text-xs font-bold uppercase tracking-wider border shrink-0 ${statusCls}`}>
-          {tenant.status}
-        </span>
-      </div>
-
-      {/* Quick action bar */}
-      <div className="flex flex-wrap gap-2">
-        <Button variant="outline" size="sm" onClick={handleSync} disabled={sync.isPending}
-          className="rounded-none border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800 font-bold uppercase text-xs">
-          <RefreshCw className={`mr-2 h-3.5 w-3.5 ${sync.isPending ? "animate-spin" : ""}`} /> Sync Stripe
-        </Button>
-        {tenant.status === "cancelled" ? (
-          <Button variant="outline" size="sm" onClick={handleReactivate} disabled={reactivate.isPending}
-            className="rounded-none border-green-900 bg-green-950 text-green-500 hover:bg-green-900 font-bold uppercase text-xs">
-            <ShieldCheck className="mr-2 h-3.5 w-3.5" /> Reactivate
-          </Button>
-        ) : (
-          <Button variant="outline" size="sm" onClick={handleCancel} disabled={cancel.isPending}
-            className="rounded-none border-red-900 bg-red-950 text-red-500 hover:bg-red-900 font-bold uppercase text-xs">
-            <AlertTriangle className="mr-2 h-3.5 w-3.5" /> Force Cancel
-          </Button>
-        )}
-      </div>
+      <AdminPageHeader
+        title={tenant.name}
+        subtitle={owner.email}
+        icon={<Building2 className="h-6 w-6" />}
+        backHref="/tenants"
+        actions={
+          <>
+            <span className={`px-2 py-1 text-xs font-bold uppercase tracking-wider border ${statusCls}`}>
+              {tenant.status}
+            </span>
+            <Button variant="outline" size="sm" onClick={handleSync} disabled={sync.isPending}
+              className="rounded-none border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800 font-bold uppercase text-xs">
+              <RefreshCw className={`mr-2 h-3.5 w-3.5 ${sync.isPending ? "animate-spin" : ""}`} /> Sync
+            </Button>
+            {tenant.status === "cancelled" ? (
+              <Button variant="outline" size="sm" onClick={handleReactivate} disabled={reactivate.isPending}
+                className="rounded-none border-green-900 bg-green-950 text-green-500 hover:bg-green-900 font-bold uppercase text-xs">
+                <ShieldCheck className="mr-2 h-3.5 w-3.5" /> Reactivate
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={handleCancel} disabled={cancel.isPending}
+                className="rounded-none border-red-900 bg-red-950 text-red-500 hover:bg-red-900 font-bold uppercase text-xs">
+                <AlertTriangle className="mr-2 h-3.5 w-3.5" /> Force Cancel
+              </Button>
+            )}
+          </>
+        }
+      />
 
       {/* Tabs */}
       <div className="border-b border-zinc-800">

@@ -5,25 +5,25 @@ import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 const CARDS: Array<{ href: string; title: string; description: string; Icon: any }> = [
   {
-    href: "/admin/reports/revenue",
+    href: "/reports/revenue",
     title: "Revenue",
     description: "Cross-tenant MRR, ARR, and payment collection over time.",
     Icon: PoundSterling,
   },
   {
-    href: "/admin/reports/tenant-activity",
+    href: "/reports/tenant-activity",
     title: "Tenant Activity",
     description: "Jobs, quotes, and invoices created per tenant.",
     Icon: Building2,
   },
   {
-    href: "/admin/reports/usage",
+    href: "/reports/usage",
     title: "Usage",
     description: "AI, voice, and SMS consumption across all tenants.",
     Icon: Cpu,
   },
   {
-    href: "/admin/reports/referrals",
+    href: "/reports/referrals",
     title: "Referrals & Growth",
     description: "Referral conversions, partner-driven signups, and growth trends.",
     Icon: GitBranch,
