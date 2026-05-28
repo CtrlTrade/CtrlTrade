@@ -56,8 +56,8 @@ export function AppCustomers() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Customers</h1>
+      <div className="flex flex-wrap justify-between items-center gap-y-3">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Customers</h1>
         <div className="flex items-center gap-3">
           {branchList.length > 0 && (
             <Select value={branchFilter} onValueChange={setBranchFilter}>
@@ -117,7 +117,7 @@ export function AppCustomers() {
           ) : filteredCustomers.length === 0 ? (
             <p className="text-muted-foreground text-sm">No customers{branchFilter !== "all" ? " for this branch" : " yet. Add your first one."}.</p>
           ) : (
-            <Table>
+            <div className="overflow-x-auto"><Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead><TableHead>Email</TableHead>
@@ -139,7 +139,7 @@ export function AppCustomers() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           )}
         </CardContent>
       </Card>

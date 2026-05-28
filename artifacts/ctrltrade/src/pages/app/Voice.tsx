@@ -112,7 +112,7 @@ export function AppVoice() {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-y-3">
         <div className="flex items-center gap-3">
           <Phone className="h-6 w-6 text-primary" />
           <div>
@@ -213,7 +213,7 @@ export function AppVoice() {
             </Card>
           ) : (
             <Card className="rounded-none">
-              <Table>
+              <div className="overflow-x-auto"><Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Direction</TableHead>
@@ -242,7 +242,7 @@ export function AppVoice() {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table></div>
             </Card>
           )}
         </TabsContent>

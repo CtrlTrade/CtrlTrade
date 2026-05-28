@@ -33,7 +33,7 @@ export function AppPos() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">CtrlTradePos® Control</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">CtrlTradePos® Control</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Manage catalogue, stock, trade accounts and purchase orders. Open the mobile app to take sales.
         </p>

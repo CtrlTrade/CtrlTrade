@@ -39,8 +39,8 @@ export function AppSchedule() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter flex items-center gap-2">
+      <div className="flex flex-wrap justify-between items-center gap-y-3">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter flex items-center gap-2">
           <CalIcon className="h-7 w-7" /> Schedule
         </h1>
         <div className="flex gap-2 items-center">

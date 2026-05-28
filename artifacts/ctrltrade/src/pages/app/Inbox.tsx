@@ -40,8 +40,8 @@ export function AppInbox() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Inbox</h1>
+      <div className="flex flex-wrap items-center justify-between gap-y-2">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Inbox</h1>
         <p className="text-sm text-muted-foreground">All customer conversations across email, SMS &amp; WhatsApp.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-4 min-h-[600px]">

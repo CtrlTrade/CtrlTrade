@@ -92,7 +92,7 @@ export function SettingsReferrals() {
           {!campaigns || campaigns.length === 0 ? (
             <div className="text-sm text-muted-foreground py-6 text-center">No campaigns yet.</div>
           ) : (
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto"><table className="w-full text-sm">
               <thead className="text-xs uppercase tracking-wider text-muted-foreground"><tr>
                 <th className="text-left py-2">Name</th><th className="text-left py-2">Reward</th><th className="text-left py-2">Targets</th><th className="text-left py-2">Active</th><th></th>
               </tr></thead>
@@ -110,7 +110,7 @@ export function SettingsReferrals() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           )}
         </CardContent>
       </Card>
@@ -121,7 +121,7 @@ export function SettingsReferrals() {
           {!conversions || conversions.length === 0 ? (
             <div className="text-sm text-muted-foreground py-6 text-center">No referrals yet.</div>
           ) : (
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto"><table className="w-full text-sm">
               <thead className="text-xs uppercase tracking-wider text-muted-foreground"><tr>
                 <th className="text-left py-2">Campaign</th><th className="text-left py-2">Referrer</th><th className="text-left py-2">New customer</th><th className="text-left py-2">Status</th><th></th>
               </tr></thead>
@@ -140,7 +140,7 @@ export function SettingsReferrals() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           )}
         </CardContent>
       </Card>

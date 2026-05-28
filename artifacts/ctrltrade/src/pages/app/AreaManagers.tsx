@@ -82,7 +82,7 @@ export function AppAreaManagers() {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-y-3">
         <div>
           <h2 className="text-2xl font-bold uppercase tracking-tighter">Area Managers</h2>
           <p className="text-sm text-muted-foreground">Assign Control Seat staff to oversee one or more branches.</p>

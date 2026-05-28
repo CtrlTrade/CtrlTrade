@@ -106,7 +106,7 @@ export function BusinessSetupSettings() {
           <CardDescription>Set the primary industry for your workspace to enable industry-specific content.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             <button
               type="button"
               onClick={() => setIndustrySlug("")}

@@ -23,7 +23,7 @@ export function AppDashboard() {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold uppercase tracking-tighter">Command Center</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Command Center</h1>
       
       <IndustryTourBanner />
 

@@ -305,8 +305,8 @@ export function AppSupplierOrders() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Purchase Orders</h1>
+      <div className="flex flex-wrap justify-between items-center gap-y-3">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Purchase Orders</h1>
 
         <Dialog
           open={open}

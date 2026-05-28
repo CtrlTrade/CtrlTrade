@@ -72,8 +72,8 @@ export function AppQuotes() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Quotes</h1>
+      <div className="flex flex-wrap justify-between items-center gap-y-3">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Quotes</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-quote">
@@ -131,7 +131,7 @@ export function AppQuotes() {
           {isLoading ? <Skeleton className="h-48" /> : !data || data.length === 0 ? (
             <p className="text-muted-foreground text-sm">No quotes yet.</p>
           ) : (
-            <Table>
+            <div className="overflow-x-auto"><Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Number</TableHead><TableHead>Title</TableHead>
@@ -152,7 +152,7 @@ export function AppQuotes() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           )}
         </CardContent>
       </Card>

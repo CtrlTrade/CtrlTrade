@@ -130,8 +130,8 @@ export function AppBilling() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Billing & Subscription</h1>
+      <div className="flex flex-wrap justify-between items-center gap-y-3">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Billing & Subscription</h1>
         <Button
           variant="outline"
           size="sm"

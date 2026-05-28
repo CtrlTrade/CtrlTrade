@@ -83,7 +83,7 @@ export function AppSettings() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold uppercase tracking-tighter">Workspace Settings</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Workspace Settings</h1>
       <Tabs defaultValue={typeof window !== "undefined" && new URLSearchParams(window.location.search).get("tab") === "integrations" ? "integrations" : "company"} className="space-y-6">
         <TabsList className="rounded-none flex-wrap h-auto">
           <TabsTrigger value="company" data-testid="tab-company">Company</TabsTrigger>

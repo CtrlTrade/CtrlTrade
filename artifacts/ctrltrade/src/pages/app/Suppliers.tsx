@@ -37,8 +37,8 @@ export function AppSuppliers() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Suppliers</h1>
+      <div className="flex flex-wrap justify-between items-center gap-y-3">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Suppliers</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-supplier">
@@ -94,7 +94,7 @@ export function AppSuppliers() {
           {isLoading ? <Skeleton className="h-48" /> : !data || data.length === 0 ? (
             <p className="text-muted-foreground text-sm">No suppliers yet.</p>
           ) : (
-            <Table>
+            <div className="overflow-x-auto"><Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead><TableHead>Contact</TableHead>
@@ -113,7 +113,7 @@ export function AppSuppliers() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           )}
         </CardContent>
       </Card>

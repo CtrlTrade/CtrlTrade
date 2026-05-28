@@ -115,7 +115,7 @@ export function AppStaff() {
             <CardTitle className="uppercase tracking-tight text-base">Pending invitations</CardTitle>
           </CardHeader>
           <CardContent>
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto"><table className="w-full text-sm">
               <thead className="text-xs uppercase text-muted-foreground border-b border-border">
                 <tr><th className="text-left py-2">Email</th><th className="text-left">Role</th><th className="text-left">Seat</th><th className="text-left">Expires</th><th className="text-right">Actions</th></tr>
               </thead>
@@ -133,7 +133,7 @@ export function AppStaff() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           </CardContent>
         </Card>
       )}
@@ -143,7 +143,7 @@ export function AppStaff() {
           <CardTitle className="uppercase tracking-tight text-base">Members</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="text-xs uppercase text-muted-foreground border-b border-border">
               <tr>
                 <th className="text-left py-2">Name</th>
@@ -249,7 +249,7 @@ export function AppStaff() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </CardContent>
       </Card>
     </div>

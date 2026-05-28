@@ -88,9 +88,9 @@ export function AppQuoteDetail() {
       <Link href="/quotes" className="text-sm flex items-center gap-1 text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to quotes
       </Link>
-      <div className="flex justify-between items-start">
+      <div className="flex flex-wrap gap-y-3 justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
           <p className="text-muted-foreground">{data.title}</p>
           <p className="text-sm mt-1">Customer: <span className="font-medium">{data.customerName}</span></p>
         </div>
@@ -99,7 +99,7 @@ export function AppQuoteDetail() {
         </div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button onClick={() => send.mutate({ quoteId: id })} disabled={data.status === "converted" || send.isPending}
           variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="button-send-quote">
           <Send className="h-4 w-4 mr-2" /> Send
@@ -130,7 +130,7 @@ export function AppQuoteDetail() {
       <Card className=" border-border shadow-sm">
         <CardHeader><CardTitle className="uppercase tracking-tight">Line items</CardTitle></CardHeader>
         <CardContent>
-          <Table>
+          <div className="overflow-x-auto"><Table>
             <TableHeader><TableRow>
               <TableHead>Description</TableHead><TableHead className="text-right">Qty</TableHead>
               <TableHead className="text-right">Unit</TableHead><TableHead className="text-right">Subtotal</TableHead>
@@ -149,7 +149,7 @@ export function AppQuoteDetail() {
                 <TableCell className="text-right font-mono font-bold">{formatGBP(data.totalPence)}</TableCell>
               </TableRow>
             </TableBody>
-          </Table>
+          </Table></div>
           {data.notes && <p className="mt-4 text-sm text-muted-foreground">{data.notes}</p>}
           {data.convertedJobId && (
             <p className="mt-4 text-sm">Converted to job: <Link href={`/app/jobs/${data.convertedJobId}`} className="underline">{data.convertedJobId}</Link></p>

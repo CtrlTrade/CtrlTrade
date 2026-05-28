@@ -158,8 +158,8 @@ export function AppInvoiceTemplates() {
       <Link href="/invoices" className="text-sm flex items-center gap-1 text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to invoices
       </Link>
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Recurring invoices</h1>
+      <div className="flex flex-wrap justify-between items-center gap-y-3">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Recurring invoices</h1>
         <Button onClick={() => { resetForm(); setShowForm((s) => !s); }}
           className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-template">
           <Plus className="h-4 w-4 mr-2" /> New template
@@ -258,7 +258,7 @@ export function AppInvoiceTemplates() {
           ) : !data || data.length === 0 ? (
             <p className="text-muted-foreground text-sm">No recurring templates yet.</p>
           ) : (
-            <Table>
+            <div className="overflow-x-auto"><Table>
               <TableHeader><TableRow>
                 <TableHead>Title</TableHead>
                 <TableHead>Customer</TableHead>
@@ -303,7 +303,7 @@ export function AppInvoiceTemplates() {
                   );
                 })}
               </TableBody>
-            </Table>
+            </Table></div>
           )}
         </CardContent>
       </Card>

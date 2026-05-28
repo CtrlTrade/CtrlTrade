@@ -110,9 +110,9 @@ export function AppInvoiceDetail() {
       <Link href="/invoices" className="text-sm flex items-center gap-1 text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to invoices
       </Link>
-      <div className="flex justify-between items-start">
+      <div className="flex flex-wrap gap-y-3 justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
           <p className="text-muted-foreground">{data.title}</p>
           <p className="text-sm mt-1">Customer: <span className="font-medium">{data.customerName}</span></p>
           {data.isDeposit && <Badge variant="secondary" className="uppercase mt-2">Deposit invoice</Badge>}
@@ -145,7 +145,7 @@ export function AppInvoiceDetail() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className="flex flex-wrap gap-y-2 justify-between items-center">
             <CardTitle className="uppercase tracking-tight">Line items</CardTitle>
             {canEdit && !editing && (
               <Button variant="outline" size="sm" onClick={startEdit}

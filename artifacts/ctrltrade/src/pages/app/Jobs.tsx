@@ -91,8 +91,8 @@ export function AppJobs() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Jobs</h1>
+      <div className="flex flex-wrap justify-between items-center gap-y-3">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Jobs</h1>
         <div className="flex items-center gap-3">
           {branchList.length > 0 && (
             <Select value={branchFilter} onValueChange={setBranchFilter}>
@@ -173,7 +173,7 @@ export function AppJobs() {
           {isLoading ? <Skeleton className="h-48" /> : filteredJobs.length === 0 ? (
             <p className="text-muted-foreground text-sm">No jobs{branchFilter !== "all" ? " for this branch" : " yet"}.</p>
           ) : (
-            <Table>
+            <div className="overflow-x-auto"><Table>
               <TableHeader><TableRow>
                 <TableHead>Number</TableHead><TableHead>Title</TableHead>
                 <TableHead>Customer</TableHead><TableHead>Scheduled</TableHead>
@@ -195,7 +195,7 @@ export function AppJobs() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           )}
         </CardContent>
       </Card>

@@ -212,7 +212,7 @@ function LeadTable({ leads, showImportTime, emptyMessage }: { leads: Lead[]; sho
     return <p className="text-muted-foreground text-sm">{emptyMessage}</p>;
   }
   return (
-    <Table>
+    <div className="overflow-x-auto"><Table>
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
@@ -227,7 +227,7 @@ function LeadTable({ leads, showImportTime, emptyMessage }: { leads: Lead[]; sho
       <TableBody>
         <LeadTableRows leads={leads} showImportTime={showImportTime} />
       </TableBody>
-    </Table>
+    </Table></div>
   );
 }
 
@@ -287,8 +287,8 @@ export function AppLeads() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Leads</h1>
+      <div className="flex flex-wrap justify-between items-center gap-y-3">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Leads</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-lead">

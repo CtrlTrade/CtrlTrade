@@ -231,9 +231,9 @@ export function AppJobDetail() {
       <Link href="/jobs" className="text-sm flex items-center gap-1 text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to jobs
       </Link>
-      <div className="flex justify-between items-start">
+      <div className="flex flex-wrap gap-y-3 justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">{data.number}</h1>
           <p className="text-muted-foreground">{data.title}</p>
           <p className="text-sm mt-1">
             Customer: <span className="font-medium">{data.customerName}</span> · Value: <span className="font-mono">{formatGBP(data.valuePence)}</span>
@@ -317,7 +317,7 @@ export function AppJobDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <table className="w-full text-sm">
+                <div className="overflow-x-auto"><table className="w-full text-sm">
                   <thead className="text-xs uppercase text-muted-foreground border-b border-border">
                     <tr>
                       <th className="text-left py-2">Staff</th>
@@ -350,7 +350,7 @@ export function AppJobDetail() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </table></div>
                 <div className="mt-3 pt-3 border-t border-border flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="h-4 w-4" />
                   Total time on site:{" "}

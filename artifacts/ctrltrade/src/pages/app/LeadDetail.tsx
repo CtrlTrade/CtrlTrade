@@ -215,7 +215,7 @@ export function AppLeadDetail() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-y-3">
         <Link href="/leads" className="inline-flex items-center gap-2 text-sm uppercase tracking-wider font-bold text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> All leads
         </Link>

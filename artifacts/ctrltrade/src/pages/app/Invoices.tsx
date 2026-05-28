@@ -39,8 +39,8 @@ export function AppInvoices() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Invoices</h1>
+      <div className="flex flex-wrap justify-between items-center gap-y-3">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Invoices</h1>
         <Link href="/invoice-templates">
           <Button variant="outline" className="rounded-none uppercase tracking-wider font-bold" data-testid="link-invoice-templates">
             <Repeat className="h-4 w-4 mr-2" /> Recurring templates
@@ -54,7 +54,7 @@ export function AppInvoices() {
             <CardTitle className="uppercase tracking-tight">Aged debtors</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-5 gap-2 mb-4 text-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-4 text-sm">
               <div><div className="text-muted-foreground uppercase text-xs">Current</div><div className="font-mono font-bold">{formatGBP(debtors.totals.currentPence)}</div></div>
               <div><div className="text-muted-foreground uppercase text-xs">1–30</div><div className="font-mono font-bold">{formatGBP(debtors.totals.days30Pence)}</div></div>
               <div><div className="text-muted-foreground uppercase text-xs">31–60</div><div className="font-mono font-bold">{formatGBP(debtors.totals.days60Pence)}</div></div>
@@ -62,7 +62,7 @@ export function AppInvoices() {
               <div><div className="text-muted-foreground uppercase text-xs">Total</div><div className="font-mono font-bold">{formatGBP(debtors.totals.totalOutstandingPence)}</div></div>
             </div>
             {debtors.rows.length > 0 && (
-              <Table>
+              <div className="overflow-x-auto"><Table>
                 <TableHeader><TableRow>
                   <TableHead>Customer</TableHead>
                   <TableHead className="text-right">Current</TableHead>
@@ -83,7 +83,7 @@ export function AppInvoices() {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table></div>
             )}
           </CardContent>
         </Card>
@@ -91,7 +91,7 @@ export function AppInvoices() {
 
       <Card className=" border-border shadow-sm">
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className="flex flex-wrap justify-between items-center gap-y-2">
             <CardTitle className="uppercase tracking-tight">All invoices</CardTitle>
             <div className="flex gap-1">
               {FILTERS.map((f) => (
@@ -115,7 +115,7 @@ export function AppInvoices() {
           ) : !data || data.length === 0 ? (
             <p className="text-muted-foreground text-sm">No invoices match the current filter.</p>
           ) : (
-            <Table>
+            <div className="overflow-x-auto"><Table>
               <TableHeader><TableRow>
                 <TableHead>Number</TableHead>
                 <TableHead>Customer</TableHead>
@@ -136,7 +136,7 @@ export function AppInvoices() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           )}
         </CardContent>
       </Card>

@@ -36,8 +36,8 @@ export function AppTradeAccounts() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold uppercase tracking-tighter">Trade Accounts</h1>
+      <div className="flex flex-wrap justify-between items-center gap-y-3">
+        <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tighter">Trade Accounts</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="rounded-none uppercase tracking-wider font-bold" data-testid="button-new-trade-account">
@@ -105,7 +105,7 @@ export function AppTradeAccounts() {
           {isLoading ? <Skeleton className="h-48" /> : !data || data.length === 0 ? (
             <p className="text-muted-foreground text-sm">No trade accounts yet.</p>
           ) : (
-            <Table>
+            <div className="overflow-x-auto"><Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Code</TableHead><TableHead>Name</TableHead><TableHead>Tier</TableHead>
@@ -126,7 +126,7 @@ export function AppTradeAccounts() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           )}
         </CardContent>
       </Card>
