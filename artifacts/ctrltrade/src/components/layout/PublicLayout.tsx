@@ -32,7 +32,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-4">
-            <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground hidden sm:inline">Log in</Link>
+            <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground">Log in</Link>
             <Link href="/signup">
               <Button className="uppercase tracking-wider font-bold text-xs whitespace-nowrap" data-testid="link-signup">
                 <span className="hidden sm:inline">Start 1 month free trial</span>
@@ -64,13 +64,6 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                   {l.label}
                 </Link>
               ))}
-              <Link
-                href="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-sm font-medium py-2.5 text-muted-foreground hover:text-foreground transition-colors sm:hidden"
-              >
-                Log in
-              </Link>
             </nav>
           </div>
         )}
