@@ -2001,6 +2001,20 @@ export const CreateBillingPaymentMethodSetupResponse = zod.object({
 })
 
 
+export const GetIndustryTourResponse = zod.object({
+  "dismissed": zod.boolean(),
+  "industryName": zod.string().nullish(),
+  "industrySlug": zod.string().nullish(),
+  "enabledModules": zod.array(zod.string()),
+  "quickActions": zod.array(zod.object({
+    "key": zod.string(),
+    "label": zod.string(),
+    "description": zod.string(),
+    "href": zod.string()
+  }))
+})
+
+
 export const GetOnboardingResponse = zod.object({
   "percentComplete": zod.number(),
   "items": zod.array(zod.object({

@@ -271,6 +271,8 @@ export * from './notificationTemplateScope';
 export * from './notificationTemplatesResponse';
 export * from './okResponse';
 export * from './okResult';
+export * from './industryTourQuickAction';
+export * from './industryTourState';
 export * from './onboardingItem';
 export * from './onboardingState';
 export * from './openTillSessionInput';

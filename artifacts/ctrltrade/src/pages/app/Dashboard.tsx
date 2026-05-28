@@ -1,16 +1,17 @@
-import { useGetOnboarding, useGetSubscription, useUpdateSubscriptionQuantities, useCancelTenant, useGetExpiryAttention, useGetLeadSourceRoi, useGetInboxUnreadCount, useListInboxThreads } from "@workspace/api-client-react";
+import { useGetOnboarding, useGetSubscription, useUpdateSubscriptionQuantities, useCancelTenant, useGetExpiryAttention, useGetLeadSourceRoi, useGetInboxUnreadCount, useListInboxThreads, useGetIndustryTour, useDismissIndustryTour } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
-import { CheckCircle2, Circle, AlertTriangle, CreditCard, Users, ShoppingCart, Clock, Target, Inbox } from "lucide-react";
+import { CheckCircle2, Circle, AlertTriangle, CreditCard, Users, ShoppingCart, Clock, Target, Inbox, X, Sparkles, ArrowRight } from "lucide-react";
 import { UsageTile } from "@/components/UsageTile";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function AppDashboard() {
   const { data: onboarding, isLoading: isLoadingOnboarding } = useGetOnboarding();
@@ -24,6 +25,8 @@ export function AppDashboard() {
     <div className="space-y-8 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold uppercase tracking-tighter">Command Center</h1>
       
+      <IndustryTourBanner />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           <AttentionRequiredCard />
@@ -76,6 +79,85 @@ export function AppDashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+function IndustryTourBanner() {
+  const { data: tour, isLoading } = useGetIndustryTour();
+  const dismiss = useDismissIndustryTour();
+  const queryClient = useQueryClient();
+
+  if (isLoading || !tour || tour.dismissed) return null;
+
+  const handleDismiss = () => {
+    dismiss.mutate(undefined, {
+      onSuccess: () => {
+        queryClient.setQueryData(["/api/v1/onboarding/industry-tour"], (old: typeof tour) => old ? { ...old, dismissed: true } : old);
+      },
+    });
+  };
+
+  return (
+    <Card className="border-primary/30 bg-primary/5 shadow-sm" data-testid="industry-tour-banner">
+      <CardHeader className="pb-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <Sparkles className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+            <div>
+              <CardTitle className="uppercase tracking-tight text-lg">
+                Your workspace is ready
+                {tour.industryName && (
+                  <span className="ml-2 text-sm font-mono text-primary bg-primary/10 px-2 py-0.5 border border-primary/20">
+                    {tour.industryName}
+                  </span>
+                )}
+              </CardTitle>
+              <CardDescription className="mt-1">
+                We've pre-populated your workspace with industry-specific content. Here's where to start.
+              </CardDescription>
+              {tour.enabledModules.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {tour.enabledModules.map((mod: string) => (
+                    <span key={mod} className="text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground border border-border px-1.5 py-0.5 font-mono">
+                      {mod}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="shrink-0 h-8 w-8 p-0 rounded-none hover:bg-primary/10"
+            onClick={handleDismiss}
+            disabled={dismiss.isPending}
+            aria-label="Dismiss onboarding tour"
+            data-testid="industry-tour-dismiss"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {tour.quickActions.map((action: { key: string; label: string; description: string; href: string }) => (
+            <Link key={action.key} href={action.href}>
+              <div
+                className="flex items-start justify-between gap-3 p-3 border border-border bg-background hover:bg-muted/40 cursor-pointer group"
+                data-testid={`industry-tour-action-${action.key}`}
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-bold uppercase tracking-wide leading-tight">{action.label}</div>
+                  <div className="text-xs text-muted-foreground mt-1 leading-snug">{action.description}</div>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary transition-colors mt-0.5" />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

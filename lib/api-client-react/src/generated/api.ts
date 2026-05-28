@@ -133,6 +133,7 @@ import type {
   InboxReplyInput,
   InboxThreadsResponse,
   InboxUnreadCount,
+  IndustryTourState,
   Industry,
   IndustryChecklistInput,
   IndustryDetail,
@@ -5654,6 +5655,113 @@ export const useCreateBillingPaymentMethodSetup = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getCreateBillingPaymentMethodSetupMutationOptions(options));
     }
+
+export const getGetIndustryTourUrl = () => {
+
+
+
+
+  return `/api/v1/onboarding/industry-tour`
+}
+
+export const getIndustryTour = async ( options?: RequestInit): Promise<IndustryTourState> => {
+
+  return customFetch<IndustryTourState>(getGetIndustryTourUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export const getGetIndustryTourQueryKey = () => {
+    return [
+    `/api/v1/onboarding/industry-tour`
+    ] as const;
+    }
+
+
+export const getGetIndustryTourQueryOptions = <TData = Awaited<ReturnType<typeof getIndustryTour>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIndustryTour>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIndustryTourQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIndustryTour>>> = ({ signal }) => getIndustryTour({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIndustryTour>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIndustryTourQueryResult = NonNullable<Awaited<ReturnType<typeof getIndustryTour>>>
+export type GetIndustryTourQueryError = ErrorType<unknown>
+
+
+
+export function useGetIndustryTour<TData = Awaited<ReturnType<typeof getIndustryTour>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIndustryTour>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIndustryTourQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+export const dismissIndustryTour = async ( options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(`/api/v1/onboarding/industry-tour/dismiss`,
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+export const getDismissIndustryTourMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dismissIndustryTour>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof dismissIndustryTour>>, TError,void, TContext> => {
+const {mutation: mutationOptions, request: requestOptions} = options ?? {};
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof dismissIndustryTour>>, void> = () => {
+
+
+          return dismissIndustryTour(requestOptions)
+        }
+
+        
+
+
+   return  { mutationFn, ...mutationOptions}}
+
+    export type DismissIndustryTourMutationResult = NonNullable<Awaited<ReturnType<typeof dismissIndustryTour>>>
+
+    export type DismissIndustryTourMutationError = ErrorType<unknown>
+
+export function useDismissIndustryTour<TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dismissIndustryTour>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ) {
+
+      const mutationOptions = getDismissIndustryTourMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+
 
 export const getGetOnboardingUrl = () => {
 

@@ -1235,6 +1235,26 @@ paths:
               schema:
                 $ref: "#/components/schemas/OnboardingState"
 
+  /v1/onboarding/industry-tour:
+    get:
+      operationId: getIndustryTour
+      tags: [onboarding]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IndustryTourState"
+
+  /v1/onboarding/industry-tour/dismiss:
+    post:
+      operationId: dismissIndustryTour
+      tags: [onboarding]
+      responses:
+        "204":
+          description: Dismissed
+
   /v1/admin/dashboard:
     get:
       operationId: getAdminDashboard
@@ -6903,6 +6923,29 @@ components:
       properties:
         clientSecret: { type: string }
         customerId: { type: string }
+
+    IndustryTourState:
+      type: object
+      required: [dismissed, quickActions, enabledModules]
+      properties:
+        dismissed: { type: boolean }
+        industryName: { type: ["string", "null"] }
+        industrySlug: { type: ["string", "null"] }
+        enabledModules:
+          type: array
+          items: { type: string }
+        quickActions:
+          type: array
+          items: { $ref: "#/components/schemas/IndustryTourQuickAction" }
+
+    IndustryTourQuickAction:
+      type: object
+      required: [key, label, description, href]
+      properties:
+        key: { type: string }
+        label: { type: string }
+        description: { type: string }
+        href: { type: string }
 
     OnboardingState:
       type: object

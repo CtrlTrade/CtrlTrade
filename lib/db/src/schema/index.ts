@@ -227,6 +227,7 @@ export const tenantsTable = pgTable(
     trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
     cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
     require2fa: boolean("require_2fa").notNull().default(false),
+    industryTourDismissedAt: timestamp("industry_tour_dismissed_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },

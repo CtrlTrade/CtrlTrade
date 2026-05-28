@@ -804,6 +804,23 @@ export interface OnboardingItem {
   href?: string | null;
 }
 
+export interface IndustryTourQuickAction {
+  key: string;
+  label: string;
+  description: string;
+  href: string;
+}
+
+export interface IndustryTourState {
+  dismissed: boolean;
+  /** @nullable */
+  industryName?: string | null;
+  /** @nullable */
+  industrySlug?: string | null;
+  enabledModules: string[];
+  quickActions: IndustryTourQuickAction[];
+}
+
 export interface OnboardingState {
   percentComplete: number;
   items: OnboardingItem[];
