@@ -7,18 +7,18 @@ import { ArrowRight, Shield, Zap, CheckCircle2, HardHat, CalendarCheck, FileText
 export function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <section className="bg-foreground text-background py-24 md:py-32 relative overflow-hidden">
+      <section className="py-24 md:py-32 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         {/* Abstract industrial background pattern */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--primary) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         
         <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">
-          <div className="inline-block px-4 py-1 mb-8 border border-primary text-primary font-bold uppercase tracking-wider text-xs">
+          <div className="inline-block px-4 py-1 mb-8 border border-[hsl(46,98%,52%)] text-[hsl(46,98%,52%)] font-bold uppercase tracking-wider text-xs">
             System Online • Trade Operating System
           </div>
           <h1 className="text-5xl md:text-7xl font-bold uppercase tracking-tighter mb-6 leading-tight">
             The OS a Serious Trade Business Runs On.
           </h1>
-          <p className="text-lg md:text-xl text-muted mb-10 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto" style={{ color: "hsl(220,25%,62%)" }}>
             Quotes, jobs, scheduling, fleet, compliance, and point-of-sale. All in one industrial-grade platform. CTRLTRADE® is built for operators who demand control.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -28,7 +28,7 @@ export function Home() {
               </Button>
             </Link>
             <Link href="/pricing">
-              <Button size="lg" variant="outline" className="rounded-none h-14 px-8 text-base uppercase font-bold tracking-wider bg-transparent border-background text-background hover:bg-background hover:text-foreground w-full sm:w-auto" data-testid="button-hero-secondary">
+              <Button size="lg" variant="outline" className="rounded-none h-14 px-8 text-base uppercase font-bold tracking-wider bg-transparent w-full sm:w-auto" style={{ borderColor: "hsla(215,30%,93%,0.4)", color: "hsl(215,30%,93%)" }} data-testid="button-hero-secondary">
                 View Pricing
               </Button>
             </Link>

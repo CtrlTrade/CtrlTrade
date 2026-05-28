@@ -1,12 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useLogin } from "@workspace/api-client-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { LogIn } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { TwoFactorChallenge } from "./TwoFactorChallenge";
 
 export function Login() {
@@ -15,6 +11,7 @@ export function Login() {
   const login = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [showTwoFactor, setShowTwoFactor] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -63,57 +60,140 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md  border-border shadow-xl">
-        <CardHeader className="space-y-2">
-          <CardTitle className="text-2xl font-bold uppercase tracking-tighter">Login</CardTitle>
-          <CardDescription>Enter your credentials to access your CTRLTRADE® command center.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                required 
-                className="rounded-none"
-                data-testid="input-login-email"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
-                required 
-                className="rounded-none"
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: "hsl(220, 90%, 8%)" }}>
+      <div
+        className="w-full max-w-md rounded-2xl px-8 py-10 shadow-2xl"
+        style={{ background: "hsl(220, 68%, 13%)", border: "1px solid hsla(220,50%,35%,0.25)" }}
+      >
+        {/* Logo + tagline */}
+        <div className="flex flex-col items-center mb-8">
+          <img
+            src="/assets/ctrltrade-logo.png"
+            alt="CtrlTrade"
+            className="h-12 w-auto object-contain mb-3"
+          />
+          <p className="text-[10px] uppercase tracking-[0.3em] font-medium" style={{ color: "hsl(220,25%,58%)" }}>
+            Control · Position · Power
+          </p>
+        </div>
+
+        <p className="text-center text-sm mb-7" style={{ color: "hsl(220,25%,58%)" }}>
+          Sign in to access your workspace
+        </p>
+
+        {/* Tab switcher */}
+        <div className="flex mb-7" style={{ borderBottom: "1px solid hsla(220,50%,35%,0.35)" }}>
+          <button
+            type="button"
+            className="flex-1 pb-3 text-sm font-semibold transition-colors"
+            style={{ color: "hsl(46,98%,52%)", borderBottom: "2px solid hsl(46,98%,52%)", marginBottom: "-1px" }}
+          >
+            Sign in
+          </button>
+          <Link
+            href="/signup"
+            className="flex-1 pb-3 text-sm font-semibold text-center transition-colors hover:opacity-80"
+            style={{ color: "hsl(220,25%,58%)" }}
+          >
+            Sign up
+          </Link>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-semibold mb-1.5" style={{ color: "hsl(215,30%,88%)" }}>
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+              autoComplete="email"
+              className="w-full rounded-lg px-4 py-2.5 text-sm transition-colors outline-none"
+              style={{
+                background: "hsl(220,80%,9%)",
+                border: "1px solid hsla(220,50%,35%,0.4)",
+                color: "hsl(215,30%,93%)",
+              }}
+              onFocus={e => (e.currentTarget.style.borderColor = "hsl(46,98%,52%)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "hsla(220,50%,35%,0.4)")}
+              data-testid="input-login-email"
+            />
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-semibold mb-1.5" style={{ color: "hsl(215,30%,88%)" }}>
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                autoComplete="current-password"
+                className="w-full rounded-lg px-4 py-2.5 pr-11 text-sm transition-colors outline-none"
+                style={{
+                  background: "hsl(220,80%,9%)",
+                  border: "1px solid hsla(220,50%,35%,0.4)",
+                  color: "hsl(215,30%,93%)",
+                }}
+                onFocus={e => (e.currentTarget.style.borderColor = "hsl(46,98%,52%)")}
+                onBlur={e => (e.currentTarget.style.borderColor = "hsla(220,50%,35%,0.4)")}
                 data-testid="input-login-password"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(s => !s)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors hover:opacity-80"
+                style={{ color: "hsl(220,25%,50%)" }}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
             </div>
-            <Button 
-              type="submit" 
-              className="w-full font-bold uppercase tracking-wider mt-4" 
-              disabled={login.isPending}
-              data-testid="button-login-submit"
+          </div>
+
+          {/* Forgot password link */}
+          <div className="flex justify-end">
+            <Link
+              href="/forgot-password"
+              className="text-xs transition-colors hover:opacity-80"
+              style={{ color: "hsl(46,98%,52%)" }}
             >
-              {login.isPending ? "Logging in..." : <><LogIn className="mr-2 h-4 w-4"/> Access System</>}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-2 border-t border-border pt-4">
-          <p className="text-sm text-muted-foreground">
-            Don't have an account? <Link href="/signup" className="text-primary font-medium hover:underline">Start your free trial</Link>
-          </p>
-          <p className="text-sm text-muted-foreground">
-            <Link href="/forgot-password" className="text-primary font-medium hover:underline">Forgot password?</Link>
-          </p>
-        </CardFooter>
-      </Card>
+              Forgot password?
+            </Link>
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={login.isPending}
+            className="w-full rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all hover:brightness-110 disabled:opacity-50 mt-1"
+            style={{ background: "hsl(46,98%,52%)", color: "hsl(220,90%,8%)" }}
+            data-testid="button-login-submit"
+          >
+            {login.isPending ? "Signing in…" : "Sign in"}
+          </button>
+        </form>
+
+        {/* Footer links */}
+        <p className="text-center text-sm mt-6" style={{ color: "hsl(220,25%,50%)" }}>
+          Don't have an account?{" "}
+          <Link href="/signup" className="font-semibold hover:opacity-80 transition-colors" style={{ color: "hsl(46,98%,52%)" }}>
+            Sign up
+          </Link>
+        </p>
+
+        <p className="text-center text-xs mt-8" style={{ color: "hsl(220,25%,38%)" }}>
+          Powered by <span style={{ color: "hsl(46,98%,52%)" }}>CtrlTrade</span>
+        </p>
+      </div>
     </div>
   );
 }
