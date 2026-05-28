@@ -53,9 +53,23 @@ export function AdminTenants() {
     setPage(1);
   };
 
-  const sorted = useMemo(() => {
+  const filtered = useMemo(() => {
     if (!tenants) return [];
-    return [...tenants].sort((a, b) => {
+    const q = search.trim().toLowerCase();
+    return tenants.filter((t) => {
+      const matchesSearch =
+        !q ||
+        (t.name ?? "").toLowerCase().includes(q) ||
+        (t.ownerEmail ?? "").toLowerCase().includes(q) ||
+        (t.id ?? "").toLowerCase().includes(q);
+      const matchesStatus =
+        statusFilter === "all" || t.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [tenants, search, statusFilter]);
+
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
       let cmp = 0;
       if (sortKey === "name") {
         cmp = (a.name ?? "").localeCompare(b.name ?? "");
@@ -70,7 +84,7 @@ export function AdminTenants() {
       }
       return sortDir === "asc" ? cmp : -cmp;
     });
-  }, [tenants, sortKey, sortDir]);
+  }, [filtered, sortKey, sortDir]);
 
   const totalPages  = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
   const safePage    = Math.min(page, totalPages);
