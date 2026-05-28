@@ -291,6 +291,95 @@ paths:
                 properties:
                   enqueued: { type: boolean }
 
+  /v1/integrations/{provider}/webhook-info:
+    get:
+      operationId: getIntegrationWebhookInfo
+      tags: [integrations]
+      summary: Return the webhook URL and secret for a connected lead-import integration.
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [webhookUrl, hasApiKey]
+                properties:
+                  webhookUrl: { type: string }
+                  webhookSecret: { type: ["string", "null"] }
+                  hasApiKey: { type: boolean }
+
+  /v1/integrations/{provider}/webhook-secret/rotate:
+    post:
+      operationId: rotateIntegrationWebhookSecret
+      tags: [integrations]
+      summary: Generate a new webhook secret for a lead-import integration.
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [webhookUrl, webhookSecret]
+                properties:
+                  webhookUrl: { type: string }
+                  webhookSecret: { type: string }
+
+  /v1/webhooks/leads/{provider}/{tenantId}:
+    post:
+      operationId: receiveLeadWebhook
+      tags: [integrations]
+      summary: >
+        Receive a real-time lead push from MyJobQuote or Checkatrade.
+        Authenticated via the X-Webhook-Secret header — the secret is shown
+        in the integration settings after connecting.
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema: { type: string, enum: [myjobquote, checkatrade] }
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+        - in: header
+          name: X-Webhook-Secret
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Raw lead payload from the platform (structure varies by provider).
+      responses:
+        "200":
+          description: OK — lead imported or already existed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [imported]
+                properties:
+                  imported: { type: boolean }
+                  reason: { type: string }
+        "401":
+          description: Bad or missing webhook secret.
+        "422":
+          description: Payload is missing required fields.
+
   /v1/integrations/{provider}/logs:
     get:
       operationId: getIntegrationLogs

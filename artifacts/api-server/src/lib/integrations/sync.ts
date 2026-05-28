@@ -579,6 +579,7 @@ export async function pullLeadsFromProvider(
         email: ext.email,
         phone: ext.phone,
         source: provider,
+        sourceDetail: ext.externalId,
         externalId: ext.externalId!,
         title: ext.description
           ? ext.description.slice(0, 120)

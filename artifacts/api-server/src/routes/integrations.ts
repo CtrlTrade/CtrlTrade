@@ -181,6 +181,13 @@ router.post("/v1/integrations/:provider/apikey", requireTenant, async (req, res)
     .from(tenantIntegrationsTable)
     .where(and(eq(tenantIntegrationsTable.tenantId, tenantId), eq(tenantIntegrationsTable.provider, provider)));
 
+  // Preserve existing webhook secret on re-connect so configured webhooks keep working.
+  const existingSettings = (existing?.settings ?? {}) as Record<string, unknown>;
+  const webhookSecret =
+    typeof existingSettings["webhookSecret"] === "string"
+      ? existingSettings["webhookSecret"]
+      : randomBytes(32).toString("hex");
+
   let row: TenantIntegration;
   if (existing) {
     const [updated] = await db
@@ -190,7 +197,7 @@ router.post("/v1/integrations/:provider/apikey", requireTenant, async (req, res)
         accessTokenEnc: encryptToken(apiKey),
         refreshTokenEnc: null,
         tokenExpiresAt: null,
-        settings: { syncIntervalMinutes },
+        settings: { syncIntervalMinutes, webhookSecret },
         connectedAt: existing.connectedAt ?? now,
         disconnectedAt: null,
         lastError: null,
@@ -208,7 +215,7 @@ router.post("/v1/integrations/:provider/apikey", requireTenant, async (req, res)
         provider,
         status: "connected",
         accessTokenEnc: encryptToken(apiKey),
-        settings: { syncIntervalMinutes },
+        settings: { syncIntervalMinutes, webhookSecret },
         connectedAt: now,
         connectedByUserId: req.auth!.user.id,
       })

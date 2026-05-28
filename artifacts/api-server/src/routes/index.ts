@@ -50,6 +50,7 @@ import areaManagersRouter from "./areaManagers";
 import jobCostsRouter from "./jobCosts";
 import adminLeadsRouter from "./adminLeads";
 import publicLeadsRouter from "./publicLeads";
+import leadWebhooksRouter from "./leadWebhooks";
 
 const router: IRouter = Router();
 
@@ -111,5 +112,6 @@ router.use(branchesRouter);
 router.use(areaManagersRouter);
 router.use(jobCostsRouter);
 router.use(adminLeadsRouter);
+router.use(leadWebhooksRouter);
 
 export default router;
