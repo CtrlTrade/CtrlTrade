@@ -310,7 +310,7 @@ export function AdminTenantDetail() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
-                <CreditCard className="h-8 w-8 text-zinc-700" />
+                <CreditCard className="h-8 w-8 text-border" />
                 <p className="text-xs font-bold text-muted-foreground">Full invoice history in Stripe</p>
                 <p className="text-[11px] text-muted-foreground max-w-xs">
                   Payment records are managed directly in Stripe. Use the Customer ID above to view all charges, refunds, and invoices.

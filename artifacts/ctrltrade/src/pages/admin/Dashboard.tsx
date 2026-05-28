@@ -44,7 +44,7 @@ function TrendBadge({ value, suffix = "%" }: { value?: number; suffix?: string }
     );
   }
   return (
-    <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-zinc-500">
+    <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-muted-foreground">
       <Minus className="h-3 w-3" />0{suffix}
     </span>
   );
@@ -61,11 +61,11 @@ export function AdminDashboard() {
   if (dashLoading || revLoading || actLoading || renLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-12 w-64 bg-zinc-900" />
+        <Skeleton className="h-12 w-64 bg-card" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-28 bg-zinc-900" />)}
+          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-28 bg-card" />)}
         </div>
-        <Skeleton className="h-64 bg-zinc-900" />
+        <Skeleton className="h-64 bg-card" />
       </div>
     );
   }
@@ -122,9 +122,9 @@ export function AdminDashboard() {
       {/* Pipeline summary */}
       {pipeline && (
         <Link href="/leads" className="block">
-          <Card className="rounded-xl border-zinc-800 bg-black shadow-none hover:border-zinc-600 transition-colors cursor-pointer">
+          <Card className="rounded-xl border-border bg-black shadow-none hover:border-border transition-colors cursor-pointer">
             <CardHeader className="pb-2">
-              <CardTitle className=" text-zinc-100 flex items-center gap-2 text-sm">
+              <CardTitle className=" text-foreground flex items-center gap-2 text-sm">
                 <Funnel className="h-4 w-4 text-red-500" /> Pipeline
               </CardTitle>
             </CardHeader>
@@ -132,18 +132,18 @@ export function AdminDashboard() {
               <div className="grid grid-cols-5 gap-2 mb-3">
                 {(["new", "contacted", "demo_booked", "won", "lost"] as const).map((s) => {
                   const labels: Record<string, string> = { new: "New", contacted: "Contacted", demo_booked: "Demo Booked", won: "Won", lost: "Lost" };
-                  const colours: Record<string, string> = { new: "text-blue-400", contacted: "text-yellow-400", demo_booked: "text-purple-400", won: "text-green-400", lost: "text-zinc-500" };
+                  const colours: Record<string, string> = { new: "text-blue-400", contacted: "text-yellow-400", demo_booked: "text-purple-400", won: "text-green-400", lost: "text-muted-foreground" };
                   return (
                     <div key={s} className="text-center">
                       <div className={`text-2xl font-mono font-bold ${colours[s]}`}>{pipeline.byStatus?.[s] ?? 0}</div>
-                      <div className="text-[10px] font-bold uppercase text-zinc-600 mt-0.5">{labels[s]}</div>
+                      <div className="text-[10px] font-bold uppercase text-muted-foreground mt-0.5">{labels[s]}</div>
                     </div>
                   );
                 })}
               </div>
-              <div className="flex items-center gap-4 border-t border-zinc-900 pt-2 mt-2">
-                <div className="text-xs text-zinc-500">Won this month: <span className="text-green-400 font-mono font-bold">{pipeline.wonThisMonth}</span></div>
-                <div className="text-xs text-zinc-500">Total: <span className="text-zinc-300 font-mono font-bold">{pipeline.total}</span></div>
+              <div className="flex items-center gap-4 border-t border-border pt-2 mt-2">
+                <div className="text-xs text-muted-foreground">Won this month: <span className="text-green-400 font-mono font-bold">{pipeline.wonThisMonth}</span></div>
+                <div className="text-xs text-muted-foreground">Total: <span className="text-foreground/80 font-mono font-bold">{pipeline.total}</span></div>
               </div>
             </CardContent>
           </Card>
@@ -151,9 +151,9 @@ export function AdminDashboard() {
       )}
 
       {/* Usage */}
-      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
+      <Card className="rounded-xl border-border bg-black shadow-none">
         <CardHeader>
-          <CardTitle className=" text-zinc-100 flex items-center gap-2 text-sm">
+          <CardTitle className=" text-foreground flex items-center gap-2 text-sm">
             <Gauge className="h-4 w-4" /> Platform usage this month
           </CardTitle>
         </CardHeader>
@@ -164,18 +164,18 @@ export function AdminDashboard() {
                 <Link
                   key={t.kind}
                   href="/usage"
-                  className="border border-zinc-800 p-3 bg-zinc-950 hover:border-red-500/50 transition-colors block"
+                  className="border border-border p-3 bg-background hover:border-red-500/50 transition-colors block"
                   data-testid={`admin-usage-${t.kind}`}
                 >
-                  <div className="font-bold text-[10px] text-zinc-500 mb-1">
+                  <div className="font-bold text-[10px] text-muted-foreground mb-1">
                     {USAGE_KIND_LABELS[t.kind] ?? t.kind}
                   </div>
-                  <div className="text-xl font-mono font-bold text-zinc-100">{t.count.toLocaleString()}</div>
+                  <div className="text-xl font-mono font-bold text-foreground">{t.count.toLocaleString()}</div>
                 </Link>
               ))}
             </div>
           ) : (
-            <div className="py-8 text-center text-zinc-600 font-mono text-sm">
+            <div className="py-8 text-center text-muted-foreground font-mono text-sm">
               No usage recorded yet this month.{" "}
               <Link href="/usage" className="text-red-500 hover:underline">View breakdown →</Link>
             </div>
@@ -186,9 +186,9 @@ export function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Revenue Breakdown */}
-          <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
+          <Card className="rounded-xl border-border bg-black shadow-none">
             <CardHeader>
-              <CardTitle className=" text-zinc-100 text-sm">Revenue Breakdown</CardTitle>
+              <CardTitle className=" text-foreground text-sm">Revenue Breakdown</CardTitle>
             </CardHeader>
             <CardContent>
               {revenue?.lines && revenue.lines.length > 0 ? (
@@ -215,22 +215,22 @@ export function AdminDashboard() {
                   <div className="space-y-2">
                     {revenue.lines.map((line, i) => (
                       <div key={i} className="flex justify-between text-sm">
-                        <span className="text-zinc-400">{line.label} <span className="text-zinc-600">({line.units} units)</span></span>
-                        <span className="font-mono text-zinc-100 font-bold">£{line.amount.toLocaleString()}</span>
+                        <span className="text-muted-foreground">{line.label} <span className="text-muted-foreground">({line.units} units)</span></span>
+                        <span className="font-mono text-foreground font-bold">£{line.amount.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div className="py-8 text-center text-zinc-600 font-mono text-sm">No revenue breakdown data available.</div>
+                <div className="py-8 text-center text-muted-foreground font-mono text-sm">No revenue breakdown data available.</div>
               )}
             </CardContent>
           </Card>
 
           {/* Upcoming Renewals */}
-          <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
+          <Card className="rounded-xl border-border bg-black shadow-none">
             <CardHeader>
-              <CardTitle className=" text-zinc-100 flex items-center gap-2 text-sm">
+              <CardTitle className=" text-foreground flex items-center gap-2 text-sm">
                 <RefreshCw className="h-4 w-4" /> Upcoming Renewals (7d)
               </CardTitle>
             </CardHeader>
@@ -242,20 +242,20 @@ export function AdminDashboard() {
                       <div>
                         <Link
                           href={`/tenants/${ren.tenantId}`}
-                          className="font-bold text-zinc-200 hover:text-red-500 uppercase text-sm"
+                          className="font-bold text-foreground/90 hover:text-red-500 uppercase text-sm"
                         >
                           {ren.tenantName}
                         </Link>
-                        <div className="text-xs text-zinc-500 font-mono mt-0.5">
+                        <div className="text-xs text-muted-foreground font-mono mt-0.5">
                           {new Date(ren.renewsAt).toLocaleDateString()}
                         </div>
                       </div>
-                      <div className="font-mono text-zinc-300 font-bold">£{ren.amount}</div>
+                      <div className="font-mono text-foreground/80 font-bold">£{ren.amount}</div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="py-8 text-center text-zinc-600 font-mono text-sm">
+                <div className="py-8 text-center text-muted-foreground font-mono text-sm">
                   No upcoming renewals in next 7 days.
                 </div>
               )}
@@ -264,9 +264,9 @@ export function AdminDashboard() {
         </div>
 
         {/* System Activity */}
-        <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
+        <Card className="rounded-xl border-border bg-black shadow-none">
           <CardHeader>
-            <CardTitle className=" text-zinc-100 flex items-center gap-2 text-sm">
+            <CardTitle className=" text-foreground flex items-center gap-2 text-sm">
               <Activity className="h-4 w-4" /> System Activity
             </CardTitle>
           </CardHeader>
@@ -275,10 +275,10 @@ export function AdminDashboard() {
               <div className="space-y-4">
                 {activity.map((act) => (
                   <div key={act.id} className="border-l-2 border-red-500 pl-4 py-1">
-                    <div className="text-xs text-zinc-500 font-mono mb-1">
+                    <div className="text-xs text-muted-foreground font-mono mb-1">
                       {new Date(act.createdAt).toLocaleString()}
                     </div>
-                    <div className="text-sm text-zinc-300">{act.message}</div>
+                    <div className="text-sm text-foreground/80">{act.message}</div>
                     {act.tenantName && (
                       <div className="text-xs font-bold uppercase text-red-500/80 mt-1">{act.tenantName}</div>
                     )}
@@ -286,7 +286,7 @@ export function AdminDashboard() {
                 ))}
               </div>
             ) : (
-              <div className="py-8 text-center text-zinc-600 font-mono text-sm">No recent system activity.</div>
+              <div className="py-8 text-center text-muted-foreground font-mono text-sm">No recent system activity.</div>
             )}
           </CardContent>
         </Card>
@@ -311,16 +311,16 @@ function KpiCard({
   const borderCls = danger
     ? "border-red-900/50 bg-red-950/20"
     : highlight
-    ? "border-red-500/50 bg-zinc-900"
-    : "border-zinc-800 bg-black";
-  const valueCls = danger ? "text-red-500" : highlight ? "text-red-500" : "text-zinc-100";
-  const iconCls = danger ? "text-red-500" : highlight ? "text-red-500" : "text-zinc-600";
+    ? "border-red-500/50 bg-card"
+    : "border-border bg-black";
+  const valueCls = danger ? "text-red-500" : highlight ? "text-red-500" : "text-foreground";
+  const iconCls = danger ? "text-red-500" : highlight ? "text-red-500" : "text-muted-foreground";
 
   return (
     <Card className={`rounded-xl shadow-none ${borderCls} ${className}`}>
       <CardContent className="p-5">
         <div className="flex justify-between items-start mb-2">
-          <div className="font-bold text-xs text-zinc-400">{title}</div>
+          <div className="font-bold text-xs text-muted-foreground">{title}</div>
           <Icon className={`h-4 w-4 shrink-0 ${iconCls}`} />
         </div>
         <div

@@ -100,7 +100,7 @@ export function IntegrationsPanel() {
                   </div>
                   <Badge
                     variant="outline"
-                    className={`rounded-xl uppercase text-xs ${status === "connected" ? "border-green-600 text-green-700" : status === "error" ? "border-red-600 text-red-700" : "border-border text-muted-foreground"}`}
+                    className={`rounded-xl uppercase text-xs ${status === "connected" ? "border-green-600 text-green-400" : status === "error" ? "border-red-600 text-red-400" : "border-border text-muted-foreground"}`}
                     data-testid={`integration-status-${p.id}`}
                   >
                     {status}
@@ -110,7 +110,7 @@ export function IntegrationsPanel() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {!p.enabled && (
-                  <div className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2">
+                  <div className="text-xs text-red-400 bg-red-50 border border-red-200 px-3 py-2">
                     Disabled by administrator.
                   </div>
                 )}
@@ -130,13 +130,13 @@ export function IntegrationsPanel() {
                   </div>
                 )}
                 {conn?.lastError && (
-                  <div className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2 flex items-start gap-2">
+                  <div className="text-xs text-red-400 bg-red-50 border border-red-200 px-3 py-2 flex items-start gap-2">
                     <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
                     <span>{conn.lastError}</span>
                   </div>
                 )}
                 {syncError && (
-                  <div className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2 flex items-start gap-2" data-testid={`sync-error-${p.id}`}>
+                  <div className="text-xs text-red-400 bg-red-50 border border-red-200 px-3 py-2 flex items-start gap-2" data-testid={`sync-error-${p.id}`}>
                     <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
                     <span>{syncError}</span>
                   </div>
@@ -247,9 +247,9 @@ function SyncLogs({ provider }: { provider: string }) {
         {rows.map((r) => (
           <li key={r.id} className="flex items-start gap-2" data-testid={`log-row-${r.id}`}>
             {r.status === "ok" ? (
-              <CheckCircle2 className="h-3 w-3 text-green-700 mt-0.5 shrink-0" />
+              <CheckCircle2 className="h-3 w-3 text-green-400 mt-0.5 shrink-0" />
             ) : r.status === "error" ? (
-              <AlertTriangle className="h-3 w-3 text-red-700 mt-0.5 shrink-0" />
+              <AlertTriangle className="h-3 w-3 text-red-400 mt-0.5 shrink-0" />
             ) : (
               <FileClock className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
             )}

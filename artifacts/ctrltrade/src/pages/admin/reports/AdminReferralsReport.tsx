@@ -7,23 +7,23 @@ export function AdminReferralsReport() {
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex items-center gap-3">
         <Link href="/reports">
-          <button className="text-zinc-400 hover:text-white transition-colors">
+          <button className="text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </button>
         </Link>
         <div>
           <h1 className="text-3xl font-bold text-white">Referrals & Growth</h1>
-          <p className="text-sm text-zinc-500 mt-1">Referral conversions, partner-driven signups, and growth trends.</p>
+          <p className="text-sm text-muted-foreground mt-1">Referral conversions, partner-driven signups, and growth trends.</p>
         </div>
       </div>
 
-      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
+      <Card className="rounded-xl border-border bg-black shadow-none">
         <CardHeader>
-          <CardTitle className=" text-zinc-100">Referral & Growth Metrics</CardTitle>
+          <CardTitle className=" text-foreground">Referral & Growth Metrics</CardTitle>
           <CardDescription>Track partner conversions and new tenant acquisition over time.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="p-12 text-center text-zinc-600 font-mono text-sm border border-dashed border-zinc-800">
+          <div className="p-12 text-center text-muted-foreground font-mono text-sm border border-dashed border-border">
             Referral and growth data coming soon.
           </div>
         </CardContent>

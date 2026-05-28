@@ -39,10 +39,10 @@ export function AdminReferrals() {
         title="Referral Partners"
         icon={<Handshake className="h-6 w-6" />}
       />
-      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
-        <CardHeader><CardTitle className=" text-zinc-100 text-sm">Partners</CardTitle></CardHeader>
+      <Card className="rounded-xl border-border bg-black shadow-none">
+        <CardHeader><CardTitle className=" text-foreground text-sm">Partners</CardTitle></CardHeader>
         <CardContent>
-          {pLoad ? <Skeleton className="h-32 w-full bg-zinc-900" /> : !partners || partners.length === 0 ? (
+          {pLoad ? <Skeleton className="h-32 w-full bg-card" /> : !partners || partners.length === 0 ? (
             <EmptyState
               icon={<Handshake className="h-10 w-10" />}
               heading="No partners yet"
@@ -73,10 +73,10 @@ export function AdminReferrals() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
-        <CardHeader><CardTitle className=" text-zinc-100 text-sm">Payout requests</CardTitle></CardHeader>
+      <Card className="rounded-xl border-border bg-black shadow-none">
+        <CardHeader><CardTitle className=" text-foreground text-sm">Payout requests</CardTitle></CardHeader>
         <CardContent>
-          {payLoad ? <Skeleton className="h-32 w-full bg-zinc-900" /> : !payouts || payouts.length === 0 ? (
+          {payLoad ? <Skeleton className="h-32 w-full bg-card" /> : !payouts || payouts.length === 0 ? (
             <EmptyState
               icon={<Handshake className="h-10 w-10" />}
               heading="No payouts pending"

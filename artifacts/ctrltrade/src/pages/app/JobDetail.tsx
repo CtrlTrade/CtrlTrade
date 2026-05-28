@@ -62,9 +62,9 @@ function fmtDuration(minutes: number | null | undefined) {
 
 const KIND_LABELS: Record<string, string> = { labour: "Labour", material: "Material", other: "Other" };
 const KIND_COLOURS: Record<string, string> = {
-  labour: "bg-blue-100 text-blue-800",
+  labour: "bg-blue-500/15 text-blue-300",
   material: "bg-emerald-100 text-emerald-800",
-  other: "bg-amber-100 text-amber-800",
+  other: "bg-amber-500/15 text-amber-300",
 };
 
 interface CostEntryFormState {

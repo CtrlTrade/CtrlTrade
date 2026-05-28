@@ -137,7 +137,7 @@ function SidebarContent({
           <button
             onClick={onToggleCollapse}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground hover:text-zinc-300 hover:bg-sidebar-accent/50 transition-colors ${collapsed ? "justify-center" : ""}`}
+            className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50 transition-colors ${collapsed ? "justify-center" : ""}`}
             data-testid="button-sidebar-collapse"
           >
             {collapsed ? <ChevronsRight className="h-4 w-4" /> : <><ChevronsLeft className="h-4 w-4" /> Collapse</>}

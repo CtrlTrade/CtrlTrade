@@ -180,14 +180,14 @@ export function AdminTenantWhiteLabel() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <Link href={`/tenants/${tenantId}`} className="text-xs uppercase font-bold text-zinc-400 hover:text-white flex items-center gap-1">
+          <Link href={`/tenants/${tenantId}`} className="text-xs uppercase font-bold text-muted-foreground hover:text-foreground flex items-center gap-1">
             <ArrowLeft className="h-3 w-3" /> Back to tenant
           </Link>
           <h1 className="text-3xl font-bold text-white mt-2">
             White Label · {data.tenant.name}
           </h1>
         </div>
-        <Button onClick={saveConfig} disabled={update.isPending} className="rounded-xl bg-red-600 hover:bg-red-700 uppercase text-xs font-bold tracking-wider">
+        <Button onClick={saveConfig} disabled={update.isPending} className="rounded-xl bg-red-600 hover:bg-red-700 text-xs font-semibold tracking-wider">
           {update.isPending ? "Saving…" : "Save Configuration"}
         </Button>
       </div>
@@ -207,8 +207,8 @@ export function AdminTenantWhiteLabel() {
               className="rounded-xl border-border bg-input text-foreground font-mono text-xs"
             />
             {data.parent && (
-              <div className="text-xs text-zinc-400 mt-1">
-                Currently nested under <span className="text-zinc-200 font-bold">{data.parent.name}</span>
+              <div className="text-xs text-muted-foreground mt-1">
+                Currently nested under <span className="text-foreground/90 font-bold">{data.parent.name}</span>
               </div>
             )}
           </div>
@@ -223,7 +223,7 @@ export function AdminTenantWhiteLabel() {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between border border-border p-3">
             <div>
-              <div className="text-sm font-bold text-zinc-100">Hide CtrlTrade branding</div>
+              <div className="text-sm font-bold text-foreground">Hide CtrlTrade branding</div>
               <div className="text-xs text-muted-foreground">Removes "Powered by CtrlTrade" badges from this tenant's portal and outbound emails.</div>
             </div>
             <Switch checked={wl.hideCtrlTradeBranding} onCheckedChange={(v) => setWl({ ...wl, hideCtrlTradeBranding: v })} />
@@ -293,7 +293,7 @@ export function AdminTenantWhiteLabel() {
                 <div className="flex items-end">
                   <div className="flex items-center gap-2">
                     <Switch checked={reseller.active} onCheckedChange={(v) => setReseller({ ...reseller, active: v })} />
-                    <span className="text-xs uppercase text-zinc-400">Active</span>
+                    <span className="text-xs uppercase text-muted-foreground">Active</span>
                   </div>
                 </div>
                 <div className="md:col-span-2">
@@ -318,8 +318,8 @@ export function AdminTenantWhiteLabel() {
             <div className="divide-y divide-zinc-800 border border-border">
               {children.map((c) => (
                 <div key={c.id} className="grid grid-cols-12 gap-4 p-3 items-center text-sm">
-                  <div className="col-span-5 font-bold text-zinc-100">{c.name}</div>
-                  <div className="col-span-3 text-xs text-zinc-400 font-mono">{c.status}</div>
+                  <div className="col-span-5 font-bold text-foreground">{c.name}</div>
+                  <div className="col-span-3 text-xs text-muted-foreground font-mono">{c.status}</div>
                   <div className="col-span-3 font-mono text-foreground">MRR {c.currency ?? "GBP"} {c.mrr.toFixed(2)}</div>
                   <div className="col-span-1 text-right">
                     <Link href={`/tenants/${c.id}`} className="text-xs uppercase font-bold text-red-500 hover:text-red-400">View</Link>
@@ -349,7 +349,7 @@ export function AdminTenantWhiteLabel() {
                 <option value="app">App</option>
               </select>
             </div>
-            <Button onClick={onAddDomain} disabled={addDomain.isPending} className="rounded-xl bg-zinc-800 hover:bg-zinc-700 uppercase text-xs font-bold">Add</Button>
+            <Button onClick={onAddDomain} disabled={addDomain.isPending} className="rounded-xl bg-muted hover:bg-muted/80 text-xs font-semibold">Add</Button>
           </div>
 
           {domainsLoading ? (
@@ -362,28 +362,28 @@ export function AdminTenantWhiteLabel() {
                 <div key={d.id} className="border border-border p-4 space-y-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-bold text-zinc-100 font-mono">{d.hostname}</div>
+                      <div className="font-bold text-foreground font-mono">{d.hostname}</div>
                       <div className="text-[10px] uppercase text-muted-foreground mt-1">{d.kind} domain</div>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className={`px-2 py-1 text-[10px] font-bold flex items-center gap-1 ${
                         d.status === 'verified' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
                         d.status === 'failed' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
-                        'bg-zinc-800 text-foreground border border-zinc-700'
+                        'bg-muted text-foreground border border-border'
                       }`}>
                         {d.status === 'verified' ? <ShieldCheck className="h-3 w-3" /> : d.status === 'failed' ? <AlertTriangle className="h-3 w-3" /> : null}
                         {d.status}
                       </span>
-                      <Button size="sm" variant="outline" onClick={() => onVerifyDomain(d.id)} disabled={verifyDomain.isPending} className="rounded-xl border-zinc-700 uppercase text-xs font-bold gap-1">
+                      <Button size="sm" variant="outline" onClick={() => onVerifyDomain(d.id)} disabled={verifyDomain.isPending} className="rounded-xl border-border text-xs font-semibold gap-1">
                         <RefreshCw className="h-3 w-3" /> Verify
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => onDeleteDomain(d.id, d.hostname)} className="rounded-xl border-zinc-700 uppercase text-xs font-bold gap-1 text-red-500 hover:text-red-400">
+                      <Button size="sm" variant="outline" onClick={() => onDeleteDomain(d.id, d.hostname)} className="rounded-xl border-border text-xs font-semibold gap-1 text-red-500 hover:text-red-400">
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
                   </div>
-                  <div className="text-[11px] font-mono text-zinc-400 bg-black/50 border border-border p-2">
-                    Publish TXT record at <span className="text-zinc-200">{d.hostname}</span>:
+                  <div className="text-[11px] font-mono text-muted-foreground bg-black/50 border border-border p-2">
+                    Publish TXT record at <span className="text-foreground/90">{d.hostname}</span>:
                     <pre className="mt-1 text-foreground whitespace-pre-wrap break-all">{`"ctrltrade-verify=${d.verificationToken}"`}</pre>
                     {d.lastError && <div className="text-red-400 mt-2">Last error: {d.lastError}</div>}
                   </div>

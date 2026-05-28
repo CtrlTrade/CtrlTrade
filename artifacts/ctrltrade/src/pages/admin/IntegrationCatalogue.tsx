@@ -34,13 +34,13 @@ export function AdminIntegrationCatalogue() {
         icon={<Plug className="h-6 w-6" />}
       />
 
-      <Card className="rounded-xl border-zinc-800 bg-zinc-900 text-zinc-100">
+      <Card className="rounded-xl border-border bg-card text-foreground">
         <CardHeader>
           <CardTitle className=" text-base">Providers</CardTitle>
         </CardHeader>
         <CardContent>
           <table className="w-full text-sm">
-            <thead className="text-xs uppercase text-zinc-400 border-b border-zinc-800">
+            <thead className="text-xs uppercase text-muted-foreground border-b border-border">
               <tr>
                 <th className="text-left py-2">Provider</th>
                 <th className="text-left">Category</th>
@@ -50,10 +50,10 @@ export function AdminIntegrationCatalogue() {
             </thead>
             <tbody>
               {(data ?? []).map((c) => (
-                <tr key={c.provider} className="border-b border-zinc-800" data-testid={`row-cat-${c.provider}`}>
+                <tr key={c.provider} className="border-b border-border" data-testid={`row-cat-${c.provider}`}>
                   <td className="py-3">
                     <div className="font-semibold">{c.label}</div>
-                    <div className="text-xs text-zinc-500">{c.description}</div>
+                    <div className="text-xs text-muted-foreground">{c.description}</div>
                   </td>
                   <td className="uppercase text-xs">{c.category}</td>
                   <td>

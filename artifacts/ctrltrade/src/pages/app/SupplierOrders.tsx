@@ -352,7 +352,7 @@ export function AppSupplierOrders() {
                 </Button>
 
                 {scanResult && (
-                  <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400">
+                  <div className="flex items-center gap-2 text-sm text-green-400 dark:text-green-400">
                     <span>✓ Receipt scanned</span>
                     {scannedFile && (
                       <span className="text-muted-foreground text-xs truncate max-w-[160px]">

@@ -28,7 +28,7 @@ const STATUS_COLOURS: Record<LeadStatus, string> = {
   contacted: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
   demo_booked: "bg-purple-500/20 text-purple-400 border-purple-500/30",
   won: "bg-green-500/20 text-green-400 border-green-500/30",
-  lost: "bg-zinc-700/60 text-zinc-400 border-zinc-600/40",
+  lost: "bg-muted/60 text-muted-foreground border-border/40",
 };
 
 export function AdminLeads() {
@@ -74,7 +74,7 @@ export function AdminLeads() {
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 uppercase text-xs font-bold border-zinc-700 text-zinc-300 hover:border-zinc-500 rounded-xl"
+              className="gap-2 text-xs font-semibold border-border text-foreground/80 hover:border-border rounded-xl"
               onClick={() => fileRef.current?.click()}
               disabled={importMutation.isPending}
             >
@@ -104,7 +104,7 @@ export function AdminLeads() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            className="pl-9 bg-black border-zinc-800 text-zinc-100 placeholder:text-muted-foreground focus-visible:border-zinc-600 rounded-xl"
+            className="pl-9 bg-black border-border text-foreground placeholder:text-muted-foreground focus-visible:border-border rounded-xl"
             placeholder="Search name, email, company…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -118,7 +118,7 @@ export function AdminLeads() {
               className={`px-3 py-1.5 text-xs font-bold uppercase border transition-colors ${
                 statusFilter === s
                   ? "border-red-500 text-red-500 bg-red-500/10"
-                  : "border-zinc-800 text-muted-foreground hover:border-zinc-600"
+                  : "border-border text-muted-foreground hover:border-border"
               }`}
             >
               {s === "all" ? "All" : STATUS_LABELS[s as LeadStatus]}
@@ -129,7 +129,7 @@ export function AdminLeads() {
 
       {isLoading ? (
         <div className="space-y-3">
-          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-14 bg-zinc-900" />)}
+          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-14 bg-card" />)}
         </div>
       ) : view === "table" ? (
         <TableView leads={leads} />
@@ -143,7 +143,7 @@ export function AdminLeads() {
 function TableView({ leads }: { leads: any[] }) {
   if (leads.length === 0) {
     return (
-      <div className="border border-zinc-800">
+      <div className="border border-border">
         <EmptyState
           icon={<Funnel className="h-10 w-10" />}
           heading="No leads found"
@@ -154,10 +154,10 @@ function TableView({ leads }: { leads: any[] }) {
   }
 
   return (
-    <div className="border border-zinc-800 overflow-auto">
+    <div className="border border-border overflow-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-zinc-800 bg-zinc-950">
+          <tr className="border-b border-border bg-background">
             <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground">Name</th>
             <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground hidden md:table-cell">Company</th>
             <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground hidden lg:table-cell">Trade</th>
@@ -170,11 +170,11 @@ function TableView({ leads }: { leads: any[] }) {
         </thead>
         <tbody>
           {leads.map((lead) => (
-            <tr key={lead.id} className="border-b border-zinc-900 hover:bg-zinc-950 transition-colors">
-              <td className="px-4 py-3 font-medium text-zinc-100">{lead.name}</td>
-              <td className="px-4 py-3 text-zinc-400 hidden md:table-cell">{lead.company ?? "—"}</td>
-              <td className="px-4 py-3 text-zinc-400 hidden lg:table-cell">{lead.trade ?? "—"}</td>
-              <td className="px-4 py-3 text-zinc-400 font-mono text-xs hidden sm:table-cell">{lead.email}</td>
+            <tr key={lead.id} className="border-b border-border hover:bg-background transition-colors">
+              <td className="px-4 py-3 font-medium text-foreground">{lead.name}</td>
+              <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{lead.company ?? "—"}</td>
+              <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">{lead.trade ?? "—"}</td>
+              <td className="px-4 py-3 text-muted-foreground font-mono text-xs hidden sm:table-cell">{lead.email}</td>
               <td className="px-4 py-3 text-muted-foreground text-xs hidden md:table-cell ">{lead.source}</td>
               <td className="px-4 py-3">
                 <StatusBadge status={lead.status} />
@@ -208,21 +208,21 @@ function KanbanView({ leads }: { leads: any[] }) {
       {STATUSES.map((status) => (
         <div key={status} className="flex-shrink-0 w-64">
           <div className="flex items-center justify-between mb-2 px-1">
-            <span className="text-xs font-bold text-zinc-400">{STATUS_LABELS[status]}</span>
+            <span className="text-xs font-bold text-muted-foreground">{STATUS_LABELS[status]}</span>
             <span className="text-xs font-mono text-muted-foreground">{grouped[status].length}</span>
           </div>
           <div className="space-y-2">
             {grouped[status].length === 0 && (
-              <div className="border border-dashed border-zinc-800 p-4 text-center text-zinc-700 text-xs font-mono">
+              <div className="border border-dashed border-border p-4 text-center text-border text-xs font-mono">
                 Empty
               </div>
             )}
             {grouped[status].map((lead) => (
               <Link key={lead.id} href={`/leads/${lead.id}`}>
-                <Card className="rounded-xl border-zinc-800 bg-zinc-950 hover:border-zinc-600 cursor-pointer transition-colors shadow-none">
+                <Card className="rounded-xl border-border bg-background hover:border-border cursor-pointer transition-colors shadow-none">
                   <CardContent className="p-3 space-y-1">
-                    <div className="font-semibold text-zinc-100 text-sm">{lead.name}</div>
-                    {lead.company && <div className="text-xs text-zinc-400">{lead.company}</div>}
+                    <div className="font-semibold text-foreground text-sm">{lead.name}</div>
+                    {lead.company && <div className="text-xs text-muted-foreground">{lead.company}</div>}
                     {lead.trade && <div className="text-xs text-muted-foreground">{lead.trade}</div>}
                     <div className="text-xs font-mono text-muted-foreground">{lead.email}</div>
                     <div className="text-xs text-muted-foreground ">{lead.source}</div>
@@ -239,7 +239,7 @@ function KanbanView({ leads }: { leads: any[] }) {
 
 function StatusBadge({ status }: { status: string }) {
   const label = STATUS_LABELS[status as LeadStatus] ?? status;
-  const cls = STATUS_COLOURS[status as LeadStatus] ?? "bg-zinc-800 text-zinc-400 border-zinc-700";
+  const cls = STATUS_COLOURS[status as LeadStatus] ?? "bg-muted text-muted-foreground border-border";
   return (
     <span className={`inline-flex items-center px-2 py-0.5 text-xs font-bold uppercase border rounded-sm ${cls}`}>
       {label}

@@ -35,12 +35,12 @@ function formatDuration(secs: number | null | undefined) {
 
 function callStatusBadge(status: string) {
   const map: Record<string, string> = {
-    completed: "bg-green-100 text-green-800",
-    "in-progress": "bg-blue-100 text-blue-800",
-    queued: "bg-yellow-100 text-yellow-800",
-    failed: "bg-red-100 text-red-800",
+    completed: "bg-green-500/15 text-green-400",
+    "in-progress": "bg-blue-500/15 text-blue-300",
+    queued: "bg-yellow-500/15 text-yellow-300",
+    failed: "bg-red-500/15 text-red-400",
     "no-answer": "bg-muted text-muted-foreground",
-    initiated: "bg-yellow-100 text-yellow-800",
+    initiated: "bg-yellow-500/15 text-yellow-300",
   };
   return <span className={`text-xs px-2 py-0.5 rounded-xl font-mono ${map[status] ?? "bg-muted"}`}>{status}</span>;
 }

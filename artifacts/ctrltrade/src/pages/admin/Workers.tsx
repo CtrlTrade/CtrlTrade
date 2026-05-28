@@ -36,10 +36,10 @@ export function AdminWorkers() {
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {(["queued","running","done","failed","dead"] as const).map(s => (
-          <Card key={s} className="rounded-xl border-zinc-800 bg-black shadow-none">
+          <Card key={s} className="rounded-xl border-border bg-black shadow-none">
             <CardContent className="p-6">
-              <div className="font-bold text-xs text-zinc-400 mb-2">{s}</div>
-              <div className={`text-3xl font-mono font-bold ${s === "failed" || s === "dead" ? "text-red-500" : s === "running" ? "text-yellow-500" : "text-zinc-100"}`} data-testid={`worker-depth-${s}`}>
+              <div className="font-bold text-xs text-muted-foreground mb-2">{s}</div>
+              <div className={`text-3xl font-mono font-bold ${s === "failed" || s === "dead" ? "text-red-500" : s === "running" ? "text-yellow-500" : "text-foreground"}`} data-testid={`worker-depth-${s}`}>
                 {data.depth[s]}
               </div>
             </CardContent>
@@ -47,16 +47,16 @@ export function AdminWorkers() {
         ))}
       </div>
 
-      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
-        <CardHeader><CardTitle className=" text-zinc-100">By Kind</CardTitle></CardHeader>
+      <Card className="rounded-xl border-border bg-black shadow-none">
+        <CardHeader><CardTitle className=" text-foreground">By Kind</CardTitle></CardHeader>
         <CardContent>
-          <div className="divide-y divide-zinc-800 border border-zinc-800">
-            <div className="grid grid-cols-6 gap-2 p-3 text-xs text-zinc-500 font-bold bg-zinc-950">
+          <div className="divide-y divide-zinc-800 border border-border">
+            <div className="grid grid-cols-6 gap-2 p-3 text-xs text-muted-foreground font-bold bg-background">
               <div>Kind</div><div>Queued</div><div>Running</div><div>Done</div><div>Failed</div><div>Dead</div>
             </div>
             {data.byKind.map(k => (
               <div key={k.kind} className="grid grid-cols-6 gap-2 p-3 text-sm font-mono">
-                <div className="text-zinc-200 font-bold">{k.kind}</div>
+                <div className="text-foreground/90 font-bold">{k.kind}</div>
                 <div>{k.queued}</div>
                 <div className="text-yellow-500">{k.running}</div>
                 <div className="text-green-500">{k.done}</div>
@@ -66,34 +66,34 @@ export function AdminWorkers() {
             ))}
             {data.byKind.length === 0 && (
               <div className="py-12 flex flex-col items-center gap-3">
-                <Cpu className="h-10 w-10 text-zinc-700" />
-                <p className="font-bold text-sm text-zinc-400">No jobs recorded</p>
-                <p className="text-xs text-zinc-600 font-mono">Background jobs will appear here as they are queued.</p>
+                <Cpu className="h-10 w-10 text-border" />
+                <p className="font-bold text-sm text-muted-foreground">No jobs recorded</p>
+                <p className="text-xs text-muted-foreground font-mono">Background jobs will appear here as they are queued.</p>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl border-zinc-800 bg-black shadow-none">
-        <CardHeader><CardTitle className=" text-zinc-100">Recent 100 Jobs</CardTitle></CardHeader>
+      <Card className="rounded-xl border-border bg-black shadow-none">
+        <CardHeader><CardTitle className=" text-foreground">Recent 100 Jobs</CardTitle></CardHeader>
         <CardContent>
-          <div className="divide-y divide-zinc-800 border border-zinc-800 max-h-[600px] overflow-y-auto">
+          <div className="divide-y divide-zinc-800 border border-border max-h-[600px] overflow-y-auto">
             {data.recent.map(j => (
               <div key={j.id} className="p-3 grid grid-cols-12 gap-2 items-center text-sm">
-                <div className="col-span-3 font-mono text-zinc-200 font-bold truncate">{j.kind}</div>
+                <div className="col-span-3 font-mono text-foreground/90 font-bold truncate">{j.kind}</div>
                 <div className={`col-span-1 text-xs uppercase font-bold tracking-wider ${
                   j.status === "done" ? "text-green-500" :
                   j.status === "running" ? "text-yellow-500" :
                   j.status === "failed" ? "text-red-400" :
-                  j.status === "dead" ? "text-red-600" : "text-zinc-400"
+                  j.status === "dead" ? "text-red-600" : "text-muted-foreground"
                 }`}>{j.status}</div>
-                <div className="col-span-1 font-mono text-xs text-zinc-500">{j.attempts}/{j.maxAttempts}</div>
-                <div className="col-span-4 text-xs text-zinc-500 truncate">{j.lastError ?? <span className="text-zinc-700">—</span>}</div>
-                <div className="col-span-2 text-xs font-mono text-zinc-600">{new Date(j.updatedAt).toLocaleString()}</div>
+                <div className="col-span-1 font-mono text-xs text-muted-foreground">{j.attempts}/{j.maxAttempts}</div>
+                <div className="col-span-4 text-xs text-muted-foreground truncate">{j.lastError ?? <span className="text-border">—</span>}</div>
+                <div className="col-span-2 text-xs font-mono text-muted-foreground">{new Date(j.updatedAt).toLocaleString()}</div>
                 <div className="col-span-1 text-right">
                   {(j.status === "failed" || j.status === "dead") && (
-                    <Button size="sm" variant="outline" disabled={retry.isPending} className="rounded-xl uppercase text-xs font-bold border-zinc-700"
+                    <Button size="sm" variant="outline" disabled={retry.isPending} className="rounded-xl uppercase text-xs font-bold border-border"
                       onClick={() => retry.mutate({ jobId: j.id })}
                       data-testid={`button-retry-${j.id}`}>
                       <RefreshCw className="h-3 w-3"/>
@@ -106,9 +106,9 @@ export function AdminWorkers() {
             ))}
             {data.recent.length === 0 && (
               <div className="py-12 flex flex-col items-center gap-3">
-                <Cpu className="h-10 w-10 text-zinc-700" />
-                <p className="font-bold text-sm text-zinc-400">No recent jobs</p>
-                <p className="text-xs text-zinc-600 font-mono">Completed and failed jobs will be listed here.</p>
+                <Cpu className="h-10 w-10 text-border" />
+                <p className="font-bold text-sm text-muted-foreground">No recent jobs</p>
+                <p className="text-xs text-muted-foreground font-mono">Completed and failed jobs will be listed here.</p>
               </div>
             )}
           </div>

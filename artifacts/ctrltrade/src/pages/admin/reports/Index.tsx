@@ -43,15 +43,15 @@ export function AdminReportsIndex() {
         {CARDS.map((c) => (
           <Link key={c.href} href={c.href}>
             <Card
-              className="border-zinc-800 bg-black hover:border-primary cursor-pointer transition-colors h-full shadow-none rounded-xl"
+              className="border-border bg-black hover:border-primary cursor-pointer transition-colors h-full shadow-none rounded-xl"
               data-testid={`admin-report-card-${c.href.split("/").pop()}`}
             >
               <CardHeader>
                 <div className="flex items-start justify-between gap-2">
-                  <CardTitle className=" text-lg text-zinc-100">{c.title}</CardTitle>
-                  <c.Icon className="h-5 w-5 text-zinc-500" />
+                  <CardTitle className=" text-lg text-foreground">{c.title}</CardTitle>
+                  <c.Icon className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <CardDescription className="text-sm text-zinc-500">{c.description}</CardDescription>
+                <CardDescription className="text-sm text-muted-foreground">{c.description}</CardDescription>
               </CardHeader>
             </Card>
           </Link>

@@ -16,7 +16,7 @@ type SortKey = "name" | "status" | "mrr" | "seats";
 type SortDir = "asc" | "desc";
 
 function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; sortDir: SortDir }) {
-  if (col !== sortKey) return <ArrowUpDown className="h-3 w-3 text-zinc-600 ml-1 inline" />;
+  if (col !== sortKey) return <ArrowUpDown className="h-3 w-3 text-muted-foreground ml-1 inline" />;
   return sortDir === "asc"
     ? <ArrowUp   className="h-3 w-3 text-red-500 ml-1 inline" />
     : <ArrowDown className="h-3 w-3 text-red-500 ml-1 inline" />;
@@ -94,7 +94,7 @@ export function AdminTenants() {
 
   const ThBtn = ({ col, label }: { col: SortKey; label: string }) => (
     <button
-      className="flex items-center gap-0.5 font-bold uppercase text-xs tracking-wider text-zinc-500 hover:text-zinc-300 transition-colors"
+      className="flex items-center gap-0.5 font-bold uppercase text-xs tracking-wider text-muted-foreground hover:text-foreground/80 transition-colors"
       onClick={() => handleSort(col)}
     >
       {label}<SortIcon col={col} sortKey={sortKey} sortDir={sortDir} />
@@ -117,22 +117,22 @@ export function AdminTenants() {
         icon={<Users className="h-6 w-6" />}
       />
 
-      <Card className="rounded-xl border-zinc-800 bg-black shadow-none p-4">
+      <Card className="rounded-xl border-border bg-black shadow-none p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search by name, email, or ID..."
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10 rounded-xl border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus:border-red-500"
+              className="pl-10 rounded-xl border-border bg-card text-white placeholder:text-muted-foreground focus:border-red-500"
             />
           </div>
           <Select value={statusFilter} onValueChange={handleFilter}>
-            <SelectTrigger className="w-full sm:w-[180px] rounded-xl border-zinc-700 bg-zinc-900 text-white">
+            <SelectTrigger className="w-full sm:w-[180px] rounded-xl border-border bg-card text-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent className="rounded-xl border-zinc-700 bg-zinc-900 text-white">
+            <SelectContent className="rounded-xl border-border bg-card text-white">
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="trial">Trial</SelectItem>
@@ -144,8 +144,8 @@ export function AdminTenants() {
         </div>
       </Card>
 
-      <div className="border border-zinc-800 bg-black">
-        <div className="grid grid-cols-12 gap-4 p-4 border-b border-zinc-800 bg-zinc-950">
+      <div className="border border-border bg-black">
+        <div className="grid grid-cols-12 gap-4 p-4 border-b border-border bg-background">
           <div className="col-span-4"><ThBtn col="name"   label="Tenant"    /></div>
           <div className="col-span-2"><ThBtn col="status" label="Status"    /></div>
           <div className="col-span-3"><ThBtn col="seats"  label="Resources" /></div>
@@ -155,7 +155,7 @@ export function AdminTenants() {
 
         {isLoading ? (
           <div className="p-4 space-y-4">
-            {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-12 bg-zinc-900" />)}
+            {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-12 bg-card" />)}
           </div>
         ) : sorted.length === 0 ? (
           <EmptyState
@@ -180,26 +180,26 @@ export function AdminTenants() {
                 <Link
                   key={tenant.id}
                   href={`/tenants/${tenant.id}`}
-                  className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-zinc-900/60 transition-colors cursor-pointer"
+                  className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-card/60 transition-colors cursor-pointer"
                 >
                   <div className="col-span-4">
-                    <div className="font-bold text-zinc-200 uppercase text-sm truncate">{tenant.name}</div>
-                    <div className="text-xs text-zinc-500 font-mono truncate">{tenant.ownerEmail}</div>
+                    <div className="font-bold text-foreground/90 uppercase text-sm truncate">{tenant.name}</div>
+                    <div className="text-xs text-muted-foreground font-mono truncate">{tenant.ownerEmail}</div>
                   </div>
                   <div className="col-span-2">
                     <span className={`px-2 py-1 text-[10px] font-bold border ${
                       tenant.status === "active"    ? "bg-green-500/10 text-green-500 border-green-500/20" :
                       tenant.status === "trial"     ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
-                      tenant.status === "cancelled" ? "bg-zinc-800 text-zinc-400 border-zinc-700" :
+                      tenant.status === "cancelled" ? "bg-muted text-muted-foreground border-border" :
                                                       "bg-red-500/10 text-red-500 border-red-500/20"
                     }`}>
                       {tenant.status}
                     </span>
                   </div>
-                  <div className="col-span-3 text-xs text-zinc-400 font-mono">
+                  <div className="col-span-3 text-xs text-muted-foreground font-mono">
                     {tenant.controlSeats}C / {tenant.fieldSeats}F / {tenant.tills}T
                   </div>
-                  <div className="col-span-2 font-mono text-zinc-300 font-bold flex items-center gap-2">
+                  <div className="col-span-2 font-mono text-foreground/80 font-bold flex items-center gap-2">
                     £{tenant.monthlyTotal}
                     {(tenant as any).require2fa && (
                       <ShieldCheck className="h-3 w-3 text-green-500" aria-label="2FA enforced" />
@@ -214,8 +214,8 @@ export function AdminTenants() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800 bg-zinc-950">
-                <span className="text-xs text-zinc-500 font-mono">
+              <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-background">
+                <span className="text-xs text-muted-foreground font-mono">
                   Page {safePage} of {totalPages}
                 </span>
                 <div className="flex items-center gap-2">
@@ -224,7 +224,7 @@ export function AdminTenants() {
                     size="sm"
                     disabled={safePage <= 1}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    className="rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 disabled:opacity-40 h-7 px-2"
+                    className="rounded-xl border-border bg-card text-foreground/80 hover:bg-muted disabled:opacity-40 h-7 px-2"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -239,7 +239,7 @@ export function AdminTenants() {
                     }, [])
                     .map((item, idx) =>
                       item === "…" ? (
-                        <span key={`ellipsis-${idx}`} className="text-zinc-600 text-xs px-1">…</span>
+                        <span key={`ellipsis-${idx}`} className="text-muted-foreground text-xs px-1">…</span>
                       ) : (
                         <button
                           key={item}
@@ -247,7 +247,7 @@ export function AdminTenants() {
                           className={`w-7 h-7 text-xs font-bold border transition-colors ${
                             item === safePage
                               ? "border-red-500 bg-red-500/10 text-red-500"
-                              : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
+                              : "border-border bg-card text-muted-foreground hover:bg-muted"
                           }`}
                         >
                           {item}
@@ -259,7 +259,7 @@ export function AdminTenants() {
                     size="sm"
                     disabled={safePage >= totalPages}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    className="rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 disabled:opacity-40 h-7 px-2"
+                    className="rounded-xl border-border bg-card text-foreground/80 hover:bg-muted disabled:opacity-40 h-7 px-2"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>

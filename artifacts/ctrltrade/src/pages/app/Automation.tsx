@@ -69,10 +69,10 @@ const BLANK_FORM: RuleForm = {
 
 function statusBadge(status: string) {
   const variants: Record<string, string> = {
-    completed: "bg-green-100 text-green-800",
-    failed: "bg-red-100 text-red-800",
-    running: "bg-blue-100 text-blue-800",
-    pending: "bg-yellow-100 text-yellow-800",
+    completed: "bg-green-500/15 text-green-400",
+    failed: "bg-red-500/15 text-red-400",
+    running: "bg-blue-500/15 text-blue-300",
+    pending: "bg-yellow-500/15 text-yellow-300",
   };
   return <span className={`text-xs px-2 py-0.5 rounded-xl font-mono ${variants[status] ?? "bg-muted"}`}>{status}</span>;
 }
