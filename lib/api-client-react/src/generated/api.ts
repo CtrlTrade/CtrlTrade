@@ -348,6 +348,7 @@ import type {
   Tenant,
   TenantIntegration,
   TenantModules,
+  TenantTradeProfile,
   TenantUpdate,
   TenantUsage,
   TillSession,
@@ -5234,6 +5235,83 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getSyncTenantFromStripeMutationOptions(options));
     }
+
+export const getGetTenantTradeCategoriesUrl = () => {
+
+
+
+
+  return `/api/v1/tenant/trade-categories`
+}
+
+/**
+ * @summary Get the trade category slugs configured for the current tenant
+ */
+export const getTenantTradeCategories = async ( options?: RequestInit): Promise<TenantTradeProfile> => {
+
+  return customFetch<TenantTradeProfile>(getGetTenantTradeCategoriesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTenantTradeCategoriesQueryKey = () => {
+    return [
+    `/api/v1/tenant/trade-categories`
+    ] as const;
+    }
+
+
+export const getGetTenantTradeCategoriesQueryOptions = <TData = Awaited<ReturnType<typeof getTenantTradeCategories>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantTradeCategories>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTenantTradeCategoriesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTenantTradeCategories>>> = ({ signal }) => getTenantTradeCategories({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTenantTradeCategories>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTenantTradeCategoriesQueryResult = NonNullable<Awaited<ReturnType<typeof getTenantTradeCategories>>>
+export type GetTenantTradeCategoriesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the trade category slugs configured for the current tenant
+ */
+
+export function useGetTenantTradeCategories<TData = Awaited<ReturnType<typeof getTenantTradeCategories>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantTradeCategories>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTenantTradeCategoriesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getGetSubscriptionUrl = () => {
 

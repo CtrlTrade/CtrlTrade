@@ -588,6 +588,7 @@ export const customersTable = pgTable(
     city: text("city"),
     postcode: text("postcode"),
     notes: text("notes"),
+    pluginData: jsonb("plugin_data").$type<Record<string, unknown>>(),
     branchId: uuid("branch_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),

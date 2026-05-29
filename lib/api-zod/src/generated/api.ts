@@ -1864,6 +1864,14 @@ export const SyncTenantFromStripeResponse = zod.object({
 })
 
 
+/**
+ * @summary Get the trade category slugs configured for the current tenant
+ */
+export const GetTenantTradeCategoriesResponse = zod.object({
+  "tradeSlugs": zod.array(zod.string())
+})
+
+
 export const GetSubscriptionResponse = zod.object({
   "id": zod.string(),
   "tenantId": zod.string(),
@@ -2961,6 +2969,7 @@ export const ListCustomersResponseItem = zod.object({
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
   "notes": zod.string().nullish(),
+  "pluginData": zod.record(zod.string(), zod.unknown()).nullish(),
   "createdAt": zod.coerce.date()
 })
 export const ListCustomersResponse = zod.array(ListCustomersResponseItem)
@@ -2976,7 +2985,8 @@ export const CreateCustomerBody = zod.object({
   "addressLine1": zod.string().optional(),
   "city": zod.string().optional(),
   "postcode": zod.string().optional(),
-  "notes": zod.string().optional()
+  "notes": zod.string().optional(),
+  "pluginData": zod.record(zod.string(), zod.unknown()).nullish()
 })
 
 
@@ -2993,6 +3003,7 @@ export const GetCustomerResponse = zod.object({
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
   "notes": zod.string().nullish(),
+  "pluginData": zod.record(zod.string(), zod.unknown()).nullish(),
   "createdAt": zod.coerce.date()
 })
 
@@ -3011,7 +3022,8 @@ export const UpdateCustomerBody = zod.object({
   "addressLine1": zod.string().optional(),
   "city": zod.string().optional(),
   "postcode": zod.string().optional(),
-  "notes": zod.string().optional()
+  "notes": zod.string().optional(),
+  "pluginData": zod.record(zod.string(), zod.unknown()).nullish()
 })
 
 export const UpdateCustomerResponse = zod.object({
@@ -3023,6 +3035,7 @@ export const UpdateCustomerResponse = zod.object({
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
   "notes": zod.string().nullish(),
+  "pluginData": zod.record(zod.string(), zod.unknown()).nullish(),
   "createdAt": zod.coerce.date()
 })
 
@@ -4918,6 +4931,7 @@ export const ConvertLeadToQuoteResponse = zod.object({
   "city": zod.string().nullish(),
   "postcode": zod.string().nullish(),
   "notes": zod.string().nullish(),
+  "pluginData": zod.record(zod.string(), zod.unknown()).nullish(),
   "createdAt": zod.coerce.date()
 }),
   "quote": zod.object({

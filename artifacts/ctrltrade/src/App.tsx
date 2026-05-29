@@ -24,6 +24,7 @@ import { AppSettings } from "@/pages/app/Settings";
 import { AppBrandingEditor } from "@/pages/app/BrandingEditor";
 import { AppBilling } from "@/pages/app/Billing";
 import { AppCustomers } from "@/pages/app/Customers";
+import { AppCustomerDetail } from "@/pages/app/CustomerDetail";
 import { AppQuotes } from "@/pages/app/Quotes";
 import { AppQuoteDetail } from "@/pages/app/QuoteDetail";
 import { AppJobs } from "@/pages/app/Jobs";
@@ -148,6 +149,7 @@ function App() {
                   <Route path="/settings/branding" component={AppBrandingEditor} />
                   <Route path="/billing" component={AppBilling} />
                   <Route path="/customers" component={AppCustomers} />
+                  <Route path="/customers/:id" component={AppCustomerDetail} />
                   <Route path="/leads" component={AppLeads} />
                   <Route path="/leads/:id" component={AppLeadDetail} />
                   <Route path="/quotes" component={AppQuotes} />

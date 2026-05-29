@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useListCustomers, useCreateCustomer, useListBranches, getListCustomersQueryKey } from "@workspace/api-client-react";
-import { FileAttachments } from "@/components/FileAttachments";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,8 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Users as UsersIcon } from "lucide-react";
+import { Plus, Users as UsersIcon, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 export function AppCustomers() {
   const { data, isLoading } = useListCustomers();
@@ -20,13 +20,11 @@ export function AppCustomers() {
   const qc = useQueryClient();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [branchFilter, setBranchFilter] = useState<string>("all");
   const branchList = branches ?? [];
   const filteredCustomers = (data ?? []).filter((c) =>
     branchFilter === "all" ? true : (c as any).branchId === branchFilter,
   );
-  const selectedCustomer = filteredCustomers.find((c) => c.id === selectedCustomerId) ?? null;
   const create = useCreateCustomer({
     mutation: {
       onSuccess: () => {
@@ -130,9 +128,12 @@ export function AppCustomers() {
                     key={c.id}
                     data-testid={`row-customer-${c.id}`}
                     className="cursor-pointer hover:bg-muted/30"
-                    onClick={() => setSelectedCustomerId(selectedCustomerId === c.id ? null : c.id)}
                   >
-                    <TableCell className="font-medium">{c.name}</TableCell>
+                    <TableCell className="font-medium">
+                      <Link href={`/app/customers/${c.id}`} className="flex items-center gap-1 hover:text-primary">
+                        {c.name} <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                      </Link>
+                    </TableCell>
                     <TableCell>{c.email ?? "—"}</TableCell>
                     <TableCell>{c.phone ?? "—"}</TableCell>
                     <TableCell>{c.city ?? "—"}</TableCell>
@@ -144,14 +145,6 @@ export function AppCustomers() {
         </CardContent>
       </Card>
 
-      {selectedCustomer && (
-        <FileAttachments
-          parentKind="customer"
-          parentId={selectedCustomer.id}
-          kind="customer_file"
-          title={`Files — ${selectedCustomer.name}`}
-        />
-      )}
     </div>
   );
 }

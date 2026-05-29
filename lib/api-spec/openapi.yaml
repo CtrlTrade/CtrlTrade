@@ -1142,6 +1142,18 @@ paths:
               schema:
                 $ref: "#/components/schemas/Subscription"
 
+  /v1/tenant/trade-categories:
+    get:
+      operationId: getTenantTradeCategories
+      tags: [tenant]
+      summary: Get the trade category slugs configured for the current tenant
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TenantTradeProfile" }
+
   /v1/subscription:
     get:
       operationId: getSubscription
@@ -6385,6 +6397,14 @@ components:
           items: { type: string }
         posEnabled: { type: boolean }
 
+    TenantTradeProfile:
+      type: object
+      required: [tradeSlugs]
+      properties:
+        tradeSlugs:
+          type: array
+          items: { type: string }
+
     Tenant:
       type: object
       required: [id, name, slug, status, createdAt]
@@ -7303,6 +7323,9 @@ components:
         city: { type: ["string", "null"] }
         postcode: { type: ["string", "null"] }
         notes: { type: ["string", "null"] }
+        pluginData:
+          type: ["object", "null"]
+          additionalProperties: {}
         createdAt: { type: string, format: date-time }
 
     CustomerInput:
@@ -7316,6 +7339,9 @@ components:
         city: { type: string }
         postcode: { type: string }
         notes: { type: string }
+        pluginData:
+          type: ["object", "null"]
+          additionalProperties: {}
 
     QuoteLineItem:
       type: object

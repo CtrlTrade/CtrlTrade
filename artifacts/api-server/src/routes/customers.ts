@@ -23,6 +23,7 @@ function serializeCustomer(c: typeof customersTable.$inferSelect) {
     city: c.city,
     postcode: c.postcode,
     notes: c.notes,
+    pluginData: c.pluginData ?? null,
     createdAt: c.createdAt.toISOString(),
   };
 }
@@ -78,9 +79,12 @@ router.patch("/v1/customers/:customerId", requireTenant, async (req, res): Promi
     return;
   }
   const tenantId = req.auth!.tenant!.id;
+  const { pluginData, ...coreFields } = parsed.data as typeof parsed.data & { pluginData?: Record<string, unknown> | null };
+  const updates: Partial<typeof customersTable.$inferInsert> = { ...coreFields };
+  if (pluginData !== undefined) updates.pluginData = pluginData ?? null;
   const [row] = await db
     .update(customersTable)
-    .set(parsed.data)
+    .set(updates)
     .where(and(eq(customersTable.tenantId, tenantId), eq(customersTable.id, (req.params.customerId as string))))
     .returning();
   if (!row) {

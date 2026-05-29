@@ -5,6 +5,7 @@
  * CtrlTrade SaaS Portal API
  * OpenAPI spec version: 0.1.0
  */
+import type { CustomerPluginData } from './customerPluginData';
 
 export interface Customer {
   id: string;
@@ -21,5 +22,7 @@ export interface Customer {
   postcode?: string | null;
   /** @nullable */
   notes?: string | null;
+  /** @nullable */
+  pluginData?: CustomerPluginData;
   createdAt: Date;
 }

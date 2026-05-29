@@ -5,6 +5,7 @@
  * CtrlTrade SaaS Portal API
  * OpenAPI spec version: 0.1.0
  */
+import type { CustomerInputPluginData } from './customerInputPluginData';
 
 export interface CustomerInput {
   /** @minLength 1 */
@@ -15,4 +16,6 @@ export interface CustomerInput {
   city?: string;
   postcode?: string;
   notes?: string;
+  /** @nullable */
+  pluginData?: CustomerInputPluginData;
 }

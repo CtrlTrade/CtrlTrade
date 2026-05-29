@@ -125,6 +125,16 @@ router.post("/v1/tenant/cancel", requireTenant, async (req, res): Promise<void> 
   );
 });
 
+router.get("/v1/tenant/trade-categories", requireTenant, async (req, res): Promise<void> => {
+  const tenantId = req.auth!.tenant!.id;
+  const rows = await db
+    .select({ slug: tradeCategoriesTable.slug })
+    .from(tenantTradeCategoriesTable)
+    .innerJoin(tradeCategoriesTable, eq(tradeCategoriesTable.id, tenantTradeCategoriesTable.tradeCategoryId))
+    .where(eq(tenantTradeCategoriesTable.tenantId, tenantId));
+  res.json({ tradeSlugs: rows.map((r) => r.slug) });
+});
+
 router.post("/v1/tenant/sync-stripe", requireTenant, async (req, res): Promise<void> => {
   const tenant = req.auth!.tenant!;
   if (!(await isStripeConnected())) {

@@ -354,6 +354,10 @@ export interface TenantModules {
   posEnabled?: boolean;
 }
 
+export interface TenantTradeProfile {
+  tradeSlugs: string[];
+}
+
 export interface ResellerProfileInput {
   displayName?: string;
   contactEmail?: string;
@@ -1069,6 +1073,11 @@ export interface UpsertFeatureFlagInput {
   description?: string;
 }
 
+/**
+ * @nullable
+ */
+export type CustomerPluginData = {[key: string]: unknown} | null;
+
 export interface Customer {
   id: string;
   name: string;
@@ -1084,8 +1093,15 @@ export interface Customer {
   postcode?: string | null;
   /** @nullable */
   notes?: string | null;
+  /** @nullable */
+  pluginData?: CustomerPluginData;
   createdAt: string;
 }
+
+/**
+ * @nullable
+ */
+export type CustomerInputPluginData = {[key: string]: unknown} | null;
 
 export interface CustomerInput {
   /** @minLength 1 */
@@ -1096,6 +1112,8 @@ export interface CustomerInput {
   city?: string;
   postcode?: string;
   notes?: string;
+  /** @nullable */
+  pluginData?: CustomerInputPluginData;
 }
 
 export interface QuoteLineItem {
