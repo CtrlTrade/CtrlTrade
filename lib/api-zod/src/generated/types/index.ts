@@ -118,6 +118,7 @@ export * from './expiryItem';
 export * from './featureFlagRecord';
 export * from './fileInput';
 export * from './fileMeta';
+export * from './financialSummary';
 export * from './forgotPasswordBody';
 export * from './franchiseRollup';
 export * from './gdprDeletionState';

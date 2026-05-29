@@ -1,10 +1,10 @@
-import { useGetOnboarding, useGetSubscription, useUpdateSubscriptionQuantities, useCancelTenant, useGetExpiryAttention, useGetLeadSourceRoi, useGetInboxUnreadCount, useListInboxThreads, useGetIndustryTour, useDismissIndustryTour } from "@workspace/api-client-react";
+import { useGetOnboarding, useGetSubscription, useUpdateSubscriptionQuantities, useCancelTenant, useGetExpiryAttention, useGetLeadSourceRoi, useGetInboxUnreadCount, useListInboxThreads, useGetIndustryTour, useDismissIndustryTour, useGetFinancialSummary } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
-import { CheckCircle2, Circle, AlertTriangle, CreditCard, Users, ShoppingCart, Clock, Target, Inbox, X, Sparkles, ArrowRight } from "lucide-react";
+import { CheckCircle2, Circle, AlertTriangle, CreditCard, Users, ShoppingCart, Clock, Target, Inbox, X, Sparkles, ArrowRight, TrendingUp, TrendingDown, Minus, BadgePoundSterling, ReceiptText, TriangleAlert, Briefcase } from "lucide-react";
 import { UsageTile } from "@/components/UsageTile";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -25,6 +25,8 @@ export function AppDashboard() {
     <div className="space-y-8 max-w-6xl mx-auto">
       <h1 className="text-2xl sm:text-3xl font-bold">Command Center</h1>
       
+      <FinancialSummaryCard />
+
       <IndustryTourBanner />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -78,6 +80,150 @@ export function AppDashboard() {
           {subscription && <SubscriptionCard subscription={subscription} />}
         </div>
       </div>
+    </div>
+  );
+}
+
+function fmtGbp(pence: number, currency = "gbp") {
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+    maximumFractionDigits: 0,
+  }).format(pence / 100);
+}
+
+function MoMBadge({ thisMonth, lastMonth }: { thisMonth: number; lastMonth: number }) {
+  if (lastMonth === 0 && thisMonth === 0) return null;
+  if (lastMonth === 0) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-green-500 bg-green-500/10 px-1.5 py-0.5">
+        <TrendingUp className="h-3 w-3" /> NEW
+      </span>
+    );
+  }
+  const pct = Math.round(((thisMonth - lastMonth) / lastMonth) * 100);
+  if (pct === 0) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-muted-foreground bg-muted px-1.5 py-0.5">
+        <Minus className="h-3 w-3" /> 0% vs last mo
+      </span>
+    );
+  }
+  const up = pct > 0;
+  return (
+    <span className={`inline-flex items-center gap-1 text-[10px] font-bold font-mono px-1.5 py-0.5 ${up ? "text-green-500 bg-green-500/10" : "text-destructive bg-destructive/10"}`}>
+      {up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+      {up ? "+" : ""}{pct}% vs last mo
+    </span>
+  );
+}
+
+function FinancialSummaryCard() {
+  const { data, isLoading } = useGetFinancialSummary();
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-28" />
+        ))}
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const currency = data.currency ?? "gbp";
+  const fmt = (p: number) => fmtGbp(p, currency);
+
+  const tiles = [
+    {
+      label: "Revenue This Month",
+      icon: BadgePoundSterling,
+      value: fmt(data.revenueThisMonthPence),
+      sub: <MoMBadge thisMonth={data.revenueThisMonthPence} lastMonth={data.revenueLastMonthPence} />,
+      subText: data.revenueLastMonthPence > 0 ? `${fmt(data.revenueLastMonthPence)} last mo` : "No revenue last month",
+      accent: "primary" as const,
+      href: "/app/invoices",
+      testId: "kpi-revenue",
+    },
+    {
+      label: "Outstanding",
+      icon: ReceiptText,
+      value: fmt(data.outstandingPence),
+      sub: null,
+      subText: `${data.outstandingCount} invoice${data.outstandingCount === 1 ? "" : "s"} awaiting payment`,
+      accent: "neutral" as const,
+      href: "/app/invoices",
+      testId: "kpi-outstanding",
+    },
+    {
+      label: "Overdue",
+      icon: TriangleAlert,
+      value: fmt(data.overduePence),
+      sub: null,
+      subText: `${data.overdueCount} invoice${data.overdueCount === 1 ? "" : "s"} past due`,
+      accent: data.overdueCount > 0 ? ("destructive" as const) : ("neutral" as const),
+      href: "/app/invoices",
+      testId: "kpi-overdue",
+    },
+    {
+      label: "Quote Pipeline",
+      icon: Target,
+      value: fmt(data.pipelinePence),
+      sub: null,
+      subText: `${data.pipelineCount} open quote${data.pipelineCount === 1 ? "" : "s"}`,
+      accent: "neutral" as const,
+      href: "/app/quotes",
+      testId: "kpi-pipeline",
+    },
+    {
+      label: "Jobs This Month",
+      icon: Briefcase,
+      value: String(data.jobsThisMonth),
+      sub: null,
+      subText: `${data.jobsCompletedThisMonth} completed${data.avgJobValuePence > 0 ? ` · avg ${fmt(data.avgJobValuePence)}` : ""}`,
+      accent: "neutral" as const,
+      href: "/app/jobs",
+      testId: "kpi-jobs",
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" data-testid="financial-summary">
+      {tiles.map((tile) => {
+        const Icon = tile.icon;
+        const isDestructive = tile.accent === "destructive";
+        const isPrimary = tile.accent === "primary";
+        return (
+          <Link key={tile.testId} href={tile.href}>
+            <div
+              data-testid={tile.testId}
+              className={`relative flex flex-col gap-2 p-4 border cursor-pointer hover:bg-muted/40 transition-colors h-full ${
+                isDestructive
+                  ? "border-destructive/40 bg-destructive/5 hover:bg-destructive/10"
+                  : isPrimary
+                  ? "border-primary/30 bg-primary/5 hover:bg-primary/10"
+                  : "border-border bg-card"
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className={`text-xs font-bold font-mono uppercase tracking-wide ${isDestructive ? "text-destructive" : isPrimary ? "text-primary" : "text-muted-foreground"}`}>
+                  {tile.label}
+                </span>
+                <Icon className={`h-4 w-4 shrink-0 ${isDestructive ? "text-destructive" : isPrimary ? "text-primary" : "text-muted-foreground"}`} />
+              </div>
+              <div className={`text-2xl font-bold font-mono leading-none ${isDestructive ? "text-destructive" : isPrimary ? "text-primary" : ""}`}>
+                {tile.value}
+              </div>
+              <div className="space-y-1 mt-auto">
+                {tile.sub}
+                <p className="text-[11px] text-muted-foreground leading-snug">{tile.subText}</p>
+              </div>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }

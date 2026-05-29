@@ -1784,6 +1784,18 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ExpiryAttention" }
 
+  /v1/dashboard/financial-summary:
+    get:
+      operationId: getFinancialSummary
+      tags: [dashboard]
+      summary: Financial overview — revenue, outstanding, overdue, pipeline and job stats
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FinancialSummary" }
+
   /v1/customers:
     get:
       operationId: listCustomers
@@ -7655,6 +7667,25 @@ components:
         expired: { type: boolean }
         recordId: { type: string }
         href: { type: string }
+
+    FinancialSummary:
+      type: object
+      required: [currency, revenueThisMonthPence, revenueLastMonthPence, outstandingPence, outstandingCount, overduePence, overdueCount, draftPence, draftCount, pipelinePence, pipelineCount, jobsThisMonth, jobsCompletedThisMonth, avgJobValuePence]
+      properties:
+        currency: { type: string }
+        revenueThisMonthPence: { type: integer }
+        revenueLastMonthPence: { type: integer }
+        outstandingPence: { type: integer }
+        outstandingCount: { type: integer }
+        overduePence: { type: integer }
+        overdueCount: { type: integer }
+        draftPence: { type: integer }
+        draftCount: { type: integer }
+        pipelinePence: { type: integer }
+        pipelineCount: { type: integer }
+        jobsThisMonth: { type: integer }
+        jobsCompletedThisMonth: { type: integer }
+        avgJobValuePence: { type: integer }
 
     ExpiryAttention:
       type: object

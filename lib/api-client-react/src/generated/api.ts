@@ -99,6 +99,7 @@ import type {
   FeatureFlagRecord,
   FileInput,
   FileMeta,
+  FinancialSummary,
   ForgotPasswordBody,
   FranchiseRollup,
   GdprDeletionState,
@@ -8164,6 +8165,83 @@ export function useGetExpiryAttention<TData = Awaited<ReturnType<typeof getExpir
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetExpiryAttentionQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetFinancialSummaryUrl = () => {
+
+
+
+
+  return `/api/v1/dashboard/financial-summary`
+}
+
+/**
+ * @summary Financial overview — revenue, outstanding, overdue, pipeline and job stats
+ */
+export const getFinancialSummary = async ( options?: RequestInit): Promise<FinancialSummary> => {
+
+  return customFetch<FinancialSummary>(getGetFinancialSummaryUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetFinancialSummaryQueryKey = () => {
+    return [
+    `/api/v1/dashboard/financial-summary`
+    ] as const;
+    }
+
+
+export const getGetFinancialSummaryQueryOptions = <TData = Awaited<ReturnType<typeof getFinancialSummary>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFinancialSummary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFinancialSummaryQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFinancialSummary>>> = ({ signal }) => getFinancialSummary({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFinancialSummary>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetFinancialSummaryQueryResult = NonNullable<Awaited<ReturnType<typeof getFinancialSummary>>>
+export type GetFinancialSummaryQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Financial overview — revenue, outstanding, overdue, pipeline and job stats
+ */
+
+export function useGetFinancialSummary<TData = Awaited<ReturnType<typeof getFinancialSummary>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFinancialSummary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetFinancialSummaryQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

@@ -2931,6 +2931,27 @@ export const GetExpiryAttentionResponse = zod.object({
 })
 
 
+/**
+ * @summary Financial overview — revenue, outstanding, overdue, pipeline and job stats
+ */
+export const GetFinancialSummaryResponse = zod.object({
+  "currency": zod.string(),
+  "revenueThisMonthPence": zod.number(),
+  "revenueLastMonthPence": zod.number(),
+  "outstandingPence": zod.number(),
+  "outstandingCount": zod.number(),
+  "overduePence": zod.number(),
+  "overdueCount": zod.number(),
+  "draftPence": zod.number(),
+  "draftCount": zod.number(),
+  "pipelinePence": zod.number(),
+  "pipelineCount": zod.number(),
+  "jobsThisMonth": zod.number(),
+  "jobsCompletedThisMonth": zod.number(),
+  "avgJobValuePence": zod.number()
+})
+
+
 export const ListCustomersResponseItem = zod.object({
   "id": zod.string(),
   "name": zod.string(),

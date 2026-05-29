@@ -1464,6 +1464,23 @@ export interface ExpiryItem {
   href: string;
 }
 
+export interface FinancialSummary {
+  currency: string;
+  revenueThisMonthPence: number;
+  revenueLastMonthPence: number;
+  outstandingPence: number;
+  outstandingCount: number;
+  overduePence: number;
+  overdueCount: number;
+  draftPence: number;
+  draftCount: number;
+  pipelinePence: number;
+  pipelineCount: number;
+  jobsThisMonth: number;
+  jobsCompletedThisMonth: number;
+  avgJobValuePence: number;
+}
+
 export interface ExpiryAttention {
   windowDays: number;
   expiredCount: number;
