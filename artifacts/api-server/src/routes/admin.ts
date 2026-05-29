@@ -81,7 +81,7 @@ router.post("/v1/admin/impersonation/stop", async (req, res): Promise<void> => {
   });
 });
 
-router.use(requireSuperAdmin);
+router.use("/v1/admin", requireSuperAdmin);
 
 router.get("/v1/admin/dashboard", async (_req, res): Promise<void> => {
   const allSubs = await db.select().from(subscriptionsTable);
@@ -322,6 +322,7 @@ router.get("/v1/admin/tenants/:tenantId", async (req, res): Promise<void> => {
       email: usersTable.email,
       name: usersTable.name,
       isSuperAdmin: usersTable.isSuperAdmin,
+      totpEnabled: usersTable.totpEnabled,
     })
     .from(membershipsTable)
     .innerJoin(usersTable, eq(usersTable.id, membershipsTable.userId))
@@ -358,6 +359,7 @@ router.get("/v1/admin/tenants/:tenantId", async (req, res): Promise<void> => {
         name: owner.name,
         role: owner.role,
         isSuperAdmin: owner.isSuperAdmin ?? false,
+        totpEnabled: owner.totpEnabled ?? false,
         seatType: owner.seatType ?? null,
       },
       subscription: serializeSubscription(sub),

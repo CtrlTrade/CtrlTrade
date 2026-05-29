@@ -16,7 +16,7 @@ import { dispatchNotification } from "../lib/notifications";
 
 const router: IRouter = Router();
 
-router.use(requireSuperAdmin);
+router.use("/v1/admin", requireSuperAdmin);
 
 function serializeSubmission(
   sub: VerificationSubmission,

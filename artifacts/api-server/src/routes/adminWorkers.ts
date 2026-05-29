@@ -13,7 +13,7 @@ import {
 
 const router: IRouter = Router();
 
-router.use(requireSuperAdmin);
+router.use("/v1/admin", requireSuperAdmin);
 
 /** Map pg-boss state → our UI bucket. */
 function bucket(state: string): "queued" | "running" | "done" | "failed" | "dead" | null {

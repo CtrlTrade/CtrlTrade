@@ -9,7 +9,7 @@ import { requireSuperAdmin } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
-router.use(requireSuperAdmin);
+router.use("/v1/admin", requireSuperAdmin);
 
 // GET /v1/admin/leads/pipeline-summary — counts by stage + sparkline
 router.get("/v1/admin/leads/pipeline-summary", async (_req, res): Promise<void> => {

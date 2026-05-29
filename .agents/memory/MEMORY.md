@@ -1,3 +1,5 @@
 - [Orval schema naming](orval-schema-naming.md) — entity-shaped names prevent TS2308; use `export type *` in api-zod index
 - [DB migration pattern](db-migration-pattern.md) — drizzle-kit push requires TTY; always use raw psql for migrations in this env
 - [OpenAPI YAML duplicates](openapi-yaml-duplicates.md) — duplicate schema keys cause yaml.parse to throw; check after every merge
+- [requireSuperAdmin router guard scoping](requireSuperAdmin-guard-scoping.md) — unscoped router.use(requireSuperAdmin) blocks ALL routes; always scope to "/v1/admin"
+- [DB schema drift fix pattern](db-schema-drift.md) — when Drizzle schema has a column the live DB lacks, apply via ALTER TABLE … ADD COLUMN IF NOT EXISTS directly via executeSql
