@@ -83,22 +83,22 @@ function MoMBadge({ thisMonth, lastMonth }: { thisMonth: number; lastMonth: numb
   if (lastMonth === 0 && thisMonth === 0) return null;
   if (lastMonth === 0) {
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-green-500 bg-green-500/10 px-1.5 py-0.5">
-        <TrendingUp className="h-3 w-3" /> NEW
+      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-600 bg-green-500/10 px-1.5 py-0.5 rounded-sm">
+        <TrendingUp className="h-3 w-3" /> New
       </span>
     );
   }
   const pct = Math.round(((thisMonth - lastMonth) / lastMonth) * 100);
   if (pct === 0) {
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-muted-foreground bg-muted px-1.5 py-0.5">
+      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-sm">
         <Minus className="h-3 w-3" /> 0% vs last mo
       </span>
     );
   }
   const up = pct > 0;
   return (
-    <span className={`inline-flex items-center gap-1 text-[10px] font-bold font-mono px-1.5 py-0.5 ${up ? "text-green-500 bg-green-500/10" : "text-destructive bg-destructive/10"}`}>
+    <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-sm ${up ? "text-green-600 bg-green-500/10" : "text-destructive bg-destructive/10"}`}>
       {up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
       {up ? "+" : ""}{pct}% vs last mo
     </span>
@@ -195,12 +195,12 @@ function FinancialSummaryCard() {
               }`}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className={`text-xs font-bold font-mono uppercase tracking-wide ${isDestructive ? "text-destructive" : isPrimary ? "text-primary" : "text-muted-foreground"}`}>
+                <span className={`text-xs font-medium ${isDestructive ? "text-destructive/80" : isPrimary ? "text-primary/80" : "text-muted-foreground"}`}>
                   {tile.label}
                 </span>
-                <Icon className={`h-4 w-4 shrink-0 ${isDestructive ? "text-destructive" : isPrimary ? "text-primary" : "text-muted-foreground"}`} />
+                <Icon className={`h-4 w-4 shrink-0 opacity-60 ${isDestructive ? "text-destructive" : isPrimary ? "text-primary" : "text-muted-foreground"}`} />
               </div>
-              <div className={`text-2xl font-bold font-mono leading-none ${isDestructive ? "text-destructive" : isPrimary ? "text-primary" : ""}`}>
+              <div className={`text-2xl font-semibold leading-none tracking-tight ${isDestructive ? "text-destructive" : isPrimary ? "text-primary" : ""}`}>
                 {tile.value}
               </div>
               <div className="space-y-1 mt-auto">
