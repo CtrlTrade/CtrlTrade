@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRoute, Link } from "wouter";
+import { useParams, Link } from "wouter";
 import {
   useGetCustomer,
   useUpdateCustomer,
@@ -30,8 +30,7 @@ import {
 import { getActivePlugins, type PluginField } from "@/lib/tradePlugins";
 
 export function AppCustomerDetail() {
-  const [, params] = useRoute("/customers/:id");
-  const customerId = params?.id ?? "";
+  const { id: customerId = "" } = useParams<{ id: string }>();
   const qc = useQueryClient();
   const { toast } = useToast();
 
