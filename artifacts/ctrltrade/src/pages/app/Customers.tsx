@@ -130,7 +130,7 @@ export function AppCustomers() {
                     className="cursor-pointer hover:bg-muted/30"
                   >
                     <TableCell className="font-medium">
-                      <Link href={`/app/customers/${c.id}`} className="flex items-center gap-1 hover:text-primary">
+                      <Link href={`/customers/${c.id}`} className="flex items-center gap-1 hover:text-primary">
                         {c.name} <ChevronRight className="h-3 w-3 text-muted-foreground" />
                       </Link>
                     </TableCell>

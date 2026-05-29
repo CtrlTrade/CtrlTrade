@@ -61,7 +61,7 @@ export function AppCustomerDetail() {
   if (!customer) {
     return (
       <div className="max-w-5xl mx-auto space-y-4">
-        <Link href="/app/customers">
+        <Link href="/customers">
           <Button variant="ghost" size="sm" className="gap-2">
             <ArrowLeft className="h-4 w-4" /> Customers
           </Button>
@@ -117,7 +117,7 @@ export function AppCustomerDetail() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <div className="flex items-center gap-3">
-        <Link href="/app/customers">
+        <Link href="/customers">
           <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
             <ArrowLeft className="h-4 w-4" /> Customers
           </Button>
@@ -298,17 +298,17 @@ export function AppCustomerDetail() {
               <CardTitle className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Link href={`/app/quotes?customerId=${customer.id}`}>
+              <Link href={`/quotes?customerId=${customer.id}`}>
                 <Button variant="outline" size="sm" className="w-full justify-start text-xs font-bold">
                   New Quote
                 </Button>
               </Link>
-              <Link href={`/app/jobs?customerId=${customer.id}`}>
+              <Link href={`/jobs?customerId=${customer.id}`}>
                 <Button variant="outline" size="sm" className="w-full justify-start text-xs font-bold">
                   New Job
                 </Button>
               </Link>
-              <Link href={`/app/invoices?customerId=${customer.id}`}>
+              <Link href={`/invoices?customerId=${customer.id}`}>
                 <Button variant="outline" size="sm" className="w-full justify-start text-xs font-bold">
                   New Invoice
                 </Button>
