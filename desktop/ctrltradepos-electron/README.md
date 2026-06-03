@@ -109,7 +109,7 @@ This compiles `src/main.ts` → `src/main.js` and launches Electron with a minim
 
 ## Releasing via GitHub Actions
 
-Push a version tag and GitHub automatically builds the Windows `.exe` and attaches it to a GitHub Release — no local Windows machine needed.
+Push a version tag and GitHub automatically builds both the Windows `.exe` and the macOS `.dmg`, then attaches them to a GitHub Release — no local Windows or macOS machine needed.
 
 ### One-time setup
 
@@ -127,9 +127,16 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-That's it. GitHub Actions picks up the tag, builds the installer on a cloud Windows machine, and uploads `CtrlTradePos Setup 1.0.0.exe` to the GitHub Release automatically (usually takes ~10 minutes).
+That's it. GitHub Actions picks up the tag and runs two parallel jobs:
 
-You can then download the `.exe` from the **Releases** page of your GitHub repo and upload it via **Admin → POS Downloads** to update the footer download link on the site.
+| Job | Runner | Output |
+|---|---|---|
+| `build-windows` | `windows-latest` | `CtrlTradePos Setup <version>.exe` |
+| `build-macos` | `macos-latest` | `CtrlTradePos-<version>.dmg` |
+
+Both artefacts are uploaded to the GitHub Release automatically (usually takes ~10–15 minutes).
+
+You can then download the installers from the **Releases** page of your GitHub repo and upload them via **Admin → POS Downloads** to update the footer download links on the site.
 
 ---
 

@@ -45,3 +45,43 @@ jobs:
           files: desktop/ctrltradepos-electron/dist/*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    name: Build macOS disk image
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Export Expo web build
+        env:
+          EXPO_PUBLIC_DOMAIN: ${{ secrets.EXPO_PUBLIC_DOMAIN }}
+        working-directory: desktop/ctrltradepos-electron
+        run: pnpm run build:web
+
+      - name: Build macOS disk image
+        working-directory: desktop/ctrltradepos-electron
+        run: pnpm run dist:mac
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload disk image to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: desktop/ctrltradepos-electron/dist/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
