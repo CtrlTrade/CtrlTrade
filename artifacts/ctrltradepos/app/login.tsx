@@ -19,35 +19,24 @@ import { MONO_FONT } from "@/constants/colors";
 export default function LoginScreen() {
   const colors = useColors();
   const { signIn } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [licenceKey, setLicenceKey] = useState("");
-  const [terminalCode, setTerminalCode] = useState("");
+  const [tillName, setTillName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async () => {
-    if (!email || !password) {
-      setError("Email and password are required.");
-      return;
-    }
     if (!licenceKey.trim()) {
       setError("A licence key is required to activate this till.");
       return;
     }
-    if (!terminalCode.trim()) {
-      setError("A terminal code is required to activate this till.");
+    if (!tillName.trim()) {
+      setError("A till name is required to activate this till.");
       return;
     }
     setSubmitting(true);
     setError(null);
     try {
-      await signIn(
-        email.trim(),
-        password,
-        licenceKey.trim() || undefined,
-        terminalCode.trim() || undefined,
-      );
+      await signIn(licenceKey.trim(), tillName.trim());
     } catch (err) {
       const message = err instanceof Error ? err.message : "Sign-in failed.";
       setError(message.replace(/^HTTP \d+[^:]*:\s*/, ""));
@@ -82,37 +71,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.label, { color: colors.mutedForeground }]}>EMAIL</Text>
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="email-address"
-              placeholder="you@company.co"
-              placeholderTextColor={colors.mutedForeground}
-              style={[
-                styles.input,
-                { color: colors.foreground, borderColor: colors.input, backgroundColor: colors.background },
-              ]}
-            />
-
-            <Text style={[styles.label, { color: colors.mutedForeground, marginTop: 16 }]}>
-              PASSWORD
-            </Text>
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              placeholder="••••••••"
-              placeholderTextColor={colors.mutedForeground}
-              style={[
-                styles.input,
-                { color: colors.foreground, borderColor: colors.input, backgroundColor: colors.background },
-              ]}
-            />
-
-            <Text style={[styles.label, { color: colors.mutedForeground, marginTop: 16 }]}>
+            <Text style={[styles.label, { color: colors.mutedForeground }]}>
               LICENCE KEY
             </Text>
             <TextInput
@@ -129,14 +88,14 @@ export default function LoginScreen() {
             />
 
             <Text style={[styles.label, { color: colors.mutedForeground, marginTop: 16 }]}>
-              TERMINAL
+              TILL NAME
             </Text>
             <TextInput
-              value={terminalCode}
-              onChangeText={setTerminalCode}
-              autoCapitalize="characters"
+              value={tillName}
+              onChangeText={setTillName}
+              autoCapitalize="none"
               autoCorrect={false}
-              placeholder="POS-001"
+              placeholder="Front Counter"
               placeholderTextColor={colors.mutedForeground}
               style={[
                 styles.input,
@@ -170,7 +129,7 @@ export default function LoginScreen() {
           </View>
 
           <Text style={[styles.footer, { color: colors.mutedForeground }]}>
-            Use your CtrlTrade workspace credentials.
+            Enter your till licence key and till name to sign in.
           </Text>
         </View>
       </KeyboardAvoidingView>

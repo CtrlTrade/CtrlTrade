@@ -7,10 +7,13 @@
  */
 import type { PosLoginCredentialsSurface } from './posLoginCredentialsSurface';
 
+/**
+ * Credentials for opening a CtrlTradePos® till. Two authentication modes are supported: (1) workspace email + password (used by the web POS), or (2) a licence key plus a till identifier — no personal password is required. In mode (2) the licence key alone determines the business (tenant), and `terminalCode` may be the till's friendly name OR its code (matched case-insensitively). `surface` selects the web or desktop POS.
+
+ */
 export interface PosLoginCredentials {
-  email: string;
-  /** @minLength 1 */
-  password: string;
+  email?: string | null;
+  password?: string | null;
   licenceKey?: string | null;
   terminalCode?: string | null;
   surface?: PosLoginCredentialsSurface;

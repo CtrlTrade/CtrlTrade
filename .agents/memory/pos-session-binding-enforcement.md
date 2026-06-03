@@ -11,6 +11,8 @@ A CtrlTradePos® till session token carries three bindings: `licenceKey`, `termi
 
 **How to apply:**
 - Login must require `licenceKey` AND `terminalCode` unconditionally (400 if missing), validate them via `validateLicenceForOpen` (tenant scope + surface-type compat + terminal exists/active/bound/branch-match), and persist the NORMALIZED binding (computed `surface`, validated `terminalCode`) into the signed token.
+- `/v1/pos/login` accepts TWO auth modes: (1) email+password (web POS) OR (2) licence-key-only (no email/password — the desktop/mobile till). In mode (2) the licence key alone resolves the tenant (`resolveLicenceOperator`) and the session is attributed to the tenant **owner** membership so the token still carries a valid user+tenant+membership for audit. The binding requirement above is unchanged for BOTH modes — dropping email/password did NOT relax the licence/terminal/surface binding. `email`/`password` are nullable in the OpenAPI `PosLoginCredentials` schema.
+- The submitted `terminalCode` may be the terminal's friendly **name** OR its code (case-insensitive); `resolveTerminalIdentifier` maps it to the canonical code before binding/validation, so the token always stores the canonical code.
 - `/v1/pos/me` must refuse (401) to refresh a token missing any of the three bindings — otherwise an under-bound token gets perpetuated indefinitely via re-sign.
 - Any NEW mutating POS endpoint must attach the full-mode gate, or it reopens the bypass.
 - Receipt reprints and till-session close are intentionally allowed in read_only (cash-up/reprint must work when a licence lapses).

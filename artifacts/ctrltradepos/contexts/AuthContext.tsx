@@ -24,12 +24,7 @@ type AuthState =
 interface AuthContextValue {
   state: AuthState;
   mode: PosMode;
-  signIn: (
-    email: string,
-    password: string,
-    licenceKey?: string,
-    terminalCode?: string,
-  ) => Promise<void>;
+  signIn: (licenceKey: string, tillName: string) => Promise<void>;
   signOut: () => Promise<void>;
   getToken: () => string | null;
 }
@@ -83,13 +78,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = useCallback(
-    async (email: string, password: string, licenceKey?: string, terminalCode?: string) => {
+    async (licenceKey: string, tillName: string) => {
+      // A CtrlTradePos® till activates with just a licence key + till name — the
+      // licence key determines the business, so no personal email/password is
+      // needed. Fall back to the previously remembered values so a returning
+      // till can restore its session.
       const key = licenceKey?.trim() || (await AsyncStorage.getItem(LICENCE_KEY)) || undefined;
-      const terminal = terminalCode?.trim() || (await AsyncStorage.getItem(TERMINAL_KEY)) || undefined;
+      const terminal = tillName?.trim() || (await AsyncStorage.getItem(TERMINAL_KEY)) || undefined;
       const session = await posLogin({
-        email,
-        password,
         licenceKey: key ?? null,
+        // The "till name" may be the terminal's friendly name or its code; the
+        // server resolves it to the canonical terminal binding.
         terminalCode: terminal ?? null,
         // The Expo app is a native installed till, so it activates against the
         // Desktop POS surface of the licence (web-only licences are rejected).

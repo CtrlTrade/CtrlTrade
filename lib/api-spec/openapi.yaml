@@ -6702,10 +6702,16 @@ components:
 
     PosLoginCredentials:
       type: object
-      required: [email, password]
+      description: >
+        Credentials for opening a CtrlTradePos® till. Two authentication modes
+        are supported: (1) workspace email + password (used by the web POS), or
+        (2) a licence key plus a till identifier — no personal password is
+        required. In mode (2) the licence key alone determines the business
+        (tenant), and `terminalCode` may be the till's friendly name OR its code
+        (matched case-insensitively). `surface` selects the web or desktop POS.
       properties:
-        email: { type: string, format: email }
-        password: { type: string, minLength: 1 }
+        email: { type: string, format: email, nullable: true }
+        password: { type: string, nullable: true }
         licenceKey: { type: string, nullable: true }
         terminalCode: { type: string, nullable: true }
         surface: { type: string, enum: [web, desktop] }

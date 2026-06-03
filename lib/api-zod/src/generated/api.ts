@@ -409,16 +409,13 @@ export const UpdateAdminIntegrationCatalogueResponse = zod.object({
 /**
  * @summary Authenticate a field/control user for the CtrlTradePos till
  */
-
-
-
 export const PosLoginBody = zod.object({
-  "email": zod.string().email(),
-  "password": zod.string().min(1),
+  "email": zod.string().email().nullish(),
+  "password": zod.string().nullish(),
   "licenceKey": zod.string().nullish(),
   "terminalCode": zod.string().nullish(),
   "surface": zod.enum(['web', 'desktop']).optional()
-})
+}).describe('Credentials for opening a CtrlTradePos® till. Two authentication modes are supported: (1) workspace email + password (used by the web POS), or (2) a licence key plus a till identifier — no personal password is required. In mode (2) the licence key alone determines the business (tenant), and `terminalCode` may be the till\'s friendly name OR its code (matched case-insensitively). `surface` selects the web or desktop POS.\n')
 
 export const PosLoginResponse = zod.object({
   "token": zod.string(),

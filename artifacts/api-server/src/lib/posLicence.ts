@@ -1,12 +1,18 @@
 import crypto from "node:crypto";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, or, sql } from "drizzle-orm";
 import {
   db,
   branchesTable,
+  membershipsTable,
   posLicencesTable,
   posTerminalsTable,
+  tenantsTable,
+  usersTable,
+  type Membership,
   type PosLicence,
   type PosTerminal,
+  type Tenant,
+  type User,
 } from "@workspace/db";
 import { PRICING } from "./pricing";
 
@@ -242,4 +248,76 @@ export async function validateLicenceForOpen(opts: {
     licence: serializeLicence({ ...licence, lastCheckAt: now }, null, []),
     terminal: terminal ? serializeTerminal(terminal) : null,
   };
+}
+
+/**
+ * Resolve a user-supplied till identifier (the "till name") to a canonical
+ * terminal code within a tenant. The identifier may be either the terminal's
+ * friendly `name` or its `terminalCode`, matched case-insensitively. Returns
+ * the canonical `terminalCode` so it can be fed into the existing licence
+ * binding validation, or `null` when nothing matches.
+ */
+export async function resolveTerminalIdentifier(opts: {
+  tenantId: string;
+  identifier: string;
+}): Promise<string | null> {
+  const ident = opts.identifier.trim();
+  if (!ident) return null;
+  const lowered = ident.toLowerCase();
+  const [terminal] = await db
+    .select()
+    .from(posTerminalsTable)
+    .where(
+      and(
+        eq(posTerminalsTable.tenantId, opts.tenantId),
+        or(
+          sql`lower(${posTerminalsTable.terminalCode}) = ${lowered}`,
+          sql`lower(${posTerminalsTable.name}) = ${lowered}`,
+        ),
+      ),
+    );
+  return terminal?.terminalCode ?? null;
+}
+
+/**
+ * Resolve the tenant + operator a licence key belongs to, for licence-key-only
+ * POS login (no email/password). The licence key alone determines the business
+ * (tenant); the POS session is attributed to a deterministic tenant operator —
+ * the owner membership when present, otherwise the earliest membership — so the
+ * issued token still carries a valid user + tenant + membership and audit
+ * logging continues to work. Returns `null` when the key is unknown or the
+ * tenant has no usable membership.
+ */
+export async function resolveLicenceOperator(licenceKey: string): Promise<{
+  user: User;
+  membership: Membership;
+  tenant: Tenant;
+} | null> {
+  const [licence] = await db
+    .select()
+    .from(posLicencesTable)
+    .where(eq(posLicencesTable.licenceKey, licenceKey));
+  if (!licence) return null;
+
+  const [tenant] = await db
+    .select()
+    .from(tenantsTable)
+    .where(eq(tenantsTable.id, licence.tenantId));
+  if (!tenant) return null;
+
+  const memberships = await db
+    .select()
+    .from(membershipsTable)
+    .where(eq(membershipsTable.tenantId, tenant.id))
+    .orderBy(asc(membershipsTable.createdAt));
+  const membership = memberships.find((m) => m.role === "owner") ?? memberships[0];
+  if (!membership) return null;
+
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, membership.userId));
+  if (!user) return null;
+
+  return { user, membership, tenant };
 }

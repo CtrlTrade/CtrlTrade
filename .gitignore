@@ -55,3 +55,8 @@ scripts/src/seed-acme-production-api.ts
 scripts/src/seed.ts
 scripts/src/seed-products.ts
 scripts/src/seed-tenant-types.ts
+
+# Exported lead data — contains real personal data (names, emails, phone
+# numbers). Must never be committed (GDPR).
+/leads_export*.csv
+attached_assets/platform-leads-exported*.csv

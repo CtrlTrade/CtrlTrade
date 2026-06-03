@@ -35,7 +35,11 @@ import { serializeTenant, serializeUser } from "../lib/serializers";
 import { signPosToken, requirePosAuth, type PosAuthContext } from "../lib/posAuth";
 import type { Request, Response, NextFunction } from "express";
 import { logAudit } from "../lib/audit";
-import { validateLicenceForOpen } from "../lib/posLicence";
+import {
+  validateLicenceForOpen,
+  resolveTerminalIdentifier,
+  resolveLicenceOperator,
+} from "../lib/posLicence";
 import {
   applyStockDelta,
   getOrCreateDefaultLocation,
@@ -54,31 +58,69 @@ router.post("/v1/pos/login", async (req, res): Promise<void> => {
     return;
   }
 
-  const [user] = await db
-    .select()
-    .from(usersTable)
-    .where(eq(usersTable.email, parsed.data.email));
-  if (!user || !(await verifyPassword(parsed.data.password, user.passwordHash))) {
-    res.status(401).json({ error: "Invalid email or password" });
-    return;
-  }
+  // Two authentication modes are supported:
+  //   1. Email + password — the web POS path (unchanged).
+  //   2. Licence key + till name — the desktop/mobile till path. The licence key
+  //      alone determines the business (tenant) and the session is attributed to
+  //      a deterministic tenant operator (owner). No personal password is needed.
+  const hasCredentials = !!parsed.data.email && !!parsed.data.password;
 
-  const memberships = await db
-    .select()
-    .from(membershipsTable)
-    .where(eq(membershipsTable.userId, user.id));
-  const membership = memberships[0] ?? null;
-  if (!membership) {
-    res.status(403).json({ error: "User has no tenant membership" });
-    return;
-  }
-  const [tenant] = await db
-    .select()
-    .from(tenantsTable)
-    .where(eq(tenantsTable.id, membership.tenantId));
-  if (!tenant) {
-    res.status(403).json({ error: "Tenant not found" });
-    return;
+  let user: typeof usersTable.$inferSelect;
+  let membership: typeof membershipsTable.$inferSelect;
+  let tenant: typeof tenantsTable.$inferSelect;
+
+  if (hasCredentials) {
+    const [foundUser] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, parsed.data.email!));
+    if (!foundUser || !(await verifyPassword(parsed.data.password!, foundUser.passwordHash))) {
+      res.status(401).json({ error: "Invalid email or password" });
+      return;
+    }
+
+    const memberships = await db
+      .select()
+      .from(membershipsTable)
+      .where(eq(membershipsTable.userId, foundUser.id));
+    const foundMembership = memberships[0] ?? null;
+    if (!foundMembership) {
+      res.status(403).json({ error: "User has no tenant membership" });
+      return;
+    }
+    const [foundTenant] = await db
+      .select()
+      .from(tenantsTable)
+      .where(eq(tenantsTable.id, foundMembership.tenantId));
+    if (!foundTenant) {
+      res.status(403).json({ error: "Tenant not found" });
+      return;
+    }
+    user = foundUser;
+    membership = foundMembership;
+    tenant = foundTenant;
+  } else {
+    // Licence-key-only path: the licence key must be present to identify the
+    // business. The operator (tenant owner) is resolved from the licence so the
+    // token carries a valid user + tenant + membership for audit logging.
+    if (!parsed.data.licenceKey) {
+      res.status(400).json({
+        error: "A CtrlTradePos® licence key is required to open this till.",
+        mode: "locked",
+      });
+      return;
+    }
+    const operator = await resolveLicenceOperator(parsed.data.licenceKey);
+    if (!operator) {
+      res.status(401).json({
+        error: "Licence key not recognised.",
+        mode: "locked",
+      });
+      return;
+    }
+    user = operator.user;
+    membership = operator.membership;
+    tenant = operator.tenant;
   }
 
   // ---------------------------------------------------------------------------
@@ -115,16 +157,28 @@ router.post("/v1/pos/login", async (req, res): Promise<void> => {
   // by the business owner/admin before the till can activate.
   if (!parsed.data.terminalCode) {
     res.status(400).json({
-      error: "A terminal code is required to activate this till.",
+      error: "A till name is required to activate this till.",
       mode: "locked",
     });
     return;
   }
 
+  // The supplied till identifier may be the terminal's friendly name OR its
+  // code (case-insensitive). Resolve it to the canonical terminal code so the
+  // existing licence-binding validation — and the token binding it persists —
+  // stay code-based. When nothing matches we fall back to the raw value so
+  // validateLicenceForOpen produces the standard "not registered" locked
+  // outcome with a clear error.
+  const resolvedTerminalCode =
+    (await resolveTerminalIdentifier({
+      tenantId: tenant.id,
+      identifier: parsed.data.terminalCode,
+    })) ?? parsed.data.terminalCode;
+
   const outcome = await validateLicenceForOpen({
     tenantId: tenant.id,
     licenceKey: parsed.data.licenceKey,
-    terminalCode: parsed.data.terminalCode,
+    terminalCode: resolvedTerminalCode,
     surface,
   });
   const mode = outcome.mode;
@@ -154,7 +208,7 @@ router.post("/v1/pos/login", async (req, res): Promise<void> => {
   // terminal that were checked at login — the client can no longer drop these.
   const { token, expiresAt } = signPosToken(user.id, tenant.id, {
     licenceKey: parsed.data.licenceKey,
-    terminalCode: parsed.data.terminalCode,
+    terminalCode: resolvedTerminalCode,
     surface,
   });
   const tenantPayload = await serializeTenant(tenant);
