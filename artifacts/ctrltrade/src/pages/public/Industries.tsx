@@ -37,6 +37,7 @@ const industries: Industry[] = [
   },
   {
     name: "Builders Merchants",
+    seoHref: "/builders-merchants-crm",
     subCategories: [
       "Independent Builders Merchant", "National Builders Merchant", "Regional Builders Merchant",
       "Online Builders Merchant", "Trade Merchant", "Building Supplies Merchant",
@@ -45,6 +46,7 @@ const industries: Industry[] = [
   },
   {
     name: "Brick, Block & Masonry",
+    seoHref: "/masonry-crm",
     subCategories: [
       "Bricklayer", "Brick Merchant", "Block Supplier", "Masonry Supplier",
       "Stone Merchant", "Stone Mason", "Concrete Product Supplier", "Paving Supplier",
@@ -53,6 +55,7 @@ const industries: Industry[] = [
   },
   {
     name: "Timber & Sheet Materials",
+    seoHref: "/timber-merchants-crm",
     subCategories: [
       "Timber Merchant", "Timber Yard", "Timber Importer", "Timber Distributor",
       "Hardwood Supplier", "Softwood Supplier", "MDF Supplier", "Plywood Supplier",
@@ -80,6 +83,7 @@ const industries: Industry[] = [
   },
   {
     name: "Heating & Gas",
+    seoHref: "/heating-gas-crm",
     subCategories: [
       "Heating Engineer", "Gas Engineer", "Boiler Installer", "Boiler Repair Specialist",
       "Boiler Merchant", "Heating Merchant", "Heating Distributor", "LPG Specialist",
@@ -98,6 +102,7 @@ const industries: Industry[] = [
   },
   {
     name: "Renewable Energy",
+    seoHref: "/renewable-energy-crm",
     subCategories: [
       "Solar Installer", "Solar Distributor", "Solar Merchant", "Heat Pump Installer",
       "Battery Storage Installer", "EV Charger Installer", "EV Infrastructure Provider",
@@ -115,6 +120,7 @@ const industries: Industry[] = [
   },
   {
     name: "Security & Fire",
+    seoHref: "/security-fire-crm",
     subCategories: [
       "CCTV Installer", "CCTV Supplier", "Alarm Installer", "Alarm Supplier",
       "Access Control Installer", "Access Control Supplier", "Locksmith",
@@ -124,6 +130,7 @@ const industries: Industry[] = [
   },
   {
     name: "Windows, Doors & Conservatories",
+    seoHref: "/windows-doors-crm",
     subCategories: [
       "Window Installer", "Window Manufacturer", "Window Supplier",
       "Door Installer", "Door Manufacturer", "Door Supplier",
@@ -133,6 +140,7 @@ const industries: Industry[] = [
   },
   {
     name: "Kitchens",
+    seoHref: "/kitchens-crm",
     subCategories: [
       "Kitchen Showroom", "Kitchen Supplier", "Kitchen Installer",
       "Kitchen Designer", "Kitchen Manufacturer", "Worktop Supplier", "Appliance Supplier",
@@ -140,6 +148,7 @@ const industries: Industry[] = [
   },
   {
     name: "Bathrooms",
+    seoHref: "/bathrooms-crm",
     subCategories: [
       "Bathroom Showroom", "Bathroom Supplier", "Bathroom Installer",
       "Bathroom Designer", "Bathroom Manufacturer",
@@ -147,6 +156,7 @@ const industries: Industry[] = [
   },
   {
     name: "Flooring",
+    seoHref: "/flooring-crm",
     subCategories: [
       "Flooring Showroom", "Flooring Supplier", "Flooring Warehouse", "Carpet Supplier",
       "Carpet Fitter", "Vinyl Flooring Specialist", "Laminate Flooring Specialist",
@@ -155,6 +165,7 @@ const industries: Industry[] = [
   },
   {
     name: "Tiles",
+    seoHref: "/tiles-crm",
     subCategories: [
       "Tile Centre", "Tile Supplier", "Tile Warehouse", "Tile Importer",
       "Tile Distributor", "Tiling Contractor",
@@ -162,6 +173,7 @@ const industries: Industry[] = [
   },
   {
     name: "Decorating",
+    seoHref: "/decorating-crm",
     subCategories: [
       "Painter", "Decorator", "Decorating Contractor", "Paint Supplier",
       "Decorating Centre", "Wallpaper Specialist", "Spray Finishing Specialist",
@@ -169,6 +181,7 @@ const industries: Industry[] = [
   },
   {
     name: "Landscaping",
+    seoHref: "/landscaping-crm",
     subCategories: [
       "Landscaper", "Landscape Contractor", "Garden Designer", "Landscape Architect",
       "Turf Supplier", "Artificial Grass Supplier", "Fencing Supplier",
@@ -177,6 +190,7 @@ const industries: Industry[] = [
   },
   {
     name: "Fencing & Gates",
+    seoHref: "/fencing-crm",
     subCategories: [
       "Fencing Contractor", "Fencing Supplier", "Gate Installer", "Gate Manufacturer",
       "Gate Automation Specialist", "Timber Fencing Specialist", "Metal Fencing Specialist",
@@ -185,6 +199,7 @@ const industries: Industry[] = [
   },
   {
     name: "Steel & Metal",
+    seoHref: "/steel-metal-crm",
     subCategories: [
       "Steel Supplier", "Steel Fabricator", "Metal Merchant", "Sheet Metal Supplier",
       "Aluminium Supplier", "Stainless Steel Supplier", "Welding Supplier", "Fabrication Workshop",
@@ -192,6 +207,7 @@ const industries: Industry[] = [
   },
   {
     name: "Industrial Supplies",
+    seoHref: "/industrial-supplies-crm",
     subCategories: [
       "Industrial Distributor", "MRO Supplier", "Industrial Fastener Supplier",
       "Industrial Hose Supplier", "Bearing Supplier", "Hydraulics Supplier",
@@ -200,6 +216,7 @@ const industries: Industry[] = [
   },
   {
     name: "Tools & Equipment",
+    seoHref: "/tools-equipment-crm",
     subCategories: [
       "Tool Shop", "Tool Merchant", "Tool Wholesaler", "Power Tool Supplier",
       "Hand Tool Supplier", "Tool Repair Centre", "Tool Hire Centre",
@@ -207,6 +224,7 @@ const industries: Industry[] = [
   },
   {
     name: "Plant & Machinery",
+    seoHref: "/plant-machinery-crm",
     subCategories: [
       "Plant Hire Company", "Machinery Dealer", "Construction Equipment Supplier",
       "Access Equipment Supplier", "Generator Supplier", "Heavy Equipment Dealer",
@@ -215,6 +233,7 @@ const industries: Industry[] = [
   },
   {
     name: "Workwear & PPE",
+    seoHref: "/workwear-ppe-crm",
     subCategories: [
       "Workwear Supplier", "PPE Supplier", "Safety Equipment Supplier",
       "Uniform Supplier", "Branded Clothing Supplier",
@@ -232,6 +251,7 @@ const industries: Industry[] = [
   },
   {
     name: "Automotive",
+    seoHref: "/automotive-crm",
     subCategories: [
       "Motor Factor", "Vehicle Parts Supplier", "Commercial Vehicle Parts Supplier",
       "Fleet Services Provider", "Garage Equipment Supplier", "Tyre Centre",
@@ -240,6 +260,7 @@ const industries: Industry[] = [
   },
   {
     name: "Warehousing",
+    seoHref: "/warehousing-crm",
     subCategories: [
       "Trade Warehouse", "Distribution Warehouse", "Regional Distribution Centre",
       "National Distribution Centre", "Trade Cash & Carry", "Fulfilment Centre",
@@ -248,6 +269,7 @@ const industries: Industry[] = [
   },
   {
     name: "Distribution",
+    seoHref: "/distribution-crm",
     subCategories: [
       "Trade Distribution Centre", "Wholesale Distributor", "National Distribution Centre",
       "Regional Distribution Centre", "Trade Logistics Company", "Importer", "Exporter",
@@ -255,6 +277,7 @@ const industries: Industry[] = [
   },
   {
     name: "Manufacturing",
+    seoHref: "/manufacturing-crm",
     subCategories: [
       "Building Products Manufacturer", "Timber Manufacturer", "Kitchen Manufacturer",
       "Bathroom Manufacturer", "Window Manufacturer", "Door Manufacturer",
@@ -263,6 +286,7 @@ const industries: Industry[] = [
   },
   {
     name: "Cabins & Modular Buildings",
+    seoHref: "/cabins-modular-crm",
     subCategories: [
       "Cabin Manufacturer", "Garden Room Builder", "Modular Building Supplier",
       "Portable Building Supplier", "Holiday Lodge Manufacturer",
@@ -271,6 +295,7 @@ const industries: Industry[] = [
   },
   {
     name: "Agricultural",
+    seoHref: "/agricultural-crm",
     subCategories: [
       "Agricultural Merchant", "Farm Supplies Merchant", "Agricultural Machinery Supplier",
       "Livestock Equipment Supplier", "Irrigation Supplier",
@@ -278,6 +303,7 @@ const industries: Industry[] = [
   },
   {
     name: "Trade Counters",
+    seoHref: "/trade-counter-epos",
     subCategories: [
       "Builders Trade Counter", "Electrical Trade Counter", "Plumbing Trade Counter",
       "Timber Trade Counter", "Roofing Trade Counter", "Flooring Trade Counter",
@@ -286,6 +312,7 @@ const industries: Industry[] = [
   },
   {
     name: "Showrooms",
+    seoHref: "/showrooms-crm",
     subCategories: [
       "Kitchen Showroom", "Bathroom Showroom", "Flooring Showroom", "Lighting Showroom",
       "Renewable Energy Showroom", "Door Showroom", "Window Showroom",
@@ -294,6 +321,7 @@ const industries: Industry[] = [
   },
   {
     name: "Specialist Trades",
+    seoHref: "/specialist-trades-crm",
     subCategories: [
       "Scaffolder", "Surveyor", "Quantity Surveyor", "Structural Engineer",
       "Building Inspector", "Damp Proofing Specialist", "Waterproofing Specialist",
@@ -304,6 +332,7 @@ const industries: Industry[] = [
   },
   {
     name: "Logistics & Transport",
+    seoHref: "/logistics-crm",
     subCategories: [
       "Haulage Company", "Pallet Distribution", "Courier Company",
       "Trade Delivery Network", "Fleet Operator", "Construction Logistics Provider",
