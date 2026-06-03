@@ -1,0 +1,28 @@
+{
+  "name": "CtrlTradePos®",
+  "short_name": "CtrlTradePos",
+  "description": "Trade Counter & Warehouse POS — CtrlTradePos® Web Till",
+  "start_url": "/app/pos/till",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#09090b",
+  "theme_color": "#18181b",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Open Till",
+      "url": "/app/pos/till",
+      "description": "Launch the till screen"
+    }
+  ]
+}

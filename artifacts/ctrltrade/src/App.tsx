@@ -46,6 +46,7 @@ import { AppLeads } from "@/pages/app/Leads";
 import { AppLeadDetail } from "@/pages/app/LeadDetail";
 import { AppInbox } from "@/pages/app/Inbox";
 import { AppPos } from "@/pages/app/Pos";
+import { PosTill } from "@/pages/app/PosTill";
 import { AppProducts } from "@/pages/app/Products";
 import { AppStock } from "@/pages/app/Stock";
 import { AppSuppliers } from "@/pages/app/Suppliers";
@@ -171,6 +172,7 @@ function App() {
                   <Route path="/invoices/:id" component={AppInvoiceDetail} />
                   <Route path="/inbox" component={AppInbox} />
                   <Route path="/pos" component={AppPos} />
+                  <Route path="/pos/till" component={PosTill} />
                   <Route path="/products" component={AppProducts} />
                   <Route path="/stock" component={AppStock} />
                   <Route path="/suppliers" component={AppSuppliers} />

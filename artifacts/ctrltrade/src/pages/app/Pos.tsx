@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Package,
   Warehouse,
@@ -7,6 +8,8 @@ import {
   Users,
   ClipboardList,
   BarChart3,
+  Monitor,
+  ExternalLink,
 } from "lucide-react";
 import {
   useListProducts,
@@ -33,11 +36,20 @@ export function AppPos() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">CtrlTradePos® Control</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Manage catalogue, stock, trade accounts and purchase orders. Open the mobile app to take sales.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold">CtrlTradePos® Control</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage catalogue, stock, trade accounts and purchase orders.
+          </p>
+        </div>
+        <Link href="/pos/till">
+          <Button className="flex items-center gap-2 shrink-0" data-testid="launch-web-till">
+            <Monitor className="h-4 w-4" />
+            Launch Web Till
+            <ExternalLink className="h-3.5 w-3.5 opacity-70" />
+          </Button>
+        </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {tiles.map((t) => (
