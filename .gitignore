@@ -50,13 +50,13 @@ Thumbs.db
 
 # Seed / demo-data scripts — contain realistic-looking personal data (names,
 # emails, phone numbers, passwords). Keep these off the public repo (GDPR).
-scripts/src/seed-acme*.ts
-scripts/src/seed-acme-production-api.ts
-scripts/src/seed.ts
-scripts/src/seed-products.ts
-scripts/src/seed-tenant-types.ts
+# Covers any script whose name starts with "seed" under scripts/src/.
+scripts/src/seed*.ts
 
-# Exported lead data — contains real personal data (names, emails, phone
-# numbers). Must never be committed (GDPR).
+# Exported data — any CSV or JSON data export must never be committed (GDPR).
+# Covers root-level exports (e.g. leads_export.csv) and anything dropped into
+# attached_assets/ (which should only hold binary design/image assets).
+/*_export*.csv
 /leads_export*.csv
-attached_assets/platform-leads-exported*.csv
+attached_assets/*.csv
+attached_assets/*.json

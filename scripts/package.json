@@ -11,6 +11,7 @@
     "seed:acme:extend": "tsx ./src/seed-acme-extend.ts",
     "seed-products": "tsx ./src/seed-products.ts",
     "seed-tenant-types": "tsx ./src/seed-tenant-types.ts",
+    "purge:sales-leads": "tsx ./src/purge-platform-sales-leads.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

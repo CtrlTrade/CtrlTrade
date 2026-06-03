@@ -188,7 +188,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     });
   };
 
-  if (isLoading || isFetching || unauthorized || !session) {
+  if (isLoading || unauthorized || !session) {
     return (
       <div className="p-8">
         <Skeleton className="h-10 w-full mb-4" />

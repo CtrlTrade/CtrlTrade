@@ -32,7 +32,11 @@ import {
 } from "@workspace/api-zod";
 import { verifyPassword } from "../lib/auth";
 import { serializeTenant, serializeUser } from "../lib/serializers";
-import { signPosToken, requirePosAuth, type PosAuthContext } from "../lib/posAuth";
+import { signPosToken, requirePosAuth, authenticatePosToken, type PosAuthContext } from "../lib/posAuth";
+import {
+  registerPosLiveConnection,
+  sendPosLiveEvent,
+} from "../lib/posLiveChannel";
 import type { Request, Response, NextFunction } from "express";
 import { logAudit } from "../lib/audit";
 import {
@@ -319,6 +323,86 @@ router.get("/v1/pos/me", requirePosAuth, async (req, res): Promise<void> => {
     mode,
     licence,
     terminal,
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GET /v1/pos/live — authenticated Server-Sent Events stream for live licence
+// status sync. A signed-in till subscribes here using its existing POS token.
+//
+// Because browsers' EventSource cannot set an Authorization header, the token
+// is accepted via the `token` (or `access_token`) query param, and validated
+// server-side exactly like /v1/pos/me — the FULL binding (licence + terminal +
+// surface) is required; anything less is rejected. On connect we send the
+// current mode, register the connection keyed by licence, and stream keep-alive
+// pings. Licence mutations broadcast a "licence-change" event to all of a
+// licence's connections (see posLiveChannel.broadcastLicenceChange). This is an
+// additive UX accelerator only — every mutating request still re-validates the
+// licence server-side (requirePosFullMode), and clients also poll as a fallback.
+// ---------------------------------------------------------------------------
+router.get("/v1/pos/live", async (req, res): Promise<void> => {
+  const header = req.headers.authorization;
+  const headerToken =
+    header && header.toLowerCase().startsWith("bearer ") ? header.slice(7).trim() : null;
+  const queryToken =
+    typeof req.query.token === "string"
+      ? req.query.token
+      : typeof req.query.access_token === "string"
+        ? req.query.access_token
+        : null;
+  const token = headerToken ?? queryToken;
+  if (!token) {
+    res.status(401).json({ error: "Missing POS token" });
+    return;
+  }
+
+  const auth = await authenticatePosToken(token);
+  if (!auth) {
+    res.status(401).json({ error: "Invalid or expired token" });
+    return;
+  }
+  // Require the full binding, mirroring /v1/pos/me — an under-bound token is not
+  // allowed to hold a live connection.
+  if (!auth.licenceKey || !auth.terminalCode || !auth.surface) {
+    res.status(401).json({ error: "Session is not fully activated. Please sign in again." });
+    return;
+  }
+
+  const outcome = await validateLicenceForOpen({
+    tenantId: auth.tenant.id,
+    licenceKey: auth.licenceKey,
+    terminalCode: auth.terminalCode,
+    surface: auth.surface,
+  });
+
+  // SSE response headers. `X-Accel-Buffering: no` disables proxy buffering so
+  // events flush immediately through the reverse proxy.
+  res.status(200);
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
+  res.flushHeaders?.();
+
+  // Initial mode snapshot so the client converges immediately on (re)connect.
+  sendPosLiveEvent(res, "mode", {
+    mode: outcome.mode,
+    status: outcome.status,
+    message: outcome.message,
+  });
+
+  const unregister = registerPosLiveConnection({ res, auth });
+  const ping = setInterval(() => {
+    try {
+      res.write(`: ping\n\n`);
+    } catch {
+      // ignore — connection close handler will clean up
+    }
+  }, 25000);
+
+  req.on("close", () => {
+    clearInterval(ping);
+    unregister();
   });
 });
 

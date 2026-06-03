@@ -26,6 +26,7 @@ import {
   posLogin,
   getPosSession,
   setAuthTokenGetter,
+  subscribePosLive,
 } from "@workspace/api-client-react";
 import {
   getPosHardware,
@@ -1318,6 +1319,14 @@ function WebPosActivationGate({
 
   const storedToken = localStorage.getItem(WEB_POS_TOKEN_KEY);
   const [activated, setActivated] = useState(false);
+  // Live licence mode for this till. Drives the read-only / locked banner so an
+  // admin licence change reflects within seconds (pushed via SSE) with polling
+  // as a guaranteed fallback. The server still re-validates every mutating
+  // request, so this is purely a UX accelerator, not a security boundary.
+  const [posMode, setPosMode] = useState<"full" | "read_only" | "locked">("full");
+  // Holds the freshest token for use inside SSE/polling callbacks without
+  // re-subscribing on every token rotation.
+  const tokenRef = useRef<string | null>(storedToken);
   // Start in "validating" state when a cached token exists so we verify it
   // before allowing through — prevents expired/revoked tokens from leaving
   // the till in a silently-broken state.
@@ -1344,7 +1353,10 @@ function WebPosActivationGate({
         // Server may rotate the token — persist the freshest one.
         const fresh = session.token ?? token;
         localStorage.setItem(WEB_POS_TOKEN_KEY, fresh);
+        tokenRef.current = fresh;
         setAuthTokenGetter(() => fresh);
+        const mode = (session as { mode?: "full" | "read_only" | "locked" }).mode;
+        if (mode) setPosMode(mode);
         const licType = ((session as { licence?: { type?: string } }).licence?.type as LicenceType | undefined) ?? "web";
         onActivated?.(licType);
         setActivated(true);
@@ -1377,7 +1389,10 @@ function WebPosActivationGate({
       const token = session.token;
       localStorage.setItem(WEB_POS_TOKEN_KEY, token);
       localStorage.setItem(WEB_POS_TERMINAL_KEY, terminalCode.trim().toUpperCase());
+      tokenRef.current = token;
       setAuthTokenGetter(() => token);
+      const mode = (session as { mode?: "full" | "read_only" | "locked" }).mode;
+      if (mode) setPosMode(mode);
       const licType = ((session as { licence?: { type?: string } }).licence?.type as LicenceType | undefined) ?? "web";
       onActivated?.(licType);
       setActivated(true);
@@ -1389,6 +1404,76 @@ function WebPosActivationGate({
       setActivating(false);
     }
   };
+
+  // Re-fetch the authoritative session and update the licence mode. Only signs
+  // out on a 401 (token invalid/expired/partial) — transient network errors are
+  // ignored so the till stays usable until the next successful poll.
+  const refresh = useCallback(async () => {
+    if (!tokenRef.current) return;
+    try {
+      const session = await getPosSession();
+      const fresh = session.token ?? tokenRef.current;
+      tokenRef.current = fresh;
+      localStorage.setItem(WEB_POS_TOKEN_KEY, fresh);
+      setAuthTokenGetter(() => fresh);
+      const mode = (session as { mode?: "full" | "read_only" | "locked" }).mode;
+      if (mode) setPosMode(mode);
+    } catch (err: unknown) {
+      if ((err as { status?: number })?.status === 401) {
+        localStorage.removeItem(WEB_POS_TOKEN_KEY);
+        tokenRef.current = null;
+        setAuthTokenGetter(null);
+        setActivated(false);
+      }
+      // Non-401 (offline, 5xx) — keep current state; polling/SSE will retry.
+    }
+  }, []);
+
+  // Live sync: subscribe to the SSE push channel and run a polling fallback
+  // while activated. EventSource is available on web/Electron; if a push is
+  // missed (or unsupported), the poll converges within the interval.
+  useEffect(() => {
+    if (!activated || !tokenRef.current) return;
+
+    const unsubscribe = subscribePosLive({
+      token: tokenRef.current,
+      onChange: () => {
+        void refresh();
+      },
+    });
+
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const startPolling = () => {
+      if (interval) return;
+      interval = setInterval(() => {
+        if (typeof document !== "undefined" && document.hidden) return;
+        void refresh();
+      }, 20000);
+    };
+    const stopPolling = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+    startPolling();
+
+    const onVisible = () => {
+      if (typeof document !== "undefined" && !document.hidden) void refresh();
+    };
+    const onOnline = () => {
+      void refresh();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("online", onOnline);
+
+    return () => {
+      unsubscribe();
+      stopPolling();
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("online", onOnline);
+    };
+  }, [activated, refresh]);
 
   if (validating) {
     return (
@@ -1463,7 +1548,25 @@ function WebPosActivationGate({
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {posMode !== "full" && (
+        <div
+          className={`px-4 py-2 text-center text-xs font-mono font-bold tracking-wide ${
+            posMode === "locked"
+              ? "bg-destructive/15 text-destructive"
+              : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+          }`}
+          data-testid="pos-mode-banner"
+        >
+          {posMode === "locked"
+            ? "TILL LOCKED — this licence has been suspended or revoked. Contact your administrator."
+            : "READ-ONLY MODE — this licence has expired or is read-only. New sales are blocked until it is renewed."}
+        </div>
+      )}
+      {children}
+    </>
+  );
 }
 
 // ---------------------------------------------------------------------------

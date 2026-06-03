@@ -11,5 +11,6 @@
 - [GitHub API push constraints](github-api-push-constraints.md) — use Contents API not trees(404); token lacks workflow scope (.github/workflows write→404); installer version comes from package.json not the tag
 - [Seed password hash staleness](seed-password-hash-staleness.md) — seed INSERT-only skips hash on re-run; always re-hash on update path or bcrypt compare silently fails
 - [bcryptjs compare debugging](bcryptjs-compare-debugging.md) — compare() returning false despite correct password means the stored hash was created from a different password; test with node -e to verify
+- [Layout isFetching skeleton blank screen](layout-ifetching-skeleton.md) — never gate skeleton return on isFetching in layouts; only isLoading; isFetching causes blank screen on every background refetch
 - [Loopback CORS for desktop](loopback-cors-desktop.md) — Electron app calls API from http://127.0.0.1:<port>; CORS must allowlist loopback or all desktop calls fail with "Failed to fetch"
 - [Git history purge is platform-managed](git-history-purge-platform-managed.md) — no github remote in repo, filter-repo not installed, git rules forbid rewrites; PII history scrub + GitHub force-push must be manual

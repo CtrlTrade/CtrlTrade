@@ -30,6 +30,17 @@ export function setBaseUrl(url: string | null): void {
 }
 
 /**
+ * Return the currently configured base URL (without a trailing slash), or
+ * `null` when none is set (web bundles that call same-origin paths).
+ *
+ * Useful for constructing non-fetch requests such as an EventSource URL, which
+ * must be absolute when the API lives on another origin (e.g. Expo/Electron).
+ */
+export function getBaseUrl(): string | null {
+  return _baseUrl;
+}
+
+/**
  * Register a getter that supplies a bearer auth token.  Before every fetch
  * the getter is invoked; when it returns a non-null string, an
  * `Authorization: Bearer <token>` header is attached to the request.

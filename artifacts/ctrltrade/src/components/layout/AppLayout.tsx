@@ -69,7 +69,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     });
   };
 
-  if (isLoading || isFetching || unauthorized || !session || !session.tenant) {
+  if (isLoading || unauthorized || !session || !session.tenant) {
     return <div className="p-8"><Skeleton className="h-10 w-full mb-4" /><Skeleton className="h-64 w-full" /></div>;
   }
 

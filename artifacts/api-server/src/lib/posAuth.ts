@@ -96,6 +96,37 @@ declare module "express-serve-static-core" {
   }
 }
 
+/**
+ * Validate a raw POS bearer token and resolve its full auth context (user +
+ * tenant + membership + licence binding), or return `null` when the token is
+ * invalid/expired or its user/tenant/membership no longer exists.
+ *
+ * Shared by `requirePosAuth` (header-based) and the SSE live channel route
+ * (which receives the token via query param because EventSource cannot send
+ * Authorization headers). Reusing this keeps a single POS auth path.
+ */
+export async function authenticatePosToken(token: string): Promise<PosAuthContext | null> {
+  const payload = verifyPosToken(token);
+  if (!payload) return null;
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, payload.u));
+  if (!user) return null;
+  const [tenant] = await db.select().from(tenantsTable).where(eq(tenantsTable.id, payload.t));
+  if (!tenant) return null;
+  const [membership] = await db
+    .select()
+    .from(membershipsTable)
+    .where(and(eq(membershipsTable.tenantId, tenant.id), eq(membershipsTable.userId, user.id)));
+  if (!membership) return null;
+  return {
+    user,
+    tenant,
+    membership,
+    licenceKey: payload.lk,
+    terminalCode: payload.tc,
+    surface: payload.sf,
+  };
+}
+
 export async function requirePosAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
   const header = req.headers.authorization;
   if (!header || !header.toLowerCase().startsWith("bearer ")) {

@@ -47,6 +47,7 @@ import {
   serializeLicence,
   LICENCE_STATUSES,
 } from "../lib/posLicence";
+import { broadcastLicenceChange } from "../lib/posLiveChannel";
 import { posLicencesTable, platformSettingsTable } from "@workspace/db";
 import {
   serializeSubscription,
@@ -1246,6 +1247,9 @@ router.patch("/v1/admin/pos-licences/:licenceId", async (req, res): Promise<void
     message: `Super admin updated till licence ${updated.licenceKey}${parsed.data.status ? ` → ${parsed.data.status}` : ""}`,
     metadata: { licenceId: updated.id },
   });
+  // Push the new effective mode to any tills bound to this licence so an idle
+  // till flips immediately, without waiting for its next request.
+  await broadcastLicenceChange(updated.licenceKey);
   res.json(serializeLicence(updated, null, []));
 });
 

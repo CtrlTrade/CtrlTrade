@@ -23,6 +23,17 @@ import {
   serializeTerminal,
   validateLicenceForOpen,
 } from "../lib/posLicence";
+import { broadcastLicenceChange } from "../lib/posLiveChannel";
+
+/** Resolve a licence key by id (tenant-scoped) and push its new mode to live tills. */
+async function broadcastLicenceById(tenantId: string, licenceId: string | null | undefined): Promise<void> {
+  if (!licenceId) return;
+  const [lic] = await db
+    .select({ licenceKey: posLicencesTable.licenceKey })
+    .from(posLicencesTable)
+    .where(and(eq(posLicencesTable.tenantId, tenantId), eq(posLicencesTable.id, licenceId)));
+  if (lic) await broadcastLicenceChange(lic.licenceKey);
+}
 
 const router: IRouter = Router();
 
@@ -137,6 +148,7 @@ router.patch(
       kind: "pos.licence.rebranched",
       message: `Till licence ${updated.licenceKey} assigned to branch`,
     });
+    await broadcastLicenceChange(updated.licenceKey);
     res.json(serializeLicence(updated, await branchNameFor(tenantId, updated.branchId), []));
   },
 );
@@ -300,6 +312,12 @@ router.patch(
       kind: "pos.terminal.updated",
       message: `Terminal ${updated.terminalCode} updated`,
     });
+    // Push to tills on both the previous and current licence (a rebind changes
+    // the binding on both sides; a status/mode change affects the current one).
+    await broadcastLicenceById(tenantId, existing.licenceId);
+    if (updated.licenceId && updated.licenceId !== existing.licenceId) {
+      await broadcastLicenceById(tenantId, updated.licenceId);
+    }
     res.json(serializeTerminal(updated, await branchNameFor(tenantId, updated.branchId)));
   },
 );

@@ -7,7 +7,8 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { posLogin, getPosSession } from "@workspace/api-client-react";
+import { AppState } from "react-native";
+import { posLogin, getPosSession, subscribePosLive } from "@workspace/api-client-react";
 import type { PosSession } from "@workspace/api-client-react";
 
 const TOKEN_KEY = "ctrltradepos.token";
@@ -106,6 +107,70 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await persistToken(null);
     setState({ status: "signed-out", session: null });
   }, []);
+
+  // Re-fetch the authoritative session and refresh the licence mode. Only signs
+  // out on a 401 (token invalid/expired/partial) — transient network errors are
+  // ignored so the till keeps working until the next successful poll.
+  const refreshSession = useCallback(async () => {
+    if (!memToken) return;
+    try {
+      const session = await getPosSession();
+      memToken = session.token;
+      await AsyncStorage.setItem(TOKEN_KEY, session.token);
+      setState({ status: "signed-in", session });
+    } catch (err: unknown) {
+      if ((err as { status?: number })?.status === 401) {
+        await persistToken(null);
+        setState({ status: "signed-out", session: null });
+      }
+      // Non-401 (offline, 5xx) — keep current session; polling/SSE will retry.
+    }
+  }, []);
+
+  // Live licence-status sync. Subscribe to the SSE push channel (web/Electron;
+  // native RN has no EventSource → it no-ops and polling covers it) and run a
+  // polling fallback so a missed push still converges. Backs off while the app
+  // is backgrounded and refreshes immediately on foreground.
+  useEffect(() => {
+    if (state.status !== "signed-in" || !memToken) return;
+
+    const unsubscribe = subscribePosLive({
+      token: memToken,
+      onChange: () => {
+        void refreshSession();
+      },
+    });
+
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const startPolling = () => {
+      if (interval) return;
+      interval = setInterval(() => {
+        void refreshSession();
+      }, 20000);
+    };
+    const stopPolling = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+    startPolling();
+
+    const sub = AppState.addEventListener("change", (next) => {
+      if (next === "active") {
+        void refreshSession();
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      stopPolling();
+      sub.remove();
+    };
+  }, [state.status, refreshSession]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
