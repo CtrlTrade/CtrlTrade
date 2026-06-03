@@ -41,7 +41,32 @@ From the workspace root:
 pnpm install
 ```
 
-### 2. Export the Expo web build
+### 2. Set the API server URL
+
+The desktop app needs to know where your backend API lives. The URL is baked into the static web bundle at build time.
+
+Copy the example file and fill in your value:
+
+```bash
+cp desktop/ctrltradepos-electron/.env.example desktop/ctrltradepos-electron/.env
+```
+
+Then open `desktop/ctrltradepos-electron/.env` and set:
+
+```dotenv
+EXPO_PUBLIC_DOMAIN=https://your-production-api-domain.com
+```
+
+**Rules:**
+- No trailing slash.
+- Must be an `https://` URL in production.
+- `.env` is git-ignored — never commit it.
+- To target a different environment (staging, local) just change this value and re-run `build:web`. No other rebuild is needed.
+- You can also skip the file entirely and export the variable in your shell before running the build step (`export EXPO_PUBLIC_DOMAIN=https://...`); a shell-level value takes precedence over `.env`.
+
+> **If this is left empty** all API calls from the desktop app will silently fail because Electron loads the bundle from disk (no domain), and the app cannot infer the server address at runtime.
+
+### 3. Export the Expo web build
 
 This compiles the React Native / Expo app to a static web bundle and places it in `www/`:
 
