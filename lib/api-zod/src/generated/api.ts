@@ -9042,3 +9042,289 @@ export const MarkVoicemailListenedResponse = zod.object({
 })
 
 
+/**
+ * @summary List this tenant's POS till licences and their terminals
+ */
+export const ListPosLicencesResponse = zod.object({
+  "licences": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceKey": zod.string(),
+  "type": zod.enum(['web', 'desktop', 'hybrid']),
+  "status": zod.enum(['active', 'trial', 'suspended', 'expired', 'revoked', 'read_only']),
+  "trialEndsAt": zod.string().nullish(),
+  "expiresAt": zod.string().nullish(),
+  "lastCheckAt": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "terminals": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "terminalCode": zod.string(),
+  "name": zod.string(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']),
+  "status": zod.enum(['active', 'inactive']),
+  "registeredAt": zod.string().nullish(),
+  "lastSeenAt": zod.string().nullish(),
+  "createdAt": zod.string()
+}))
+})),
+  "monthlyTotalPence": zod.number(),
+  "pricePerTillPence": zod.number(),
+  "currency": zod.string()
+})
+
+
+/**
+ * @summary Request an additional till licence (adds a billable till)
+ */
+export const RequestExtraTillBody = zod.object({
+  "type": zod.enum(['web', 'desktop', 'hybrid']),
+  "branchId": zod.string().nullish(),
+  "name": zod.string().nullish()
+})
+
+
+/**
+ * @summary Assign a till licence to a branch
+ */
+export const UpdatePosLicenceBranchParams = zod.object({
+  "licenceId": zod.coerce.string()
+})
+
+export const UpdatePosLicenceBranchBody = zod.object({
+  "branchId": zod.string().nullish()
+})
+
+export const UpdatePosLicenceBranchResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceKey": zod.string(),
+  "type": zod.enum(['web', 'desktop', 'hybrid']),
+  "status": zod.enum(['active', 'trial', 'suspended', 'expired', 'revoked', 'read_only']),
+  "trialEndsAt": zod.string().nullish(),
+  "expiresAt": zod.string().nullish(),
+  "lastCheckAt": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "terminals": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "terminalCode": zod.string(),
+  "name": zod.string(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']),
+  "status": zod.enum(['active', 'inactive']),
+  "registeredAt": zod.string().nullish(),
+  "lastSeenAt": zod.string().nullish(),
+  "createdAt": zod.string()
+}))
+})
+
+
+/**
+ * @summary Register or create a till terminal and bind it to a licence
+ */
+export const RegisterPosTerminalBody = zod.object({
+  "name": zod.string(),
+  "licenceKey": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "branchId": zod.string().nullish(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']).optional()
+})
+
+
+/**
+ * @summary Rename, re-branch, set mode, or deactivate a terminal
+ */
+export const UpdatePosTerminalParams = zod.object({
+  "terminalId": zod.coerce.string()
+})
+
+export const UpdatePosTerminalBody = zod.object({
+  "name": zod.string().optional(),
+  "branchId": zod.string().nullish(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']).optional(),
+  "status": zod.enum(['active', 'inactive']).optional(),
+  "licenceId": zod.string().nullish()
+})
+
+export const UpdatePosTerminalResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "terminalCode": zod.string(),
+  "name": zod.string(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']),
+  "status": zod.enum(['active', 'inactive']),
+  "registeredAt": zod.string().nullish(),
+  "lastSeenAt": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Validate a licence key for a terminal on till open (web surface)
+ */
+export const ValidatePosLicenceBody = zod.object({
+  "licenceKey": zod.string(),
+  "terminalCode": zod.string().nullish(),
+  "surface": zod.enum(['web', 'desktop']).optional()
+})
+
+export const ValidatePosLicenceResponse = zod.object({
+  "valid": zod.boolean(),
+  "status": zod.string(),
+  "mode": zod.enum(['full', 'read_only', 'locked']),
+  "message": zod.string().nullish(),
+  "licence": zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceKey": zod.string(),
+  "type": zod.enum(['web', 'desktop', 'hybrid']),
+  "status": zod.enum(['active', 'trial', 'suspended', 'expired', 'revoked', 'read_only']),
+  "trialEndsAt": zod.string().nullish(),
+  "expiresAt": zod.string().nullish(),
+  "lastCheckAt": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "terminals": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "terminalCode": zod.string(),
+  "name": zod.string(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']),
+  "status": zod.enum(['active', 'inactive']),
+  "registeredAt": zod.string().nullish(),
+  "lastSeenAt": zod.string().nullish(),
+  "createdAt": zod.string()
+}))
+}).optional(),
+  "terminal": zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "terminalCode": zod.string(),
+  "name": zod.string(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']),
+  "status": zod.enum(['active', 'inactive']),
+  "registeredAt": zod.string().nullish(),
+  "lastSeenAt": zod.string().nullish(),
+  "createdAt": zod.string()
+}).optional()
+})
+
+
+export const AdminListPosLicencesParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const AdminListPosLicencesResponse = zod.object({
+  "licences": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceKey": zod.string(),
+  "type": zod.enum(['web', 'desktop', 'hybrid']),
+  "status": zod.enum(['active', 'trial', 'suspended', 'expired', 'revoked', 'read_only']),
+  "trialEndsAt": zod.string().nullish(),
+  "expiresAt": zod.string().nullish(),
+  "lastCheckAt": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "terminals": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "terminalCode": zod.string(),
+  "name": zod.string(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']),
+  "status": zod.enum(['active', 'inactive']),
+  "registeredAt": zod.string().nullish(),
+  "lastSeenAt": zod.string().nullish(),
+  "createdAt": zod.string()
+}))
+})),
+  "monthlyTotalPence": zod.number(),
+  "pricePerTillPence": zod.number(),
+  "currency": zod.string()
+})
+
+
+export const AdminIssuePosLicenceParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const AdminIssuePosLicenceBody = zod.object({
+  "type": zod.enum(['web', 'desktop', 'hybrid']),
+  "branchId": zod.string().nullish(),
+  "status": zod.enum(['active', 'trial']).optional(),
+  "trialDays": zod.number().nullish(),
+  "notes": zod.string().nullish()
+})
+
+
+/**
+ * @summary Suspend, reactivate, revoke or re-branch a licence
+ */
+export const AdminUpdatePosLicenceParams = zod.object({
+  "licenceId": zod.coerce.string()
+})
+
+export const AdminUpdatePosLicenceBody = zod.object({
+  "status": zod.enum(['active', 'trial', 'suspended', 'expired', 'revoked', 'read_only']).optional(),
+  "branchId": zod.string().nullish(),
+  "notes": zod.string().nullish()
+})
+
+export const AdminUpdatePosLicenceResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceKey": zod.string(),
+  "type": zod.enum(['web', 'desktop', 'hybrid']),
+  "status": zod.enum(['active', 'trial', 'suspended', 'expired', 'revoked', 'read_only']),
+  "trialEndsAt": zod.string().nullish(),
+  "expiresAt": zod.string().nullish(),
+  "lastCheckAt": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "terminals": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "terminalCode": zod.string(),
+  "name": zod.string(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']),
+  "status": zod.enum(['active', 'inactive']),
+  "registeredAt": zod.string().nullish(),
+  "lastSeenAt": zod.string().nullish(),
+  "createdAt": zod.string()
+}))
+})
+
+

@@ -2211,6 +2211,63 @@ export const branchesTable = pgTable(
 
 export type Branch = typeof branchesTable.$inferSelect;
 
+// ---- POS Licences & Terminals ---------------------------------------------
+// Per-till licensing for CtrlTradePos®. A licence (key) authorises one till and
+// bills at £59.99/till/month. A terminal is the physical/virtual till bound to a
+// licence, branch and tenant once registered.
+export const posLicencesTable = pgTable(
+  "pos_licences",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    branchId: uuid("branch_id").references(() => branchesTable.id, { onDelete: "set null" }),
+    licenceKey: text("licence_key").notNull(),
+    // web | desktop | hybrid — which deployment surfaces the key may activate.
+    type: varchar("type", { length: 16 }).notNull().default("web"),
+    // active | trial | suspended | expired | revoked | read_only
+    status: varchar("status", { length: 16 }).notNull().default("trial"),
+    trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    lastCheckAt: timestamp("last_check_at", { withTimezone: true }),
+    stripeSubscriptionItemId: text("stripe_subscription_item_id"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("pos_licences_tenant_idx").on(t.tenantId),
+    keyUniq: unique("pos_licences_key_uniq").on(t.licenceKey),
+  }),
+);
+
+export type PosLicence = typeof posLicencesTable.$inferSelect;
+
+export const posTerminalsTable = pgTable(
+  "pos_terminals",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id, { onDelete: "cascade" }),
+    branchId: uuid("branch_id").references(() => branchesTable.id, { onDelete: "set null" }),
+    licenceId: uuid("licence_id").references(() => posLicencesTable.id, { onDelete: "set null" }),
+    terminalCode: text("terminal_code").notNull(), // e.g. POS-001
+    name: text("name").notNull(),
+    // trade_counter | showroom | warehouse
+    mode: varchar("mode", { length: 16 }).notNull().default("trade_counter"),
+    // active | inactive
+    status: varchar("status", { length: 16 }).notNull().default("active"),
+    registeredAt: timestamp("registered_at", { withTimezone: true }),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    tenantIdx: index("pos_terminals_tenant_idx").on(t.tenantId),
+    codeUniq: unique("pos_terminals_tenant_code_uniq").on(t.tenantId, t.terminalCode),
+  }),
+);
+
+export type PosTerminal = typeof posTerminalsTable.$inferSelect;
+
 // ---- Area Managers ---------------------------------------------------------
 export const areaManagersTable = pgTable(
   "area_managers",

@@ -5,6 +5,218 @@
  * CtrlTrade SaaS Portal API
  * OpenAPI spec version: 0.1.0
  */
+export type PosTerminalMode = typeof PosTerminalMode[keyof typeof PosTerminalMode];
+
+
+export const PosTerminalMode = {
+  trade_counter: 'trade_counter',
+  showroom: 'showroom',
+  warehouse: 'warehouse',
+} as const;
+
+export type PosTerminalStatus = typeof PosTerminalStatus[keyof typeof PosTerminalStatus];
+
+
+export const PosTerminalStatus = {
+  active: 'active',
+  inactive: 'inactive',
+} as const;
+
+export interface PosTerminal {
+  id: string;
+  tenantId: string;
+  branchId?: string | null;
+  branchName?: string | null;
+  licenceId?: string | null;
+  terminalCode: string;
+  name: string;
+  mode: PosTerminalMode;
+  status: PosTerminalStatus;
+  registeredAt?: string | null;
+  lastSeenAt?: string | null;
+  createdAt: string;
+}
+
+export type PosLicenceType = typeof PosLicenceType[keyof typeof PosLicenceType];
+
+
+export const PosLicenceType = {
+  web: 'web',
+  desktop: 'desktop',
+  hybrid: 'hybrid',
+} as const;
+
+export type PosLicenceStatus = typeof PosLicenceStatus[keyof typeof PosLicenceStatus];
+
+
+export const PosLicenceStatus = {
+  active: 'active',
+  trial: 'trial',
+  suspended: 'suspended',
+  expired: 'expired',
+  revoked: 'revoked',
+  read_only: 'read_only',
+} as const;
+
+export interface PosLicence {
+  id: string;
+  tenantId: string;
+  branchId?: string | null;
+  branchName?: string | null;
+  licenceKey: string;
+  type: PosLicenceType;
+  status: PosLicenceStatus;
+  trialEndsAt?: string | null;
+  expiresAt?: string | null;
+  lastCheckAt?: string | null;
+  notes?: string | null;
+  createdAt: string;
+  terminals: PosTerminal[];
+}
+
+export interface PosLicenceList {
+  licences: PosLicence[];
+  monthlyTotalPence: number;
+  pricePerTillPence: number;
+  currency: string;
+}
+
+export type IssuePosLicenceInputType = typeof IssuePosLicenceInputType[keyof typeof IssuePosLicenceInputType];
+
+
+export const IssuePosLicenceInputType = {
+  web: 'web',
+  desktop: 'desktop',
+  hybrid: 'hybrid',
+} as const;
+
+export type IssuePosLicenceInputStatus = typeof IssuePosLicenceInputStatus[keyof typeof IssuePosLicenceInputStatus];
+
+
+export const IssuePosLicenceInputStatus = {
+  active: 'active',
+  trial: 'trial',
+} as const;
+
+export interface IssuePosLicenceInput {
+  type: IssuePosLicenceInputType;
+  branchId?: string | null;
+  status?: IssuePosLicenceInputStatus;
+  trialDays?: number | null;
+  notes?: string | null;
+}
+
+export type AdminUpdatePosLicenceInputStatus = typeof AdminUpdatePosLicenceInputStatus[keyof typeof AdminUpdatePosLicenceInputStatus];
+
+
+export const AdminUpdatePosLicenceInputStatus = {
+  active: 'active',
+  trial: 'trial',
+  suspended: 'suspended',
+  expired: 'expired',
+  revoked: 'revoked',
+  read_only: 'read_only',
+} as const;
+
+export interface AdminUpdatePosLicenceInput {
+  status?: AdminUpdatePosLicenceInputStatus;
+  branchId?: string | null;
+  notes?: string | null;
+}
+
+export interface AssignLicenceBranchInput {
+  branchId?: string | null;
+}
+
+export type RequestExtraTillInputType = typeof RequestExtraTillInputType[keyof typeof RequestExtraTillInputType];
+
+
+export const RequestExtraTillInputType = {
+  web: 'web',
+  desktop: 'desktop',
+  hybrid: 'hybrid',
+} as const;
+
+export interface RequestExtraTillInput {
+  type: RequestExtraTillInputType;
+  branchId?: string | null;
+  name?: string | null;
+}
+
+export type RegisterPosTerminalInputMode = typeof RegisterPosTerminalInputMode[keyof typeof RegisterPosTerminalInputMode];
+
+
+export const RegisterPosTerminalInputMode = {
+  trade_counter: 'trade_counter',
+  showroom: 'showroom',
+  warehouse: 'warehouse',
+} as const;
+
+export interface RegisterPosTerminalInput {
+  name: string;
+  licenceKey?: string | null;
+  licenceId?: string | null;
+  branchId?: string | null;
+  mode?: RegisterPosTerminalInputMode;
+}
+
+export type UpdatePosTerminalInputMode = typeof UpdatePosTerminalInputMode[keyof typeof UpdatePosTerminalInputMode];
+
+
+export const UpdatePosTerminalInputMode = {
+  trade_counter: 'trade_counter',
+  showroom: 'showroom',
+  warehouse: 'warehouse',
+} as const;
+
+export type UpdatePosTerminalInputStatus = typeof UpdatePosTerminalInputStatus[keyof typeof UpdatePosTerminalInputStatus];
+
+
+export const UpdatePosTerminalInputStatus = {
+  active: 'active',
+  inactive: 'inactive',
+} as const;
+
+export interface UpdatePosTerminalInput {
+  name?: string;
+  branchId?: string | null;
+  mode?: UpdatePosTerminalInputMode;
+  status?: UpdatePosTerminalInputStatus;
+  licenceId?: string | null;
+}
+
+export type PosLicenceValidationRequestSurface = typeof PosLicenceValidationRequestSurface[keyof typeof PosLicenceValidationRequestSurface];
+
+
+export const PosLicenceValidationRequestSurface = {
+  web: 'web',
+  desktop: 'desktop',
+} as const;
+
+export interface PosLicenceValidationRequest {
+  licenceKey: string;
+  terminalCode?: string | null;
+  surface?: PosLicenceValidationRequestSurface;
+}
+
+export type PosLicenceValidationResultMode = typeof PosLicenceValidationResultMode[keyof typeof PosLicenceValidationResultMode];
+
+
+export const PosLicenceValidationResultMode = {
+  full: 'full',
+  read_only: 'read_only',
+  locked: 'locked',
+} as const;
+
+export interface PosLicenceValidationResult {
+  valid: boolean;
+  status: string;
+  mode: PosLicenceValidationResultMode;
+  message?: string | null;
+  licence?: PosLicence;
+  terminal?: PosTerminal;
+}
+
 export interface HealthStatus {
   status: string;
 }

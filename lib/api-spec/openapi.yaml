@@ -6106,8 +6106,284 @@ paths:
                 properties:
                   voicemail: { $ref: "#/components/schemas/Voicemail" }
 
+  # ---- CtrlTradePos® licensing & terminals (tenant) ----------------------
+  /v1/pos-licences:
+    get:
+      operationId: listPosLicences
+      tags: [pos-licensing]
+      summary: List this tenant's POS till licences and their terminals
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosLicenceList" }
+  /v1/pos-licences/request:
+    post:
+      operationId: requestExtraTill
+      tags: [pos-licensing]
+      summary: Request an additional till licence (adds a billable till)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RequestExtraTillInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosLicence" }
+  /v1/pos-licences/{licenceId}:
+    patch:
+      operationId: updatePosLicenceBranch
+      tags: [pos-licensing]
+      summary: Assign a till licence to a branch
+      parameters:
+        - in: path
+          name: licenceId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AssignLicenceBranchInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosLicence" }
+  /v1/pos-terminals:
+    post:
+      operationId: registerPosTerminal
+      tags: [pos-licensing]
+      summary: Register or create a till terminal and bind it to a licence
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RegisterPosTerminalInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosTerminal" }
+  /v1/pos-terminals/{terminalId}:
+    patch:
+      operationId: updatePosTerminal
+      tags: [pos-licensing]
+      summary: Rename, re-branch, set mode, or deactivate a terminal
+      parameters:
+        - in: path
+          name: terminalId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdatePosTerminalInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosTerminal" }
+  /v1/pos-terminals/validate:
+    post:
+      operationId: validatePosLicence
+      tags: [pos-licensing]
+      summary: Validate a licence key for a terminal on till open (web surface)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PosLicenceValidationRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosLicenceValidationResult" }
+
+  # ---- CtrlTradePos® licensing (super admin) -----------------------------
+  /v1/admin/tenants/{tenantId}/pos-licences:
+    get:
+      operationId: adminListPosLicences
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosLicenceList" }
+    post:
+      operationId: adminIssuePosLicence
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/IssuePosLicenceInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosLicence" }
+  /v1/admin/pos-licences/{licenceId}:
+    patch:
+      operationId: adminUpdatePosLicence
+      tags: [admin]
+      summary: Suspend, reactivate, revoke or re-branch a licence
+      parameters:
+        - in: path
+          name: licenceId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminUpdatePosLicenceInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosLicence" }
+
 components:
   schemas:
+    PosTerminal:
+      type: object
+      required: [id, tenantId, terminalCode, name, mode, status, createdAt]
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        branchId: { type: string, nullable: true }
+        branchName: { type: string, nullable: true }
+        licenceId: { type: string, nullable: true }
+        terminalCode: { type: string }
+        name: { type: string }
+        mode: { type: string, enum: [trade_counter, showroom, warehouse] }
+        status: { type: string, enum: [active, inactive] }
+        registeredAt: { type: string, nullable: true }
+        lastSeenAt: { type: string, nullable: true }
+        createdAt: { type: string }
+
+    PosLicence:
+      type: object
+      required: [id, tenantId, licenceKey, type, status, createdAt, terminals]
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        branchId: { type: string, nullable: true }
+        branchName: { type: string, nullable: true }
+        licenceKey: { type: string }
+        type: { type: string, enum: [web, desktop, hybrid] }
+        status: { type: string, enum: [active, trial, suspended, expired, revoked, read_only] }
+        trialEndsAt: { type: string, nullable: true }
+        expiresAt: { type: string, nullable: true }
+        lastCheckAt: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        createdAt: { type: string }
+        terminals:
+          type: array
+          items: { $ref: "#/components/schemas/PosTerminal" }
+
+    PosLicenceList:
+      type: object
+      required: [licences, monthlyTotalPence, currency, pricePerTillPence]
+      properties:
+        licences:
+          type: array
+          items: { $ref: "#/components/schemas/PosLicence" }
+        monthlyTotalPence: { type: integer }
+        pricePerTillPence: { type: integer }
+        currency: { type: string }
+
+    IssuePosLicenceInput:
+      type: object
+      required: [type]
+      properties:
+        type: { type: string, enum: [web, desktop, hybrid] }
+        branchId: { type: string, nullable: true }
+        status: { type: string, enum: [active, trial] }
+        trialDays: { type: integer, nullable: true }
+        notes: { type: string, nullable: true }
+
+    AdminUpdatePosLicenceInput:
+      type: object
+      properties:
+        status: { type: string, enum: [active, trial, suspended, expired, revoked, read_only] }
+        branchId: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+
+    AssignLicenceBranchInput:
+      type: object
+      properties:
+        branchId: { type: string, nullable: true }
+
+    RequestExtraTillInput:
+      type: object
+      required: [type]
+      properties:
+        type: { type: string, enum: [web, desktop, hybrid] }
+        branchId: { type: string, nullable: true }
+        name: { type: string, nullable: true }
+
+    RegisterPosTerminalInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        licenceKey: { type: string, nullable: true }
+        licenceId: { type: string, nullable: true }
+        branchId: { type: string, nullable: true }
+        mode: { type: string, enum: [trade_counter, showroom, warehouse] }
+
+    UpdatePosTerminalInput:
+      type: object
+      properties:
+        name: { type: string }
+        branchId: { type: string, nullable: true }
+        mode: { type: string, enum: [trade_counter, showroom, warehouse] }
+        status: { type: string, enum: [active, inactive] }
+        licenceId: { type: string, nullable: true }
+
+    PosLicenceValidationRequest:
+      type: object
+      required: [licenceKey]
+      properties:
+        licenceKey: { type: string }
+        terminalCode: { type: string, nullable: true }
+        surface: { type: string, enum: [web, desktop] }
+
+    PosLicenceValidationResult:
+      type: object
+      required: [valid, mode, status]
+      properties:
+        valid: { type: boolean }
+        status: { type: string }
+        mode: { type: string, enum: [full, read_only, locked] }
+        message: { type: string, nullable: true }
+        licence: { $ref: "#/components/schemas/PosLicence" }
+        terminal: { $ref: "#/components/schemas/PosTerminal" }
+
     HealthStatus:
       type: object
       required: [status]

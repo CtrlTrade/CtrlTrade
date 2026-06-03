@@ -32,6 +32,7 @@ import type {
   AdminPayoutDecision,
   AdminTenantDetail,
   AdminTenantSummary,
+  AdminUpdatePosLicenceInput,
   AdminUsage,
   AdminVerificationSubmission,
   AdminWorkerJob,
@@ -44,6 +45,7 @@ import type {
   ApproveVerificationSubmission200,
   AreaManager,
   AreaManagerInput,
+  AssignLicenceBranchInput,
   AuditLogEntry,
   AutomationRuleInput,
   AutomationRuleResponse,
@@ -151,6 +153,7 @@ import type {
   InvoiceSummary,
   InvoiceTemplate,
   InvoiceTemplateInput,
+  IssuePosLicenceInput,
   Job,
   JobAssignmentInput,
   JobCheckin,
@@ -261,6 +264,10 @@ import type {
   PortalSession,
   PortalVerifyInput,
   PosJob,
+  PosLicence,
+  PosLicenceList,
+  PosLicenceValidationRequest,
+  PosLicenceValidationResult,
   PosProduct,
   PosReceiptReceipt,
   PosReceiptRequest,
@@ -268,6 +275,7 @@ import type {
   PosSale,
   PosSaleInput,
   PosSession,
+  PosTerminal,
   PosTransaction,
   PosTransactionInput,
   Pricing,
@@ -297,6 +305,7 @@ import type {
   ReferralCampaignInput,
   ReferralConversionRecord,
   ReferralTrackInput,
+  RegisterPosTerminalInput,
   RejectTimesheetEntryInput,
   RejectVerificationSubmission200,
   ReplyDraftInput,
@@ -312,6 +321,7 @@ import type {
   ReportLeadRoi,
   ReportQuoteConversion,
   ReportRevenue,
+  RequestExtraTillInput,
   ResellerDashboard,
   ResetPasswordBody,
   RevenueBreakdown,
@@ -371,6 +381,7 @@ import type {
   UpdateJobCostEntryInput,
   UpdateMemberInput,
   UpdatePlatformLeadInput,
+  UpdatePosTerminalInput,
   UpdateTimesheetEntryInput,
   UploadUrlRequest,
   UploadUrlResponse,
@@ -26924,5 +26935,648 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getMarkVoicemailListenedMutationOptions(options));
+    }
+
+export const getListPosLicencesUrl = () => {
+
+
+
+
+  return `/api/v1/pos-licences`
+}
+
+/**
+ * @summary List this tenant's POS till licences and their terminals
+ */
+export const listPosLicences = async ( options?: RequestInit): Promise<PosLicenceList> => {
+
+  return customFetch<PosLicenceList>(getListPosLicencesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPosLicencesQueryKey = () => {
+    return [
+    `/api/v1/pos-licences`
+    ] as const;
+    }
+
+
+export const getListPosLicencesQueryOptions = <TData = Awaited<ReturnType<typeof listPosLicences>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPosLicences>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPosLicencesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPosLicences>>> = ({ signal }) => listPosLicences({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPosLicences>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPosLicencesQueryResult = NonNullable<Awaited<ReturnType<typeof listPosLicences>>>
+export type ListPosLicencesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List this tenant's POS till licences and their terminals
+ */
+
+export function useListPosLicences<TData = Awaited<ReturnType<typeof listPosLicences>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPosLicences>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPosLicencesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getRequestExtraTillUrl = () => {
+
+
+
+
+  return `/api/v1/pos-licences/request`
+}
+
+/**
+ * @summary Request an additional till licence (adds a billable till)
+ */
+export const requestExtraTill = async (requestExtraTillInput: RequestExtraTillInput, options?: RequestInit): Promise<PosLicence> => {
+
+  return customFetch<PosLicence>(getRequestExtraTillUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      requestExtraTillInput,)
+  }
+);}
+
+
+
+
+export const getRequestExtraTillMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestExtraTill>>, TError,{data: BodyType<RequestExtraTillInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestExtraTill>>, TError,{data: BodyType<RequestExtraTillInput>}, TContext> => {
+
+const mutationKey = ['requestExtraTill'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestExtraTill>>, {data: BodyType<RequestExtraTillInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestExtraTill(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestExtraTillMutationResult = NonNullable<Awaited<ReturnType<typeof requestExtraTill>>>
+    export type RequestExtraTillMutationBody = BodyType<RequestExtraTillInput>
+    export type RequestExtraTillMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Request an additional till licence (adds a billable till)
+ */
+export const useRequestExtraTill = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestExtraTill>>, TError,{data: BodyType<RequestExtraTillInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestExtraTill>>,
+        TError,
+        {data: BodyType<RequestExtraTillInput>},
+        TContext
+      > => {
+      return useMutation(getRequestExtraTillMutationOptions(options));
+    }
+
+export const getUpdatePosLicenceBranchUrl = (licenceId: string,) => {
+
+
+
+
+  return `/api/v1/pos-licences/${licenceId}`
+}
+
+/**
+ * @summary Assign a till licence to a branch
+ */
+export const updatePosLicenceBranch = async (licenceId: string,
+    assignLicenceBranchInput: AssignLicenceBranchInput, options?: RequestInit): Promise<PosLicence> => {
+
+  return customFetch<PosLicence>(getUpdatePosLicenceBranchUrl(licenceId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      assignLicenceBranchInput,)
+  }
+);}
+
+
+
+
+export const getUpdatePosLicenceBranchMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePosLicenceBranch>>, TError,{licenceId: string;data: BodyType<AssignLicenceBranchInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePosLicenceBranch>>, TError,{licenceId: string;data: BodyType<AssignLicenceBranchInput>}, TContext> => {
+
+const mutationKey = ['updatePosLicenceBranch'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePosLicenceBranch>>, {licenceId: string;data: BodyType<AssignLicenceBranchInput>}> = (props) => {
+          const {licenceId,data} = props ?? {};
+
+          return  updatePosLicenceBranch(licenceId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdatePosLicenceBranchMutationResult = NonNullable<Awaited<ReturnType<typeof updatePosLicenceBranch>>>
+    export type UpdatePosLicenceBranchMutationBody = BodyType<AssignLicenceBranchInput>
+    export type UpdatePosLicenceBranchMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Assign a till licence to a branch
+ */
+export const useUpdatePosLicenceBranch = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePosLicenceBranch>>, TError,{licenceId: string;data: BodyType<AssignLicenceBranchInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updatePosLicenceBranch>>,
+        TError,
+        {licenceId: string;data: BodyType<AssignLicenceBranchInput>},
+        TContext
+      > => {
+      return useMutation(getUpdatePosLicenceBranchMutationOptions(options));
+    }
+
+export const getRegisterPosTerminalUrl = () => {
+
+
+
+
+  return `/api/v1/pos-terminals`
+}
+
+/**
+ * @summary Register or create a till terminal and bind it to a licence
+ */
+export const registerPosTerminal = async (registerPosTerminalInput: RegisterPosTerminalInput, options?: RequestInit): Promise<PosTerminal> => {
+
+  return customFetch<PosTerminal>(getRegisterPosTerminalUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      registerPosTerminalInput,)
+  }
+);}
+
+
+
+
+export const getRegisterPosTerminalMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerPosTerminal>>, TError,{data: BodyType<RegisterPosTerminalInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof registerPosTerminal>>, TError,{data: BodyType<RegisterPosTerminalInput>}, TContext> => {
+
+const mutationKey = ['registerPosTerminal'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerPosTerminal>>, {data: BodyType<RegisterPosTerminalInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  registerPosTerminal(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RegisterPosTerminalMutationResult = NonNullable<Awaited<ReturnType<typeof registerPosTerminal>>>
+    export type RegisterPosTerminalMutationBody = BodyType<RegisterPosTerminalInput>
+    export type RegisterPosTerminalMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Register or create a till terminal and bind it to a licence
+ */
+export const useRegisterPosTerminal = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerPosTerminal>>, TError,{data: BodyType<RegisterPosTerminalInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof registerPosTerminal>>,
+        TError,
+        {data: BodyType<RegisterPosTerminalInput>},
+        TContext
+      > => {
+      return useMutation(getRegisterPosTerminalMutationOptions(options));
+    }
+
+export const getUpdatePosTerminalUrl = (terminalId: string,) => {
+
+
+
+
+  return `/api/v1/pos-terminals/${terminalId}`
+}
+
+/**
+ * @summary Rename, re-branch, set mode, or deactivate a terminal
+ */
+export const updatePosTerminal = async (terminalId: string,
+    updatePosTerminalInput: UpdatePosTerminalInput, options?: RequestInit): Promise<PosTerminal> => {
+
+  return customFetch<PosTerminal>(getUpdatePosTerminalUrl(terminalId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updatePosTerminalInput,)
+  }
+);}
+
+
+
+
+export const getUpdatePosTerminalMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePosTerminal>>, TError,{terminalId: string;data: BodyType<UpdatePosTerminalInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePosTerminal>>, TError,{terminalId: string;data: BodyType<UpdatePosTerminalInput>}, TContext> => {
+
+const mutationKey = ['updatePosTerminal'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePosTerminal>>, {terminalId: string;data: BodyType<UpdatePosTerminalInput>}> = (props) => {
+          const {terminalId,data} = props ?? {};
+
+          return  updatePosTerminal(terminalId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdatePosTerminalMutationResult = NonNullable<Awaited<ReturnType<typeof updatePosTerminal>>>
+    export type UpdatePosTerminalMutationBody = BodyType<UpdatePosTerminalInput>
+    export type UpdatePosTerminalMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Rename, re-branch, set mode, or deactivate a terminal
+ */
+export const useUpdatePosTerminal = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePosTerminal>>, TError,{terminalId: string;data: BodyType<UpdatePosTerminalInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updatePosTerminal>>,
+        TError,
+        {terminalId: string;data: BodyType<UpdatePosTerminalInput>},
+        TContext
+      > => {
+      return useMutation(getUpdatePosTerminalMutationOptions(options));
+    }
+
+export const getValidatePosLicenceUrl = () => {
+
+
+
+
+  return `/api/v1/pos-terminals/validate`
+}
+
+/**
+ * @summary Validate a licence key for a terminal on till open (web surface)
+ */
+export const validatePosLicence = async (posLicenceValidationRequest: PosLicenceValidationRequest, options?: RequestInit): Promise<PosLicenceValidationResult> => {
+
+  return customFetch<PosLicenceValidationResult>(getValidatePosLicenceUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      posLicenceValidationRequest,)
+  }
+);}
+
+
+
+
+export const getValidatePosLicenceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validatePosLicence>>, TError,{data: BodyType<PosLicenceValidationRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof validatePosLicence>>, TError,{data: BodyType<PosLicenceValidationRequest>}, TContext> => {
+
+const mutationKey = ['validatePosLicence'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof validatePosLicence>>, {data: BodyType<PosLicenceValidationRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  validatePosLicence(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ValidatePosLicenceMutationResult = NonNullable<Awaited<ReturnType<typeof validatePosLicence>>>
+    export type ValidatePosLicenceMutationBody = BodyType<PosLicenceValidationRequest>
+    export type ValidatePosLicenceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Validate a licence key for a terminal on till open (web surface)
+ */
+export const useValidatePosLicence = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validatePosLicence>>, TError,{data: BodyType<PosLicenceValidationRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof validatePosLicence>>,
+        TError,
+        {data: BodyType<PosLicenceValidationRequest>},
+        TContext
+      > => {
+      return useMutation(getValidatePosLicenceMutationOptions(options));
+    }
+
+export const getAdminListPosLicencesUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/v1/admin/tenants/${tenantId}/pos-licences`
+}
+
+export const adminListPosLicences = async (tenantId: string, options?: RequestInit): Promise<PosLicenceList> => {
+
+  return customFetch<PosLicenceList>(getAdminListPosLicencesUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminListPosLicencesQueryKey = (tenantId: string,) => {
+    return [
+    `/api/v1/admin/tenants/${tenantId}/pos-licences`
+    ] as const;
+    }
+
+
+export const getAdminListPosLicencesQueryOptions = <TData = Awaited<ReturnType<typeof adminListPosLicences>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListPosLicences>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminListPosLicencesQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListPosLicences>>> = ({ signal }) => adminListPosLicences(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(tenantId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminListPosLicences>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminListPosLicencesQueryResult = NonNullable<Awaited<ReturnType<typeof adminListPosLicences>>>
+export type AdminListPosLicencesQueryError = ErrorType<unknown>
+
+
+
+export function useAdminListPosLicences<TData = Awaited<ReturnType<typeof adminListPosLicences>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListPosLicences>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminListPosLicencesQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAdminIssuePosLicenceUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/v1/admin/tenants/${tenantId}/pos-licences`
+}
+
+export const adminIssuePosLicence = async (tenantId: string,
+    issuePosLicenceInput: IssuePosLicenceInput, options?: RequestInit): Promise<PosLicence> => {
+
+  return customFetch<PosLicence>(getAdminIssuePosLicenceUrl(tenantId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      issuePosLicenceInput,)
+  }
+);}
+
+
+
+
+export const getAdminIssuePosLicenceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminIssuePosLicence>>, TError,{tenantId: string;data: BodyType<IssuePosLicenceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminIssuePosLicence>>, TError,{tenantId: string;data: BodyType<IssuePosLicenceInput>}, TContext> => {
+
+const mutationKey = ['adminIssuePosLicence'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminIssuePosLicence>>, {tenantId: string;data: BodyType<IssuePosLicenceInput>}> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  adminIssuePosLicence(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminIssuePosLicenceMutationResult = NonNullable<Awaited<ReturnType<typeof adminIssuePosLicence>>>
+    export type AdminIssuePosLicenceMutationBody = BodyType<IssuePosLicenceInput>
+    export type AdminIssuePosLicenceMutationError = ErrorType<unknown>
+
+    export const useAdminIssuePosLicence = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminIssuePosLicence>>, TError,{tenantId: string;data: BodyType<IssuePosLicenceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminIssuePosLicence>>,
+        TError,
+        {tenantId: string;data: BodyType<IssuePosLicenceInput>},
+        TContext
+      > => {
+      return useMutation(getAdminIssuePosLicenceMutationOptions(options));
+    }
+
+export const getAdminUpdatePosLicenceUrl = (licenceId: string,) => {
+
+
+
+
+  return `/api/v1/admin/pos-licences/${licenceId}`
+}
+
+/**
+ * @summary Suspend, reactivate, revoke or re-branch a licence
+ */
+export const adminUpdatePosLicence = async (licenceId: string,
+    adminUpdatePosLicenceInput: AdminUpdatePosLicenceInput, options?: RequestInit): Promise<PosLicence> => {
+
+  return customFetch<PosLicence>(getAdminUpdatePosLicenceUrl(licenceId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminUpdatePosLicenceInput,)
+  }
+);}
+
+
+
+
+export const getAdminUpdatePosLicenceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdatePosLicence>>, TError,{licenceId: string;data: BodyType<AdminUpdatePosLicenceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminUpdatePosLicence>>, TError,{licenceId: string;data: BodyType<AdminUpdatePosLicenceInput>}, TContext> => {
+
+const mutationKey = ['adminUpdatePosLicence'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminUpdatePosLicence>>, {licenceId: string;data: BodyType<AdminUpdatePosLicenceInput>}> = (props) => {
+          const {licenceId,data} = props ?? {};
+
+          return  adminUpdatePosLicence(licenceId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminUpdatePosLicenceMutationResult = NonNullable<Awaited<ReturnType<typeof adminUpdatePosLicence>>>
+    export type AdminUpdatePosLicenceMutationBody = BodyType<AdminUpdatePosLicenceInput>
+    export type AdminUpdatePosLicenceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Suspend, reactivate, revoke or re-branch a licence
+ */
+export const useAdminUpdatePosLicence = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdatePosLicence>>, TError,{licenceId: string;data: BodyType<AdminUpdatePosLicenceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminUpdatePosLicence>>,
+        TError,
+        {licenceId: string;data: BodyType<AdminUpdatePosLicenceInput>},
+        TContext
+      > => {
+      return useMutation(getAdminUpdatePosLicenceMutationOptions(options));
     }
 
