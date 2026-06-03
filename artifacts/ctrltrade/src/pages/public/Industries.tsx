@@ -355,11 +355,6 @@ function IndustryCard({ industry, isOpen, onToggle }: {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-base leading-snug">{industry.name}</span>
-            {industry.seoHref && (
-              <span className="text-[10px] font-bold tracking-wider px-1.5 py-0.5 border border-primary text-primary uppercase shrink-0">
-                SEO
-              </span>
-            )}
           </div>
           <span className="text-xs text-muted-foreground mt-0.5 block">
             {industry.subCategories.length} sub-categories
