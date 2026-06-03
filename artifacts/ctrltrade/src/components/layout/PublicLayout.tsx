@@ -7,6 +7,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const productsRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
 
@@ -107,29 +109,78 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-border bg-card max-h-[80vh] overflow-y-auto">
-            <nav className="container mx-auto px-4 py-3 flex flex-col">
+            <nav className="container mx-auto px-4 py-2 flex flex-col">
+
+              {/* Products accordion */}
+              <button
+                className="flex items-center justify-between w-full py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border-b border-border/30"
+                onClick={() => { setMobileProductsOpen(o => !o); setMobileMoreOpen(false); }}
+              >
+                Products
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${mobileProductsOpen ? "rotate-180" : ""}`} />
+              </button>
+              {mobileProductsOpen && (
+                <div className="flex flex-col bg-muted/40 border-b border-border/30">
+                  {[
+                    { href: "/features", label: "Features", desc: "Full platform overview" },
+                    { href: "/crm", label: "CtrlTrade CRM", desc: "Leads, jobs, invoicing" },
+                    { href: "/ctrltradepos", label: "CtrlTradePos®", desc: "Trade counter EPOS" },
+                    { href: "/customer-portal", label: "Customer Portal", desc: "24/7 customer self-service" },
+                  ].map(l => (
+                    <Link key={l.href} href={l.href} onClick={() => { setMobileMenuOpen(false); setMobileProductsOpen(false); }}
+                      className="flex flex-col px-5 py-3 border-b border-border/20 last:border-0 hover:bg-muted transition-colors">
+                      <span className="text-sm font-semibold text-foreground">{l.label}</span>
+                      <span className="text-xs text-muted-foreground mt-0.5">{l.desc}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* Direct links */}
               {[
-                { href: "/features", label: "Features" },
-                { href: "/crm", label: "CRM" },
-                { href: "/ctrltradepos", label: "CtrlTradePos®" },
-                { href: "/customer-portal", label: "Customer Portal" },
                 { href: "/pricing", label: "Pricing" },
                 { href: "/industries", label: "Industries" },
                 { href: "/integrations", label: "Integrations" },
                 { href: "/marketplace", label: "Marketplace" },
-                { href: "/addons", label: "Add-ons" },
-                { href: "/security", label: "Security" },
-                { href: "/blog", label: "Blog" },
-                { href: "/about", label: "About" },
-                { href: "/contact", label: "Contact" },
-                { href: "/status", label: "Status" },
-                { href: "/login", label: "Log in" },
               ].map(l => (
                 <Link key={l.href} href={l.href} onClick={() => setMobileMenuOpen(false)}
-                  className="text-sm font-medium py-2.5 text-muted-foreground hover:text-foreground transition-colors border-b border-border/30 last:border-0">
+                  className="py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border-b border-border/30">
                   {l.label}
                 </Link>
               ))}
+
+              {/* More accordion */}
+              <button
+                className="flex items-center justify-between w-full py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border-b border-border/30"
+                onClick={() => { setMobileMoreOpen(o => !o); setMobileProductsOpen(false); }}
+              >
+                More
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${mobileMoreOpen ? "rotate-180" : ""}`} />
+              </button>
+              {mobileMoreOpen && (
+                <div className="flex flex-col bg-muted/40 border-b border-border/30">
+                  {[
+                    { href: "/addons", label: "Add-ons" },
+                    { href: "/security", label: "Security" },
+                    { href: "/blog", label: "Blog" },
+                    { href: "/about", label: "About" },
+                    { href: "/contact", label: "Contact" },
+                    { href: "/status", label: "Status" },
+                  ].map(l => (
+                    <Link key={l.href} href={l.href} onClick={() => { setMobileMenuOpen(false); setMobileMoreOpen(false); }}
+                      className="px-5 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors border-b border-border/20 last:border-0">
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* Log in */}
+              <Link href="/login" onClick={() => setMobileMenuOpen(false)}
+                className="py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Log in
+              </Link>
+
             </nav>
           </div>
         )}
