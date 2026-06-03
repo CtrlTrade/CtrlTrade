@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Target, Users, Zap, Globe } from "lucide-react";
+import { PageHead } from "@/components/PageHead";
 
 const values = [
   { icon: Target, title: "Built For Trades", desc: "We only build for trade businesses. Every feature, every workflow, every design decision is made with a trade operator in mind." },
@@ -12,6 +13,11 @@ const values = [
 export function AboutPage() {
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="About CtrlTrade® — Built For Trade Businesses"
+        description="CtrlTrade® is built and operated in the UK by a team focused entirely on trade businesses. GDPR compliant, UK VAT-ready, and operator-first by design."
+        canonical="/about"
+      />
       <section className="py-24 md:py-32 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">

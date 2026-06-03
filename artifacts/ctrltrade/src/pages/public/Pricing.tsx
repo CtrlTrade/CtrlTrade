@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Minus } from "lucide-react";
+import { PageHead } from "@/components/PageHead";
 
 export function Pricing() {
   const { data: pricing, isLoading } = useGetPricing();
@@ -31,6 +32,11 @@ export function Pricing() {
 
   return (
     <div className="container mx-auto px-4 py-20">
+      <PageHead
+        title="Pricing — Transparent Plans For Trade Businesses"
+        description="Straightforward pricing for CtrlTrade®. Choose control seats, field seats, and tills. No hidden fees. Start with a free 1 month trial."
+        canonical="/pricing"
+      />
       <div className="text-center max-w-2xl mx-auto mb-16">
         <h1 className="text-4xl md:text-5xl font-bold mb-6">Build Your Command Center</h1>
         <p className="text-lg text-muted-foreground">Transparent pricing. No hidden fees. Tailor your setup to your exact crew size.</p>

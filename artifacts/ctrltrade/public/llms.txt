@@ -1,0 +1,67 @@
+# CtrlTrade®
+
+CtrlTrade® is the complete operating system for trade businesses in the United Kingdom. It combines CRM, job scheduling, dispatch, invoicing, customer portal, AI voice, trade counter EPOS, and warehouse management in a single cloud platform. Built for sole traders, multi-branch operators, builders merchants, field service companies, and every trade vertical.
+
+## Key pages
+
+- https://ctrltrade.co.uk/ — Home / product overview
+- https://ctrltrade.co.uk/features — Full feature list
+- https://ctrltrade.co.uk/pricing — Pricing and plans
+- https://ctrltrade.co.uk/industries — Industries served
+- https://ctrltrade.co.uk/crm — CtrlTrade CRM product page
+- https://ctrltrade.co.uk/ctrltradepos — CtrlTradePos® EPOS & warehouse product page
+- https://ctrltrade.co.uk/customer-portal — Customer portal product page
+- https://ctrltrade.co.uk/integrations — Third-party integrations
+- https://ctrltrade.co.uk/addons — Platform add-ons
+- https://ctrltrade.co.uk/security — Security overview
+- https://ctrltrade.co.uk/marketplace — Contractor & supplier marketplace
+- https://ctrltrade.co.uk/about — About CtrlTrade
+- https://ctrltrade.co.uk/blog — Blog
+- https://ctrltrade.co.uk/contact — Contact
+
+## Industry landing pages
+
+- https://ctrltrade.co.uk/roofing-crm
+- https://ctrltrade.co.uk/electrical-crm
+- https://ctrltrade.co.uk/plumbing-crm
+- https://ctrltrade.co.uk/hvac-crm
+- https://ctrltrade.co.uk/builders-crm
+- https://ctrltrade.co.uk/cleaning-crm
+- https://ctrltrade.co.uk/facilities-management-crm
+- https://ctrltrade.co.uk/trade-counter-epos
+- https://ctrltrade.co.uk/warehouse-management-software
+- https://ctrltrade.co.uk/showroom-management-software
+- https://ctrltrade.co.uk/field-service-management-software
+- https://ctrltrade.co.uk/builders-merchants-crm
+- https://ctrltrade.co.uk/masonry-crm
+- https://ctrltrade.co.uk/timber-merchants-crm
+- https://ctrltrade.co.uk/heating-gas-crm
+- https://ctrltrade.co.uk/renewable-energy-crm
+- https://ctrltrade.co.uk/security-fire-crm
+- https://ctrltrade.co.uk/windows-doors-crm
+- https://ctrltrade.co.uk/kitchens-crm
+- https://ctrltrade.co.uk/bathrooms-crm
+- https://ctrltrade.co.uk/flooring-crm
+- https://ctrltrade.co.uk/tiles-crm
+- https://ctrltrade.co.uk/decorating-crm
+- https://ctrltrade.co.uk/landscaping-crm
+- https://ctrltrade.co.uk/fencing-crm
+- https://ctrltrade.co.uk/steel-metal-crm
+- https://ctrltrade.co.uk/industrial-supplies-crm
+- https://ctrltrade.co.uk/tools-equipment-crm
+- https://ctrltrade.co.uk/plant-machinery-crm
+- https://ctrltrade.co.uk/workwear-ppe-crm
+- https://ctrltrade.co.uk/automotive-crm
+- https://ctrltrade.co.uk/warehousing-crm
+- https://ctrltrade.co.uk/distribution-crm
+- https://ctrltrade.co.uk/manufacturing-crm
+- https://ctrltrade.co.uk/cabins-modular-crm
+- https://ctrltrade.co.uk/agricultural-crm
+- https://ctrltrade.co.uk/showrooms-crm
+- https://ctrltrade.co.uk/specialist-trades-crm
+- https://ctrltrade.co.uk/logistics-crm
+
+## Trust & legal
+
+- https://ctrltrade.co.uk/security — Security and compliance overview
+- https://ctrltrade.co.uk/status — Platform status

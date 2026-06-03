@@ -11,8 +11,8 @@
     "build:web": "node scripts/check-env.mjs && dotenv -e .env --override=false -- pnpm --filter @workspace/ctrltradepos exec expo export --platform web --output-dir ../../desktop/ctrltradepos-electron/www",
     "build:main": "tsc -p tsconfig.json",
     "start": "pnpm run build:main && electron .",
-    "dist:win": "pnpm run build:main && electron-builder --win",
-    "dist:mac": "pnpm run build:main && electron-builder --mac"
+    "dist:win": "pnpm run build:main && electron-builder --win --config electron-builder.config.js",
+    "dist:mac": "pnpm run build:main && electron-builder --mac --config electron-builder.config.js"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -20,24 +20,5 @@
     "electron": "^33.0.0",
     "electron-builder": "^25.0.0",
     "typescript": "~5.9.2"
-  },
-  "build": {
-    "appId": "com.ctrltrade.pos",
-    "productName": "CtrlTradePos",
-    "icon": "assets/icon",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "src/main.js",
-      "www/**",
-      "assets/**"
-    ],
-    "win": {
-      "target": "nsis"
-    },
-    "mac": {
-      "target": "dmg"
-    }
   }
 }

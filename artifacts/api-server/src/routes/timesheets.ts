@@ -105,8 +105,8 @@ router.post("/v1/jobs/:jobId/checkin", requireTenant, async (req, res): Promise<
       tenantId,
       jobId,
       userId,
-      checkInLat: body.lat,
-      checkInLng: body.lng,
+      checkInLat: body.lat != null ? String(body.lat) : null,
+      checkInLng: body.lng != null ? String(body.lng) : null,
       notes: body.notes,
     })
     .returning();
@@ -158,8 +158,8 @@ router.post("/v1/jobs/:jobId/checkout", requireTenant, async (req, res): Promise
     .update(jobCheckinsTable)
     .set({
       checkedOutAt,
-      checkOutLat: body.lat,
-      checkOutLng: body.lng,
+      checkOutLat: body.lat != null ? String(body.lat) : null,
+      checkOutLng: body.lng != null ? String(body.lng) : null,
       notes: body.notes ?? open.notes,
       durationMinutes,
     })

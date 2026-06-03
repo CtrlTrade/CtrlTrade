@@ -7,6 +7,8 @@
     "hello": "tsx ./src/hello.ts",
     "seed": "tsx ./src/seed.ts",
     "seed:acme": "tsx ./src/seed-acme.ts",
+    "seed:acme:prod": "tsx ./src/seed-acme-production-api.ts",
+    "seed:acme:extend": "tsx ./src/seed-acme-extend.ts",
     "seed-products": "tsx ./src/seed-products.ts",
     "seed-tenant-types": "tsx ./src/seed-tenant-types.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"

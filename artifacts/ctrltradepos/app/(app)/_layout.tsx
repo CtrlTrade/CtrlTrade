@@ -18,6 +18,7 @@ export default function AppLayout() {
           <Stack.Screen name="basket" options={{ presentation: "modal" }} />
           <Stack.Screen name="refund" options={{ presentation: "modal" }} />
           <Stack.Screen name="eod-report" options={{ presentation: "modal" }} />
+          <Stack.Screen name="trade-account/[id]" options={{ presentation: "modal" }} />
         </Stack>
       </OfflineSyncProvider>
     </ModulesProvider>

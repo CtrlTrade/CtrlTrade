@@ -38,7 +38,28 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+### Schema changes must be published to reach production
+
+The Drizzle schema in `lib/db/src/schema/index.ts` is the single source of truth. When you merge a schema change, this is what happens:
+
+| Step | When | What runs | Target DB |
+|---|---|---|---|
+| 1 | Task merges | `scripts/post-merge.sh` → `pnpm --filter db push` | **Dev only** |
+| 2 | You click Publish | Replit diffs dev vs prod, shows rename warnings, applies SQL | **Production** |
+
+**Checklist after every schema change:**
+
+1. Merge the task (post-merge script pushes to dev automatically).
+2. Verify the feature works in development.
+3. **Re-publish the app** — the Publish flow computes a SQL diff between dev and production and applies it. If any column/table was renamed, you will see a confirmation prompt (renaming without confirming is treated as drop + add and will lose data).
+
+**What NOT to do:**
+
+- Do not add `CREATE TABLE`/`ALTER TABLE` DDL to `post-merge.sh` or application startup — the Publish flow owns production schema.
+- Do not run `drizzle-kit push` or raw `psql` DDL against the production connection string.
+- Do not modify the build/deploy command to run schema mutations — it runs on every deploy and is unsafe.
+
+See [Replit Production Databases docs](https://docs.replit.com/cloud-services/storage-and-databases/production-databases) for more detail.
 
 ## Pointers
 

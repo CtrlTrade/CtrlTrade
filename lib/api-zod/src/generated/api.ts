@@ -2235,6 +2235,27 @@ export const ListAdminTenantsResponseItem = zod.object({
 export const ListAdminTenantsResponse = zod.array(ListAdminTenantsResponseItem)
 
 
+export const adminCreateTenantBodyControlSeatsMin = 0;
+
+export const adminCreateTenantBodyFieldSeatsMin = 0;
+
+export const adminCreateTenantBodyTillsMin = 0;
+
+
+
+export const AdminCreateTenantBody = zod.object({
+  "name": zod.string(),
+  "ownerEmail": zod.string(),
+  "ownerName": zod.string(),
+  "ownerPassword": zod.string(),
+  "status": zod.string().optional(),
+  "controlSeats": zod.number().min(adminCreateTenantBodyControlSeatsMin).optional(),
+  "fieldSeats": zod.number().min(adminCreateTenantBodyFieldSeatsMin).optional(),
+  "tills": zod.number().min(adminCreateTenantBodyTillsMin).optional(),
+  "branchName": zod.string().optional()
+})
+
+
 export const GetAdminTenantParams = zod.object({
   "tenantId": zod.coerce.string()
 })
@@ -2346,6 +2367,36 @@ export const GetAdminTenantResponse = zod.object({
 })),
   "branchCount": zod.number(),
   "projectsCount": zod.number().describe('Total number of projects for this tenant')
+})
+
+
+export const AdminUpdateTenantParams = zod.object({
+  "tenantId": zod.coerce.string()
+})
+
+export const AdminUpdateTenantBody = zod.object({
+  "name": zod.string().optional(),
+  "slug": zod.string().optional(),
+  "status": zod.string().optional()
+})
+
+export const AdminUpdateTenantResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "status": zod.string(),
+  "controlSeats": zod.number(),
+  "fieldSeats": zod.number(),
+  "tills": zod.number(),
+  "monthlyTotal": zod.number(),
+  "currency": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "ownerEmail": zod.string(),
+  "trialEndsAt": zod.coerce.date().nullish()
+})
+
+
+export const AdminDeleteTenantParams = zod.object({
+  "tenantId": zod.coerce.string()
 })
 
 
@@ -3084,6 +3135,7 @@ export const GetExpiryAttentionResponse = zod.object({
  */
 export const GetFinancialSummaryResponse = zod.object({
   "currency": zod.string(),
+  "revenueTodayPence": zod.number(),
   "revenueThisMonthPence": zod.number(),
   "revenueLastMonthPence": zod.number(),
   "outstandingPence": zod.number(),
@@ -3096,6 +3148,7 @@ export const GetFinancialSummaryResponse = zod.object({
   "pipelineCount": zod.number(),
   "jobsThisMonth": zod.number(),
   "jobsCompletedThisMonth": zod.number(),
+  "jobsScheduledCount": zod.number(),
   "avgJobValuePence": zod.number()
 })
 
@@ -7075,7 +7128,8 @@ export const GetTillSessionReportResponse = zod.object({
 
 
 export const ListPosTransactionsQueryParams = zod.object({
-  "sessionId": zod.coerce.string().optional()
+  "sessionId": zod.coerce.string().optional(),
+  "tradeAccountId": zod.coerce.string().optional()
 })
 
 export const ListPosTransactionsResponseItem = zod.object({

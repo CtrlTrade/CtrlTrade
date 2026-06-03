@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function PartnerLayout({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
-  const { data, isLoading, error } = useGetPartnerMe({ query: { retry: false, queryKey: ["partner-me"] } });
+  const { data, isLoading, isFetching, error } = useGetPartnerMe({ query: { retry: false, queryKey: ["partner-me"] } });
   const qc = useQueryClient();
   const logout = usePartnerLogout({
     mutation: {
@@ -18,13 +18,13 @@ export function PartnerLayout({ children }: { children: React.ReactNode }) {
       },
     },
   });
-  const unauthorized = !isLoading && (!data?.partner || !!error);
+  const unauthorized = !isLoading && !isFetching && (!data?.partner || !!error);
 
   useEffect(() => {
     if (unauthorized) setLocation("~/partner/login");
   }, [unauthorized, setLocation]);
 
-  if (isLoading || unauthorized || !data?.partner) {
+  if (isLoading || isFetching || unauthorized || !data?.partner) {
     return (
       <div className="p-8">
         <Skeleton className="h-10 w-full mb-4" />

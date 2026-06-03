@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Star, ShieldCheck } from "lucide-react";
+import { PageHead } from "@/components/PageHead";
 
 export function Marketplace() {
   const [q, setQ] = useState("");
@@ -15,6 +16,11 @@ export function Marketplace() {
 
   return (
     <div className="max-w-6xl mx-auto py-12 px-4 space-y-8">
+      <PageHead
+        title="Trades Marketplace — Find Verified Contractors & Suppliers"
+        description="Browse verified CtrlTrade® contractors and suppliers. Search by trade, region, or keyword to find the right business for your job."
+        canonical="/marketplace"
+      />
       <header>
         <h1 className="text-4xl font-bold">Trades Marketplace</h1>
         <p className="text-muted-foreground mt-2">Verified CtrlTrade® contractors and suppliers.</p>

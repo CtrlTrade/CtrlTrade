@@ -57,6 +57,40 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // Core React runtime — always needed, cache aggressively
+          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) {
+            return "vendor-react";
+          }
+          // Radix UI primitives — large but shared across many pages
+          if (id.includes("node_modules/@radix-ui/")) {
+            return "vendor-radix";
+          }
+          // Recharts + d3 dependencies — only used on report pages
+          if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-") || id.includes("node_modules/victory-")) {
+            return "vendor-charts";
+          }
+          // Stripe — only used on billing pages
+          if (id.includes("node_modules/@stripe/")) {
+            return "vendor-stripe";
+          }
+          // Uppy file upload — only used on specific pages
+          if (id.includes("node_modules/@uppy/")) {
+            return "vendor-uppy";
+          }
+          // Framer Motion — used on public/marketing pages
+          if (id.includes("node_modules/framer-motion")) {
+            return "vendor-framer";
+          }
+          // Remaining node_modules in a shared vendor chunk
+          if (id.includes("node_modules/")) {
+            return "vendor";
+          }
+        },
+      },
+    },
   },
   server: {
     port,

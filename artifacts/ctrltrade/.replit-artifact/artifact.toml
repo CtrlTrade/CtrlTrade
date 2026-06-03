@@ -22,9 +22,67 @@ build = [ "pnpm", "--filter", "@workspace/ctrltrade", "run", "build" ]
 publicDir = "artifacts/ctrltrade/dist/public"
 serve = "static"
 
+# Authenticated/private SPA sections — rewrite to app-shell.html for client-side routing.
+# app-shell.html is the clean SPA bootstrap (empty root div) written by prerender.mjs
+# BEFORE it overwrites index.html with the prerendered homepage HTML.
+# Using the clean shell here prevents a hydration mismatch where React 18 would
+# attempt to hydrateRoot against homepage markup on a /login or /app/* URL and
+# fail, leaving the page interactive-dead (visible but unclickable).
 [[services.production.rewrites]]
-from = "/*"
-to = "/index.html"
+from = "/app/*"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/app"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/admin/*"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/admin"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/portal/*"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/partner/*"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/partner"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/reseller"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/login"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/signup"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/accept-invite"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/forgot-password"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/reset-password"
+to = "/app-shell.html"
+
+[[services.production.rewrites]]
+from = "/book/*"
+to = "/app-shell.html"
 
 [services.env]
 PORT = "23264"

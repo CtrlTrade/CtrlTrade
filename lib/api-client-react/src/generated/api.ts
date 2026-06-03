@@ -23,6 +23,7 @@ import type {
   AcceptInvitationInput,
   ActivityEntry,
   AdminConfirmInstallerUploadInput,
+  AdminCreateTenantInput,
   AdminDashboard,
   AdminInstallerUploadUrlInput,
   AdminInstallerUploadUrlResponse,
@@ -37,6 +38,7 @@ import type {
   AdminTenantSummary,
   AdminUpdatePosDownloadsInput,
   AdminUpdatePosLicenceInput,
+  AdminUpdateTenantInput,
   AdminUsage,
   AdminVerificationSubmission,
   AdminWorkerJob,
@@ -6394,6 +6396,71 @@ export function useListAdminTenants<TData = Awaited<ReturnType<typeof listAdminT
 
 
 
+export const getAdminCreateTenantUrl = () => {
+
+
+
+
+  return `/api/v1/admin/tenants`
+}
+
+export const adminCreateTenant = async (adminCreateTenantInput: AdminCreateTenantInput, options?: RequestInit): Promise<AdminTenantSummary> => {
+
+  return customFetch<AdminTenantSummary>(getAdminCreateTenantUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminCreateTenantInput,)
+  }
+);}
+
+
+
+
+export const getAdminCreateTenantMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCreateTenant>>, TError,{data: BodyType<AdminCreateTenantInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminCreateTenant>>, TError,{data: BodyType<AdminCreateTenantInput>}, TContext> => {
+
+const mutationKey = ['adminCreateTenant'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminCreateTenant>>, {data: BodyType<AdminCreateTenantInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminCreateTenant(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminCreateTenantMutationResult = NonNullable<Awaited<ReturnType<typeof adminCreateTenant>>>
+    export type AdminCreateTenantMutationBody = BodyType<AdminCreateTenantInput>
+    export type AdminCreateTenantMutationError = ErrorType<unknown>
+
+    export const useAdminCreateTenant = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCreateTenant>>, TError,{data: BodyType<AdminCreateTenantInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminCreateTenant>>,
+        TError,
+        {data: BodyType<AdminCreateTenantInput>},
+        TContext
+      > => {
+      return useMutation(getAdminCreateTenantMutationOptions(options));
+    }
+
 export const getGetAdminTenantUrl = (tenantId: string,) => {
 
 
@@ -6464,6 +6531,136 @@ export function useGetAdminTenant<TData = Awaited<ReturnType<typeof getAdminTena
 
 
 
+
+export const getAdminUpdateTenantUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/v1/admin/tenants/${tenantId}`
+}
+
+export const adminUpdateTenant = async (tenantId: string,
+    adminUpdateTenantInput: AdminUpdateTenantInput, options?: RequestInit): Promise<AdminTenantSummary> => {
+
+  return customFetch<AdminTenantSummary>(getAdminUpdateTenantUrl(tenantId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminUpdateTenantInput,)
+  }
+);}
+
+
+
+
+export const getAdminUpdateTenantMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdateTenant>>, TError,{tenantId: string;data: BodyType<AdminUpdateTenantInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminUpdateTenant>>, TError,{tenantId: string;data: BodyType<AdminUpdateTenantInput>}, TContext> => {
+
+const mutationKey = ['adminUpdateTenant'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminUpdateTenant>>, {tenantId: string;data: BodyType<AdminUpdateTenantInput>}> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  adminUpdateTenant(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminUpdateTenantMutationResult = NonNullable<Awaited<ReturnType<typeof adminUpdateTenant>>>
+    export type AdminUpdateTenantMutationBody = BodyType<AdminUpdateTenantInput>
+    export type AdminUpdateTenantMutationError = ErrorType<unknown>
+
+    export const useAdminUpdateTenant = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdateTenant>>, TError,{tenantId: string;data: BodyType<AdminUpdateTenantInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminUpdateTenant>>,
+        TError,
+        {tenantId: string;data: BodyType<AdminUpdateTenantInput>},
+        TContext
+      > => {
+      return useMutation(getAdminUpdateTenantMutationOptions(options));
+    }
+
+export const getAdminDeleteTenantUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/v1/admin/tenants/${tenantId}`
+}
+
+export const adminDeleteTenant = async (tenantId: string, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getAdminDeleteTenantUrl(tenantId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getAdminDeleteTenantMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminDeleteTenant>>, TError,{tenantId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminDeleteTenant>>, TError,{tenantId: string}, TContext> => {
+
+const mutationKey = ['adminDeleteTenant'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminDeleteTenant>>, {tenantId: string}> = (props) => {
+          const {tenantId} = props ?? {};
+
+          return  adminDeleteTenant(tenantId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminDeleteTenantMutationResult = NonNullable<Awaited<ReturnType<typeof adminDeleteTenant>>>
+
+    export type AdminDeleteTenantMutationError = ErrorType<unknown>
+
+    export const useAdminDeleteTenant = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminDeleteTenant>>, TError,{tenantId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminDeleteTenant>>,
+        TError,
+        {tenantId: string},
+        TContext
+      > => {
+      return useMutation(getAdminDeleteTenantMutationOptions(options));
+    }
 
 export const getAdminUpdateTenantQuantitiesUrl = (tenantId: string,) => {
 

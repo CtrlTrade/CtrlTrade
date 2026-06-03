@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useCreatePlatformLead } from "@workspace/api-client-react";
+import { PageHead } from "@/components/PageHead";
 import {
   ArrowRight, Shield, Zap, CheckCircle2, HardHat, CalendarCheck, FileText,
   Truck, ShieldCheck, Mail, MapPin, BarChart3, Users, Package, CreditCard,
@@ -25,7 +26,7 @@ const coreModules = [
     desc: "The complete back-office and field management system for trade businesses.",
   },
   {
-    href: "/epos",
+    href: "/ctrltradepos",
     icon: Monitor,
     title: "CtrlTradePos®",
     badge: "£59.99 / till",
@@ -94,6 +95,11 @@ const includedItems = [
 export function Home() {
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="The Complete Operating System For Trade Businesses"
+        description="CtrlTrade® is the complete operating system for trade businesses. CRM, Scheduling, Dispatch, Invoicing, Customer Portal, EPOS & Warehouse Management — all in one platform."
+        canonical="/"
+      />
       {/* Hero */}
       <section className="py-24 md:py-36 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
@@ -351,6 +357,11 @@ const featureGroups = [
 export function Features() {
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="Features — CRM, EPOS, Compliance & More For Trade Businesses"
+        description="Explore every feature in CtrlTrade®: CRM, scheduling, invoicing, EPOS, fleet management, compliance, AI automation, and more — all built for trade businesses."
+        canonical="/features"
+      />
       <section className="py-24 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 max-w-4xl relative z-10">
@@ -456,6 +467,11 @@ const integrationGroups = [
 export function Integrations() {
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="Integrations — Connect CtrlTrade® To Your Existing Tools"
+        description="CtrlTrade® integrates with Xero, QuickBooks, Stripe, Google Calendar, WhatsApp, Twilio, and more. Keep your entire trade business stack in sync."
+        canonical="/integrations"
+      />
       <section className="py-24 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 max-w-4xl relative z-10">
@@ -509,7 +525,7 @@ export function Integrations() {
 const availableAddons = [
   { name: "CtrlAI®", price: "Included", desc: "AI quotes, AI dispatch, AI reporting, and AI insights built into your workflow.", href: "/features" },
   { name: "CtrlVoice®", price: "Add-on", desc: "Integrated VoIP phone system, SMS, WhatsApp business messaging, and call recording.", href: "/features" },
-  { name: "CtrlTradePos®", price: "£59.99 / till / month", desc: "Full EPOS system for trade counters, warehouses, and showrooms.", href: "/epos" },
+  { name: "CtrlTradePos®", price: "£59.99 / till / month", desc: "Full EPOS system for trade counters, warehouses, and showrooms.", href: "/ctrltradepos" },
   { name: "CtrlWorkflow®", price: "Included", desc: "Trigger-based automation rules — assign jobs, send reminders, escalate payments.", href: "/features" },
   { name: "CtrlCompliance®", price: "Included", desc: "RAMS, risk assessments, method statements, certifications, and compliance tracking.", href: "/features" },
   { name: "CtrlFleet®", price: "Included", desc: "Live vehicle tracking, MOT/service scheduling, mileage logging, and cost tracking.", href: "/features" },
@@ -526,6 +542,11 @@ const comingSoon = [
 export function Addons() {
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="Add-Ons — Extend Your CtrlTrade® Platform"
+        description="Extend CtrlTrade® with CtrlAI®, CtrlVoice®, CtrlTradePos®, and more. Most modules are included as standard — add specialist capabilities as your business grows."
+        canonical="/addons"
+      />
       <section className="py-24 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 max-w-4xl relative z-10">
@@ -605,6 +626,11 @@ const securityItems = [
 export function Security() {
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="Security & Compliance — GDPR, Encryption & Data Protection"
+        description="CtrlTrade® is engineered to exceed compliance and security standards. GDPR-compliant, AES-256 encryption, tenant isolation, MFA, and immutable audit logs."
+        canonical="/security"
+      />
       <section className="py-24 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">
@@ -677,6 +703,11 @@ export function Contact() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="Contact Us — Get In Touch With CtrlTrade®"
+        description="Questions about pricing, implementation, or data migration? Contact the CtrlTrade® team — we're here to help trade businesses get up and running."
+        canonical="/contact"
+      />
       <section className="py-24 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 max-w-4xl relative z-10">

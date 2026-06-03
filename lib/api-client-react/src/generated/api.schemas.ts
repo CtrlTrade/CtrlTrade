@@ -1180,6 +1180,27 @@ export interface UpcomingRenewal {
   currency: string;
 }
 
+export interface AdminCreateTenantInput {
+  name: string;
+  ownerEmail: string;
+  ownerName: string;
+  ownerPassword: string;
+  status?: string;
+  /** @minimum 0 */
+  controlSeats?: number;
+  /** @minimum 0 */
+  fieldSeats?: number;
+  /** @minimum 0 */
+  tills?: number;
+  branchName?: string;
+}
+
+export interface AdminUpdateTenantInput {
+  name?: string;
+  slug?: string;
+  status?: string;
+}
+
 export interface AdminTenantSummary {
   id: string;
   name: string;
@@ -1788,6 +1809,7 @@ export interface ExpiryItem {
 
 export interface FinancialSummary {
   currency: string;
+  revenueTodayPence: number;
   revenueThisMonthPence: number;
   revenueLastMonthPence: number;
   outstandingPence: number;
@@ -1800,6 +1822,7 @@ export interface FinancialSummary {
   pipelineCount: number;
   jobsThisMonth: number;
   jobsCompletedThisMonth: number;
+  jobsScheduledCount: number;
   avgJobValuePence: number;
 }
 
@@ -5104,6 +5127,7 @@ search?: string;
 
 export type ListPosTransactionsParams = {
 sessionId?: string;
+tradeAccountId?: string;
 };
 
 export type ListComplianceQueueParams = {

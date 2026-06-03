@@ -6,6 +6,7 @@ import {
   CreditCard, ReceiptText, ArrowRight, CheckCircle2, Building2, Warehouse,
   AppWindow, Laptop
 } from "lucide-react";
+import { PageHead } from "@/components/PageHead";
 
 const tillFeatures = [
   { icon: Monitor, title: "Touchscreen Till", desc: "Large-format touchscreen interface optimised for fast trade counter sales. Quick-action buttons, product search, and barcode lookup." },
@@ -75,6 +76,11 @@ export function CtrlTradePosPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="CtrlTradePos® — EPOS For Trade Counters, Warehouses & Showrooms"
+        description="CtrlTradePos® is the purpose-built EPOS system for trade counters. Barcode scanning, trade accounts, stock control, receipt printing, and offline mode — fully integrated with your CRM."
+        canonical="/ctrltradepos"
+      />
       <section className="py-24 md:py-32 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">

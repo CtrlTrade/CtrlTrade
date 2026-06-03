@@ -150,7 +150,7 @@ function SidebarContent({
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
-  const { data: session, isLoading } = useGetSession();
+  const { data: session, isLoading, isFetching } = useGetSession();
   const logout = useLogout();
   const stopImpersonation = useStopImpersonation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -159,7 +159,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     try { return localStorage.getItem(COLLAPSED_KEY) === "true"; } catch { return false; }
   });
 
-  const unauthorized = !isLoading && (!session || !session.user.isSuperAdmin);
+  const unauthorized = !isLoading && !isFetching && (!session || !session.user.isSuperAdmin);
   const isImpersonating = !!(session as any)?.impersonation;
 
   useEffect(() => {
@@ -188,7 +188,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     });
   };
 
-  if (isLoading || unauthorized || !session) {
+  if (isLoading || isFetching || unauthorized || !session) {
     return (
       <div className="p-8">
         <Skeleton className="h-10 w-full mb-4" />

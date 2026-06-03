@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useListTradeCategories } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowRight, ChevronDown, ChevronUp, Search } from "lucide-react";
+import { PageHead } from "@/components/PageHead";
 
 const seoLandingPages: Record<string, string> = {
   roofing: "/roofing-crm",
@@ -347,23 +348,33 @@ function IndustryCard({ industry, isOpen, onToggle }: {
 }) {
   return (
     <div className={`border bg-card transition-colors ${isOpen ? "border-primary" : "border-border hover:border-primary/50"}`}>
-      <button
-        type="button"
-        onClick={onToggle}
-        className="w-full text-left p-5 flex items-start justify-between gap-3 focus:outline-none"
-      >
+      <div className="p-5 flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-base leading-snug">{industry.name}</span>
+            {industry.seoHref ? (
+              <Link
+                href={industry.seoHref}
+                className="font-bold text-base leading-snug hover:text-primary transition-colors"
+              >
+                {industry.name}
+              </Link>
+            ) : (
+              <span className="font-bold text-base leading-snug">{industry.name}</span>
+            )}
           </div>
           <span className="text-xs text-muted-foreground mt-0.5 block">
             {industry.subCategories.length} sub-categories
           </span>
         </div>
-        <div className="shrink-0 mt-0.5 text-muted-foreground">
+        <button
+          type="button"
+          onClick={onToggle}
+          className="shrink-0 mt-0.5 text-muted-foreground focus:outline-none"
+          aria-label={isOpen ? "Collapse" : "Expand"}
+        >
           {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </div>
-      </button>
+        </button>
+      </div>
 
       {isOpen && (
         <div className="px-5 pb-5 border-t border-border/50">
@@ -428,6 +439,11 @@ export function Industries() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="Industries — CRM Software For Every Trade"
+        description="CtrlTrade® is purpose-built for every trade. Browse industry-specific CRM editions for roofing, electrical, plumbing, HVAC, building, cleaning, facilities management, and more."
+        canonical="/industries"
+      />
       <section className="py-24 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">

@@ -12,7 +12,7 @@ function formatGBP(pence: number) {
 export function PortalDashboard() {
   const { tenantSlug } = useParams<{ tenantSlug: string }>();
   const [, setLocation] = useLocation();
-  const { data: session, isLoading: sessLoading, isError: sessError } = useGetPortalSession({
+  const { data: session, isLoading: sessLoading, isFetching: sessFetching, isError: sessError } = useGetPortalSession({
     query: { retry: false, queryKey: ["portal-session"] },
   });
   const { data, isLoading } = useGetPortalDashboard({
@@ -20,10 +20,10 @@ export function PortalDashboard() {
   });
 
   useEffect(() => {
-    if (!sessLoading && sessError) setLocation(`/portal/${tenantSlug}`);
-  }, [sessLoading, sessError, setLocation, tenantSlug]);
+    if (!sessLoading && !sessFetching && sessError) setLocation(`/portal/${tenantSlug}`);
+  }, [sessLoading, sessFetching, sessError, setLocation, tenantSlug]);
 
-  if (sessLoading || isLoading || !data) return <Skeleton className="h-96" />;
+  if (sessLoading || sessFetching || isLoading || !data) return <Skeleton className="h-96" />;
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">

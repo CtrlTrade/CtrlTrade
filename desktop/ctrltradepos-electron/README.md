@@ -142,10 +142,57 @@ You can then download the installers from the **Releases** page of your GitHub r
 
 ## Code signing & notarisation
 
-Code signing is **not** configured here. To distribute the app:
+### Windows — stop the SmartScreen "unknown publisher" warning
 
-- **Windows**: Obtain an EV or OV code signing certificate and configure `win.certificateFile` / `win.certificatePassword` in the `build` section of `package.json` (or via environment variables — see the [electron-builder docs](https://www.electron.build/code-signing)).
-- **macOS**: Enrol in the Apple Developer Programme, set up a Developer ID Application certificate, and add your Apple ID credentials for notarisation. See the [electron-builder macOS docs](https://www.electron.build/configuration/mac).
+By default Windows Defender SmartScreen warns users that the installer is from an
+"unknown publisher" because the `.exe` is **not code-signed**. Signing it with a
+certificate makes Windows recognise CtrlTrade as the publisher and removes the
+warning (immediately with an EV certificate; gradually as reputation builds with an
+OV certificate).
+
+The build is already **wired for signing**: it signs automatically when the right
+credentials are present in the environment and produces an unsigned build otherwise,
+so nothing breaks before you buy a certificate. Build config lives in
+`electron-builder.config.js`.
+
+Pick **one** of the two options below and add the values as **GitHub repository
+secrets** (Settings → Secrets and variables → Actions). The `build-desktop.yml`
+workflow already passes them through.
+
+**Option A — PFX / .p12 certificate file** (an OV or EV cert exported to a file):
+
+| Secret | Value |
+|---|---|
+| `WINDOWS_CSC_LINK` | Base64 of the `.pfx`/`.p12` file (`base64 -w0 cert.pfx`) — or a URL to it |
+| `WINDOWS_CSC_KEY_PASSWORD` | The certificate's password |
+
+> Note: an **EV** certificate normally lives on a hardware token / HSM and cannot be
+> exported to a file, so Option A is mainly for **OV** certificates. For an EV cert in
+> CI, use Option B.
+
+**Option B — Azure Trusted Signing** (cloud signing, no hardware token, runs in CI —
+the low-cost recommended option):
+
+| Secret | Value |
+|---|---|
+| `AZURE_CODE_SIGNING_ENDPOINT` | e.g. `https://eus.codesigning.azure.net/` |
+| `AZURE_CODE_SIGNING_ACCOUNT` | Trusted Signing account name |
+| `AZURE_CERTIFICATE_PROFILE` | Certificate profile name |
+| `AZURE_TENANT_ID` / `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET` | Service principal credentials for the signing tool |
+| `WINDOWS_PUBLISHER_NAME` | _(optional)_ display name, defaults to `CtrlTrade` |
+
+Once secrets are added, the next tag push (`git tag vX.Y.Z && git push origin vX.Y.Z`)
+produces a signed installer. Verify it by right-clicking the `.exe` →
+**Properties → Digital Signatures** — it should list CtrlTrade as a valid signer.
+
+To sign locally instead of in CI, export the same variables in your shell before
+running `pnpm run dist:win`.
+
+### macOS
+
+Enrol in the Apple Developer Programme, set up a Developer ID Application certificate,
+and add your Apple ID credentials for notarisation. See the
+[electron-builder macOS docs](https://www.electron.build/configuration/mac).
 
 ---
 

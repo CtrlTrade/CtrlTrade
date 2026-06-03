@@ -1,2 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /app/
+Disallow: /admin/
+Disallow: /partner/
+Disallow: /portal/
+Disallow: /reseller/
+
+Sitemap: https://ctrltrade.co.uk/sitemap.xml

@@ -240,7 +240,22 @@ export default function BasketScreen() {
         </View>
 
         <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>TRADE ACCOUNT</Text>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <Text style={[styles.sectionLabel, { color: colors.mutedForeground, marginBottom: 0 }]}>TRADE ACCOUNT</Text>
+            {basket.tradeAccountId && (
+              <Pressable
+                onPress={() =>
+                  router.push({
+                    pathname: "/(app)/trade-account/[id]",
+                    params: { id: basket.tradeAccountId! },
+                  })
+                }
+                style={({ pressed }) => [styles.viewAcctBtn, { borderColor: colors.border, opacity: pressed ? 0.7 : 1 }]}
+              >
+                <Text style={[styles.viewAcctText, { color: colors.primary }]}>VIEW ACCOUNT →</Text>
+              </Pressable>
+            )}
+          </View>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
             <Pressable
               onPress={() => basket.setTradeAccount(null, null)}
@@ -383,4 +398,6 @@ const styles = StyleSheet.create({
   offlineTitle: { fontFamily: MONO_FONT, fontSize: 22, fontWeight: "700", letterSpacing: 3, textAlign: "center" },
   offlineBody: { fontFamily: MONO_FONT, fontSize: 13, lineHeight: 20, textAlign: "center" },
   offlineBadge: { fontFamily: MONO_FONT, fontSize: 12, letterSpacing: 2, fontWeight: "700" },
+  viewAcctBtn: { borderWidth: 1, borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5 },
+  viewAcctText: { fontFamily: MONO_FONT, fontSize: 10, letterSpacing: 1.5, fontWeight: "700" },
 });

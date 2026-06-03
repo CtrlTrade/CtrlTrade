@@ -8,6 +8,7 @@
 
 export interface FinancialSummary {
   currency: string;
+  revenueTodayPence: number;
   revenueThisMonthPence: number;
   revenueLastMonthPence: number;
   outstandingPence: number;
@@ -20,5 +21,6 @@ export interface FinancialSummary {
   pipelineCount: number;
   jobsThisMonth: number;
   jobsCompletedThisMonth: number;
+  jobsScheduledCount: number;
   avgJobValuePence: number;
 }

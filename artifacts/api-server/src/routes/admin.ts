@@ -38,6 +38,7 @@ import {
   AdminUpdatePosLicenceBody,
 } from "@workspace/api-zod";
 import { requireSuperAdmin } from "../middlewares/auth";
+import { hashPassword, slugify } from "../lib/auth";
 import { ObjectStorageService } from "../lib/objectStorage";
 import { setObjectAclPolicy } from "../lib/objectAcl";
 import {
@@ -312,6 +313,201 @@ router.get("/v1/admin/tenants", async (req, res): Promise<void> => {
       }),
     ),
   );
+});
+
+router.post("/v1/admin/tenants", async (req, res): Promise<void> => {
+  const body = z
+    .object({
+      name: z.string().min(2),
+      ownerEmail: z.string().email(),
+      ownerName: z.string().min(1),
+      ownerPassword: z.string().min(8),
+      status: z.enum(["trial", "active", "cancelled", "suspended"]).optional().default("active"),
+      controlSeats: z.number().int().min(0).optional().default(1),
+      fieldSeats: z.number().int().min(0).optional().default(1),
+      tills: z.number().int().min(0).optional().default(1),
+      branchName: z.string().optional(),
+    })
+    .safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+  const { name, ownerEmail, ownerName, ownerPassword, status, controlSeats, fieldSeats, tills, branchName } = body.data;
+
+  const existingUser = await db.select().from(usersTable).where(eq(usersTable.email, ownerEmail));
+  if (existingUser.length > 0) {
+    res.status(409).json({ error: "A user with that email already exists" });
+    return;
+  }
+
+  let baseSlug = slugify(name);
+  let slug = baseSlug;
+  for (let i = 1; i <= 20; i++) {
+    const found = await db.select().from(tenantsTable).where(eq(tenantsTable.slug, slug));
+    if (found.length === 0) break;
+    slug = `${baseSlug}-${i}`;
+  }
+
+  const passwordHash = await hashPassword(ownerPassword);
+
+  const [tenant] = await db
+    .insert(tenantsTable)
+    .values({ name, slug, status })
+    .returning();
+
+  const [user] = await db
+    .insert(usersTable)
+    .values({ email: ownerEmail, name: ownerName, passwordHash })
+    .returning();
+
+  await db.insert(membershipsTable).values({
+    tenantId: tenant.id,
+    userId: user.id,
+    role: "owner",
+    seatType: "control",
+  });
+
+  await db.insert(subscriptionsTable).values({
+    tenantId: tenant.id,
+    stripeSubscriptionId: "manual",
+    stripeCustomerId: "manual",
+    status: status === "trial" ? "trialing" : "active",
+    controlSeats,
+    fieldSeats,
+    tills,
+    currency: "gbp",
+    cancelAtPeriodEnd: false,
+  });
+
+  await db.insert(branchesTable).values({
+    tenantId: tenant.id,
+    name: branchName?.trim() || name,
+  });
+
+  await logAudit({
+    tenantId: tenant.id,
+    actorUserId: user.id,
+    actorLabel: `superadmin:${req.auth?.user?.email ?? "system"}`,
+    kind: "tenant.created",
+    message: `Tenant "${name}" created by super-admin. Owner: ${ownerEmail}.`,
+    metadata: { slug, ownerEmail },
+  });
+
+  const sub = await getTenantSubscription(tenant.id);
+  res.status(201).json({
+    id: tenant.id,
+    name: tenant.name,
+    status: tenant.status,
+    controlSeats: sub?.controlSeats ?? 0,
+    fieldSeats: sub?.fieldSeats ?? 0,
+    tills: sub?.tills ?? 0,
+    monthlyTotal: sub ? computeMonthlyTotal(sub.controlSeats, sub.fieldSeats, sub.tills) : 0,
+    currency: sub?.currency ?? "gbp",
+    createdAt: tenant.createdAt.toISOString(),
+    trialEndsAt: tenant.trialEndsAt?.toISOString() ?? null,
+    ownerEmail,
+  });
+});
+
+router.patch("/v1/admin/tenants/:tenantId", async (req, res): Promise<void> => {
+  const tenantId = req.params.tenantId;
+  const [tenant] = await db.select().from(tenantsTable).where(eq(tenantsTable.id, tenantId));
+  if (!tenant) {
+    res.status(404).json({ error: "Tenant not found" });
+    return;
+  }
+
+  const body = z
+    .object({
+      name: z.string().min(2).optional(),
+      slug: z.string().min(2).optional(),
+      status: z.enum(["trial", "active", "cancelled", "suspended"]).optional(),
+    })
+    .safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+
+  const updates: Partial<typeof tenantsTable.$inferInsert> = {};
+  if (body.data.name !== undefined) updates.name = body.data.name;
+  if (body.data.status !== undefined) updates.status = body.data.status;
+  if (body.data.slug !== undefined) {
+    const newSlug = slugify(body.data.slug);
+    const existing = await db
+      .select()
+      .from(tenantsTable)
+      .where(and(eq(tenantsTable.slug, newSlug), sql`id != ${tenantId}`));
+    if (existing.length > 0) {
+      res.status(409).json({ error: "Slug is already taken" });
+      return;
+    }
+    updates.slug = newSlug;
+  }
+
+  if (Object.keys(updates).length === 0) {
+    res.status(400).json({ error: "No fields to update" });
+    return;
+  }
+
+  const [updated] = await db
+    .update(tenantsTable)
+    .set(updates)
+    .where(eq(tenantsTable.id, tenantId))
+    .returning();
+
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "tenant.updated",
+    message: `Tenant updated by super-admin: ${JSON.stringify(updates)}.`,
+    metadata: updates,
+  });
+
+  const sub = await getTenantSubscription(tenantId);
+  const [ownerRow] = await db
+    .select({ email: usersTable.email })
+    .from(membershipsTable)
+    .innerJoin(usersTable, eq(usersTable.id, membershipsTable.userId))
+    .where(and(eq(membershipsTable.tenantId, tenantId), eq(membershipsTable.role, "owner")));
+
+  res.json({
+    id: updated.id,
+    name: updated.name,
+    status: updated.status,
+    controlSeats: sub?.controlSeats ?? 0,
+    fieldSeats: sub?.fieldSeats ?? 0,
+    tills: sub?.tills ?? 0,
+    monthlyTotal: sub ? computeMonthlyTotal(sub.controlSeats, sub.fieldSeats, sub.tills) : 0,
+    currency: sub?.currency ?? "gbp",
+    createdAt: updated.createdAt.toISOString(),
+    trialEndsAt: updated.trialEndsAt?.toISOString() ?? null,
+    ownerEmail: ownerRow?.email ?? "",
+  });
+});
+
+router.delete("/v1/admin/tenants/:tenantId", async (req, res): Promise<void> => {
+  const tenantId = req.params.tenantId;
+  const [tenant] = await db.select().from(tenantsTable).where(eq(tenantsTable.id, tenantId));
+  if (!tenant) {
+    res.status(404).json({ error: "Tenant not found" });
+    return;
+  }
+
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "tenant.deleted",
+    message: `Tenant "${tenant.name}" permanently deleted by super-admin.`,
+    metadata: { slug: tenant.slug },
+  });
+
+  await db.delete(tenantsTable).where(eq(tenantsTable.id, tenantId));
+
+  res.status(204).end();
 });
 
 router.get("/v1/admin/tenants/:tenantId", async (req, res): Promise<void> => {

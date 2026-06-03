@@ -1,4 +1,5 @@
 import { CheckCircle2, AlertCircle, Clock } from "lucide-react";
+import { PageHead } from "@/components/PageHead";
 
 const services = [
   { name: "API", description: "Core API service", status: "operational" },
@@ -47,6 +48,12 @@ export function StatusPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="System Status — CtrlTrade® Platform Status"
+        description="Live status for all CtrlTrade® services including the API, web application, EPOS, customer portal, worker queue, and integrations."
+        canonical="/status"
+        noIndex={true}
+      />
       <section className="py-24 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 text-center relative z-10">

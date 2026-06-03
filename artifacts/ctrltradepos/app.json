@@ -18,7 +18,8 @@
     },
     "android": {},
     "web": {
-      "favicon": "./assets/ctrltrade-icon.png"
+      "favicon": "./assets/ctrltrade-icon.png",
+      "output": "single"
     },
     "plugins": [
       [

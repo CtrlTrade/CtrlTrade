@@ -837,8 +837,10 @@ async function serializeTransaction(
 router.get("/v1/pos/transactions", requirePosAuth, async (req, res) => {
   const { tenant } = req.posAuth!;
   const sessionId = (req.query.sessionId as string | undefined) ?? null;
+  const tradeAccountId = (req.query.tradeAccountId as string | undefined) ?? null;
   const conditions = [eq(posTransactionsTable.tenantId, tenant.id)];
   if (sessionId) conditions.push(eq(posTransactionsTable.tillSessionId, sessionId));
+  if (tradeAccountId) conditions.push(eq(posTransactionsTable.tradeAccountId, tradeAccountId));
   const txs = await db
     .select()
     .from(posTransactionsTable)

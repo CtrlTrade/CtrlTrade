@@ -5,6 +5,7 @@ import {
   Truck, ShieldCheck, Zap, CheckCircle2, ArrowRight, Phone,
   BarChart3, Mail, Clock, Star
 } from "lucide-react";
+import { PageHead } from "@/components/PageHead";
 
 const features = [
   { icon: Users, title: "Lead Management", desc: "Capture leads from web forms, phone calls, and lead platforms. Score, assign, and track every enquiry from first contact to won job." },
@@ -37,6 +38,11 @@ const compareRows = [
 export function CrmPage() {
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="CRM Software For Trade Businesses"
+        description="CtrlTrade® CRM handles leads, quotes, jobs, scheduling, invoicing, fleet, compliance, and more — all in one platform built for trade businesses."
+        canonical="/crm"
+      />
       <section className="py-24 md:py-32 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">

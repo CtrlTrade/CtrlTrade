@@ -27,9 +27,10 @@ export function Login() {
           return;
         }
         toast({ title: "Login successful", description: "Welcome back." });
-        // Invalidate the session cache so AppLayout gets fresh data instead of
-        // stale "unauthenticated" state, which would immediately redirect back.
-        await qc.invalidateQueries({ queryKey: getGetSessionQueryKey() });
+        // Seed the cache with the freshly-authenticated session before navigating
+        // so any layout subscribed to useGetSession sees correct data immediately
+        // instead of racing against a background refetch of stale unauthenticated data.
+        qc.setQueryData(getGetSessionQueryKey(), session);
         if ((session as any).twoFactorSetupRequired) {
           setLocation("/app/settings?tab=security&setup=required");
           return;

@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, ArrowRight } from "lucide-react";
+import { PageHead } from "@/components/PageHead";
 
 interface SeoLandingConfig {
   badge: string;
@@ -606,6 +607,11 @@ export function SeoLandingPage({ slug }: { slug: string }) {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title={config.headline}
+        description={config.subheadline}
+        canonical={`/${slug}`}
+      />
       <section className="py-24 md:py-32 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 max-w-4xl relative z-10">

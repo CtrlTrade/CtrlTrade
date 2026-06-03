@@ -4,6 +4,7 @@ import {
   FileText, CreditCard, MapPin, Star, MessageCircle, CheckCircle2,
   Globe, ArrowRight, Lock, Bell, Share2
 } from "lucide-react";
+import { PageHead } from "@/components/PageHead";
 
 const features = [
   { icon: FileText, title: "Quote Approval", desc: "Customers receive quotes by email, review line items, and approve with a digital signature — from any device." },
@@ -19,6 +20,11 @@ const features = [
 export function CustomerPortalPage() {
   return (
     <div className="flex flex-col min-h-screen">
+      <PageHead
+        title="Customer Portal — 24/7 Self-Service For Your Customers"
+        description="Give your customers a branded portal to accept quotes, pay invoices, track jobs, and leave reviews — without calling your office. Included with every CtrlTrade® account."
+        canonical="/customer-portal"
+      />
       <section className="py-24 md:py-32 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(hsl(46,98%,52%) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">

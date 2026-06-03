@@ -38,12 +38,20 @@ const corsAllowlist = new Set<string>(
     process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : "",
   ].filter(Boolean),
 );
+// The CtrlTradePos desktop app (Electron) serves its bundled web build from a
+// loopback origin on a dynamically-assigned port (http://127.0.0.1:<port>) and
+// calls this API cross-origin. Such origins can only come from software running
+// on the user's own machine, so we allow them in addition to the static
+// allowlist. Without this, every desktop API call is blocked by CORS and fails
+// with "Failed to fetch".
+const loopbackOrigin = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
 app.use(
   cors({
     origin: (origin, cb) => {
       // Allow same-origin / non-browser (no Origin header)
       if (!origin) return cb(null, true);
       if (corsAllowlist.has(origin)) return cb(null, true);
+      if (loopbackOrigin.test(origin)) return cb(null, true);
       return cb(null, false);
     },
     credentials: true,

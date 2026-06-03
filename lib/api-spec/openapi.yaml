@@ -1347,6 +1347,22 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AdminTenantSummary"
+    post:
+      operationId: adminCreateTenant
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCreateTenantInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTenantSummary"
 
   /v1/admin/tenants/{tenantId}:
     get:
@@ -1364,6 +1380,38 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminTenantDetail"
+    patch:
+      operationId: adminUpdateTenant
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUpdateTenantInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTenantSummary"
+    delete:
+      operationId: adminDeleteTenant
+      tags: [admin]
+      parameters:
+        - in: path
+          name: tenantId
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: No Content
 
   /v1/admin/tenants/{tenantId}/quantities:
     patch:
@@ -4479,6 +4527,10 @@ paths:
           name: sessionId
           required: false
           schema: { type: string }
+        - in: query
+          name: tradeAccountId
+          required: false
+          schema: { type: string }
       responses:
         "200":
           description: OK
@@ -7555,6 +7607,27 @@ components:
         amount: { type: number }
         currency: { type: string }
 
+    AdminCreateTenantInput:
+      type: object
+      required: [name, ownerEmail, ownerName, ownerPassword]
+      properties:
+        name: { type: string }
+        ownerEmail: { type: string }
+        ownerName: { type: string }
+        ownerPassword: { type: string }
+        status: { type: string }
+        controlSeats: { type: integer, minimum: 0 }
+        fieldSeats: { type: integer, minimum: 0 }
+        tills: { type: integer, minimum: 0 }
+        branchName: { type: string }
+
+    AdminUpdateTenantInput:
+      type: object
+      properties:
+        name: { type: string }
+        slug: { type: string }
+        status: { type: string }
+
     AdminTenantSummary:
       type: object
       required: [id, name, status, controlSeats, fieldSeats, tills, monthlyTotal, currency, createdAt, ownerEmail]
@@ -8158,9 +8231,10 @@ components:
 
     FinancialSummary:
       type: object
-      required: [currency, revenueThisMonthPence, revenueLastMonthPence, outstandingPence, outstandingCount, overduePence, overdueCount, draftPence, draftCount, pipelinePence, pipelineCount, jobsThisMonth, jobsCompletedThisMonth, avgJobValuePence]
+      required: [currency, revenueThisMonthPence, revenueLastMonthPence, revenueTodayPence, outstandingPence, outstandingCount, overduePence, overdueCount, draftPence, draftCount, pipelinePence, pipelineCount, jobsThisMonth, jobsCompletedThisMonth, jobsScheduledCount, avgJobValuePence]
       properties:
         currency: { type: string }
+        revenueTodayPence: { type: integer }
         revenueThisMonthPence: { type: integer }
         revenueLastMonthPence: { type: integer }
         outstandingPence: { type: integer }
@@ -8173,6 +8247,7 @@ components:
         pipelineCount: { type: integer }
         jobsThisMonth: { type: integer }
         jobsCompletedThisMonth: { type: integer }
+        jobsScheduledCount: { type: integer }
         avgJobValuePence: { type: integer }
 
     ExpiryAttention:

@@ -1,58 +1,57 @@
 # See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-  # compiled output
-  dist
-  tmp
-  out-tsc
-  *.tsbuildinfo
-  .expo
-  .expo-shared
+# compiled output
+dist
+tmp
+out-tsc
+*.tsbuildinfo
+.expo
+.expo-shared
 
-  # dependencies
-  node_modules
+# dependencies
+node_modules
 
-  # IDEs and editors
-  /.idea
-  .project
-  .classpath
-  .c9/
-  *.launch
-  .settings/
-  *.sublime-workspace
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
-  # IDE - VSCode
-  .vscode/*
-  !.vscode/settings.json
-  !.vscode/tasks.json
-  !.vscode/launch.json
-  !.vscode/extensions.json
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
-  # misc
-  /.sass-cache
-  /connect.lock
-  /coverage
-  /libpeerconnection.log
-  npm-debug.log
-  yarn-error.log
-  testem.log
-  /typings
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
 
-  # System Files
-  .DS_Store
-  Thumbs.db
+# System Files
+.DS_Store
+Thumbs.db
 
-  .cursor/rules/nx-rules.mdc
-  .github/instructions/nx.instructions.md
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md
 
-  # Replit
-  .cache/
-  .local/
+# Replit
+.cache/
+.local/
 
-  # Seed / demo-data scripts — contain realistic-looking personal data (names,
-  # emails, phone numbers, passwords). Keep these off the public repo (GDPR).
-  scripts/src/seed-acme*.ts
-  scripts/src/seed-acme-production-api.ts
-  scripts/src/seed.ts
-  scripts/src/seed-products.ts
-  scripts/src/seed-tenant-types.ts
-  
+# Seed / demo-data scripts — contain realistic-looking personal data (names,
+# emails, phone numbers, passwords). Keep these off the public repo (GDPR).
+scripts/src/seed-acme*.ts
+scripts/src/seed-acme-production-api.ts
+scripts/src/seed.ts
+scripts/src/seed-products.ts
+scripts/src/seed-tenant-types.ts

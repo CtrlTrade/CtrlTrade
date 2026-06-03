@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "wouter";
+import { PageHead } from "@/components/PageHead";
 
 interface BookingInfo {
   tenantName: string;
@@ -130,6 +131,11 @@ export function PublicBooking() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f5f5f5", fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>
+      <PageHead
+        title={`Book Online — ${info.tenantName}`}
+        description={`Book a job online with ${info.tenantName}. Choose your service, preferred date, and submit your details — we'll be in touch to confirm.`}
+        noIndex={true}
+      />
       <div style={{ background: brandColor, padding: "1.5rem 2rem", display: "flex", alignItems: "center", gap: "1rem" }}>
         {info.logoUrl && (
           <img src={info.logoUrl} alt={info.tenantName} style={{ height: "40px", objectFit: "contain" }} />

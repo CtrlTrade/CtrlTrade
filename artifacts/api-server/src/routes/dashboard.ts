@@ -27,6 +27,17 @@ router.get("/v1/dashboard/financial-summary", requireTenant, async (req, res): P
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // Revenue today (paid invoices)
+  const [revenueToday] = await db
+    .select({ total: sql<number>`coalesce(sum(${invoicesTable.totalPence}), 0)::int` })
+    .from(invoicesTable)
+    .where(and(
+      eq(invoicesTable.tenantId, tenantId),
+      eq(invoicesTable.status, "paid"),
+      gte(invoicesTable.paidAt, startOfToday),
+    ));
 
   // Revenue this month (paid invoices)
   const [revenueThisMonth] = await db
@@ -119,6 +130,15 @@ router.get("/v1/dashboard/financial-summary", requireTenant, async (req, res): P
       gte(jobsTable.completedAt, startOfMonth),
     ));
 
+  // Jobs scheduled (status = scheduled or in_progress, with a future or today scheduledStart)
+  const [jobsScheduled] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(jobsTable)
+    .where(and(
+      eq(jobsTable.tenantId, tenantId),
+      sql`${jobsTable.status} in ('scheduled', 'in_progress')`,
+    ));
+
   // Average job value (completed jobs with value > 0, all time)
   const [avgJob] = await db
     .select({ avg: sql<number>`coalesce(avg(${jobsTable.valuePence}), 0)::int` })
@@ -138,6 +158,7 @@ router.get("/v1/dashboard/financial-summary", requireTenant, async (req, res): P
 
   res.json({
     currency: currencyRow?.currency ?? "gbp",
+    revenueTodayPence: revenueToday?.total ?? 0,
     revenueThisMonthPence: revenueThisMonth?.total ?? 0,
     revenueLastMonthPence: revenueLastMonth?.total ?? 0,
     outstandingPence: outstanding?.total ?? 0,
@@ -150,6 +171,7 @@ router.get("/v1/dashboard/financial-summary", requireTenant, async (req, res): P
     pipelineCount: pipeline?.count ?? 0,
     jobsThisMonth: jobsThisMonth?.count ?? 0,
     jobsCompletedThisMonth: jobsCompleted?.count ?? 0,
+    jobsScheduledCount: jobsScheduled?.count ?? 0,
     avgJobValuePence: avgJob?.avg ?? 0,
   });
 });

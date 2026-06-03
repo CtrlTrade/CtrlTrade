@@ -6,7 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type ListPosTransactionsParams = {
-sessionId?: string;
-tradeAccountId?: string;
-};
+export interface AdminUpdateTenantInput {
+  name?: string;
+  slug?: string;
+  status?: string;
+}
