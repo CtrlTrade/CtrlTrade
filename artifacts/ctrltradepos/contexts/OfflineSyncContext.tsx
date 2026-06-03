@@ -7,7 +7,11 @@ import React, {
   useState,
 } from "react";
 import { AppState, type AppStateStatus } from "react-native";
-import { createPosTransaction } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  createPosTransaction,
+  getGetCurrentTillSessionQueryKey,
+} from "@workspace/api-client-react";
 import {
   getQueue,
   removeFromQueue,
@@ -49,6 +53,7 @@ export function OfflineSyncProvider({ children }: { children: React.ReactNode })
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const syncInProgress = useRef(false);
+  const qc = useQueryClient();
 
   const refreshCount = useCallback(async () => {
     const q = await getQueue();
@@ -90,12 +95,13 @@ export function OfflineSyncProvider({ children }: { children: React.ReactNode })
 
     if (syncedAny) {
       setLastSyncedAt(new Date().toISOString());
+      void qc.invalidateQueries({ queryKey: getGetCurrentTillSessionQueryKey() });
     }
 
     await refreshCount();
     setIsSyncing(false);
     syncInProgress.current = false;
-  }, [refreshCount]);
+  }, [refreshCount, qc]);
 
   useEffect(() => {
     refreshCount();
