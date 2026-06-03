@@ -1,0 +1,380 @@
+Construction & Building
+Sub-Categories
+General Builder
+Building Contractor
+Main Contractor
+Sub Contractor
+Property Developer
+House Builder
+Commercial Builder
+Industrial Builder
+Civil Engineering Contractor
+Groundworks Contractor
+Demolition Contractor
+Structural Contractor
+Refurbishment Contractor
+Renovation Contractor
+Restoration Contractor
+Extension Builder
+Loft Conversion Specialist
+Basement Conversion Specialist
+New Build Contractor
+Builders Merchants
+Sub-Categories
+Independent Builders Merchant
+National Builders Merchant
+Regional Builders Merchant
+Online Builders Merchant
+Trade Merchant
+Building Supplies Merchant
+Construction Materials Merchant
+Merchant Group
+Trade Distribution Centre
+Brick, Block & Masonry
+Sub-Categories
+Bricklayer
+Brick Merchant
+Block Supplier
+Masonry Supplier
+Stone Merchant
+Stone Mason
+Concrete Product Supplier
+Paving Supplier
+Pointing Specialist
+Restoration Mason
+Timber & Sheet Materials
+Sub-Categories
+Timber Merchant
+Timber Yard
+Timber Importer
+Timber Distributor
+Hardwood Supplier
+Softwood Supplier
+MDF Supplier
+Plywood Supplier
+OSB Supplier
+Timber Frame Supplier
+Sawmill
+Roofing
+Sub-Categories
+Roofing Contractor
+Roofing Merchant
+Flat Roofing Specialist
+Slate Roofing Specialist
+Tile Roofing Specialist
+Roof Repair Contractor
+Roof Surveyor
+Guttering Specialist
+Fascia Specialist
+Soffit Specialist
+Leadwork Contractor
+Chimney Specialist
+Plumbing
+Sub-Categories
+Plumber
+Plumbing Contractor
+Plumbing Merchant
+Plumbing Distributor
+Water Systems Installer
+Water Treatment Specialist
+Pipework Contractor
+Leak Detection Specialist
+Drainage Contractor
+Drainage Supplier
+Heating & Gas
+Sub-Categories
+Heating Engineer
+Gas Engineer
+Boiler Installer
+Boiler Repair Specialist
+Boiler Merchant
+Heating Merchant
+Heating Distributor
+LPG Specialist
+Oil Heating Specialist
+Underfloor Heating Installer
+Radiator Supplier
+Electrical
+Sub-Categories
+Electrician
+Electrical Contractor
+Electrical Wholesaler
+Electrical Distributor
+Domestic Electrician
+Commercial Electrician
+Industrial Electrician
+Lighting Contractor
+Lighting Supplier
+Cable Supplier
+Switchgear Supplier
+Electrical Manufacturer
+Renewable Energy
+Sub-Categories
+Solar Installer
+Solar Distributor
+Solar Merchant
+Heat Pump Installer
+Battery Storage Installer
+EV Charger Installer
+EV Infrastructure Provider
+Renewable Energy Contractor
+Renewable Equipment Supplier
+HVAC
+Sub-Categories
+HVAC Contractor
+Air Conditioning Installer
+Air Conditioning Supplier
+Ventilation Contractor
+Ventilation Supplier
+Refrigeration Contractor
+Refrigeration Supplier
+Ductwork Manufacturer
+Security & Fire
+Sub-Categories
+CCTV Installer
+CCTV Supplier
+Alarm Installer
+Alarm Supplier
+Access Control Installer
+Access Control Supplier
+Locksmith
+Security Contractor
+Fire Alarm Installer
+Fire Protection Contractor
+Fire Equipment Supplier
+Fire Extinguisher Supplier
+Windows, Doors & Conservatories
+Sub-Categories
+Window Installer
+Window Manufacturer
+Window Supplier
+Door Installer
+Door Manufacturer
+Door Supplier
+Conservatory Installer
+Conservatory Manufacturer
+Glass Merchant
+Double Glazing Installer
+Aluminium Systems Supplier
+UPVC Supplier
+Kitchens
+Sub-Categories
+Kitchen Showroom
+Kitchen Supplier
+Kitchen Installer
+Kitchen Designer
+Kitchen Manufacturer
+Worktop Supplier
+Appliance Supplier
+Bathrooms
+Sub-Categories
+Bathroom Showroom
+Bathroom Supplier
+Bathroom Installer
+Bathroom Designer
+Bathroom Manufacturer
+Flooring
+Sub-Categories
+Flooring Showroom
+Flooring Supplier
+Flooring Warehouse
+Carpet Supplier
+Carpet Fitter
+Vinyl Flooring Specialist
+Laminate Flooring Specialist
+Hardwood Flooring Specialist
+Resin Flooring Specialist
+Tile Flooring Specialist
+Tiles
+Sub-Categories
+Tile Centre
+Tile Supplier
+Tile Warehouse
+Tile Importer
+Tile Distributor
+Tiling Contractor
+Decorating
+Sub-Categories
+Painter
+Decorator
+Decorating Contractor
+Paint Supplier
+Decorating Centre
+Wallpaper Specialist
+Spray Finishing Specialist
+Landscaping
+Sub-Categories
+Landscaper
+Landscape Contractor
+Garden Designer
+Landscape Architect
+Turf Supplier
+Artificial Grass Supplier
+Fencing Supplier
+Decking Supplier
+Outdoor Living Supplier
+Garden Centre
+Steel & Metal
+Sub-Categories
+Steel Supplier
+Steel Fabricator
+Metal Merchant
+Sheet Metal Supplier
+Aluminium Supplier
+Stainless Steel Supplier
+Welding Supplier
+Fabrication Workshop
+Tools & Equipment
+Sub-Categories
+Tool Shop
+Tool Merchant
+Tool Wholesaler
+Power Tool Supplier
+Hand Tool Supplier
+Tool Repair Centre
+Tool Hire Centre
+Plant & Machinery
+Sub-Categories
+Plant Hire Company
+Machinery Dealer
+Construction Equipment Supplier
+Access Equipment Supplier
+Generator Supplier
+Heavy Equipment Dealer
+Machinery Repair Specialist
+Workwear & PPE
+Sub-Categories
+Workwear Supplier
+PPE Supplier
+Safety Equipment Supplier
+Uniform Supplier
+Branded Clothing Supplier
+Automotive
+Sub-Categories
+Motor Factor
+Vehicle Parts Supplier
+Commercial Vehicle Parts Supplier
+Fleet Services Provider
+Garage Equipment Supplier
+Tyre Centre
+Auto Electrical Supplier
+Warehousing & Distribution
+Sub-Categories
+Trade Warehouse
+Distribution Warehouse
+Regional Distribution Centre
+National Distribution Centre
+Trade Cash & Carry
+Fulfilment Centre
+Importer
+Exporter
+Wholesale Distributor
+Trade Logistics Company
+Manufacturing
+Sub-Categories
+Building Products Manufacturer
+Timber Manufacturer
+Kitchen Manufacturer
+Bathroom Manufacturer
+Window Manufacturer
+Door Manufacturer
+Glass Manufacturer
+Steel Manufacturer
+Modular Building Manufacturer
+Cabins & Modular Buildings
+Sub-Categories
+Cabin Manufacturer
+Garden Room Builder
+Modular Building Supplier
+Portable Building Supplier
+Holiday Lodge Manufacturer
+Glamping Pod Manufacturer
+Tiny Home Builder
+Park Home Manufacturer
+Agricultural
+Sub-Categories
+Agricultural Merchant
+Farm Supplies Merchant
+Agricultural Machinery Supplier
+Livestock Equipment Supplier
+Irrigation Supplier
+Trade Counters
+Sub-Categories
+Builders Trade Counter
+Electrical Trade Counter
+Plumbing Trade Counter
+Timber Trade Counter
+Roofing Trade Counter
+Flooring Trade Counter
+Tool Trade Counter
+Multi-Trade Counter
+Showrooms
+Sub-Categories
+Kitchen Showroom
+Bathroom Showroom
+Flooring Showroom
+Lighting Showroom
+Renewable Energy Showroom
+Door Showroom
+Window Showroom
+Home Improvement Showroom
+Outdoor Living Showroom
+Specialist Trades
+Sub-Categories
+Scaffolder
+Surveyor
+Quantity Surveyor
+Structural Engineer
+Building Inspector
+Damp Proofing Specialist
+Waterproofing Specialist
+Asbestos Contractor
+Lift Installer
+Escalator Contractor
+Signage Contractor
+Shopfitter
+Partitioning Contractor
+Ceiling Contractor
+Acoustic Specialist
+Logistics & Transport
+Sub-Categories
+Haulage Company
+Pallet Distribution
+Courier Company
+Trade Delivery Network
+Fleet Operator
+Construction Logistics Provider
+CtrlTrade® Signup Logic
+
+Question 1: What type of business are you?
+
+Trade Contractor
+Trade Supplier
+Trade Merchant
+Trade Counter
+Showroom
+Warehouse
+Manufacturer
+Distributor
+Cabin & Modular Buildings
+
+Question 2: Select Category
+
+(Displays categories above)
+
+Question 3: Select Sub-Category
+
+(Displays only relevant sub-categories)
+
+Question 4: Do you have a Trade Counter / Showroom?
+
+Yes → Enable CtrlTradePos®
+No → CRM Only
+
+Question 5: Number of Locations
+
+Single Site
+Multi Site
+National Group
+
+This structure gives CtrlTrade® over 250+ mapped trade sectors and allows automatic setup of CRM workflows, job templates, stock items, quote templates, suppliers, manufacturers, showrooms, warehouses and CtrlTradePos® configurations during onboarding.
