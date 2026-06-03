@@ -1,0 +1,759 @@
+CtrlTrade® Marketing Website Specification 
+
+Website Purpose 
+
+The CtrlTrade® website is designed to: 
+
+Generate new SaaS signups 
+
+Convert visitors into 1 Month Free Trial users 
+
+Showcase all platform features 
+
+Explain CRM, EPOS, Warehouse and Customer Portal 
+
+Display integrations 
+
+Present pricing 
+
+Build trust 
+
+Support SEO 
+
+Drive recurring subscriptions 
+
+Primary CTA throughout site: 
+
+Start Your Free 1 Month Trial 
+ 
+
+No Demo Request. 
+
+No Contact Sales requirement. 
+
+Everything should drive directly into signup. 
+
+ 
+
+SITE STRUCTURE 
+
+/ 
+├── Home 
+├── Pricing 
+├── Industries 
+├── Features 
+├── CRM 
+├── CtrlTradePos® 
+├── Customer Portal 
+├── Integrations 
+├── Marketplace 
+├── Add-ons 
+├── Security 
+├── About 
+├── Contact 
+├── Blog 
+├── Signup 
+├── Login 
+└── Status 
+ 
+
+ 
+
+HOME PAGE 
+
+Hero Section 
+
+Headline: 
+
+The Complete Operating System For Trade Businesses 
+ 
+
+Subheadline: 
+
+CRM, Scheduling, Dispatch, Invoicing, Customer Portal, AI, Trade Counter EPOS and Warehouse Management — all in one platform. 
+ 
+
+Buttons: 
+
+Start Free 1 Month Trial 
+ 
+View Pricing 
+ 
+
+ 
+
+Trust Section 
+
+Built For 
+ 
+✓ Sole Traders 
+✓ Trade Businesses 
+✓ Suppliers 
+✓ Trade Counters 
+✓ Warehouses 
+✓ Showrooms 
+✓ Field Service Companies 
+✓ Multi-Branch Operators 
+ 
+
+ 
+
+Platform Overview 
+
+Visual: 
+
+CtrlTrade SaaS Platform 
+        ↓ 
+  CtrlTrade CRM 
+        ↓ 
+CtrlTradePos® 
+        ↓ 
+Customer Portal 
+ 
+
+ 
+
+Core Modules 
+
+Cards: 
+
+CRM 
+
+Manage: 
+
+Leads 
+
+Customers 
+
+Quotes 
+
+Jobs 
+
+Scheduling 
+
+Invoicing 
+
+ 
+
+CtrlTradePos® 
+
+Manage: 
+
+Trade Counters 
+
+Showrooms 
+
+Warehouses 
+
+Stock 
+
+Trade Accounts 
+
+Till Sales 
+
+ 
+
+Customer Portal 
+
+Allow customers to: 
+
+Accept quotes 
+
+Track jobs 
+
+Pay invoices 
+
+Leave reviews 
+
+ 
+
+CtrlAI® 
+
+AI quotes 
+
+AI dispatch 
+
+AI reporting 
+
+AI insights 
+
+ 
+
+CtrlVoice® 
+
+VoIP 
+
+SMS 
+
+WhatsApp 
+
+Call recording 
+
+ 
+
+Industries Section 
+
+Show industry tiles. 
+
+Roofing 
+
+Electrical 
+
+Plumbing 
+
+HVAC 
+
+Building 
+
+Construction 
+
+Facilities 
+
+Cleaning 
+
+Landscaping 
+
+Fire & Security 
+
+Warehousing 
+
+Utilities 
+
+Multi-Trade 
+
+Button: 
+
+View All Industries 
+ 
+
+ 
+
+Feature Comparison 
+
+Compare: 
+
+CtrlTrade 
+Jobber 
+Tradify 
+ServiceM8 
+SimPRO 
+ 
+
+Show: 
+
+CRM 
+
+EPOS 
+
+Warehouse 
+
+Customer Portal 
+
+AI 
+
+Marketplace 
+
+VoIP 
+
+ 
+
+CTA 
+
+Start Your Free 1 Month Trial 
+ 
+
+ 
+
+PRICING PAGE 
+
+Control Seat 
+
+£79/month 
+
+Includes: 
+
+CRM 
+
+Quotes 
+
+Jobs 
+
+Scheduling 
+
+Invoicing 
+
+Customer Portal 
+
+Reporting 
+
+Integrations 
+
+ 
+
+Field Seat 
+
+£19/month 
+
+Includes: 
+
+Mobile Jobs 
+
+Photos 
+
+GPS 
+
+Forms 
+
+Timesheets 
+
+ 
+
+CtrlTradePos® 
+
+£59.99/month 
+
+Per Till Licence 
+
+Includes: 
+
+Touchscreen Till 
+
+Barcode Scanning 
+
+Receipt Printing 
+
+Trade Accounts 
+
+Stock Management 
+
+Trade Counter CRM 
+
+ 
+
+Included 
+
+Every account includes: 
+
+1 Month Free Trial 
+
+Unlimited Customers 
+
+Unlimited Quotes 
+
+Unlimited Jobs 
+
+Unlimited Storage Fair Usage 
+
+Customer Portal 
+
+ 
+
+INDUSTRIES PAGE 
+
+Explain trade-specific CRM. 
+
+Examples: 
+
+Roofing CRM 
+
+Features: 
+
+Roof Surveys 
+
+Flat Roof Quotes 
+
+Height Safety 
+
+Before/After Photos 
+
+ 
+
+Electrical CRM 
+
+Features: 
+
+EICR 
+
+EV Chargers 
+
+NICEIC Forms 
+
+ 
+
+Plumbing CRM 
+
+Features: 
+
+Boiler Servicing 
+
+Gas Safety 
+
+Leak Repairs 
+
+ 
+
+And all supported categories. 
+
+ 
+
+CRM PAGE 
+
+CtrlTrade CRM 
+
+Headline: 
+
+Everything You Need To Run A Trade Business 
+ 
+
+Features: 
+
+Leads 
+
+Customers 
+
+Quotes 
+
+Jobs 
+
+Dispatch 
+
+Compliance 
+
+Fleet 
+
+Invoicing 
+
+AI 
+
+Screenshots: 
+
+Dashboard 
+
+Jobs 
+
+Calendar 
+
+Quotes 
+
+ 
+
+CTRLTRADEPOS® PAGE 
+
+Trade Counter EPOS 
+
+Headline: 
+
+Built For Trade Counters, Warehouses And Showrooms 
+ 
+
+Features: 
+
+Touchscreen Till 
+
+Barcode Scanning 
+
+Receipt Printing 
+
+Trade Accounts 
+
+Stock Control 
+
+Supplier Ordering 
+
+Deployment: 
+
+Web POS 
+
+Browser-based. 
+
+Desktop POS 
+
+Installed application. 
+
+ 
+
+Hardware Support 
+
+Barcode Scanners 
+
+Receipt Printers 
+
+Cash Drawers 
+
+Customer Displays 
+
+Label Printers 
+
+ 
+
+CUSTOMER PORTAL PAGE 
+
+Headline: 
+
+Give Customers 24/7 Access 
+ 
+
+Features: 
+
+Quote Approval 
+
+Invoice Payments 
+
+Job Tracking 
+
+Messaging 
+
+Reviews 
+
+ 
+
+INTEGRATIONS PAGE 
+
+Grid layout. 
+
+Accounting: 
+
+Xero 
+
+QuickBooks 
+
+Sage 
+
+Communication: 
+
+Teams 
+
+Outlook 
+
+WhatsApp 
+
+Twilio 
+
+Lead Sources: 
+
+MyJobQuote 
+
+Checkatrade 
+
+Bark 
+
+Rated People 
+
+TrustATrader 
+
+AI: 
+
+OpenAI 
+
+Maps: 
+
+Google Maps 
+
+ 
+
+MARKETPLACE PAGE 
+
+Features: 
+
+Find Subcontractors 
+
+Find Suppliers 
+
+Labour Exchange 
+
+Reviews 
+
+Ratings 
+
+ 
+
+ADD-ONS PAGE 
+
+Available Now: 
+
+CtrlAI® 
+
+CtrlVoice® 
+
+CtrlTradePos® 
+
+CtrlWorkflow® 
+
+CtrlCompliance® 
+
+CtrlFleet® 
+
+Coming Soon: 
+
+CtrlUniversity® 
+
+CtrlRecruit® 
+
+CtrlInsurance® 
+
+CtrlLegal® 
+
+CtrlEnergy® 
+
+ 
+
+SECURITY PAGE 
+
+Features: 
+
+GDPR 
+
+Tenant Isolation 
+
+Encryption 
+
+Audit Logs 
+
+MFA 
+
+Secure Backups 
+
+ 
+
+BLOG 
+
+SEO engine. 
+
+Categories: 
+
+CRM 
+
+Roofing 
+
+Electrical 
+
+Plumbing 
+
+Trade Counter 
+
+Warehouse 
+
+AI 
+
+Business Growth 
+
+ 
+
+SIGNUP PAGE 
+
+Flow: 
+
+Company Details 
+↓ 
+Trade Categories 
+↓ 
+Seats 
+↓ 
+CtrlTradePos® Licences 
+↓ 
+Payment Method 
+↓ 
+Free Trial 
+↓ 
+Workspace Created 
+ 
+
+Fields: 
+
+Company Name 
+
+Email 
+
+Phone 
+
+Address 
+
+Industries 
+
+Categories 
+
+Control Seats 
+
+Field Seats 
+
+POS Licences 
+
+ 
+
+LOGIN PAGE 
+
+Routes: 
+
+/app 
+/admin 
+/portal 
+ 
+
+ 
+
+SEO STRUCTURE 
+
+Create landing pages for: 
+
+/roofing-crm 
+/electrical-crm 
+/plumbing-crm 
+/hvac-crm 
+/builders-crm 
+/cleaning-crm 
+/facilities-management-crm 
+/trade-counter-epos 
+/warehouse-management-software 
+/showroom-management-software 
+/field-service-management-software 
+ 
+
+ 
+
+FOOTER 
+
+Links: 
+
+Pricing 
+
+Features 
+
+Industries 
+
+Integrations 
+
+Security 
+
+Blog 
+
+Contact 
+
+Legal: 
+
+Privacy Policy 
+
+Terms 
+
+Cookie Policy 
+
+ 
+
+FINAL POSITIONING 
+
+CtrlTrade® 
+ 
+The Complete Operating System For Trade Businesses. 
+ 
+CRM. 
+EPOS. 
+Warehouse. 
+Customer Portal. 
+AI. 
+VoIP. 
+ 
+Everything connected in one platform. 
+ 
+
+This is the complete marketing website structure that matches the CRM, CtrlTradePos®, SaaS platform and customer portal architecture. 
+
+ 

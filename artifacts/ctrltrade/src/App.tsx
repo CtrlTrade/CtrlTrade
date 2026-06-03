@@ -11,6 +11,13 @@ import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Home, Features, Integrations, Addons, Security, Contact } from "@/pages/public/StaticPages";
 import { Pricing } from "@/pages/public/Pricing";
 import { Industries } from "@/pages/public/Industries";
+import { CrmPage } from "@/pages/public/CrmPage";
+import { CtrlTradePosPage } from "@/pages/public/CtrlTradePosPage";
+import { CustomerPortalPage } from "@/pages/public/CustomerPortalPage";
+import { AboutPage } from "@/pages/public/AboutPage";
+import { BlogPage } from "@/pages/public/BlogPage";
+import { StatusPage } from "@/pages/public/StatusPage";
+import { SeoLandingPage } from "@/pages/public/SeoLandingPage";
 
 // Auth
 import { Login } from "@/pages/auth/Login";
@@ -273,16 +280,43 @@ function App() {
             <Route>
               <PublicLayout>
                 <Switch>
+                  {/* Main marketing pages */}
                   <Route path="/" component={Home} />
-                  <Route path="/marketplace" component={Marketplace} />
-                  <Route path="/marketplace/:slug" component={MarketplaceListing} />
-                  <Route path="/pricing" component={Pricing} />
                   <Route path="/features" component={Features} />
+                  <Route path="/pricing" component={Pricing} />
                   <Route path="/industries" component={Industries} />
                   <Route path="/integrations" component={Integrations} />
                   <Route path="/addons" component={Addons} />
                   <Route path="/security" component={Security} />
                   <Route path="/contact" component={Contact} />
+
+                  {/* New product pages */}
+                  <Route path="/crm" component={CrmPage} />
+                  <Route path="/epos" component={CtrlTradePosPage} />
+                  <Route path="/customer-portal" component={CustomerPortalPage} />
+
+                  {/* Company pages */}
+                  <Route path="/about" component={AboutPage} />
+                  <Route path="/blog" component={BlogPage} />
+                  <Route path="/status" component={StatusPage} />
+
+                  {/* Marketplace */}
+                  <Route path="/marketplace" component={Marketplace} />
+                  <Route path="/marketplace/:slug" component={MarketplaceListing} />
+
+                  {/* SEO landing pages */}
+                  <Route path="/roofing-crm">{() => <SeoLandingPage slug="roofing-crm" />}</Route>
+                  <Route path="/electrical-crm">{() => <SeoLandingPage slug="electrical-crm" />}</Route>
+                  <Route path="/plumbing-crm">{() => <SeoLandingPage slug="plumbing-crm" />}</Route>
+                  <Route path="/hvac-crm">{() => <SeoLandingPage slug="hvac-crm" />}</Route>
+                  <Route path="/builders-crm">{() => <SeoLandingPage slug="builders-crm" />}</Route>
+                  <Route path="/cleaning-crm">{() => <SeoLandingPage slug="cleaning-crm" />}</Route>
+                  <Route path="/facilities-management-crm">{() => <SeoLandingPage slug="facilities-management-crm" />}</Route>
+                  <Route path="/trade-counter-epos">{() => <SeoLandingPage slug="trade-counter-epos" />}</Route>
+                  <Route path="/warehouse-management-software">{() => <SeoLandingPage slug="warehouse-management-software" />}</Route>
+                  <Route path="/showroom-management-software">{() => <SeoLandingPage slug="showroom-management-software" />}</Route>
+                  <Route path="/field-service-management-software">{() => <SeoLandingPage slug="field-service-management-software" />}</Route>
+
                   <Route component={NotFound} />
                 </Switch>
               </PublicLayout>

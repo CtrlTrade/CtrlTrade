@@ -1,0 +1,137 @@
+🏗️ Building & Construction
+Builders Merchant
+Timber Merchant
+Roofing Merchant
+Plumbing Merchant
+Heating Merchant
+Electrical Wholesaler
+Insulation Supplier
+Brick & Block Merchant
+Aggregates & Landscaping Supplier
+Steel & Metal Supplier
+Fixings & Fasteners Supplier
+🔨 Trade Counters & Trade Shops
+General Trade Counter
+Tool Shop
+Hardware Store
+Decorating Centre
+Paint & Coatings Centre
+Ironmongery Store
+Workwear & PPE Supplier
+Safety Equipment Supplier
+Janitorial & Cleaning Supplies
+Welding Supplies Store
+🚿 Plumbing, Heating & Renewables
+Bathroom Showroom
+Kitchen Showroom
+Plumbing Supplies
+Heating Supplies
+Boiler Centre
+Renewable Energy Supplier
+Solar Equipment Supplier
+Heat Pump Specialist
+⚡ Electrical & Technology
+Electrical Wholesaler
+Lighting Showroom
+Security Systems Supplier
+CCTV & Access Control
+Smart Home Supplier
+Data & Network Cabling Supplier
+EV Charging Supplier
+🚪 Doors, Windows & Glass
+Window & Door Showroom
+UPVC Supplier
+Aluminium Systems Supplier
+Glass Merchant
+Conservatory Supplier
+🏠 Interiors & Finishing
+Flooring Showroom
+Tile Centre
+Carpet Warehouse
+Kitchen Supplier
+Bedroom Furniture Supplier
+Worktop Supplier
+Blinds & Shutters Supplier
+🌳 Landscaping & Outdoor
+Landscaping Merchant
+Garden Centre
+Fencing Supplier
+Decking Supplier
+Paving & Patio Centre
+Artificial Grass Supplier
+🚛 Warehouses & Distribution
+Building Materials Warehouse
+Plumbing Warehouse
+Electrical Distribution Centre
+Timber Distribution Centre
+Flooring Warehouse
+Multi-Trade Distribution Hub
+Trade Cash & Carry
+🚗 Automotive & Industrial
+Motor Factors
+Auto Parts Warehouse
+Commercial Vehicle Parts
+Tyre Centre
+Industrial Supplies
+Engineering Supplies
+Bearings & Power Transmission
+❄️ Specialist Trades
+Refrigeration Supplier
+Air Conditioning Supplier
+Ventilation Supplier
+Fire Protection Supplier
+Lift & Access Equipment Supplier
+🏢 Manufacturing & Fabrication
+Joinery Manufacturer
+Kitchen Manufacturer
+Window Manufacturer
+Steel Fabricator
+Sheet Metal Fabricator
+Signage Manufacturer
+🏪 Showrooms
+Kitchen Showroom
+Bathroom Showroom
+Flooring Showroom
+Lighting Showroom
+Door & Window Showroom
+Home Improvement Centre
+Trade & Retail Showroom
+🚚 Trade Services
+Tool Hire Centre
+Plant Hire Centre
+Equipment Rental
+Scaffolding Supplier
+Waste Management Supplier
+Portable Building Supplier
+CtrlTrade Tenant Types
+
+For onboarding, you could ask:
+
+Business Type
+
+Trade Shop
+Trade Counter
+Showroom
+Warehouse
+Builders Merchant
+Wholesaler
+Manufacturer
+Distribution Centre
+Service Contractor
+
+Has Trade Counter?
+
+Yes → Enable CtrlTradePOS®
+No → CRM Only
+
+Has Warehouse?
+
+Yes → Enable Stock Control, Barcode Scanning & Goods In/Out
+No → Standard Inventory
+
+Has Showroom?
+
+Yes → Enable Quote Builder, Product Catalogues & Finance Options
+No → Hide Showroom Features
+
+This structure works well for CtrlTrade CRM, CtrlTradePOS®, stock management, barcode scanning, trade accounts, quotations, delivery scheduling, and warehouse operations.
