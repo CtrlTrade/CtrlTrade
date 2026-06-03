@@ -32,6 +32,7 @@ import type {
   AdminPayoutDecision,
   AdminTenantDetail,
   AdminTenantSummary,
+  AdminUpdatePosDownloadsInput,
   AdminUpdatePosLicenceInput,
   AdminUsage,
   AdminVerificationSubmission,
@@ -264,6 +265,7 @@ import type {
   PortalReviewInput,
   PortalSession,
   PortalVerifyInput,
+  PosDownloads,
   PosJob,
   PosLicence,
   PosLicenceList,
@@ -27086,6 +27088,231 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getMarkVoicemailListenedMutationOptions(options));
+    }
+
+export const getGetPosDownloadsUrl = () => {
+
+
+
+
+  return `/api/v1/pos/downloads`
+}
+
+/**
+ * @summary Get the current Windows and macOS installer download URLs
+ */
+export const getPosDownloads = async ( options?: RequestInit): Promise<PosDownloads> => {
+
+  return customFetch<PosDownloads>(getGetPosDownloadsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPosDownloadsQueryKey = () => {
+    return [
+    `/api/v1/pos/downloads`
+    ] as const;
+    }
+
+
+export const getGetPosDownloadsQueryOptions = <TData = Awaited<ReturnType<typeof getPosDownloads>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPosDownloads>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPosDownloadsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPosDownloads>>> = ({ signal }) => getPosDownloads({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPosDownloads>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPosDownloadsQueryResult = NonNullable<Awaited<ReturnType<typeof getPosDownloads>>>
+export type GetPosDownloadsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the current Windows and macOS installer download URLs
+ */
+
+export function useGetPosDownloads<TData = Awaited<ReturnType<typeof getPosDownloads>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPosDownloads>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPosDownloadsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAdminGetPosDownloadsUrl = () => {
+
+
+
+
+  return `/api/v1/admin/pos-downloads`
+}
+
+/**
+ * @summary Get the current POS download URLs (super admin)
+ */
+export const adminGetPosDownloads = async ( options?: RequestInit): Promise<PosDownloads> => {
+
+  return customFetch<PosDownloads>(getAdminGetPosDownloadsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminGetPosDownloadsQueryKey = () => {
+    return [
+    `/api/v1/admin/pos-downloads`
+    ] as const;
+    }
+
+
+export const getAdminGetPosDownloadsQueryOptions = <TData = Awaited<ReturnType<typeof adminGetPosDownloads>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminGetPosDownloads>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminGetPosDownloadsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminGetPosDownloads>>> = ({ signal }) => adminGetPosDownloads({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminGetPosDownloads>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminGetPosDownloadsQueryResult = NonNullable<Awaited<ReturnType<typeof adminGetPosDownloads>>>
+export type AdminGetPosDownloadsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the current POS download URLs (super admin)
+ */
+
+export function useAdminGetPosDownloads<TData = Awaited<ReturnType<typeof adminGetPosDownloads>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminGetPosDownloads>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminGetPosDownloadsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAdminUpdatePosDownloadsUrl = () => {
+
+
+
+
+  return `/api/v1/admin/pos-downloads`
+}
+
+/**
+ * @summary Update the Windows and macOS POS download URLs (super admin)
+ */
+export const adminUpdatePosDownloads = async (adminUpdatePosDownloadsInput: AdminUpdatePosDownloadsInput, options?: RequestInit): Promise<PosDownloads> => {
+
+  return customFetch<PosDownloads>(getAdminUpdatePosDownloadsUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminUpdatePosDownloadsInput,)
+  }
+);}
+
+
+
+
+export const getAdminUpdatePosDownloadsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdatePosDownloads>>, TError,{data: BodyType<AdminUpdatePosDownloadsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminUpdatePosDownloads>>, TError,{data: BodyType<AdminUpdatePosDownloadsInput>}, TContext> => {
+
+const mutationKey = ['adminUpdatePosDownloads'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminUpdatePosDownloads>>, {data: BodyType<AdminUpdatePosDownloadsInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminUpdatePosDownloads(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminUpdatePosDownloadsMutationResult = NonNullable<Awaited<ReturnType<typeof adminUpdatePosDownloads>>>
+    export type AdminUpdatePosDownloadsMutationBody = BodyType<AdminUpdatePosDownloadsInput>
+    export type AdminUpdatePosDownloadsMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update the Windows and macOS POS download URLs (super admin)
+ */
+export const useAdminUpdatePosDownloads = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdatePosDownloads>>, TError,{data: BodyType<AdminUpdatePosDownloadsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminUpdatePosDownloads>>,
+        TError,
+        {data: BodyType<AdminUpdatePosDownloadsInput>},
+        TContext
+      > => {
+      return useMutation(getAdminUpdatePosDownloadsMutationOptions(options));
     }
 
 export const getListPosLicencesUrl = () => {

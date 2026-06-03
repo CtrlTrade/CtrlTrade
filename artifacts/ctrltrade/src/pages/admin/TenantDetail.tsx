@@ -26,6 +26,7 @@ import { RefreshCw, AlertTriangle, ShieldCheck, UserCheck, Download, Trash2, Glo
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminPosLicences } from "@/components/admin/AdminPosLicences";
+import { AdminPosDownloads } from "@/components/admin/AdminPosDownloads";
 
 type Tab = "overview" | "billing" | "team" | "pos" | "settings";
 
@@ -410,6 +411,7 @@ export function AdminTenantDetail() {
       {/* Tab: POS */}
       {activeTab === "pos" && (
         <div className="space-y-6">
+          <AdminPosDownloads />
           <AdminPosLicences tenantId={id!} />
         </div>
       )}

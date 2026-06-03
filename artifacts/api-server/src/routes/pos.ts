@@ -15,6 +15,7 @@ import {
   posTransactionsTable,
   posTransactionItemsTable,
   cashDrawersTable,
+  platformSettingsTable,
   type PosTransaction,
   type PosTransactionItem,
   type TillSession,
@@ -1319,6 +1320,19 @@ router.post("/v1/pos/transactions/:transactionId/receipt", requirePosAuth, async
     method: parsed.data.method,
     destination,
     deliveredAt: deliveredAt.toISOString(),
+  });
+});
+
+// ---- Public: POS download URLs (no auth required) ----
+router.get("/v1/pos/downloads", async (_req, res): Promise<void> => {
+  const rows = await db
+    .select()
+    .from(platformSettingsTable)
+    .where(sql`key IN ('windows_url', 'macos_url')`);
+  const map = Object.fromEntries(rows.map((r) => [r.key, r.value ?? null]));
+  res.json({
+    windowsUrl: (map["windows_url"] as string | null | undefined) ?? null,
+    macosUrl: (map["macos_url"] as string | null | undefined) ?? null,
   });
 });
 

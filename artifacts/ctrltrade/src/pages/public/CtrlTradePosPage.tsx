@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useGetPosDownloads } from "@workspace/api-client-react";
 import {
   Monitor, Smartphone, Barcode, Printer, Wifi, Package, Users,
   CreditCard, ReceiptText, ArrowRight, CheckCircle2, Building2, Warehouse,
@@ -25,48 +26,53 @@ const hardware = [
   { name: "Label Printers", detail: "Product and price label printing for warehouse and stock use" },
 ];
 
-const platforms = [
-  {
-    icon: AppWindow,
-    title: "Windows",
-    desc: "Full EPOS experience on Windows 10 & 11. Optimised for touchscreen tills and dedicated counter hardware.",
-    cta: "Open on Windows",
-    href: "/ctrltradepos/",
-    external: false,
-  },
-  {
-    icon: Laptop,
-    title: "macOS",
-    desc: "Run CtrlTradePos® on any Mac. Ideal for showroom and back-office till setups.",
-    cta: "Open on Mac",
-    href: "/ctrltradepos/",
-    external: false,
-  },
-  {
-    icon: Smartphone,
-    title: "iOS",
-    desc: "Sell from an iPhone or iPad. Portable till for trade counters, events, and pop-up locations.",
-    cta: "App Store",
-    href: null,
-    external: true,
-  },
-  {
-    icon: Smartphone,
-    title: "Android",
-    desc: "Native Android app for phones and tablets. Works with Bluetooth scanners and portable printers.",
-    cta: "Google Play",
-    href: null,
-    external: true,
-  },
-];
-
 const useCases = [
   { icon: Building2, title: "Trade Counters", desc: "Fast walk-in counter sales with barcode scanning, trade account billing, and stock deduction." },
   { icon: Warehouse, title: "Warehouses", desc: "Goods in/out, picking, packing, and stock transfers alongside till operations." },
   { icon: Monitor, title: "Showrooms", desc: "Product display, consultation, quote building, and deposit collection in one interface." },
 ];
 
+function PlatformCard({
+  icon: Icon,
+  title,
+  desc,
+  cta,
+  downloadUrl,
+}: {
+  icon: React.ElementType;
+  title: string;
+  desc: string;
+  cta: string;
+  downloadUrl: string | null | undefined;
+}) {
+  const isLoading = downloadUrl === undefined;
+
+  return (
+    <div className="border border-primary bg-primary/5 p-6 flex flex-col">
+      <Icon className="h-9 w-9 text-primary mb-4" />
+      <h3 className="text-lg font-bold mb-2">{title}</h3>
+      <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">{desc}</p>
+      {isLoading ? (
+        <div className="h-8 animate-pulse bg-primary/10 rounded" />
+      ) : downloadUrl ? (
+        <a href={downloadUrl} download>
+          <Button size="sm" className="w-full font-semibold">{cta}</Button>
+        </a>
+      ) : (
+        <div className="space-y-2">
+          <Button size="sm" variant="outline" className="w-full font-semibold opacity-50 cursor-not-allowed" disabled>
+            {cta}
+          </Button>
+          <p className="text-xs text-center text-muted-foreground">Coming Soon</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function CtrlTradePosPage() {
+  const { data: downloads } = useGetPosDownloads();
+
   return (
     <div className="flex flex-col min-h-screen">
       <section className="py-24 md:py-32 relative overflow-hidden" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
@@ -119,29 +125,38 @@ export function CtrlTradePosPage() {
             <p className="text-muted-foreground">Download CtrlTradePos® for your device and start selling today.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {platforms.map((p, i) => (
-              <div key={i} className="border border-primary bg-primary/5 p-6 flex flex-col">
-                <p.icon className="h-9 w-9 text-primary mb-4" />
-                <h3 className="text-lg font-bold mb-2">{p.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">{p.desc}</p>
-                {p.external ? (
-                  p.href ? (
-                    <a href={p.href} target="_blank" rel="noopener noreferrer">
-                      <Button size="sm" variant="outline" className="w-full font-semibold">{p.cta}</Button>
-                    </a>
-                  ) : (
-                    <div className="space-y-2">
-                      <Button size="sm" variant="outline" className="w-full font-semibold opacity-50 cursor-not-allowed" disabled>{p.cta}</Button>
-                      <p className="text-xs text-center text-muted-foreground">Coming Soon</p>
-                    </div>
-                  )
-                ) : (
-                  <Link href={p.href!}>
-                    <Button size="sm" className="w-full font-semibold">{p.cta}</Button>
-                  </Link>
-                )}
+            <PlatformCard
+              icon={AppWindow}
+              title="Windows"
+              desc="Full EPOS experience on Windows 10 & 11. Optimised for touchscreen tills and dedicated counter hardware."
+              cta="Download for Windows"
+              downloadUrl={downloads?.windowsUrl}
+            />
+            <PlatformCard
+              icon={Laptop}
+              title="macOS"
+              desc="Run CtrlTradePos® on any Mac. Ideal for showroom and back-office till setups."
+              cta="Download for macOS"
+              downloadUrl={downloads?.macosUrl}
+            />
+            <div className="border border-primary bg-primary/5 p-6 flex flex-col">
+              <Smartphone className="h-9 w-9 text-primary mb-4" />
+              <h3 className="text-lg font-bold mb-2">iOS</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">Sell from an iPhone or iPad. Portable till for trade counters, events, and pop-up locations.</p>
+              <div className="space-y-2">
+                <Button size="sm" variant="outline" className="w-full font-semibold opacity-50 cursor-not-allowed" disabled>App Store</Button>
+                <p className="text-xs text-center text-muted-foreground">Coming Soon</p>
               </div>
-            ))}
+            </div>
+            <div className="border border-primary bg-primary/5 p-6 flex flex-col">
+              <Smartphone className="h-9 w-9 text-primary mb-4" />
+              <h3 className="text-lg font-bold mb-2">Android</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">Native Android app for phones and tablets. Works with Bluetooth scanners and portable printers.</p>
+              <div className="space-y-2">
+                <Button size="sm" variant="outline" className="w-full font-semibold opacity-50 cursor-not-allowed" disabled>Google Play</Button>
+                <p className="text-xs text-center text-muted-foreground">Coming Soon</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -6136,6 +6136,47 @@ paths:
                 properties:
                   voicemail: { $ref: "#/components/schemas/Voicemail" }
 
+  # ---- CtrlTradePos® download links (public) -----------------------------
+  /v1/pos/downloads:
+    get:
+      operationId: getPosDownloads
+      tags: [pos-downloads]
+      summary: Get the current Windows and macOS installer download URLs
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosDownloads" }
+
+  # ---- CtrlTradePos® download links (super admin) ------------------------
+  /v1/admin/pos-downloads:
+    get:
+      operationId: adminGetPosDownloads
+      tags: [admin]
+      summary: Get the current POS download URLs (super admin)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosDownloads" }
+    put:
+      operationId: adminUpdatePosDownloads
+      tags: [admin]
+      summary: Update the Windows and macOS POS download URLs (super admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminUpdatePosDownloadsInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosDownloads" }
+
   # ---- CtrlTradePos® licensing & terminals (tenant) ----------------------
   /v1/pos-licences:
     get:
@@ -6298,6 +6339,19 @@ paths:
 
 components:
   schemas:
+    PosDownloads:
+      type: object
+      required: [windowsUrl, macosUrl]
+      properties:
+        windowsUrl: { type: string, nullable: true }
+        macosUrl: { type: string, nullable: true }
+
+    AdminUpdatePosDownloadsInput:
+      type: object
+      properties:
+        windowsUrl: { type: string, nullable: true }
+        macosUrl: { type: string, nullable: true }
+
     PosTerminal:
       type: object
       required: [id, tenantId, terminalCode, name, mode, status, createdAt]

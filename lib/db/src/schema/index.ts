@@ -2455,3 +2455,11 @@ export const staffNotificationsTable = pgTable(
   }),
 );
 export type StaffNotification = typeof staffNotificationsTable.$inferSelect;
+
+// ---- Platform settings (global key-value config, super admin only) --------
+export const platformSettingsTable = pgTable("platform_settings", {
+  key: varchar("key", { length: 128 }).primaryKey(),
+  value: text("value"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+});
+export type PlatformSetting = typeof platformSettingsTable.$inferSelect;

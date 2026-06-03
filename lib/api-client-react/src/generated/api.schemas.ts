@@ -5,6 +5,16 @@
  * CtrlTrade SaaS Portal API
  * OpenAPI spec version: 0.1.0
  */
+export interface PosDownloads {
+  windowsUrl: string | null;
+  macosUrl: string | null;
+}
+
+export interface AdminUpdatePosDownloadsInput {
+  windowsUrl?: string | null;
+  macosUrl?: string | null;
+}
+
 export type PosTerminalMode = typeof PosTerminalMode[keyof typeof PosTerminalMode];
 
 

@@ -9205,6 +9205,38 @@ export const MarkVoicemailListenedResponse = zod.object({
 
 
 /**
+ * @summary Get the current Windows and macOS installer download URLs
+ */
+export const GetPosDownloadsResponse = zod.object({
+  "windowsUrl": zod.string().nullable(),
+  "macosUrl": zod.string().nullable()
+})
+
+
+/**
+ * @summary Get the current POS download URLs (super admin)
+ */
+export const AdminGetPosDownloadsResponse = zod.object({
+  "windowsUrl": zod.string().nullable(),
+  "macosUrl": zod.string().nullable()
+})
+
+
+/**
+ * @summary Update the Windows and macOS POS download URLs (super admin)
+ */
+export const AdminUpdatePosDownloadsBody = zod.object({
+  "windowsUrl": zod.string().nullish(),
+  "macosUrl": zod.string().nullish()
+})
+
+export const AdminUpdatePosDownloadsResponse = zod.object({
+  "windowsUrl": zod.string().nullable(),
+  "macosUrl": zod.string().nullable()
+})
+
+
+/**
  * @summary List this tenant's POS till licences and their terminals
  */
 export const ListPosLicencesResponse = zod.object({

@@ -1,4 +1,5 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
+import { z } from "zod/v4";
 import { and, desc, eq, gte, ilike, inArray, lt, sql, isNull } from "drizzle-orm";
 import * as archiverNS from "archiver";
 const archiver: any = (archiverNS as any).default ?? archiverNS;
@@ -43,7 +44,7 @@ import {
   serializeLicence,
   LICENCE_STATUSES,
 } from "../lib/posLicence";
-import { posLicencesTable } from "@workspace/db";
+import { posLicencesTable, platformSettingsTable } from "@workspace/db";
 import {
   serializeSubscription,
   serializeTenant,
@@ -1048,6 +1049,57 @@ router.patch("/v1/admin/pos-licences/:licenceId", async (req, res): Promise<void
     metadata: { licenceId: updated.id },
   });
   res.json(serializeLicence(updated, null, []));
+});
+
+// ---- POS Download URLs (super admin) ---------------------------------------
+const httpsUrlOrNull = z.union([
+  z.string().url().startsWith("https://"),
+  z.literal(""),
+  z.null(),
+]);
+const UpdatePosDownloadsBody = z.object({
+  windowsUrl: httpsUrlOrNull.optional(),
+  macosUrl: httpsUrlOrNull.optional(),
+});
+
+async function readPosDownloadUrls() {
+  const rows = await db
+    .select()
+    .from(platformSettingsTable)
+    .where(
+      sql`key IN ('windows_url', 'macos_url')`,
+    );
+  const map = Object.fromEntries(rows.map((r) => [r.key, r.value ?? null]));
+  return {
+    windowsUrl: (map["windows_url"] as string | null | undefined) ?? null,
+    macosUrl: (map["macos_url"] as string | null | undefined) ?? null,
+  };
+}
+
+router.get("/v1/admin/pos-downloads", async (_req, res): Promise<void> => {
+  res.json(await readPosDownloadUrls());
+});
+
+router.put("/v1/admin/pos-downloads", async (req, res): Promise<void> => {
+  const parsed = UpdatePosDownloadsBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid URL — must be https:// or null" });
+    return;
+  }
+  const { windowsUrl, macosUrl } = parsed.data;
+  if (windowsUrl !== undefined) {
+    await db
+      .insert(platformSettingsTable)
+      .values({ key: "windows_url", value: windowsUrl || null })
+      .onConflictDoUpdate({ target: platformSettingsTable.key, set: { value: windowsUrl || null } });
+  }
+  if (macosUrl !== undefined) {
+    await db
+      .insert(platformSettingsTable)
+      .values({ key: "macos_url", value: macosUrl || null })
+      .onConflictDoUpdate({ target: platformSettingsTable.key, set: { value: macosUrl || null } });
+  }
+  res.json(await readPosDownloadUrls());
 });
 
 export default router;
