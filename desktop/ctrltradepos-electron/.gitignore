@@ -1,0 +1,5 @@
+www/
+dist/
+src/main.js
+src/main.d.ts
+node_modules/
