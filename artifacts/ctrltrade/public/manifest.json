@@ -1,8 +1,8 @@
 {
-  "name": "CtrlTradePos®",
-  "short_name": "CtrlTradePos",
-  "description": "Trade Counter & Warehouse POS — CtrlTradePos® Web Till",
-  "start_url": "/app/pos/till",
+  "name": "CtrlTrade®",
+  "short_name": "CtrlTrade",
+  "description": "The complete operating system for trade businesses. CRM, EPOS, Scheduling, Dispatch & more.",
+  "start_url": "/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#09090b",
@@ -13,6 +13,12 @@
       "src": "/favicon.svg",
       "type": "image/svg+xml",
       "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/ctrltrade-icon.png",
+      "type": "image/png",
+      "sizes": "192x192",
       "purpose": "any maskable"
     }
   ],
@@ -23,6 +29,11 @@
       "name": "Open Till",
       "url": "/app/pos/till",
       "description": "Launch the till screen"
+    },
+    {
+      "name": "Dashboard",
+      "url": "/app/dashboard",
+      "description": "Open the main dashboard"
     }
   ]
 }

@@ -1,3 +1,19 @@
 <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="180" height="180" rx="36" fill="#FF3C00"/>
+  <!-- Dark background -->
+  <rect width="180" height="180" rx="36" fill="#0F0F11"/>
+  <!-- Yellow bracket left -->
+  <rect x="22" y="32" width="8" height="116" rx="2" fill="#FFB800"/>
+  <rect x="22" y="32" width="40" height="8" rx="2" fill="#FFB800"/>
+  <rect x="22" y="140" width="40" height="8" rx="2" fill="#FFB800"/>
+  <!-- "ct" letterforms in yellow -->
+  <!-- c -->
+  <path d="M72 72 Q72 60 84 60 L96 60" stroke="#FFB800" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M72 72 L72 108 Q72 120 84 120 L96 120" stroke="#FFB800" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <!-- t -->
+  <line x1="110" y1="48" x2="110" y2="120" stroke="#FFB800" stroke-width="8" stroke-linecap="round"/>
+  <line x1="96" y1="72" x2="136" y2="72" stroke="#FFB800" stroke-width="8" stroke-linecap="round"/>
+  <!-- Yellow bracket right -->
+  <rect x="150" y="32" width="8" height="116" rx="2" fill="#FFB800"/>
+  <rect x="118" y="32" width="40" height="8" rx="2" fill="#FFB800"/>
+  <rect x="118" y="140" width="40" height="8" rx="2" fill="#FFB800"/>
 </svg>
