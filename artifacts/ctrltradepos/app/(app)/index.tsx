@@ -117,7 +117,7 @@ export default function PosHomeScreen() {
 
       {pendingCount > 0 && (
         <Pressable
-          onPress={triggerSync}
+          onPress={() => router.push("/(app)/sales")}
           style={[styles.syncBanner, { backgroundColor: colors.card, borderColor: colors.primary }]}
         >
           <View style={styles.syncRow}>
@@ -127,9 +127,7 @@ export default function PosHomeScreen() {
                 ? `SYNCING ${pendingCount} OFFLINE SALE${pendingCount === 1 ? "" : "S"}…`
                 : `${pendingCount} OFFLINE SALE${pendingCount === 1 ? "" : "S"} PENDING SYNC`}
             </Text>
-            {!isSyncing && (
-              <Text style={[styles.syncAction, { color: colors.primary }]}>SYNC NOW</Text>
-            )}
+            <Text style={[styles.syncAction, { color: colors.primary }]}>VIEW →</Text>
           </View>
         </Pressable>
       )}

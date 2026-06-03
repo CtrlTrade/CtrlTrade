@@ -16,6 +16,7 @@ import {
   getQueue,
   removeFromQueue,
   markAttempt,
+  type QueuedTransaction,
 } from "@/lib/offlineQueue";
 import { getAuthToken } from "@/contexts/AuthContext";
 
@@ -24,6 +25,7 @@ const MAX_ATTEMPTS = 10;
 
 interface OfflineSyncContextValue {
   pendingCount: number;
+  pendingItems: import("@/lib/offlineQueue").QueuedTransaction[];
   isSyncing: boolean;
   triggerSync: () => void;
   lastSyncedAt: string | null;
@@ -31,6 +33,7 @@ interface OfflineSyncContextValue {
 
 const OfflineSyncContext = createContext<OfflineSyncContextValue>({
   pendingCount: 0,
+  pendingItems: [],
   isSyncing: false,
   triggerSync: () => {},
   lastSyncedAt: null,
@@ -49,7 +52,7 @@ function isNetworkError(err: unknown): boolean {
 }
 
 export function OfflineSyncProvider({ children }: { children: React.ReactNode }) {
-  const [pendingCount, setPendingCount] = useState(0);
+  const [pendingItems, setPendingItems] = useState<QueuedTransaction[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const syncInProgress = useRef(false);
@@ -57,7 +60,7 @@ export function OfflineSyncProvider({ children }: { children: React.ReactNode })
 
   const refreshCount = useCallback(async () => {
     const q = await getQueue();
-    setPendingCount(q.length);
+    setPendingItems(q);
   }, []);
 
   const triggerSync = useCallback(async () => {
@@ -128,7 +131,7 @@ export function OfflineSyncProvider({ children }: { children: React.ReactNode })
   }, [triggerSync]);
 
   return (
-    <OfflineSyncContext.Provider value={{ pendingCount, isSyncing, triggerSync, lastSyncedAt }}>
+    <OfflineSyncContext.Provider value={{ pendingCount: pendingItems.length, pendingItems, isSyncing, triggerSync, lastSyncedAt }}>
       {children}
     </OfflineSyncContext.Provider>
   );
