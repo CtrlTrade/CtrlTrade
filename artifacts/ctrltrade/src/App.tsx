@@ -318,6 +318,34 @@ function App() {
                   <Route path="/warehouse-management-software">{() => <SeoLandingPage slug="warehouse-management-software" />}</Route>
                   <Route path="/showroom-management-software">{() => <SeoLandingPage slug="showroom-management-software" />}</Route>
                   <Route path="/field-service-management-software">{() => <SeoLandingPage slug="field-service-management-software" />}</Route>
+                  <Route path="/builders-merchants-crm">{() => <SeoLandingPage slug="builders-merchants-crm" />}</Route>
+                  <Route path="/masonry-crm">{() => <SeoLandingPage slug="masonry-crm" />}</Route>
+                  <Route path="/timber-merchants-crm">{() => <SeoLandingPage slug="timber-merchants-crm" />}</Route>
+                  <Route path="/heating-gas-crm">{() => <SeoLandingPage slug="heating-gas-crm" />}</Route>
+                  <Route path="/renewable-energy-crm">{() => <SeoLandingPage slug="renewable-energy-crm" />}</Route>
+                  <Route path="/security-fire-crm">{() => <SeoLandingPage slug="security-fire-crm" />}</Route>
+                  <Route path="/windows-doors-crm">{() => <SeoLandingPage slug="windows-doors-crm" />}</Route>
+                  <Route path="/kitchens-crm">{() => <SeoLandingPage slug="kitchens-crm" />}</Route>
+                  <Route path="/bathrooms-crm">{() => <SeoLandingPage slug="bathrooms-crm" />}</Route>
+                  <Route path="/flooring-crm">{() => <SeoLandingPage slug="flooring-crm" />}</Route>
+                  <Route path="/tiles-crm">{() => <SeoLandingPage slug="tiles-crm" />}</Route>
+                  <Route path="/decorating-crm">{() => <SeoLandingPage slug="decorating-crm" />}</Route>
+                  <Route path="/landscaping-crm">{() => <SeoLandingPage slug="landscaping-crm" />}</Route>
+                  <Route path="/fencing-crm">{() => <SeoLandingPage slug="fencing-crm" />}</Route>
+                  <Route path="/steel-metal-crm">{() => <SeoLandingPage slug="steel-metal-crm" />}</Route>
+                  <Route path="/industrial-supplies-crm">{() => <SeoLandingPage slug="industrial-supplies-crm" />}</Route>
+                  <Route path="/tools-equipment-crm">{() => <SeoLandingPage slug="tools-equipment-crm" />}</Route>
+                  <Route path="/plant-machinery-crm">{() => <SeoLandingPage slug="plant-machinery-crm" />}</Route>
+                  <Route path="/workwear-ppe-crm">{() => <SeoLandingPage slug="workwear-ppe-crm" />}</Route>
+                  <Route path="/automotive-crm">{() => <SeoLandingPage slug="automotive-crm" />}</Route>
+                  <Route path="/warehousing-crm">{() => <SeoLandingPage slug="warehousing-crm" />}</Route>
+                  <Route path="/distribution-crm">{() => <SeoLandingPage slug="distribution-crm" />}</Route>
+                  <Route path="/manufacturing-crm">{() => <SeoLandingPage slug="manufacturing-crm" />}</Route>
+                  <Route path="/cabins-modular-crm">{() => <SeoLandingPage slug="cabins-modular-crm" />}</Route>
+                  <Route path="/agricultural-crm">{() => <SeoLandingPage slug="agricultural-crm" />}</Route>
+                  <Route path="/showrooms-crm">{() => <SeoLandingPage slug="showrooms-crm" />}</Route>
+                  <Route path="/specialist-trades-crm">{() => <SeoLandingPage slug="specialist-trades-crm" />}</Route>
+                  <Route path="/logistics-crm">{() => <SeoLandingPage slug="logistics-crm" />}</Route>
 
 
                   <Route component={NotFound} />
