@@ -76,7 +76,7 @@ export default function PosHomeScreen() {
   const { mode } = useAuth();
   const posEnabled = modules?.posEnabled ?? false;
   const { data: session, isLoading: sessionLoading } = useGetCurrentTillSession();
-  const { pendingCount, isSyncing, triggerSync } = useOfflineSync();
+  const { pendingCount, isSyncing, triggerSync, lastSyncedSales, dismissSyncedSales } = useOfflineSync();
 
   const isOpen = !!session;
   const takingsPence = session
@@ -130,6 +130,33 @@ export default function PosHomeScreen() {
             <Text style={[styles.syncAction, { color: colors.primary }]}>VIEW →</Text>
           </View>
         </Pressable>
+      )}
+
+      {lastSyncedSales.length > 0 && (
+        <View style={[styles.syncedBanner, { backgroundColor: colors.card, borderColor: colors.primary }]}>
+          <View style={styles.syncedHeader}>
+            <Text style={[styles.syncedTitle, { color: colors.primary }]}>
+              ✓ SYNC COMPLETE — {lastSyncedSales.length} SALE{lastSyncedSales.length === 1 ? "" : "S"} UPLOADED
+            </Text>
+            <Pressable onPress={dismissSyncedSales} hitSlop={8}>
+              <Text style={[styles.syncedDismiss, { color: colors.mutedForeground }]}>✕</Text>
+            </Pressable>
+          </View>
+          {lastSyncedSales.map((sale) => (
+            <Pressable
+              key={sale.id}
+              onPress={() => router.push({ pathname: "/(app)/receipt/[id]", params: { id: sale.id } })}
+              style={({ pressed }) => [styles.syncedSaleRow, { borderColor: colors.border, opacity: pressed ? 0.75 : 1 }]}
+            >
+              <Text style={[styles.syncedSaleCustomer, { color: colors.foreground }]} numberOfLines={1}>
+                {sale.customerName || "Walk-in customer"}
+              </Text>
+              <Text style={[styles.syncedSaleReceipt, { color: colors.primary }]}>
+                £{(sale.totalPence / 100).toFixed(2)} · RECEIPT →
+              </Text>
+            </Pressable>
+          ))}
+        </View>
       )}
 
       <ScrollView contentContainerStyle={styles.scroll}>
@@ -252,4 +279,11 @@ const styles = StyleSheet.create({
   tileLabel: { fontFamily: MONO_FONT, fontSize: 15, letterSpacing: 2, fontWeight: "700" },
   tileHint: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 1, marginTop: 8 },
   note: { fontFamily: MONO_FONT, fontSize: 12, lineHeight: 18, textAlign: "center" },
+  syncedBanner: { borderTopWidth: 1, borderBottomWidth: 1, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6 },
+  syncedHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 },
+  syncedTitle: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 1, fontWeight: "700", flex: 1 },
+  syncedDismiss: { fontFamily: MONO_FONT, fontSize: 14, paddingLeft: 12 },
+  syncedSaleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderTopWidth: 1, paddingVertical: 8, gap: 12 },
+  syncedSaleCustomer: { fontFamily: MONO_FONT, fontSize: 12, fontWeight: "700", flex: 1 },
+  syncedSaleReceipt: { fontFamily: MONO_FONT, fontSize: 12, letterSpacing: 1 },
 });

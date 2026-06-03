@@ -23,12 +23,20 @@ import { getAuthToken } from "@/contexts/AuthContext";
 const SYNC_INTERVAL_MS = 30_000;
 const MAX_ATTEMPTS = 10;
 
+export interface SyncedSaleInfo {
+  id: string;
+  customerName: string | null;
+  totalPence: number;
+}
+
 interface OfflineSyncContextValue {
   pendingCount: number;
   pendingItems: import("@/lib/offlineQueue").QueuedTransaction[];
   isSyncing: boolean;
   triggerSync: () => void;
   lastSyncedAt: string | null;
+  lastSyncedSales: SyncedSaleInfo[];
+  dismissSyncedSales: () => void;
 }
 
 const OfflineSyncContext = createContext<OfflineSyncContextValue>({
@@ -37,6 +45,8 @@ const OfflineSyncContext = createContext<OfflineSyncContextValue>({
   isSyncing: false,
   triggerSync: () => {},
   lastSyncedAt: null,
+  lastSyncedSales: [],
+  dismissSyncedSales: () => {},
 });
 
 function isNetworkError(err: unknown): boolean {
@@ -55,12 +65,17 @@ export function OfflineSyncProvider({ children }: { children: React.ReactNode })
   const [pendingItems, setPendingItems] = useState<QueuedTransaction[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
+  const [lastSyncedSales, setLastSyncedSales] = useState<SyncedSaleInfo[]>([]);
   const syncInProgress = useRef(false);
   const qc = useQueryClient();
 
   const refreshCount = useCallback(async () => {
     const q = await getQueue();
     setPendingItems(q);
+  }, []);
+
+  const dismissSyncedSales = useCallback(() => {
+    setLastSyncedSales([]);
   }, []);
 
   const triggerSync = useCallback(async () => {
@@ -74,11 +89,12 @@ export function OfflineSyncProvider({ children }: { children: React.ReactNode })
     syncInProgress.current = true;
     setIsSyncing(true);
 
-    let syncedAny = false;
+    const newlySynced: SyncedSaleInfo[] = [];
+
     for (const item of queue) {
       if (item.attempts >= MAX_ATTEMPTS) continue;
       try {
-        await createPosTransaction({
+        const result = await createPosTransaction({
           ...item.payload,
           idempotencyKey: item.clientId,
           items: item.payload.items.map((i) => ({
@@ -87,7 +103,11 @@ export function OfflineSyncProvider({ children }: { children: React.ReactNode })
           })),
         });
         await removeFromQueue(item.clientId);
-        syncedAny = true;
+        newlySynced.push({
+          id: result.id,
+          customerName: result.customerName ?? null,
+          totalPence: result.totalPence,
+        });
       } catch (err) {
         if (isNetworkError(err)) {
           break;
@@ -96,9 +116,10 @@ export function OfflineSyncProvider({ children }: { children: React.ReactNode })
       }
     }
 
-    if (syncedAny) {
+    if (newlySynced.length > 0) {
       setLastSyncedAt(new Date().toISOString());
       void qc.invalidateQueries({ queryKey: getGetCurrentTillSessionQueryKey() });
+      setLastSyncedSales(newlySynced);
     }
 
     await refreshCount();
@@ -131,7 +152,7 @@ export function OfflineSyncProvider({ children }: { children: React.ReactNode })
   }, [triggerSync]);
 
   return (
-    <OfflineSyncContext.Provider value={{ pendingCount: pendingItems.length, pendingItems, isSyncing, triggerSync, lastSyncedAt }}>
+    <OfflineSyncContext.Provider value={{ pendingCount: pendingItems.length, pendingItems, isSyncing, triggerSync, lastSyncedAt, lastSyncedSales, dismissSyncedSales }}>
       {children}
     </OfflineSyncContext.Provider>
   );
