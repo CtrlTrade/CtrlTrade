@@ -1,0 +1,1564 @@
+Build CtrlTrade® as a fully autonomous multi-tenant SaaS operating system.
+
+CtrlTrade® is built for:
+- sole traders
+- trade businesses
+- suppliers
+- trade counters
+- warehouses
+- field service companies
+- multi-branch operators
+- enterprise contractors
+
+CtrlTrade® must be premium, clean, fast, secure, scalable and user-friendly.
+
+==================================================
+SYSTEM STRUCTURE
+==================================================
+
+Layer 1 → CtrlTrade SaaS Platform
+Layer 2 → Tenant CtrlTrade CRM & CtrlTradePos®
+Layer 3 → Tenant Customer Portal
+
+Use:
+- React/Vite frontend
+- Express API
+- PostgreSQL database
+- Drizzle ORM
+- TypeScript
+- Stripe billing
+- tenant isolation by tenant_id/company_id
+- role-based access
+- seat-based access
+- customer portal at /portal/:slug
+- API versioning using /api/v1/
+- background workers for async jobs
+- S3-compatible object storage for files
+
+==================================================
+PUBLIC WEBSITE
+==================================================
+
+Create:
+
+/                       Marketing website
+/pricing                Pricing page
+/signup                 Tenant signup
+/login                  Tenant login
+/features               Platform features
+/industries             Supported industries
+/integrations           Integrations
+/addons                 Add-on marketplace
+/security               GDPR & security
+/contact                Contact/support
+/app                    Tenant CRM
+/admin                  Super Admin Platform
+/portal/:slug           Customer portal
+/api/v1                 Versioned API
+
+No demo request flow.
+Only “Start 1 Month Free Trial”.
+
+==================================================
+PRICING
+==================================================
+
+Control Seat — Core Plan
+£79 / seat / month
+
+For owners, managers and office teams who run the business.
+
+Includes:
+- Full CRM & pipeline management
+- Quotes, jobs & invoicing
+- Staff & resource management
+- Financial reports & insights
+- Purchase orders
+- Customer portal access
+- Xero accounting integration
+- Compliance & document tracking
+- Fleet & vehicle management
+- System settings & permissions
+
+Field Seat — Add-on
+£19 / seat / month
+
+For engineers, operatives and field staff completing jobs on the road.
+
+Includes:
+- Mobile-first job access
+- View & update assigned jobs
+- GPS check-in / check-out
+- Photo capture on site
+- Digital job-completion sign-off
+- Timesheet & travel logging
+- Customer contact details
+- Real-time schedule view
+
+CtrlTradePos® — Add-on
+£59.99 / till / month
+
+For trade counters, trade shops, warehouses and supplier operations running inside CtrlTrade.
+
+Includes:
+- CtrlTradePos® till system
+- touchscreen till interface
+- barcode scanning
+- receipt printing
+- trade counter CRM
+- trade account pricing
+- stock & inventory management
+- warehouse management
+- branch stock management
+- supplier ordering
+- purchase orders
+- product catalogue
+- customer purchase history
+- click & collect
+- split payments
+- refunds & promotions
+- cash drawer support
+- card terminal support
+- AI stock intelligence
+- low-stock alerts
+- stock movement tracking
+- till session management
+- end-of-day reconciliation
+
+Billing rules:
+- every tenant must have at least 1 Control Seat
+- Field Seats are optional add-ons
+- CtrlTradePos® is billed per till
+- tenants can add multiple tills
+- tills are billed alongside Control Seats and Field Seats
+- all tenants receive a 1 month free trial
+- payment method is required before trial activation
+- after the trial, Stripe billing starts automatically unless cancelled
+- tenant access pauses or downgrades if Stripe payment fails
+
+==================================================
+STRIPE BILLING
+==================================================
+
+The /admin Super Admin platform must use Stripe to take payments for all SaaS plans.
+
+Stripe must handle:
+- Control Seat subscriptions at £79 / seat / month
+- Field Seat add-ons at £19 / seat / month
+- CtrlTradePos® till subscriptions at £59.99 / till / month
+- 1 month free trial
+- monthly recurring billing
+- annual billing future support
+- add-on billing
+- failed payment handling
+- plan upgrades/downgrades
+- seat quantity changes
+- till quantity changes
+- till activation/deactivation
+- invoices and receipts
+- subscription cancellation
+- tenant billing status
+- Stripe webhooks
+- failed payment retries
+
+Payment flow:
+
+Tenant signs up
+↓
+Chooses Control Seats and Field Seats
+↓
+Adds optional CtrlTradePos® tills
+↓
+Adds payment method
+↓
+Starts 1 month free trial
+↓
+Stripe customer is created
+↓
+Stripe subscription is created with trial period
+↓
+Tenant workspace is provisioned
+↓
+After trial, Stripe charges saved payment method
+↓
+Billing status updates inside /admin
+↓
+Tenant access remains active if payment succeeds
+↓
+Tenant is flagged, paused or downgraded if payment fails
+
+/admin billing must include:
+- Stripe dashboard summary
+- tenant subscription status
+- active trials
+- failed payments
+- upcoming renewals
+- MRR
+- ARR
+- seat revenue
+- till revenue
+- add-on revenue
+- usage revenue
+- total active tills
+- till subscription management
+- till licence overrides
+- manual plan override
+- cancel subscription
+- reactivate subscription
+- update seat quantity
+- update till quantity
+- view Stripe customer ID
+- view Stripe subscription ID
+- sync billing status from Stripe
+- audit logs for all billing changes
+- tenant cancellation flow
+- data export before tenant deletion
+
+==================================================
+USAGE METERING
+==================================================
+
+Add usage metering for future billing and limits.
+
+Track:
+- AI usage
+- storage usage
+- API usage
+- SMS usage
+- WhatsApp usage
+- call minutes
+- automation executions
+- emails sent
+- file uploads
+- portal activity
+- POS transactions
+- till usage
+
+Tables:
+usage_events
+usage_counters
+usage_limits
+tenant_usage_summary
+usage_billing_items
+
+Usage metering must support:
+- plan limits
+- add-on limits
+- fair usage policies
+- future usage billing
+- overage alerts
+
+==================================================
+FEATURE FLAGS
+==================================================
+
+Add feature flag infrastructure.
+
+Tables:
+feature_flags
+tenant_feature_flags
+feature_rollouts
+beta_features
+
+Feature flags must support:
+- beta features
+- coming soon modules
+- plan locking
+- tenant-specific unlocks
+- staged rollouts
+- enterprise-only features
+- Super Admin override
+
+==================================================
+NOTIFICATION ENGINE
+==================================================
+
+Create a central notification engine.
+
+Channels:
+- email
+- SMS
+- WhatsApp
+- push notifications
+- in-app notifications
+- voice/call alerts
+
+Notification system must support:
+- templates
+- triggers
+- scheduling
+- retries
+- delivery logs
+- failed delivery alerts
+- tenant branding
+- customer notifications
+- internal staff notifications
+
+Tables:
+notification_templates
+notification_events
+notification_deliveries
+notification_preferences
+
+==================================================
+BACKGROUND WORKERS
+==================================================
+
+Add background worker infrastructure.
+
+Use queue workers for:
+- Stripe webhooks
+- AI tasks
+- automation runs
+- imports
+- exports
+- email sending
+- SMS sending
+- WhatsApp messages
+- file processing
+- OCR
+- report generation
+- Xero sync
+- calendar sync
+- POS stock sync
+
+Suggested architecture:
+- Redis/BullMQ or equivalent queue system
+- worker process
+- retry logic
+- dead-letter queue
+- job monitoring dashboard
+
+Tables:
+event_queue
+worker_jobs
+failed_jobs
+scheduled_jobs
+job_retry_logs
+
+==================================================
+FILE STORAGE
+==================================================
+
+Use S3-compatible object storage.
+
+Do not store files directly in PostgreSQL.
+
+Store:
+- customer uploads
+- job photos
+- compliance documents
+- invoices
+- quotes
+- receipts
+- warranties
+- certificates
+- videos
+- POS receipts
+- product images
+- branding assets
+
+File system must include:
+- MIME validation
+- file size limits
+- signed upload URLs
+- tenant-scoped folders
+- access permissions
+- virus scanning future support
+- audit logs
+
+Tables:
+files
+file_versions
+file_access_logs
+storage_objects
+
+==================================================
+SIGNUP FLOW
+==================================================
+
+Visitor lands on website
+↓
+Clicks Start 1 Month Free Trial
+↓
+Creates company account
+↓
+Chooses industry/categories
+↓
+Chooses number of Control Seats
+↓
+Adds optional Field Seats
+↓
+Adds optional CtrlTradePos® tills
+↓
+Selects optional add-ons
+↓
+Creates owner login
+↓
+Adds payment method
+↓
+Stripe customer and trial subscription are created
+↓
+Trial starts
+↓
+Tenant workspace is provisioned
+↓
+User enters onboarding wizard
+↓
+Tenant enters CtrlTrade CRM
+
+Signup fields:
+- company name
+- business email
+- business phone
+- address
+- industry/categories
+- number of staff
+- number of Control Seats
+- number of Field Seats
+- number of CtrlTradePos® tills
+- owner name
+- owner email
+- password
+- MFA setup optional
+- payment method
+
+Onboarding checklist:
+- company profile
+- logo and branding
+- trade categories
+- branches
+- staff
+- Control Seats
+- Field Seats
+- CtrlTradePos® setup
+- create trade counter
+- configure tills
+- add products
+- connect receipt printer
+- configure stock locations
+- configure supplier accounts
+- quote settings
+- invoice settings
+- Stripe payments
+- Xero integration
+- calendar integration
+- customer portal setup
+- first customer
+- first job
+
+==================================================
+TRADE CATEGORY SETUP
+==================================================
+
+On signup, tenant must choose one or more trade categories.
+
+The selected trade category controls:
+- job types
+- quote templates
+- job forms
+- compliance checklists
+- required photos
+- dashboard wording
+- automation rules
+- AI prompts
+- customer portal wording
+
+Example:
+
+Roofing tenant gets:
+- Roof repair
+- Flat roof
+- Guttering
+- Leak investigation
+- Chimney work
+- Fascias & soffits
+- Before/after photos
+- Height safety checklist
+- Scaffold checklist
+- Roof survey form
+- Weather warning alerts
+- Roofing quote templates
+- Roofing risk assessment
+
+Electrical tenant gets:
+- EICR
+- Consumer unit replacement
+- Rewires
+- EV charger installation
+- PAT testing
+- Circuit schedule
+- NICEIC/NAPIT certificate fields
+- Electrical safety checklist
+- Test result forms
+
+Plumbing tenant gets:
+- Leak repair
+- Boiler service
+- Bathroom install
+- Pipework
+- Emergency plumbing
+- Pressure testing
+- Gas safety reminders
+- Before/after photos
+
+Cleaning tenant gets:
+- Recurring cleaning contracts
+- End-of-tenancy cleaning
+- Deep cleaning
+- Consumables checklist
+- Team rota
+- Cleaning inspection forms
+
+Each tenant can add multiple industries and each branch can operate different industries.
+
+==================================================
+LAYER 1 — CTRLTRADE SAAS PLATFORM
+==================================================
+
+Super Admin area at /admin.
+
+Used by:
+- CtrlTrade owners
+- platform staff
+- billing staff
+- support staff
+- compliance staff
+- referral managers
+- reseller managers
+
+Super Admin modules:
+
+Platform Dashboard:
+- total tenants
+- active tenants
+- trials
+- MRR
+- ARR
+- churn
+- seat usage
+- till usage
+- add-on revenue
+- marketplace revenue
+- AI revenue
+- voice revenue
+- usage revenue
+- platform health
+- API health
+- worker health
+- storage health
+- failed payments
+- growth analytics
+
+Tenant Management:
+- create tenants
+- suspend tenants
+- reactivate tenants
+- delete tenants
+- manage plans
+- manage Control Seats
+- manage Field Seats
+- manage CtrlTradePos® tills
+- manage add-ons
+- manage feature flags
+- view tenant usage
+- view tenant integrations
+- impersonate tenant
+- GDPR export
+- GDPR deletion
+- white-label provisioning
+- franchise provisioning
+
+Plans & Billing:
+- Control Seat pricing
+- Field Seat pricing
+- CtrlTradePos® pricing
+- add-on pricing
+- usage pricing
+- monthly billing
+- annual billing future support
+- trial management
+- Stripe subscriptions
+- Stripe webhooks
+- VAT handling
+- failed payment recovery
+- enterprise contracts
+- manual billing override
+
+SaaS Referral System:
+This grows CtrlTrade itself.
+
+Features:
+- affiliate partners
+- resellers
+- agencies
+- Utility Umbrella referrals
+- referral links
+- referral codes
+- recurring commission
+- fixed commission
+- revenue share
+- payout dashboard
+- commission statements
+
+Marketplace Infrastructure:
+- contractor marketplace
+- labour exchange
+- supplier marketplace
+- reviews
+- ratings
+- verification badges
+- marketplace moderation
+- AI contractor matching
+- escrow payments future support
+
+Integration Catalogue:
+Super Admin controls:
+- availability
+- pricing
+- plan access
+- global integration health
+
+Integrations:
+- Xero
+- QuickBooks
+- Sage
+- Stripe
+- GoCardless
+- Google Calendar
+- Microsoft Outlook
+- Teams
+- Slack
+- Zoom
+- MyJobQuote
+- Checkatrade
+- Bark
+- Rated People
+- TrustATrader
+- WhatsApp
+- Twilio
+- Radius GPS
+- Samsara
+- Verizon Connect
+- OpenAI
+- Google Maps
+- Mailchimp
+- HubSpot
+- Screwfix
+- Toolstation
+- Travis Perkins
+- Wolseley
+- City Plumbing
+
+CtrlAI®:
+- AI estimating
+- AI quote builder
+- AI lead scoring
+- AI dispatching
+- AI scheduling
+- AI forecasting
+- AI CRM search
+- AI reporting
+- AI receptionist
+- AI support assistant
+- AI compliance assistant
+- AI workflow suggestions
+- AI margin optimisation
+- AI voice assistant
+
+CtrlVoice®:
+- VoIP
+- SIP extensions
+- browser calling
+- softphone
+- SMS
+- WhatsApp
+- IVR
+- call queues
+- call recording
+- voicemail transcription
+- AI call summaries
+- CRM call logging
+
+Security:
+- MFA
+- SSO future support
+- RBAC
+- encryption
+- audit logs
+- API security
+- device tracking
+- session monitoring
+- threat monitoring
+- GDPR export/deletion
+- data retention
+
+White Label & Franchise:
+- custom domains
+- white-label branding
+- parent-child tenants
+- franchise structures
+- regional management
+- reseller provisioning
+- white-label apps
+
+Fully Autonomous Infrastructure:
+
+CtrlWorkflow® automation engine:
+Trigger → Condition → Action → AI Decision
+
+Automation modes:
+- Manual
+- AI Suggest
+- Approval Required
+- Fully Autonomous
+
+Event system:
+- event queue
+- background workers
+- scheduled jobs
+- retry logic
+- failure logs
+- automation logs
+- AI confidence scoring
+- approval thresholds
+- human review rules
+- rollback logs
+
+==================================================
+LAYER 2 — TENANT CTRLTRADE CRM & CTRLTRADEPOS®
+==================================================
+
+Tenant CRM at /app.
+
+Every tenant is fully isolated by tenant_id/company_id.
+
+Tenants can have:
+- multiple branches
+- multiple locations
+- multiple industries
+- multiple departments
+- multiple teams
+- multiple warehouses
+- multiple trade counters
+- multiple trade shops
+- multiple vehicles
+
+Tenant CRM modules:
+
+Dashboard:
+- global dashboard
+- branch dashboard
+- industry dashboard
+- revenue
+- profitability
+- forecasting
+- AI insights
+- KPI widgets
+- alerts
+
+Leads:
+- website leads
+- marketplace leads
+- referral leads
+- Facebook leads
+- Google leads
+- voice-to-lead
+- MyJobQuote leads
+- Checkatrade leads
+- AI lead scoring
+- auto follow-up
+- lead automations
+- lead source ROI
+
+Customers:
+- customer profiles
+- multiple properties
+- communication history
+- notes
+- files
+- AI summaries
+- portal access
+- lifetime value tracking
+- customer tags
+
+Quotes:
+- AI quote builder
+- templates
+- deposits
+- e-signatures
+- finance options
+- margin analysis
+- material pricing
+- auto follow-up
+- convert quote to job
+
+Jobs:
+- job workflows
+- job statuses
+- site inspections
+- photos
+- labour tracking
+- GPS tracking
+- risk assessments
+- QA checks
+- AI job summaries
+- customer sign-off
+- completion forms
+
+Calendar & Dispatch:
+- drag-and-drop scheduling
+- AI dispatching
+- route optimisation
+- geo-fencing
+- traffic-aware routing
+- emergency dispatching
+- live technician maps
+- Google Calendar sync
+- Outlook sync
+
+Staff & Workforce:
+- roles
+- permissions
+- shift management
+- attendance tracking
+- payroll exports
+- training records
+- certifications
+- performance tracking
+
+Seat structure:
+
+Control Seat:
+For owners, managers, office staff and supervisors.
+
+Access:
+- CRM
+- customers
+- leads
+- quotes
+- jobs
+- invoices
+- reports
+- settings
+- integrations
+- automation
+- branding
+
+Field Seat:
+For engineers, operatives and mobile workers.
+
+Access:
+- assigned jobs
+- forms
+- maps
+- photos
+- timesheets
+- completion forms
+- customer contact details
+- real-time schedule
+
+Tenant Integrations:
+Tenants activate and manage their own integrations from:
+Settings → Integrations
+
+Tenant controls:
+- OAuth setup
+- API keys
+- sync settings
+- disconnect/reconnect
+- sync logs
+
+Super Admin controls:
+- availability
+- pricing
+- plan restrictions
+- billing
+- global health
+
+Tenant Referral System:
+This grows the tenant’s own business.
+
+Features:
+- customer referrals
+- staff referrals
+- partner referrals
+- referral campaigns
+- referral rewards
+- cashback rewards
+- QR codes
+- customer credits
+- referral analytics
+
+Finance Engine:
+- invoices
+- purchase orders
+- forecasting
+- profit tracking
+- CIS support
+- OCR receipt scanning
+- aged debtors
+- Direct Debit
+- recurring billing
+- payment reminders
+
+Payments:
+- Stripe
+- Apple Pay
+- Google Pay
+- deposit payments
+- refunds
+- payment plans
+- portal payments
+- payment links
+
+Materials & Stock:
+- inventory
+- warehouse stock
+- van stock
+- branch stock
+- barcode scanning
+- supplier pricing
+- auto reordering
+- stock transfers
+
+Fleet:
+- vehicle tracking
+- MOT/service tracking
+- driver scoring
+- fuel tracking
+- mileage logs
+- route replay
+- Radius GPS integration
+
+Compliance:
+- RAMS builder
+- method statements
+- risk assessments
+- incident reports
+- insurance tracking
+- training records
+- certificate expiry alerts
+- verification badges
+
+Communication Hub:
+- emails
+- SMS
+- WhatsApp
+- VoIP
+- voice notes
+- AI call summaries
+- unified inbox
+- internal chat
+- voicemail transcription
+
+Marketplace:
+- post jobs
+- find subcontractors
+- supplier marketplace
+- reviews
+- verification
+- marketplace messaging
+- labour exchange
+
+Analytics & BI:
+- forecasting
+- branch profitability
+- industry profitability
+- engineer profitability
+- revenue heatmaps
+- AI insights
+- lead ROI
+
+Branding System:
+Tenant can manage branding from:
+Settings → Branding
+
+Branding includes:
+- CRM logo
+- portal logo
+- CtrlTradePos® logo
+- colours
+- themes
+- fonts
+- invoice templates
+- quote templates
+- email templates
+- receipt templates
+- branch branding
+- customer portal branding
+- custom domain future support
+
+CtrlTradePos®:
+Trade Shop, Trade Counter & Till System.
+
+Purpose:
+Run warehouses, trade counters, trade shops and retail operations inside CtrlTrade.
+
+CtrlTradePos® modules:
+- touchscreen tills
+- barcode scanning
+- receipt printing
+- split payments
+- refunds
+- promotions
+- cash drawer support
+- card terminal support
+- trade accounts
+- trade pricing
+- customer pricing
+- warehouse stock
+- branch stock
+- van stock
+- stock transfers
+- supplier management
+- purchase orders
+- supplier invoices
+- product catalogue
+- barcode labels
+- click & collect
+- AI stock intelligence
+- till session management
+- end-of-day reconciliation
+
+POS security:
+- role restrictions for till access
+- manager approval for refunds
+- refund approval rules
+- cash drawer audit logs
+- till session logs
+- end-of-day reconciliation
+
+Full Category Engine:
+Every category controls:
+- workflows
+- templates
+- forms
+- automation
+- dashboards
+- compliance
+- AI prompts
+
+Supported categories:
+- Roofing
+- Electrical
+- Plumbing
+- HVAC
+- Heating & Gas
+- Solar
+- Construction
+- Building
+- Facilities
+- Property Maintenance
+- Cleaning
+- Landscaping
+- Tree Surgery
+- Scaffolding
+- Flooring
+- Painting
+- Windows & Doors
+- Locksmiths
+- Fire & Security
+- Pest Control
+- Drainage
+- Waste Removal
+- Appliance Repair
+- Garage Doors
+- Kitchens & Bathrooms
+- Carpentry
+- Tiling
+- Plastering
+- Bricklaying
+- Groundworks
+- Demolition
+- Shopfitting
+- Telecoms
+- IT & Smart Systems
+- CCTV
+- Agriculture
+- Marine
+- Fleet Services
+- Courier & Logistics
+- Hospitality Maintenance
+- Healthcare Maintenance
+- Education Maintenance
+- Industrial Maintenance
+- Warehousing
+- Utilities
+- Lift Systems
+- Handyman
+- Insurance Repairs
+- Modular Buildings
+- Smart Buildings
+- Rope Access
+- Energy Retrofit
+- Surveying
+- Multi-Service Enterprise
+
+Add-On Marketplace:
+
+Available now:
+- CtrlAI®
+- CtrlVoice®
+- CtrlTradePos®
+- CtrlWorkflow®
+- CtrlCompliance®
+- CtrlFleet®
+- CtrlAnalytics®
+- CtrlFinance®
+- CtrlPortal+®
+
+Coming soon:
+- CtrlUniversity®
+- CtrlRecruit®
+- CtrlInsurance®
+- CtrlFinance+®
+- CtrlEnergy®
+- CtrlLegal®
+- CtrlSites®
+- CtrlBI®
+- CtrlIoT®
+- CtrlProjects Enterprise®
+- CtrlSubbies®
+- CtrlCustomer360®
+- CtrlDocuments AI®
+- CtrlCommand®
+- CtrlTrade API Marketplace®
+- CtrlWorkers AI®
+- CtrlVision®
+- CtrlDrone®
+- CtrlAssets Enterprise®
+- CtrlOperations AI®
+
+==================================================
+LAYER 3 — TENANT CUSTOMER PORTAL
+==================================================
+
+Customer portal at:
+/portal/:slug
+
+Future custom domain:
+portal.companyname.co.uk
+
+Customer Portal modules:
+- quotes
+- invoices
+- payments
+- job tracking
+- messaging
+- reviews
+- referrals
+- maintenance plans
+- documents
+- customer login
+
+==================================================
+DATABASE REQUIREMENTS
+==================================================
+
+Use PostgreSQL with tenant isolation.
+
+Every tenant-owned table must include:
+- tenant_id
+- company_id
+- created_at
+- updated_at
+
+Where needed include:
+- branch_id
+- industry_id
+- department_id
+- team_id
+
+Core tables:
+users
+sessions
+password_reset_tokens
+tenants
+tenant_users
+companies
+branches
+industries
+departments
+teams
+roles
+permissions
+staff
+customers
+customer_notes
+leads
+quotes
+quote_items
+jobs
+job_staff
+job_photos
+job_checklists
+job_costs
+invoices
+invoice_items
+payments
+purchase_orders
+materials
+suppliers
+subcontractors
+vehicles
+compliance_documents
+compliance_notifications
+email_logs
+attachments
+activity_log
+calendar_events
+portal_tokens
+reviews
+marketplace_listings
+marketplace_applications
+add_ons
+tenant_add_ons
+pricing_config
+tenant_pricing_snapshots
+trade_categories
+support_tickets
+support_ticket_replies
+platform_leads
+platform_lead_messages
+
+Stripe billing tables:
+stripe_customers
+stripe_subscriptions
+stripe_subscription_items
+stripe_invoices
+stripe_payment_events
+billing_events
+
+Feature flag tables:
+feature_flags
+tenant_feature_flags
+feature_rollouts
+beta_features
+
+Usage metering tables:
+usage_events
+usage_counters
+usage_limits
+tenant_usage_summary
+usage_billing_items
+
+Notification tables:
+notification_templates
+notification_events
+notification_deliveries
+notification_preferences
+
+Worker tables:
+event_queue
+worker_jobs
+failed_jobs
+scheduled_jobs
+job_retry_logs
+
+File storage tables:
+files
+file_versions
+file_access_logs
+storage_objects
+
+Automation tables:
+automation_rules
+automation_triggers
+automation_conditions
+automation_actions
+automation_runs
+automation_logs
+automation_failures
+ai_decisions
+ai_confidence_scores
+approval_requests
+approval_rules
+
+Referral tables:
+platform_referral_partners
+platform_referral_links
+platform_referral_clicks
+platform_referral_leads
+platform_referral_conversions
+platform_referral_commissions
+platform_referral_payouts
+tenant_referral_campaigns
+tenant_referral_codes
+tenant_referral_rewards
+tenant_referral_conversions
+
+CtrlTradePos® tables:
+products
+product_categories
+product_variants
+stock_locations
+stock_movements
+warehouse_bins
+trade_accounts
+pos_transactions
+pos_transaction_items
+cash_drawers
+till_sessions
+supplier_orders
+supplier_deliveries
+customer_loyalty
+barcode_labels
+inventory_adjustments
+branch_stock
+
+Branding tables:
+tenant_branding
+tenant_themes
+tenant_logos
+tenant_colour_profiles
+branch_branding
+industry_branding
+portal_branding
+invoice_templates
+quote_templates
+email_templates
+pos_receipt_templates
+brand_assets
+
+==================================================
+AUTHENTICATION & AUTHORIZATION
+==================================================
+
+Login methods:
+- Replit OIDC
+- email/password credential login
+- mobile credential login
+
+Sessions:
+- server-side sessions
+- HttpOnly cookie
+- encrypted session secret
+- PostgreSQL session store
+
+Super Admin:
+- detected by isSuperAdmin flag
+- routes to /admin
+- cannot access tenant data unless using approved impersonation
+
+Tenant user:
+- routes to /app
+- resolved by tenant_users table
+- all API queries scoped by tenant_id/company_id
+
+Customer:
+- routes to /portal/:slug
+- magic link or token-based authentication
+
+Permissions:
+- Super Admin
+- Platform Staff
+- Referral Partner
+- Reseller
+- Tenant Owner
+- Tenant Manager
+- Branch Manager
+- Industry Manager
+- Office Admin
+- Accountant
+- Field Worker
+- Subcontractor
+- Customer
+
+==================================================
+SECURITY REQUIREMENTS
+==================================================
+
+Must include:
+- tenant isolation middleware
+- fail-closed tenant resolver
+- RBAC permissions
+- seat-based access
+- MFA-ready auth
+- password hashing
+- encrypted sessions
+- encrypted integration tokens
+- audit logs
+- IDOR protection
+- rate limiting
+- CORS allowlist
+- CSP headers
+- secure file upload validation
+- object storage
+- GDPR export
+- GDPR deletion
+- data retention settings
+- readiness check endpoint
+- backup-ready architecture
+
+==================================================
+KEY BUSINESS FLOWS
+==================================================
+
+Lead → Quote → Job → Invoice:
+Lead created
+AI scores lead
+Lead converted to quote
+Quote sent to customer
+Customer accepts in portal
+Job created
+Staff assigned
+Calendar updated
+Materials reserved
+Job completed
+Invoice generated
+Payment collected
+Xero synced
+Review requested
+Referral requested
+
+Free Trial Signup:
+Website visitor clicks Start 1 Month Free Trial
+Creates tenant
+Selects seats
+Adds payment method
+Stripe customer created
+Trial subscription created
+Workspace provisioned
+Trial starts
+Onboarding wizard opens
+After trial, Stripe billing begins
+
+Field Worker Flow:
+Field worker logs in
+Views assigned jobs
+Navigates to site
+GPS check-in
+Uploads photos
+Completes checklist
+Gets customer sign-off
+Job marked complete
+
+Customer Portal Flow:
+Customer receives portal link
+Views quote
+Accepts quote
+Pays deposit
+Tracks job
+Pays invoice
+Leaves review
+Shares referral link
+
+CtrlTradePos® Flow:
+Customer buys product
+Till transaction created
+Stock updated
+Receipt generated
+Payment processed
+Xero sync triggered
+
+Stock-to-Job Flow:
+Engineer uses part
+Van stock reduced
+Job cost updated
+Warehouse stock adjusted
+Profit margin recalculated
+Reorder triggered if low stock
+
+Autonomous Flow:
+Lead arrives
+AI scores lead
+AI replies automatically
+Survey scheduled
+Quote generated
+Customer accepts
+Job created
+Engineer assigned
+Route optimised
+Materials reserved
+Warehouse updated
+Customer updated
+Job completed
+Invoice generated
+Payment collected
+Accounting synced
+Review requested
+Referral requested
+Customer added to maintenance plan
+
+==================================================
+BUILD PRIORITY
+==================================================
+
+Phase 1:
+- marketing website
+- pricing page
+- signup/login
+- Stripe 1 month trial billing
+- tenant provisioning
+- Super Admin
+- Tenant CRM core
+- customers
+- leads
+- quotes
+- jobs
+- invoices
+- payments
+- calendar
+- staff
+- customer portal
+- Control Seat / Field Seat billing
+- CtrlTradePos® till billing
+- Trade Category Setup
+
+Phase 2:
+- Xero
+- Stripe webhooks
+- Google Calendar
+- Outlook
+- marketplace
+- compliance
+- fleet
+- reports
+- tenant branding
+- referrals
+- notifications
+- file storage
+- feature flags
+
+Phase 3:
+- CtrlWorkflow®
+- AI automation
+- CtrlAI®
+- CtrlVoice®
+- WhatsApp/SMS
+- advanced analytics
+- autonomous flows
+- background workers
+- usage metering
+
+Phase 4:
+- CtrlTradePos®
+- warehouse
+- inventory
+- trade counter
+- product catalogue
+- supplier ordering
+- POS hardware support
+
+Phase 5:
+- white label
+- franchise
+- developer API
+- coming soon modules
+- enterprise operations centre
+
+==================================================
+FINAL POSITIONING
+==================================================
+
+CtrlTrade® is the complete fully autonomous SaaS operating system for sole traders, trade businesses, suppliers, trade counters, warehouses and field service companies.
+
+Layer 1:
+CtrlTrade controls the SaaS platform.
+
+Layer 2:
+Tenants run their business, CRM and CtrlTradePos®.
+
+Layer 3:
+Customers interact through branded portals.
