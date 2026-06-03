@@ -32,6 +32,8 @@ const MIME_TYPES: Record<string, string> = {
 // paths (/_expo/static/...) resolve to the filesystem root and Expo Router's
 // History-based routing has an opaque origin, so the app renders a blank page.
 // A real localhost origin fixes both, with an SPA fallback to index.html.
+let staticServer: http.Server | undefined;
+
 function startStaticServer(rootDir: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const indexPath = path.join(rootDir, "index.html");
@@ -65,6 +67,7 @@ function startStaticServer(rootDir: string): Promise<string> {
 
     server.on("error", reject);
     server.listen(0, "127.0.0.1", () => {
+      staticServer = server;
       const address = server.address() as AddressInfo;
       resolve(`http://127.0.0.1:${address.port}`);
     });
@@ -87,6 +90,11 @@ async function createWindow(): Promise<BrowserWindow> {
   });
 
   win.maximize();
+
+  // Reuse a single server across window re-creations (e.g. macOS re-activation)
+  // to avoid leaking listeners.
+  staticServer?.close();
+  staticServer = undefined;
 
   const wwwDir = path.join(__dirname, "..", "www");
   const baseUrl = await startStaticServer(wwwDir);
@@ -130,4 +138,9 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
+});
+
+app.on("before-quit", () => {
+  staticServer?.close();
+  staticServer = undefined;
 });
