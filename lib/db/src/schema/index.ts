@@ -2368,7 +2368,7 @@ export const platformSalesLeadsTable = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull(),
-    email: varchar("email", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }),
     phone: text("phone"),
     company: text("company"),
     trade: text("trade"),

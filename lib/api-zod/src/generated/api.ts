@@ -8535,7 +8535,7 @@ export const ListAdminLeadsQueryParams = zod.object({
 export const ListAdminLeadsResponseItem = zod.object({
   "id": zod.string(),
   "name": zod.string(),
-  "email": zod.string(),
+  "email": zod.string().nullish(),
   "phone": zod.string().nullish(),
   "company": zod.string().nullish(),
   "trade": zod.string().nullish(),
@@ -8584,7 +8584,7 @@ export const GetAdminLeadParams = zod.object({
 export const GetAdminLeadResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
-  "email": zod.string(),
+  "email": zod.string().nullish(),
   "phone": zod.string().nullish(),
   "company": zod.string().nullish(),
   "trade": zod.string().nullish(),
@@ -8624,7 +8624,7 @@ export const UpdateAdminLeadBody = zod.object({
 export const UpdateAdminLeadResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
-  "email": zod.string(),
+  "email": zod.string().nullish(),
   "phone": zod.string().nullish(),
   "company": zod.string().nullish(),
   "trade": zod.string().nullish(),

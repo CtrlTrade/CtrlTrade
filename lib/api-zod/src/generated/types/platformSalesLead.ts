@@ -9,7 +9,8 @@
 export interface PlatformSalesLead {
   id: string;
   name: string;
-  email: string;
+  /** @nullable */
+  email?: string | null;
   /** @nullable */
   phone?: string | null;
   /** @nullable */

@@ -10864,11 +10864,11 @@ components:
 
     PlatformSalesLead:
       type: object
-      required: [id, name, email, source, status, createdAt, updatedAt]
+      required: [id, name, source, status, createdAt, updatedAt]
       properties:
         id: { type: string }
         name: { type: string }
-        email: { type: string }
+        email: { type: ["string", "null"] }
         phone: { type: ["string", "null"] }
         company: { type: ["string", "null"] }
         trade: { type: ["string", "null"] }

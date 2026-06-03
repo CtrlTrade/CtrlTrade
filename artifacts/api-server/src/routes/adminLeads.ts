@@ -178,38 +178,28 @@ router.post("/v1/admin/leads/import", async (req, res): Promise<void> => {
     res.status(400).json({ error: "csv field is required" });
     return;
   }
-  const lines = csvText.split(/\r?\n/).filter(Boolean);
-  if (lines.length < 2) {
+
+  // Full-text CSV parser — correctly handles quoted fields containing commas and newlines
+  const parsedRows = parseCsvText(csvText);
+  if (parsedRows.length < 2) {
     res.status(400).json({ error: "CSV must have a header row and at least one data row" });
     return;
   }
 
-  const parseRow = (line: string): string[] => {
-    const result: string[] = [];
-    let cur = "";
-    let inQuote = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') {
-        if (inQuote && line[i + 1] === '"') { cur += '"'; i++; }
-        else inQuote = !inQuote;
-      } else if (ch === "," && !inQuote) {
-        result.push(cur.trim()); cur = "";
-      } else {
-        cur += ch;
-      }
-    }
-    result.push(cur.trim());
-    return result;
+  const rawHeaders = parsedRows[0].map((h) => h.toLowerCase().replace(/\s+/g, "_"));
+
+  // Alias map: normalised export header -> internal field name
+  const HEADER_ALIASES: Record<string, string> = {
+    contact_name: "name",
+    contact_email: "email",
+    contact_phone: "phone",
+    mobile_number: "phone",
+    company_name: "company",
+    industry: "trade",
   };
 
-  const headers = parseRow(lines[0]).map((h) => h.toLowerCase().replace(/\s+/g, "_"));
-  const required = ["name", "email"];
-  const missing = required.filter((r) => !headers.includes(r));
-  if (missing.length > 0) {
-    res.status(400).json({ error: `Missing required columns: ${missing.join(", ")}` });
-    return;
-  }
+  // Build resolved header list (internal field names)
+  const headers = rawHeaders.map((h) => HEADER_ALIASES[h] ?? h);
 
   const getCol = (row: string[], col: string): string | null => {
     const idx = headers.indexOf(col);
@@ -218,46 +208,143 @@ router.post("/v1/admin/leads/import", async (req, res): Promise<void> => {
     return val && val.length > 0 ? val : null;
   };
 
-  // Fetch existing emails to detect duplicates
+  const hasNameOrCompanyCol = headers.includes("name") || headers.includes("company");
+  const hasContactCol = headers.includes("email") || headers.includes("phone");
+  if (!hasNameOrCompanyCol) {
+    res.status(400).json({ error: "Missing required columns: need at least one of name, contact_name, company_name" });
+    return;
+  }
+  if (!hasContactCol) {
+    res.status(400).json({ error: "Missing required columns: need at least one of email, contact_email, phone, contact_phone, mobile_number" });
+    return;
+  }
+
+  // Per-row name: prefer contact name, fall back to company name
+  const getNameForRow = (row: string[]): string | null =>
+    getCol(row, "name") ?? getCol(row, "company");
+
+  // Fetch existing emails + phones for duplicate detection
+  const existingRows = await db
+    .select({ email: platformSalesLeadsTable.email, phone: platformSalesLeadsTable.phone })
+    .from(platformSalesLeadsTable);
   const existingEmails = new Set(
-    (await db.select({ email: platformSalesLeadsTable.email }).from(platformSalesLeadsTable)).map(
-      (r) => r.email.toLowerCase(),
-    ),
+    existingRows.filter((r) => r.email).map((r) => r.email!.toLowerCase()),
+  );
+  const existingPhones = new Set(
+    existingRows.filter((r) => r.phone && !r.email).map((r) => normalisePhone(r.phone!)),
   );
 
   let imported = 0;
   let skipped = 0;
   const errors: string[] = [];
 
-  for (let i = 1; i < lines.length; i++) {
-    const row = parseRow(lines[i]);
-    const name = getCol(row, "name");
-    const email = getCol(row, "email")?.toLowerCase();
-    if (!name || !email) {
-      errors.push(`Row ${i + 1}: missing name or email`);
+  for (let i = 1; i < parsedRows.length; i++) {
+    const row = parsedRows[i];
+    const name = getNameForRow(row);
+    if (!name) {
+      errors.push(`Row ${i + 1}: missing name`);
       skipped++;
       continue;
     }
-    if (existingEmails.has(email)) {
+
+    const email = getCol(row, "email")?.toLowerCase() ?? null;
+    const phoneRaw = getCol(row, "phone");
+    const phone = phoneRaw ? normalisePhone(phoneRaw) : null;
+
+    if (!email && !phone) {
+      errors.push(`Row ${i + 1}: missing contact info (need email or phone)`);
       skipped++;
       continue;
     }
+
+    // Duplicate detection: by email when present, else by phone
+    if (email && existingEmails.has(email)) {
+      skipped++;
+      continue;
+    }
+    if (!email && phone && existingPhones.has(phone)) {
+      skipped++;
+      continue;
+    }
+
     await db.insert(platformSalesLeadsTable).values({
       name,
-      email,
-      phone: getCol(row, "phone"),
+      email: email ?? null,
+      phone: phone ?? null,
       company: getCol(row, "company"),
       trade: getCol(row, "trade"),
       source: getCol(row, "source") ?? "import",
       status: getCol(row, "status") ?? "new",
       notes: getCol(row, "notes"),
     });
-    existingEmails.add(email);
+
+    if (email) existingEmails.add(email);
+    else if (phone) existingPhones.add(phone);
     imported++;
   }
 
   res.json({ imported, skipped, errors });
 });
+
+function normalisePhone(p: string): string {
+  return p.replace(/\s+/g, "").toLowerCase();
+}
+
+/**
+ * RFC-4180-compliant CSV parser.
+ * Correctly handles quoted fields that contain commas, double-quotes (escaped as ""),
+ * and embedded newlines (\n or \r\n) — all common in real export files.
+ * Returns an array of rows, each row being an array of trimmed field strings.
+ */
+function parseCsvText(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cur = "";
+  let inQuote = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+
+    if (inQuote) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          inQuote = false;
+        }
+      } else {
+        cur += ch;
+      }
+    } else {
+      if (ch === '"') {
+        inQuote = true;
+      } else if (ch === ",") {
+        row.push(cur.trim());
+        cur = "";
+      } else if (ch === "\r" && text[i + 1] === "\n") {
+        i++;
+        row.push(cur.trim());
+        cur = "";
+        if (row.length > 1 || row[0] !== "") rows.push(row);
+        row = [];
+      } else if (ch === "\n" || ch === "\r") {
+        row.push(cur.trim());
+        cur = "";
+        if (row.length > 1 || row[0] !== "") rows.push(row);
+        row = [];
+      } else {
+        cur += ch;
+      }
+    }
+  }
+
+  // Flush the last field / row
+  row.push(cur.trim());
+  if (row.length > 1 || row[0] !== "") rows.push(row);
+
+  return rows;
+}
 
 function serializeLead(lead: typeof platformSalesLeadsTable.$inferSelect) {
   return {
