@@ -1,8 +1,13 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "zmqRdPZq5k3qWLjHKZjw3"
 uri = "file://artifacts/ctrltradepos/assets/images/icon.png"
 type = "image"
 title = "ctrltradepos icon"
+
+[[outputs]]
+id = "2e3A6QK_2M-GodpQlmYCn"
+uri = "file://leads_export.csv"
+type = "table"
+title = "Platform Leads (32 rows)"
