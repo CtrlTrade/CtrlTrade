@@ -2,7 +2,8 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   Monitor, Smartphone, Barcode, Printer, Wifi, Package, Users,
-  CreditCard, ReceiptText, ArrowRight, CheckCircle2, Building2, Warehouse
+  CreditCard, ReceiptText, ArrowRight, CheckCircle2, Building2, Warehouse,
+  AppWindow, Laptop
 } from "lucide-react";
 
 const tillFeatures = [
@@ -24,21 +25,38 @@ const hardware = [
   { name: "Label Printers", detail: "Product and price label printing for warehouse and stock use" },
 ];
 
-const deployments = [
+const platforms = [
   {
-    icon: Monitor,
-    title: "Web POS",
-    subtitle: "Browser-based",
-    desc: "Run directly in the browser — no installation required. Works on any touchscreen device, tablet, or desktop. Instant updates.",
-    available: true,
+    icon: AppWindow,
+    title: "Windows",
+    desc: "Full EPOS experience on Windows 10 & 11. Optimised for touchscreen tills and dedicated counter hardware.",
+    cta: "Open on Windows",
+    href: "/ctrltradepos/",
+    external: false,
+  },
+  {
+    icon: Laptop,
+    title: "macOS",
+    desc: "Run CtrlTradePos® on any Mac. Ideal for showroom and back-office till setups.",
+    cta: "Open on Mac",
+    href: "/ctrltradepos/",
+    external: false,
   },
   {
     icon: Smartphone,
-    title: "Desktop POS",
-    subtitle: "Installed application",
-    desc: "Native installed application for dedicated till hardware. Deeper hardware integration, kiosk mode, and enhanced peripheral support.",
-    available: false,
-    badge: "Coming Soon",
+    title: "iOS",
+    desc: "Sell from an iPhone or iPad. Portable till for trade counters, events, and pop-up locations.",
+    cta: "App Store",
+    href: "#",
+    external: true,
+  },
+  {
+    icon: Smartphone,
+    title: "Android",
+    desc: "Native Android app for phones and tablets. Works with Bluetooth scanners and portable printers.",
+    cta: "Google Play",
+    href: "#",
+    external: true,
   },
 ];
 
@@ -97,22 +115,24 @@ export function CtrlTradePosPage() {
       <section className="py-24 bg-card border-t border-border">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Deployment Options</h2>
-            <p className="text-muted-foreground">Choose how you run CtrlTradePos® in your operation.</p>
+            <h2 className="text-3xl font-bold mb-4">Available On Every Platform</h2>
+            <p className="text-muted-foreground">Download CtrlTradePos® for your device and start selling today.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {deployments.map((d, i) => (
-              <div key={i} className={`border p-8 relative ${d.available ? "border-primary bg-primary/5" : "border-border bg-card opacity-75"}`}>
-                {d.badge && (
-                  <div className="absolute top-4 right-4 bg-muted text-muted-foreground text-xs font-bold px-2 py-1">{d.badge}</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {platforms.map((p, i) => (
+              <div key={i} className="border border-primary bg-primary/5 p-6 flex flex-col">
+                <p.icon className="h-9 w-9 text-primary mb-4" />
+                <h3 className="text-lg font-bold mb-2">{p.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">{p.desc}</p>
+                {p.external ? (
+                  <a href={p.href} target="_blank" rel="noopener noreferrer">
+                    <Button size="sm" variant="outline" className="w-full font-semibold">{p.cta}</Button>
+                  </a>
+                ) : (
+                  <Link href={p.href}>
+                    <Button size="sm" className="w-full font-semibold">{p.cta}</Button>
+                  </Link>
                 )}
-                {d.available && (
-                  <div className="absolute top-4 right-4 bg-green-500/20 text-green-700 text-xs font-bold px-2 py-1">Available Now</div>
-                )}
-                <d.icon className="h-10 w-10 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-1">{d.title}</h3>
-                <div className="text-sm text-muted-foreground font-medium mb-4">{d.subtitle}</div>
-                <p className="text-muted-foreground text-sm leading-relaxed">{d.desc}</p>
               </div>
             ))}
           </div>

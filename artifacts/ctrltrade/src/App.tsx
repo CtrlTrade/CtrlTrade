@@ -294,7 +294,7 @@ function App() {
 
                   {/* New product pages */}
                   <Route path="/crm" component={CrmPage} />
-                  <Route path="/epos" component={CtrlTradePosPage} />
+                  <Route path="/ctrltradepos" component={CtrlTradePosPage} />
                   <Route path="/customer-portal" component={CustomerPortalPage} />
 
                   {/* Company pages */}
@@ -318,6 +318,7 @@ function App() {
                   <Route path="/warehouse-management-software">{() => <SeoLandingPage slug="warehouse-management-software" />}</Route>
                   <Route path="/showroom-management-software">{() => <SeoLandingPage slug="showroom-management-software" />}</Route>
                   <Route path="/field-service-management-software">{() => <SeoLandingPage slug="field-service-management-software" />}</Route>
+
 
                   <Route component={NotFound} />
                 </Switch>

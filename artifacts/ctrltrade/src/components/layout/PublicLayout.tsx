@@ -47,7 +47,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                     <div className="font-semibold">CtrlTrade CRM</div>
                     <div className="text-xs text-muted-foreground mt-0.5">Leads, jobs, invoicing</div>
                   </Link>
-                  <Link href="/epos" onClick={() => setProductsOpen(false)} className="block px-4 py-3 text-sm hover:bg-muted transition-colors border-t border-border/40">
+                  <Link href="/ctrltradepos" onClick={() => setProductsOpen(false)} className="block px-4 py-3 text-sm hover:bg-muted transition-colors border-t border-border/40">
                     <div className="font-semibold">CtrlTradePos®</div>
                     <div className="text-xs text-muted-foreground mt-0.5">Trade counter EPOS</div>
                   </Link>
@@ -111,7 +111,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               {[
                 { href: "/features", label: "Features" },
                 { href: "/crm", label: "CRM" },
-                { href: "/epos", label: "CtrlTradePos®" },
+                { href: "/ctrltradepos", label: "CtrlTradePos®" },
                 { href: "/customer-portal", label: "Customer Portal" },
                 { href: "/pricing", label: "Pricing" },
                 { href: "/industries", label: "Industries" },
@@ -153,7 +153,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                   { href: "/features", label: "Features" },
                   { href: "/pricing", label: "Pricing" },
                   { href: "/crm", label: "CRM" },
-                  { href: "/epos", label: "CtrlTradePos®" },
+                  { href: "/ctrltradepos", label: "CtrlTradePos®" },
                   { href: "/customer-portal", label: "Customer Portal" },
                   { href: "/addons", label: "Add-ons" },
                 ].map(l => <li key={l.href}><Link href={l.href} className="hover:text-foreground transition-colors">{l.label}</Link></li>)}
