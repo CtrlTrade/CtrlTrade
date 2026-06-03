@@ -508,48 +508,6 @@ export function Industries() {
         </div>
       </section>
 
-      <section className="py-20 bg-card border-t border-border">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">All Supported Trade Categories</h2>
-            <p className="text-muted-foreground">CtrlTrade® supports every trade category with relevant job types, forms, and compliance workflows.</p>
-          </div>
-
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {[1,2,3,4,5,6].map(i => <Skeleton key={i} className="h-40" />)}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {categories?.map((cat) => {
-                const slug = cat.slug?.toLowerCase() ?? "";
-                const name = cat.name?.toLowerCase() ?? "";
-                const href = seoLandingPages[slug] ?? seoLandingPages[name] ?? "/industries";
-                return (
-                  <div key={cat.id} className="border border-border bg-background p-6 hover:border-primary transition-colors group">
-                    <div className="flex items-center gap-3 mb-4">
-                      <h3 className="text-lg font-bold" data-testid={`category-${cat.slug}`}>{cat.name}</h3>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {cat.jobTypes.slice(0, 4).map((jt) => (
-                        <span key={jt} className="text-xs bg-secondary/10 text-secondary-foreground px-2 py-1 font-mono">
-                          {jt}
-                        </span>
-                      ))}
-                      {cat.jobTypes.length > 4 && (
-                        <span className="text-xs bg-secondary/10 text-secondary-foreground px-2 py-1 font-mono">
-                          +{cat.jobTypes.length - 4} more
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </section>
-
       <section className="py-24" style={{ background: "hsl(220,90%,8%)", color: "hsl(215,30%,93%)" }}>
         <div className="container mx-auto px-4 text-center max-w-3xl">
           <h2 className="text-4xl font-bold mb-6">Built For Your Trade</h2>
