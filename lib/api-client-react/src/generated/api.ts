@@ -22,7 +22,10 @@ import type {
 import type {
   AcceptInvitationInput,
   ActivityEntry,
+  AdminConfirmInstallerUploadInput,
   AdminDashboard,
+  AdminInstallerUploadUrlInput,
+  AdminInstallerUploadUrlResponse,
   AdminIntegrationCatalogueEntry,
   AdminIntegrationCatalogueInput,
   AdminLeadsCsvImportInput,
@@ -27313,6 +27316,148 @@ export const useAdminUpdatePosDownloads = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getAdminUpdatePosDownloadsMutationOptions(options));
+    }
+
+export const getAdminRequestInstallerUploadUrlUrl = () => {
+
+
+
+
+  return `/api/v1/admin/pos-downloads/request-installer-upload-url`
+}
+
+/**
+ * @summary Request a presigned URL for uploading a POS installer file (super admin)
+ */
+export const adminRequestInstallerUploadUrl = async (adminInstallerUploadUrlInput: AdminInstallerUploadUrlInput, options?: RequestInit): Promise<AdminInstallerUploadUrlResponse> => {
+
+  return customFetch<AdminInstallerUploadUrlResponse>(getAdminRequestInstallerUploadUrlUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminInstallerUploadUrlInput,)
+  }
+);}
+
+
+
+
+export const getAdminRequestInstallerUploadUrlMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminRequestInstallerUploadUrl>>, TError,{data: BodyType<AdminInstallerUploadUrlInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminRequestInstallerUploadUrl>>, TError,{data: BodyType<AdminInstallerUploadUrlInput>}, TContext> => {
+
+const mutationKey = ['adminRequestInstallerUploadUrl'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminRequestInstallerUploadUrl>>, {data: BodyType<AdminInstallerUploadUrlInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminRequestInstallerUploadUrl(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminRequestInstallerUploadUrlMutationResult = NonNullable<Awaited<ReturnType<typeof adminRequestInstallerUploadUrl>>>
+    export type AdminRequestInstallerUploadUrlMutationBody = BodyType<AdminInstallerUploadUrlInput>
+    export type AdminRequestInstallerUploadUrlMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Request a presigned URL for uploading a POS installer file (super admin)
+ */
+export const useAdminRequestInstallerUploadUrl = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminRequestInstallerUploadUrl>>, TError,{data: BodyType<AdminInstallerUploadUrlInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminRequestInstallerUploadUrl>>,
+        TError,
+        {data: BodyType<AdminInstallerUploadUrlInput>},
+        TContext
+      > => {
+      return useMutation(getAdminRequestInstallerUploadUrlMutationOptions(options));
+    }
+
+export const getAdminConfirmInstallerUploadUrl = () => {
+
+
+
+
+  return `/api/v1/admin/pos-downloads/confirm-installer-upload`
+}
+
+/**
+ * @summary Confirm a POS installer upload, make it public, and save the URL (super admin)
+ */
+export const adminConfirmInstallerUpload = async (adminConfirmInstallerUploadInput: AdminConfirmInstallerUploadInput, options?: RequestInit): Promise<PosDownloads> => {
+
+  return customFetch<PosDownloads>(getAdminConfirmInstallerUploadUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminConfirmInstallerUploadInput,)
+  }
+);}
+
+
+
+
+export const getAdminConfirmInstallerUploadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminConfirmInstallerUpload>>, TError,{data: BodyType<AdminConfirmInstallerUploadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminConfirmInstallerUpload>>, TError,{data: BodyType<AdminConfirmInstallerUploadInput>}, TContext> => {
+
+const mutationKey = ['adminConfirmInstallerUpload'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminConfirmInstallerUpload>>, {data: BodyType<AdminConfirmInstallerUploadInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminConfirmInstallerUpload(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminConfirmInstallerUploadMutationResult = NonNullable<Awaited<ReturnType<typeof adminConfirmInstallerUpload>>>
+    export type AdminConfirmInstallerUploadMutationBody = BodyType<AdminConfirmInstallerUploadInput>
+    export type AdminConfirmInstallerUploadMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Confirm a POS installer upload, make it public, and save the URL (super admin)
+ */
+export const useAdminConfirmInstallerUpload = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminConfirmInstallerUpload>>, TError,{data: BodyType<AdminConfirmInstallerUploadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminConfirmInstallerUpload>>,
+        TError,
+        {data: BodyType<AdminConfirmInstallerUploadInput>},
+        TContext
+      > => {
+      return useMutation(getAdminConfirmInstallerUploadMutationOptions(options));
     }
 
 export const getListPosLicencesUrl = () => {

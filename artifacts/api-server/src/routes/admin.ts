@@ -38,6 +38,8 @@ import {
   AdminUpdatePosLicenceBody,
 } from "@workspace/api-zod";
 import { requireSuperAdmin } from "../middlewares/auth";
+import { ObjectStorageService } from "../lib/objectStorage";
+import { setObjectAclPolicy } from "../lib/objectAcl";
 import {
   generateLicenceKey,
   loadLicenceList,
@@ -1100,6 +1102,70 @@ router.put("/v1/admin/pos-downloads", async (req, res): Promise<void> => {
       .onConflictDoUpdate({ target: platformSettingsTable.key, set: { value: macosUrl || null } });
   }
   res.json(await readPosDownloadUrls());
+});
+
+const installerObjectStorage = new ObjectStorageService();
+
+const RequestInstallerUploadUrlBody = z.object({
+  platform: z.enum(["windows", "macos"]),
+  fileName: z.string().min(1),
+  fileSize: z.number().positive(),
+  contentType: z.string().min(1),
+});
+
+router.post("/v1/admin/pos-downloads/request-installer-upload-url", async (req, res): Promise<void> => {
+  const parsed = RequestInstallerUploadUrlBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Missing or invalid fields" });
+    return;
+  }
+  try {
+    const uploadUrl = await installerObjectStorage.getObjectEntityUploadURL();
+    const objectPath = installerObjectStorage.normalizeObjectEntityPath(uploadUrl);
+    res.json({ uploadUrl, objectPath });
+  } catch (err) {
+    req.log.error({ err }, "Failed to generate installer upload URL");
+    res.status(500).json({ error: "Failed to generate upload URL" });
+  }
+});
+
+const ConfirmInstallerUploadBody = z.object({
+  platform: z.enum(["windows", "macos"]),
+  objectPath: z.string().min(1),
+});
+
+router.post("/v1/admin/pos-downloads/confirm-installer-upload", async (req, res): Promise<void> => {
+  const parsed = ConfirmInstallerUploadBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Missing or invalid fields" });
+    return;
+  }
+  const { platform, objectPath } = parsed.data;
+  try {
+    const objectFile = await installerObjectStorage.getObjectEntityFile(objectPath);
+    await setObjectAclPolicy(objectFile, {
+      owner: "admin",
+      visibility: "public",
+    });
+    const servingUrl = `/api/storage${objectPath}`;
+    const dbKey = platform === "windows" ? "windows_url" : "macos_url";
+    await db
+      .insert(platformSettingsTable)
+      .values({ key: dbKey, value: servingUrl })
+      .onConflictDoUpdate({ target: platformSettingsTable.key, set: { value: servingUrl } });
+    await logAudit({
+      tenantId: null,
+      actorUserId: req.auth!.user.id,
+      actorLabel: `superadmin:${req.auth!.user.email}`,
+      kind: "admin.pos_installer_uploaded",
+      message: `Uploaded new ${platform} POS installer: ${objectPath}`,
+      metadata: { platform, objectPath, servingUrl },
+    });
+    res.json(await readPosDownloadUrls());
+  } catch (err) {
+    req.log.error({ err }, "Failed to confirm installer upload");
+    res.status(500).json({ error: "Failed to confirm upload" });
+  }
 });
 
 export default router;

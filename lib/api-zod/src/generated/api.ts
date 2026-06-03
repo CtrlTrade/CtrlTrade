@@ -9237,6 +9237,36 @@ export const AdminUpdatePosDownloadsResponse = zod.object({
 
 
 /**
+ * @summary Request a presigned URL for uploading a POS installer file (super admin)
+ */
+export const AdminRequestInstallerUploadUrlBody = zod.object({
+  "platform": zod.enum(['windows', 'macos']),
+  "fileName": zod.string(),
+  "fileSize": zod.number(),
+  "contentType": zod.string()
+})
+
+export const AdminRequestInstallerUploadUrlResponse = zod.object({
+  "uploadUrl": zod.string(),
+  "objectPath": zod.string()
+})
+
+
+/**
+ * @summary Confirm a POS installer upload, make it public, and save the URL (super admin)
+ */
+export const AdminConfirmInstallerUploadBody = zod.object({
+  "platform": zod.enum(['windows', 'macos']),
+  "objectPath": zod.string()
+})
+
+export const AdminConfirmInstallerUploadResponse = zod.object({
+  "windowsUrl": zod.string().nullable(),
+  "macosUrl": zod.string().nullable()
+})
+
+
+/**
  * @summary List this tenant's POS till licences and their terminals
  */
 export const ListPosLicencesResponse = zod.object({

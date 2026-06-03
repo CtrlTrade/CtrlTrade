@@ -6177,6 +6177,40 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/PosDownloads" }
 
+  /v1/admin/pos-downloads/request-installer-upload-url:
+    post:
+      operationId: adminRequestInstallerUploadUrl
+      tags: [admin]
+      summary: Request a presigned URL for uploading a POS installer file (super admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminInstallerUploadUrlInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminInstallerUploadUrlResponse" }
+
+  /v1/admin/pos-downloads/confirm-installer-upload:
+    post:
+      operationId: adminConfirmInstallerUpload
+      tags: [admin]
+      summary: Confirm a POS installer upload, make it public, and save the URL (super admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminConfirmInstallerUploadInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PosDownloads" }
+
   # ---- CtrlTradePos® licensing & terminals (tenant) ----------------------
   /v1/pos-licences:
     get:
@@ -6351,6 +6385,29 @@ components:
       properties:
         windowsUrl: { type: string, nullable: true }
         macosUrl: { type: string, nullable: true }
+
+    AdminInstallerUploadUrlInput:
+      type: object
+      required: [platform, fileName, fileSize, contentType]
+      properties:
+        platform: { type: string, enum: [windows, macos] }
+        fileName: { type: string }
+        fileSize: { type: number }
+        contentType: { type: string }
+
+    AdminInstallerUploadUrlResponse:
+      type: object
+      required: [uploadUrl, objectPath]
+      properties:
+        uploadUrl: { type: string }
+        objectPath: { type: string }
+
+    AdminConfirmInstallerUploadInput:
+      type: object
+      required: [platform, objectPath]
+      properties:
+        platform: { type: string, enum: [windows, macos] }
+        objectPath: { type: string }
 
     PosTerminal:
       type: object

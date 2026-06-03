@@ -8,7 +8,12 @@
 
 export * from './acceptInvitationInput';
 export * from './activityEntry';
+export * from './adminConfirmInstallerUploadInput';
+export * from './adminConfirmInstallerUploadInputPlatform';
 export * from './adminDashboard';
+export * from './adminInstallerUploadUrlInput';
+export * from './adminInstallerUploadUrlInputPlatform';
+export * from './adminInstallerUploadUrlResponse';
 export * from './adminIntegrationCatalogueEntry';
 export * from './adminIntegrationCatalogueInput';
 export * from './adminLeadsCsvImportInput';

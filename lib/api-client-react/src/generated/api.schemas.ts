@@ -15,6 +15,39 @@ export interface AdminUpdatePosDownloadsInput {
   macosUrl?: string | null;
 }
 
+export type AdminInstallerUploadUrlInputPlatform = typeof AdminInstallerUploadUrlInputPlatform[keyof typeof AdminInstallerUploadUrlInputPlatform];
+
+
+export const AdminInstallerUploadUrlInputPlatform = {
+  windows: 'windows',
+  macos: 'macos',
+} as const;
+
+export interface AdminInstallerUploadUrlInput {
+  platform: AdminInstallerUploadUrlInputPlatform;
+  fileName: string;
+  fileSize: number;
+  contentType: string;
+}
+
+export interface AdminInstallerUploadUrlResponse {
+  uploadUrl: string;
+  objectPath: string;
+}
+
+export type AdminConfirmInstallerUploadInputPlatform = typeof AdminConfirmInstallerUploadInputPlatform[keyof typeof AdminConfirmInstallerUploadInputPlatform];
+
+
+export const AdminConfirmInstallerUploadInputPlatform = {
+  windows: 'windows',
+  macos: 'macos',
+} as const;
+
+export interface AdminConfirmInstallerUploadInput {
+  platform: AdminConfirmInstallerUploadInputPlatform;
+  objectPath: string;
+}
+
 export type PosTerminalMode = typeof PosTerminalMode[keyof typeof PosTerminalMode];
 
 
