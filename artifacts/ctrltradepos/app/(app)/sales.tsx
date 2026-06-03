@@ -43,7 +43,7 @@ export default function SalesLogScreen() {
             onPress={() => router.replace("/(app)")}
             style={({ pressed }) => [styles.back, { borderColor: colors.border, opacity: pressed ? 0.7 : 1 }]}
           >
-            <Text style={[styles.backText, { color: colors.foreground }]}>← JOBS</Text>
+            <Text style={[styles.backText, { color: colors.foreground }]}>← HOME</Text>
           </Pressable>
         }
       />

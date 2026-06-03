@@ -61,7 +61,7 @@ export default function LoginScreen() {
                 resizeMode="contain"
               />
               <Text style={[styles.brandSubtitle, { color: colors.mutedForeground }]}>
-                POS · Field Console
+                Trade Counter POS
               </Text>
             </View>
           </View>
