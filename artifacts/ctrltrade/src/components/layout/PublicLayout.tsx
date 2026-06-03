@@ -190,7 +190,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
       <footer className="border-t border-border bg-card py-12 mt-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-10">
             <div className="col-span-2 md:col-span-1">
               <div className="mb-4">
                 <img src="/assets/ctrltrade-logo-transparent.png" alt="CtrlTrade" className="h-10 w-auto object-contain" />
@@ -242,6 +242,22 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 <li><Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
                 <li><Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link></li>
                 <li><Link href="/cookies" className="hover:text-foreground transition-colors">Cookie Policy</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4 text-xs uppercase tracking-wider">Download</h3>
+              <ul className="space-y-2.5 text-sm text-muted-foreground">
+                {[
+                  { label: "Windows" },
+                  { label: "macOS" },
+                  { label: "iOS" },
+                  { label: "Android" },
+                ].map(p => (
+                  <li key={p.label} className="flex items-center gap-2">
+                    <span>{p.label}</span>
+                    <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-medium">Coming Soon</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
