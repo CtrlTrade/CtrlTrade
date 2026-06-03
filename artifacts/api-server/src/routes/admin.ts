@@ -33,8 +33,17 @@ import {
   AdminReactivateTenantResponse,
   AdminSyncTenantResponse,
   GetAdminTenantAuditLogResponse,
+  AdminIssuePosLicenceBody,
+  AdminUpdatePosLicenceBody,
 } from "@workspace/api-zod";
 import { requireSuperAdmin } from "../middlewares/auth";
+import {
+  generateLicenceKey,
+  loadLicenceList,
+  serializeLicence,
+  LICENCE_STATUSES,
+} from "../lib/posLicence";
+import { posLicencesTable } from "@workspace/db";
 import {
   serializeSubscription,
   serializeTenant,
@@ -919,6 +928,104 @@ router.delete("/v1/admin/feature-flags/:flagId", async (req, res): Promise<void>
     metadata: { key: existing.key, tenantId: existing.tenantId, deleted: true },
   });
   res.status(204).end();
+});
+
+// ---- CtrlTradePos® licensing (super admin) -------------------------------
+
+router.get("/v1/admin/tenants/:tenantId/pos-licences", async (req, res): Promise<void> => {
+  const tenantId = req.params.tenantId as string;
+  const [tenant] = await db.select().from(tenantsTable).where(eq(tenantsTable.id, tenantId));
+  if (!tenant) {
+    res.status(404).json({ error: "Tenant not found" });
+    return;
+  }
+  res.json(await loadLicenceList(tenantId));
+});
+
+router.post("/v1/admin/tenants/:tenantId/pos-licences", async (req, res): Promise<void> => {
+  const tenantId = req.params.tenantId as string;
+  const parsed = AdminIssuePosLicenceBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  const [tenant] = await db.select().from(tenantsTable).where(eq(tenantsTable.id, tenantId));
+  if (!tenant) {
+    res.status(404).json({ error: "Tenant not found" });
+    return;
+  }
+  const status = parsed.data.status ?? "active";
+  const trialEndsAt =
+    status === "trial"
+      ? new Date(Date.now() + (parsed.data.trialDays ?? 14) * 24 * 60 * 60 * 1000)
+      : null;
+  const [row] = await db
+    .insert(posLicencesTable)
+    .values({
+      tenantId,
+      branchId: parsed.data.branchId ?? null,
+      licenceKey: generateLicenceKey(),
+      type: parsed.data.type,
+      status,
+      trialEndsAt,
+      notes: parsed.data.notes ?? null,
+    })
+    .returning();
+  await logAudit({
+    tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "pos.licence.issued",
+    message: `Super admin issued ${parsed.data.type} till licence (${status})`,
+    metadata: { licenceId: row.id, licenceKey: row.licenceKey },
+  });
+  res.status(201).json(serializeLicence(row, null, []));
+});
+
+router.patch("/v1/admin/pos-licences/:licenceId", async (req, res): Promise<void> => {
+  const licenceId = req.params.licenceId as string;
+  const parsed = AdminUpdatePosLicenceBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  const [existing] = await db
+    .select()
+    .from(posLicencesTable)
+    .where(eq(posLicencesTable.id, licenceId));
+  if (!existing) {
+    res.status(404).json({ error: "Licence not found" });
+    return;
+  }
+  const patch: Record<string, unknown> = {};
+  if (parsed.data.status !== undefined) {
+    if (!LICENCE_STATUSES.includes(parsed.data.status as (typeof LICENCE_STATUSES)[number])) {
+      res.status(400).json({ error: "Invalid status" });
+      return;
+    }
+    patch.status = parsed.data.status;
+    // Ensure a trial always has an end date; default to 14 days when none is set yet.
+    if (parsed.data.status === "trial" && !existing.trialEndsAt) {
+      patch.trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+    }
+  }
+  if (parsed.data.branchId !== undefined) patch.branchId = parsed.data.branchId;
+  if (parsed.data.notes !== undefined) patch.notes = parsed.data.notes;
+
+  const [updated] = await db
+    .update(posLicencesTable)
+    .set(patch)
+    .where(eq(posLicencesTable.id, licenceId))
+    .returning();
+  await logAudit({
+    tenantId: updated.tenantId,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "pos.licence.updated",
+    message: `Super admin updated till licence ${updated.licenceKey}${parsed.data.status ? ` → ${parsed.data.status}` : ""}`,
+    metadata: { licenceId: updated.id },
+  });
+  res.json(serializeLicence(updated, null, []));
 });
 
 export default router;

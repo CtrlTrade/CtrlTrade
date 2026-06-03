@@ -53,6 +53,7 @@ import publicLeadsRouter from "./publicLeads";
 import leadWebhooksRouter from "./leadWebhooks";
 import industriesRouter from "./industries";
 import staffNotificationsRouter from "./staff-notifications";
+import posLicencesRouter from "./posLicences";
 
 const router: IRouter = Router();
 
@@ -117,5 +118,6 @@ router.use(adminLeadsRouter);
 router.use(leadWebhooksRouter);
 router.use(industriesRouter);
 router.use(staffNotificationsRouter);
+router.use(posLicencesRouter);
 
 export default router;

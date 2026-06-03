@@ -55,10 +55,11 @@ export async function nextTerminalCode(tenantId: string): Promise<string> {
  * override (suspended / revoked / read_only).
  */
 export function effectiveStatus(l: PosLicence, now = new Date()): (typeof LICENCE_STATUSES)[number] {
-  if (l.status === "revoked" || l.status === "suspended" || l.status === "read_only") return l.status;
-  if (l.status === "trial" && l.trialEndsAt && l.trialEndsAt.getTime() < now.getTime()) return "expired";
+  const s = l.status as (typeof LICENCE_STATUSES)[number];
+  if (s === "revoked" || s === "suspended" || s === "read_only") return s;
+  if (s === "trial" && l.trialEndsAt && l.trialEndsAt.getTime() < now.getTime()) return "expired";
   if (l.expiresAt && l.expiresAt.getTime() < now.getTime()) return "expired";
-  return l.status;
+  return s;
 }
 
 /** Map an effective status to the till operating mode. */

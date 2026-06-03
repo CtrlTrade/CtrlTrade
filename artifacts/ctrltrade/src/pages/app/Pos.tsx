@@ -14,6 +14,7 @@ import {
   useListTradeAccounts,
   useListSuppliers,
 } from "@workspace/api-client-react";
+import { PosLicences } from "@/components/pos/PosLicences";
 
 export function AppPos() {
   const { data: products } = useListProducts();
@@ -56,6 +57,8 @@ export function AppPos() {
           </Link>
         ))}
       </div>
+
+      <PosLicences />
     </div>
   );
 }

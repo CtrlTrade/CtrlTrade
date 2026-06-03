@@ -25,13 +25,15 @@ import { useToast } from "@/hooks/use-toast";
 import { RefreshCw, AlertTriangle, ShieldCheck, UserCheck, Download, Trash2, Globe, Building2, CreditCard } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminPosLicences } from "@/components/admin/AdminPosLicences";
 
-type Tab = "overview" | "billing" | "team" | "settings";
+type Tab = "overview" | "billing" | "team" | "pos" | "settings";
 
 const TABS: Array<{ id: Tab; label: string }> = [
   { id: "overview",  label: "Overview"  },
   { id: "billing",   label: "Billing"   },
   { id: "team",      label: "Team"      },
+  { id: "pos",       label: "POS"       },
   { id: "settings",  label: "Settings"  },
 ];
 
@@ -396,6 +398,13 @@ export function AdminTenantDetail() {
               )}
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* Tab: POS */}
+      {activeTab === "pos" && (
+        <div className="space-y-6">
+          <AdminPosLicences tenantId={id!} />
         </div>
       )}
 
