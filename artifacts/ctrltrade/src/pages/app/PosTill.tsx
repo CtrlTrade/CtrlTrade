@@ -24,6 +24,7 @@ import {
   useValidatePosLicence,
   useListPosTradeAccounts,
   posLogin,
+  getPosSession,
   setAuthTokenGetter,
 } from "@workspace/api-client-react";
 import {
@@ -1315,9 +1316,12 @@ function WebPosActivationGate({
 }) {
   const licenceKey = localStorage.getItem("ctrltradepos-licence-key") ?? "";
 
-  const [activated, setActivated] = useState(() => {
-    return !!localStorage.getItem(WEB_POS_TOKEN_KEY);
-  });
+  const storedToken = localStorage.getItem(WEB_POS_TOKEN_KEY);
+  const [activated, setActivated] = useState(false);
+  // Start in "validating" state when a cached token exists so we verify it
+  // before allowing through — prevents expired/revoked tokens from leaving
+  // the till in a silently-broken state.
+  const [validating, setValidating] = useState(!!storedToken);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [terminalCode, setTerminalCode] = useState(
@@ -1326,12 +1330,32 @@ function WebPosActivationGate({
   const [error, setError] = useState<string | null>(null);
   const [activating, setActivating] = useState(false);
 
-  // On mount: if a stored token exists, register it immediately so API calls work.
+  // On mount: if a stored token exists, validate it via /v1/pos/me.
+  // On success we activate; on failure (expired/revoked) we clear storage
+  // and fall through to the credential form — no manual localStorage reset needed.
   useEffect(() => {
     const token = localStorage.getItem(WEB_POS_TOKEN_KEY);
-    if (token) {
-      setAuthTokenGetter(() => token);
-    }
+    if (!token) return;
+
+    setAuthTokenGetter(() => token);
+
+    getPosSession()
+      .then((session) => {
+        // Server may rotate the token — persist the freshest one.
+        const fresh = session.token ?? token;
+        localStorage.setItem(WEB_POS_TOKEN_KEY, fresh);
+        setAuthTokenGetter(() => fresh);
+        const licType = ((session as { licence?: { type?: string } }).licence?.type as LicenceType | undefined) ?? "web";
+        onActivated?.(licType);
+        setActivated(true);
+      })
+      .catch(() => {
+        // Token is expired or revoked — clear it and show the form.
+        localStorage.removeItem(WEB_POS_TOKEN_KEY);
+        setAuthTokenGetter(null);
+      })
+      .finally(() => setValidating(false));
+
     // Cleanup: unregister POS auth when navigating away from the till.
     return () => {
       setAuthTokenGetter(null);
@@ -1365,6 +1389,14 @@ function WebPosActivationGate({
       setActivating(false);
     }
   };
+
+  if (validating) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   if (!activated) {
     return (
