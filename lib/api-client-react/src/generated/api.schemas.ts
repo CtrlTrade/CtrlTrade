@@ -4795,6 +4795,17 @@ export interface PlatformLeadsImportResult {
   errors: string[];
 }
 
+export interface CreateAdminLeadInput {
+  name: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  trade?: string;
+  source?: string;
+  status?: string;
+  notes?: string;
+}
+
 export interface CreatePlatformLeadInput {
   name: string;
   email: string;

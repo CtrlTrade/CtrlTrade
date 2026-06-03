@@ -5602,6 +5602,21 @@ paths:
                   status: { type: string }
 
   /v1/admin/leads:
+    post:
+      operationId: createAdminLead
+      tags: [admin]
+      summary: Manually create a platform sales lead (super admin).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateAdminLeadInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PlatformSalesLead" }
     get:
       operationId: listAdminLeads
       tags: [admin]
@@ -10929,6 +10944,19 @@ components:
         errors:
           type: array
           items: { type: string }
+
+    CreateAdminLeadInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        company: { type: string }
+        trade: { type: string }
+        source: { type: string }
+        status: { type: string }
+        notes: { type: string }
 
     CreatePlatformLeadInput:
       type: object

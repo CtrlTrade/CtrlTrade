@@ -56,12 +56,40 @@ router.get("/v1/admin/leads/pipeline-summary", async (_req, res): Promise<void> 
   });
 });
 
-// GET /v1/admin/leads — list with search + status filter
+// POST /v1/admin/leads — manually create a lead
+router.post("/v1/admin/leads", async (req, res): Promise<void> => {
+  const { name, email, phone, company, trade, source, status, notes } = req.body ?? {};
+  if (!name) {
+    res.status(400).json({ error: "name is required" });
+    return;
+  }
+  const [lead] = await db
+    .insert(platformSalesLeadsTable)
+    .values({
+      name: String(name).trim(),
+      email: email ? String(email).trim().toLowerCase() : null,
+      phone: phone ? String(phone).trim() : null,
+      company: company ? String(company).trim() : null,
+      trade: trade ? String(trade).trim() : null,
+      source: source ? String(source).trim() : "manual",
+      status: status ? String(status).trim() : "new",
+      notes: notes ? String(notes).trim() : null,
+    })
+    .returning();
+  res.status(201).json(serializeLead(lead));
+});
+
+// GET /v1/admin/leads — list with search + status filter (archived excluded unless explicitly requested)
 router.get("/v1/admin/leads", async (req, res): Promise<void> => {
   const search = (req.query.search as string | undefined)?.trim();
   const status = req.query.status as string | undefined;
   const filters = [] as ReturnType<typeof eq>[];
-  if (status && status !== "all") filters.push(eq(platformSalesLeadsTable.status, status));
+  if (status && status !== "all") {
+    filters.push(eq(platformSalesLeadsTable.status, status));
+  } else {
+    // hide archived from the default/all view
+    filters.push(sql`${platformSalesLeadsTable.status} != 'archived'`);
+  }
   if (search) {
     filters.push(
       or(

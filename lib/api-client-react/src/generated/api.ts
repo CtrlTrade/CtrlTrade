@@ -82,6 +82,7 @@ import type {
   ContractCreateInput,
   ContractJobSummary,
   ContractUpdateInput,
+  CreateAdminLeadInput,
   CreateChildTenantInput,
   CreateJobCostEntryInput,
   CreatePlatformLead201,
@@ -24577,6 +24578,77 @@ export const useCreatePlatformLead = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getCreatePlatformLeadMutationOptions(options));
+    }
+
+export const getCreateAdminLeadUrl = () => {
+
+
+
+
+  return `/api/v1/admin/leads`
+}
+
+/**
+ * @summary Manually create a platform sales lead (super admin).
+ */
+export const createAdminLead = async (createAdminLeadInput: CreateAdminLeadInput, options?: RequestInit): Promise<PlatformSalesLead> => {
+
+  return customFetch<PlatformSalesLead>(getCreateAdminLeadUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createAdminLeadInput,)
+  }
+);}
+
+
+
+
+export const getCreateAdminLeadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminLead>>, TError,{data: BodyType<CreateAdminLeadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdminLead>>, TError,{data: BodyType<CreateAdminLeadInput>}, TContext> => {
+
+const mutationKey = ['createAdminLead'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminLead>>, {data: BodyType<CreateAdminLeadInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdminLead(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdminLeadMutationResult = NonNullable<Awaited<ReturnType<typeof createAdminLead>>>
+    export type CreateAdminLeadMutationBody = BodyType<CreateAdminLeadInput>
+    export type CreateAdminLeadMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Manually create a platform sales lead (super admin).
+ */
+export const useCreateAdminLead = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminLead>>, TError,{data: BodyType<CreateAdminLeadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createAdminLead>>,
+        TError,
+        {data: BodyType<CreateAdminLeadInput>},
+        TContext
+      > => {
+      return useMutation(getCreateAdminLeadMutationOptions(options));
     }
 
 export const getListAdminLeadsUrl = (params?: ListAdminLeadsParams,) => {

@@ -8526,6 +8526,21 @@ export const CreatePlatformLeadBody = zod.object({
 
 
 /**
+ * @summary Manually create a platform sales lead (super admin).
+ */
+export const CreateAdminLeadBody = zod.object({
+  "name": zod.string(),
+  "email": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "company": zod.string().optional(),
+  "trade": zod.string().optional(),
+  "source": zod.string().optional(),
+  "status": zod.string().optional(),
+  "notes": zod.string().optional()
+})
+
+
+/**
  * @summary List all platform sales leads (super admin).
  */
 export const ListAdminLeadsQueryParams = zod.object({

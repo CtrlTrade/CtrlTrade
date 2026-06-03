@@ -99,6 +99,7 @@ export * from './connectIntegration200';
 export * from './contractCreateInput';
 export * from './contractJobSummary';
 export * from './contractUpdateInput';
+export * from './createAdminLeadInput';
 export * from './createChildTenantInput';
 export * from './createJobCostEntryInput';
 export * from './createPlatformLead201';
