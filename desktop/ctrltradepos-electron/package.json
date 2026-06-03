@@ -1,6 +1,6 @@
 {
   "name": "@workspace/ctrltradepos-electron",
-  "version": "0.0.0",
+  "version": "1.0.8",
   "private": true,
   "repository": {
     "type": "git",
