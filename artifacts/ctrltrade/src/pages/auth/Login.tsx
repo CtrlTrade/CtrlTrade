@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useLogin } from "@workspace/api-client-react";
+import { useLogin, getGetSessionQueryKey } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
 import { TwoFactorChallenge } from "./TwoFactorChallenge";
@@ -8,6 +9,7 @@ import { TwoFactorChallenge } from "./TwoFactorChallenge";
 export function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const qc = useQueryClient();
   const login = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,12 +21,15 @@ export function Login() {
     if (!email || !password) return;
 
     login.mutate({ data: { email, password } }, {
-      onSuccess: (session) => {
+      onSuccess: async (session) => {
         if ((session as any).twoFactorRequired) {
           setShowTwoFactor(true);
           return;
         }
         toast({ title: "Login successful", description: "Welcome back." });
+        // Invalidate the session cache so AppLayout gets fresh data instead of
+        // stale "unauthenticated" state, which would immediately redirect back.
+        await qc.invalidateQueries({ queryKey: getGetSessionQueryKey() });
         if ((session as any).twoFactorSetupRequired) {
           setLocation("/app/settings?tab=security&setup=required");
           return;

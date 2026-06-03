@@ -49,13 +49,13 @@ function NavLinks({ links, location, onNavigate }: { links: NavLink[]; location:
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { data: session, isLoading } = useGetSession();
+  const { data: session, isLoading, isFetching } = useGetSession();
   const logout = useLogout();
   const qc = useQueryClient();
   const stopImp = useStopImpersonation({ mutation: { onSuccess: () => { qc.invalidateQueries(); setLocation("~/admin/tenants"); } } });
   const { data: integrations } = useListIntegrations();
   const failedIntegration = (integrations ?? []).find((i) => i.status === "error");
-  const unauthorized = !isLoading && (!session || !session.tenant);
+  const unauthorized = !isLoading && !isFetching && (!session || !session.tenant);
 
   useEffect(() => {
     if (unauthorized) setLocation("~/login");
@@ -69,7 +69,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     });
   };
 
-  if (isLoading || unauthorized || !session || !session.tenant) {
+  if (isLoading || isFetching || unauthorized || !session || !session.tenant) {
     return <div className="p-8"><Skeleton className="h-10 w-full mb-4" /><Skeleton className="h-64 w-full" /></div>;
   }
 
