@@ -1,0 +1,957 @@
+```text
+Build CtrlTrade® as a multi-tenant SaaS platform with two connected but separate tenant business applications:
+
+1. CtrlTrade CRM
+2. CtrlTradePos®
+
+Important:
+CtrlTradePos® is NOT part of the CRM.
+CtrlTradePos® is a separate EPOS trade counter system connected to the CRM through shared customers, products, stock, invoices, payments and reports.
+
+==================================================
+PLATFORM STRUCTURE
+==================================================
+
+Layer 1 → CtrlTrade SaaS Platform
+Layer 2 → Tenant Business Applications
+          ├── CtrlTrade CRM
+          └── CtrlTradePos®
+Layer 3 → Tenant Customer Portal
+
+Built for:
+- sole traders
+- trade businesses
+- field service companies
+- suppliers
+- trade counters
+- warehouses
+- showrooms
+- multi-branch operators
+
+Use:
+- React/Vite frontend
+- Express API
+- PostgreSQL
+- Drizzle ORM
+- TypeScript
+- Stripe billing
+- tenant isolation by tenant_id/company_id
+- API versioning /api/v1
+- object storage
+- background workers
+
+==================================================
+LAYER 1 — CTRLTRADE SAAS PLATFORM
+==================================================
+
+URL:
+/admin
+
+Purpose:
+Manage the SaaS platform, tenants, payments, licences and billing.
+
+Super Admin modules:
+- Platform dashboard
+- Tenant management
+- Stripe billing
+- Plan management
+- Licence management
+- Add-on management
+- Feature flags
+- Usage metering
+- Support tickets
+- Integrations catalogue
+- SaaS referrals
+- Marketplace moderation
+- Audit logs
+- Security settings
+
+Stripe pricing:
+- Control Seat: £79 / seat / month
+- Field Seat: £19 / seat / month
+- CtrlTradePos® Till Licence: £59.99 / till / month
+
+Trial:
+- 1 month free trial
+- payment method required before activation
+- Stripe subscription created with trial period
+- billing starts automatically after trial
+
+Super Admin can:
+- create tenant
+- suspend tenant
+- reactivate tenant
+- delete tenant
+- manage seats
+- manage till licences
+- issue POS licence keys
+- suspend POS terminals
+- reissue licence keys
+- view Stripe customer ID
+- view Stripe subscription ID
+- override billing manually
+- export tenant data before deletion
+
+==================================================
+CTRLTRADE CRM
+==================================================
+
+URL:
+/app
+
+Purpose:
+CtrlTrade CRM is the tenant’s business operations system.
+
+It manages:
+- leads
+- customers
+- quotes
+- jobs
+- scheduling
+- field staff
+- invoices
+- payments
+- compliance
+- documents
+- fleet
+- communications
+- reports
+- automations
+- customer portal
+
+It does NOT contain EPOS till screens.
+It does NOT process counter sales directly.
+It connects to CtrlTradePos® for stock, products, customers, payments and reporting.
+
+==================================================
+CRM MODULES
+==================================================
+
+Dashboard:
+- global dashboard
+- branch dashboard
+- industry dashboard
+- revenue
+- profit
+- open leads
+- quotes sent
+- jobs in progress
+- unpaid invoices
+- staff activity
+- AI insights
+
+Leads:
+- manual leads
+- website leads
+- phone leads
+- marketplace leads
+- referral leads
+- MyJobQuote leads
+- Checkatrade leads
+- AI lead scoring
+- lead pipeline
+- follow-up automation
+
+Lead pipeline:
+New → Contacted → Survey Booked → Quote Sent → Won/Lost → Job Created
+
+Customers:
+- customer profiles
+- multiple properties
+- phone/email
+- notes
+- files
+- quote history
+- job history
+- invoice history
+- communication history
+- customer portal access
+- shared with CtrlTradePos®
+
+Quotes:
+- quote builder
+- AI quote builder
+- quote templates
+- line items
+- labour
+- materials
+- VAT
+- discounts
+- deposits
+- PDF generation
+- e-signature
+- send to portal
+- convert to job
+
+Jobs:
+- job list
+- job detail
+- job statuses
+- assigned staff
+- job notes
+- photos
+- forms
+- checklists
+- labour tracking
+- material costs
+- customer sign-off
+- completion forms
+- convert to invoice
+
+Job statuses:
+New
+Booked
+In Progress
+On Hold
+Completed
+Invoiced
+Paid
+Cancelled
+
+Calendar & Dispatch:
+- drag-and-drop calendar
+- staff scheduling
+- job scheduling
+- Google Calendar sync
+- Outlook sync
+- route optimisation
+- live engineer map
+- emergency dispatch
+- recurring jobs
+
+Staff & Workforce:
+- staff profiles
+- Control Seats
+- Field Seats
+- roles
+- permissions
+- shifts
+- rota
+- timesheets
+- training records
+- certifications
+- payroll export
+
+Control Seat:
+£79 / seat / month
+For owners, managers and office staff.
+Full CRM access.
+
+Field Seat:
+£19 / seat / month
+For engineers and mobile workers.
+Assigned job access only.
+
+Compliance:
+- RAMS builder
+- method statements
+- risk assessments
+- incident reports
+- certificate tracking
+- insurance tracking
+- expiry alerts
+- trade-specific checklists
+
+Finance:
+- invoices
+- invoice PDFs
+- purchase orders
+- payment links
+- Stripe payments
+- deposits
+- payment reminders
+- Xero sync
+- CIS support
+- aged debtors
+- recurring maintenance invoices
+
+Fleet:
+- vehicle records
+- MOT dates
+- service dates
+- tax dates
+- driver assignment
+- mileage logs
+- live map from field check-ins
+- vehicle reminders
+
+Documents:
+- quote PDFs
+- invoice PDFs
+- certificates
+- warranties
+- job photos
+- signed documents
+- customer uploads
+- stored in object storage
+
+Communications:
+- email
+- SMS
+- WhatsApp
+- VoIP
+- call logs
+- voicemail transcription
+- AI call summaries
+- internal notes
+- unified inbox
+
+Marketplace:
+- post work
+- find subcontractors
+- receive applications
+- contractor reviews
+- AI contractor matching
+
+Branding:
+Tenant controls:
+- logo
+- brand colours
+- fonts
+- quote templates
+- invoice templates
+- email templates
+- customer portal branding
+
+Tenant Integrations:
+Managed from Settings → Integrations.
+
+Tenant can connect:
+- Xero
+- Stripe
+- Google Calendar
+- Outlook
+- MyJobQuote
+- Checkatrade
+- WhatsApp
+- Twilio
+
+==================================================
+TRADE CATEGORY ENGINE
+==================================================
+
+On signup, tenant chooses one or more trade categories.
+
+Categories control:
+- job types
+- quote templates
+- job forms
+- compliance checklists
+- required photos
+- dashboard wording
+- automation rules
+- AI prompts
+- customer portal wording
+
+Example: Roofing tenant gets:
+- Roof repair
+- Flat roof
+- Guttering
+- Leak investigation
+- Chimney work
+- Fascias & soffits
+- Before/after photos
+- Height safety checklist
+- Scaffold checklist
+- Roof survey form
+- Weather warning alerts
+- Roofing quote templates
+- Roofing risk assessment
+
+Example: Electrical tenant gets:
+- EICR
+- Rewire
+- Consumer unit replacement
+- EV charger installation
+- PAT testing
+- electrical test forms
+- NICEIC/NAPIT fields
+- electrical safety checklist
+
+Example: Plumbing tenant gets:
+- Leak repair
+- Boiler service
+- Boiler installation
+- Bathroom installation
+- pressure testing
+- gas safety reminders
+- before/after photos
+
+Supported categories:
+- Roofing
+- Electrical
+- Plumbing
+- HVAC
+- Heating & Gas
+- Solar
+- Construction
+- Building
+- Facilities Management
+- Property Maintenance
+- Cleaning
+- Landscaping
+- Tree Surgery
+- Scaffolding
+- Flooring
+- Painting
+- Windows & Doors
+- Locksmiths
+- Fire & Security
+- Pest Control
+- Drainage
+- Waste Removal
+- Appliance Repair
+- Garage Doors
+- Kitchens & Bathrooms
+- Carpentry
+- Tiling
+- Plastering
+- Bricklaying
+- Groundworks
+- Demolition
+- Shopfitting
+- Telecoms
+- IT & Smart Systems
+- CCTV
+- Agriculture
+- Marine
+- Fleet Services
+- Courier & Logistics
+- Hospitality Maintenance
+- Healthcare Maintenance
+- Education Maintenance
+- Industrial Maintenance
+- Warehousing
+- Utilities
+- Lift Systems
+- Handyman
+- Insurance Repairs
+- Modular Buildings
+- Smart Buildings
+- Rope Access
+- Energy Retrofit
+- Surveying
+- Multi-Service Enterprise
+
+==================================================
+CTRLTRADEPOS®
+==================================================
+
+URL:
+/app/pos
+
+Purpose:
+CtrlTradePos® is a separate EPOS trade counter and showroom system.
+
+Built for:
+- trade centres
+- trade counters
+- trade shops
+- warehouses
+- suppliers
+- builders merchants
+- electrical wholesalers
+- plumbing merchants
+- roofing suppliers
+- flooring suppliers
+- timber merchants
+- showrooms
+- kitchen showrooms
+- bathroom showrooms
+
+Important:
+CtrlTradePos® is connected to the CRM but is a different application.
+It can only be used with an active licence key.
+
+==================================================
+CTRLTRADEPOS® LICENSING
+==================================================
+
+Price:
+£59.99 / till / month
+
+Each till requires:
+- licence key
+- terminal ID
+- tenant ID
+- branch ID
+- till name
+- activation status
+- last licence check timestamp
+
+Licence states:
+- Active
+- Trial
+- Suspended
+- Expired
+- Revoked
+- Read Only
+
+Licence validation flow:
+
+POS app opens
+↓
+Checks licence key
+↓
+Validates tenant, branch and terminal
+↓
+If active, allow till login
+↓
+If expired or suspended, lock till or switch to read-only mode
+
+Super Admin can:
+- issue licence key
+- revoke licence key
+- suspend till
+- reactivate till
+- move licence to another branch
+- view terminal activity
+- view till billing
+
+Tenant admin can:
+- view till licences
+- assign till to branch
+- rename till
+- request extra till
+- deactivate till
+
+==================================================
+CTRLTRADEPOS® MODULES
+==================================================
+
+Till Sales:
+- product search
+- barcode scanning
+- cart
+- quantity changes
+- discounts
+- promotions
+- VAT
+- cash payments
+- card payments
+- split payments
+- trade account payments
+- refunds
+- returns
+- receipt printing
+- email receipts
+
+Trade Counter CRM:
+- walk-in customers
+- trade account customers
+- customer lookup
+- customer pricing
+- customer purchase history
+- quick reorder
+- credit limits
+- account balance
+
+Trade Accounts:
+- customer account billing
+- credit limits
+- monthly statements
+- account payments
+- outstanding balances
+- trade discounts
+- account holds
+
+Products:
+- product catalogue
+- product categories
+- variants
+- SKUs
+- barcodes
+- product images
+- VAT rates
+- retail pricing
+- trade pricing
+- bulk pricing
+- supplier pricing
+
+Inventory:
+- stock levels
+- branch stock
+- counter stock
+- warehouse stock
+- van stock
+- stock adjustments
+- stock transfers
+- low-stock alerts
+- stock movement logs
+- batch tracking future support
+- serial numbers future support
+
+Warehouse Link:
+- goods in
+- goods out
+- supplier deliveries
+- purchase orders
+- picking
+- packing
+- stock transfers
+- bin locations
+
+Supplier Management:
+- supplier records
+- supplier products
+- supplier pricing
+- purchase orders
+- supplier invoices
+- delivery notes
+- reorder suggestions
+
+Till Sessions:
+- open till
+- starting float
+- cashier login
+- transaction logs
+- cash count
+- card total
+- variance report
+- close till
+- end-of-day reconciliation
+
+POS Security:
+- cashier permissions
+- manager permissions
+- refund approval
+- discount approval
+- cash drawer audit
+- till session audit
+- licence audit log
+
+Reports:
+- sales by till
+- sales by branch
+- sales by cashier
+- sales by product
+- gross margin
+- refunds
+- discounts
+- cash variance
+- stock movement
+- trade account balances
+
+AI Stock Intelligence:
+- demand forecasting
+- dead stock alerts
+- reorder suggestions
+- fast-moving products
+- margin warnings
+
+==================================================
+CRM ↔ POS CONNECTION
+==================================================
+
+Shared between CRM and POS:
+- tenants
+- branches
+- customers
+- products
+- stock
+- invoices
+- payments
+- receipts
+- reports
+- staff
+- permissions
+
+Example POS sale flow:
+
+Customer buys product at trade counter
+↓
+CtrlTradePos® creates transaction
+↓
+Stock is reduced
+↓
+Payment is recorded
+↓
+Receipt is generated
+↓
+Customer purchase history updates
+↓
+CRM revenue dashboard updates
+↓
+Xero sync is triggered if connected
+
+Example CRM job stock flow:
+
+Engineer uses material on job
+↓
+CRM checks available stock
+↓
+Stock is reserved from warehouse/van/branch
+↓
+Job material cost updates
+↓
+Job margin recalculates
+↓
+Low stock triggers reorder suggestion
+
+==================================================
+LAYER 3 — CUSTOMER PORTAL
+==================================================
+
+URL:
+/portal/:slug
+
+Purpose:
+Customer-facing portal for each tenant.
+
+Features:
+- customer login
+- quote viewing
+- quote acceptance
+- e-signature
+- deposit payment
+- invoice payment
+- job tracking
+- engineer ETA
+- progress photos
+- messaging
+- document access
+- reviews
+- referrals
+- maintenance plans
+
+==================================================
+AUTOMATION ENGINE
+==================================================
+
+CtrlWorkflow®:
+
+Trigger → Condition → AI Decision → Action
+
+Triggers:
+- lead created
+- quote sent
+- quote accepted
+- deposit paid
+- job scheduled
+- job completed
+- invoice overdue
+- payment received
+- stock low
+- till closed
+- licence expired
+- certificate expiring
+
+Actions:
+- send email
+- send SMS
+- send WhatsApp
+- create job
+- assign staff
+- create invoice
+- update stock
+- create purchase order
+- notify manager
+- trigger Xero sync
+
+Modes:
+- Manual
+- AI Suggest
+- Approval Required
+- Fully Autonomous
+
+==================================================
+DATABASE REQUIREMENTS
+==================================================
+
+All tenant-owned tables must include:
+- tenant_id
+- company_id
+- created_at
+- updated_at
+
+Where needed:
+- branch_id
+- industry_id
+- department_id
+- team_id
+- terminal_id
+- licence_id
+
+Core CRM tables:
+users
+sessions
+tenants
+tenant_users
+companies
+branches
+industries
+departments
+teams
+roles
+permissions
+staff
+customers
+customer_notes
+leads
+quotes
+quote_items
+jobs
+job_staff
+job_photos
+job_checklists
+job_costs
+invoices
+invoice_items
+payments
+purchase_orders
+materials
+suppliers
+subcontractors
+vehicles
+compliance_documents
+calendar_events
+attachments
+activity_log
+portal_tokens
+reviews
+
+POS tables:
+pos_licences
+pos_terminals
+pos_till_sessions
+pos_transactions
+pos_transaction_items
+pos_refunds
+pos_cash_drawer_logs
+products
+product_categories
+product_variants
+product_barcodes
+stock_locations
+stock_movements
+stock_transfers
+warehouse_bins
+trade_accounts
+trade_account_statements
+supplier_orders
+supplier_deliveries
+inventory_adjustments
+
+Billing tables:
+stripe_customers
+stripe_subscriptions
+stripe_subscription_items
+stripe_invoices
+stripe_payment_events
+billing_events
+
+Automation tables:
+automation_rules
+automation_triggers
+automation_conditions
+automation_actions
+automation_runs
+automation_logs
+event_queue
+worker_jobs
+failed_jobs
+scheduled_jobs
+
+Branding tables:
+tenant_branding
+tenant_themes
+portal_branding
+invoice_templates
+quote_templates
+email_templates
+pos_receipt_templates
+
+==================================================
+SECURITY REQUIREMENTS
+==================================================
+
+Must include:
+- tenant isolation middleware
+- fail-closed tenant resolver
+- RBAC permissions
+- seat-based access
+- POS licence validation
+- till-level permissions
+- password hashing
+- encrypted sessions
+- encrypted integration tokens
+- audit logs
+- IDOR protection
+- rate limiting
+- secure file uploads
+- GDPR export
+- GDPR deletion
+- data retention rules
+
+==================================================
+BUILD PRIORITY
+==================================================
+
+Phase 1:
+- public website
+- signup/login
+- Stripe trial billing
+- tenant provisioning
+- Super Admin
+- CRM core
+- customers
+- leads
+- quotes
+- jobs
+- invoices
+- calendar
+- staff
+- customer portal
+- trade category setup
+
+Phase 2:
+- Xero
+- Stripe webhooks
+- Google Calendar
+- Outlook
+- compliance
+- fleet
+- reports
+- branding
+- referrals
+- notifications
+
+Phase 3:
+- CtrlTradePos®
+- POS licence keys
+- till screens
+- product catalogue
+- barcode scanning
+- trade accounts
+- stock management
+- till sessions
+- POS reports
+
+Phase 4:
+- warehouse management
+- supplier ordering
+- advanced stock
+- AI stock intelligence
+- showroom sales
+
+Phase 5:
+- CtrlWorkflow®
+- CtrlAI®
+- CtrlVoice®
+- WhatsApp/SMS
+- automation
+- white label
+- enterprise features
+
+==================================================
+FINAL POSITIONING
+==================================================
+
+CtrlTrade CRM is the business operations platform.
+
+CtrlTradePos® is the separate EPOS trade counter, showroom and warehouse sales platform.
+
+Both are connected through shared customers, products, stock, payments, invoices and reports.
+
+CtrlTrade® is the complete SaaS operating system for sole traders, trade businesses, suppliers, trade counters, warehouses, showrooms and field service companies.
+```

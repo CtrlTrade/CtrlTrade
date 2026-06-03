@@ -1,0 +1,278 @@
+==================================================
+CTRLTRADEPOS® DEPLOYMENT ARCHITECTURE
+==================================================
+
+CtrlTradePos® is a modern EPOS platform that supports both:
+
+1. Cloud Web POS
+2. Installed Desktop POS
+
+Both versions connect to the same CtrlTrade platform and database.
+
+==================================================
+OPTION 1
+WEB POS
+==================================================
+
+Cloud-hosted browser-based EPOS.
+
+Access URL:
+
+https://app.ctrltrade.co.uk/pos
+
+or
+
+https://tenantname.ctrltrade.co.uk/pos
+
+Supported browsers:
+
+- Chrome
+- Edge
+- Safari
+- Firefox
+
+Supported devices:
+
+- Windows PCs
+- Windows Touchscreen POS
+- Android POS
+- Android Tablets
+- iPads
+- Surface Pro
+- Mac Desktop
+- Linux Desktop
+
+Benefits:
+
+- No installation
+- Instant updates
+- Works anywhere
+- Multi-branch access
+- Easy deployment
+
+==================================================
+OPTION 2
+INSTALLED DESKTOP POS
+==================================================
+
+Dedicated installed CtrlTradePos® application.
+
+Supported platforms:
+
+- Windows Desktop
+- Windows POS Terminals
+- Windows Touchscreen Systems
+
+Future:
+
+- Android POS App
+- iPad POS App
+- macOS POS App
+
+Benefits:
+
+- Faster startup
+- Offline-first operation
+- Hardware integration
+- Full-screen kiosk mode
+- Better peripheral support
+
+==================================================
+LICENSING
+==================================================
+
+Every till requires:
+
+- Active CtrlTradePos® Licence
+- Licence Key
+- Terminal ID
+- Tenant ID
+- Branch ID
+
+Licence Types:
+
+Web POS Licence
+
+Desktop POS Licence
+
+Hybrid Licence
+
+Price:
+
+£59.99 per till per month
+
+==================================================
+POS TERMINAL REGISTRATION
+==================================================
+
+Each terminal must register with:
+
+- Terminal Name
+- Terminal ID
+- Branch
+- Tenant
+- Licence Key
+
+Example:
+
+POS-001
+Trade Counter 1
+London Branch
+
+POS-002
+Warehouse Counter
+
+POS-003
+Showroom Counter
+
+==================================================
+TOUCHSCREEN MODE
+==================================================
+
+CtrlTradePos® must be fully touchscreen optimised.
+
+Requirements:
+
+- Large touch targets
+- Touch keyboard support
+- Swipe support
+- Quick action buttons
+- Fast checkout
+- Dark mode
+- Light mode
+- Full-screen mode
+- Kiosk mode
+
+==================================================
+SUPPORTED HARDWARE
+==================================================
+
+Barcode Scanners:
+
+- USB Barcode Scanner
+- Bluetooth Scanner
+- Wireless Scanner
+- Android Scanner Devices
+
+Receipt Printers:
+
+- USB Thermal Printers
+- Network Printers
+- Bluetooth Printers
+
+Cash Drawers:
+
+- USB
+- RJ11
+- Printer Trigger
+
+Customer Displays:
+
+- Secondary Display
+- Pole Display
+- Customer Screen
+
+Label Printers:
+
+- Zebra
+- Brother
+- Dymo
+
+Card Terminals (Future Integrations):
+
+- Handpoint
+- PAX
+- Dojo
+- Worldpay
+- Stripe Terminal
+- Trust Payments
+
+==================================================
+OFFLINE MODE
+==================================================
+
+Desktop POS:
+
+Full Offline Support
+
+Features:
+
+- Continue selling offline
+- Local transaction storage
+- Offline receipt printing
+- Offline stock movement
+- Auto-sync when online
+
+Web POS:
+
+Limited Offline Support via PWA
+
+Features:
+
+- Cached transactions
+- Sync on reconnect
+
+==================================================
+POS MODES
+==================================================
+
+Trade Counter Mode
+
+Optimised for:
+
+- Builders Merchants
+- Electrical Wholesalers
+- Plumbing Merchants
+- Roofing Suppliers
+
+Features:
+
+- Fast checkout
+- Trade account lookup
+- Barcode scanning
+- Quick sale screen
+
+Showroom Mode
+
+Optimised for:
+
+- Kitchen Showrooms
+- Bathroom Showrooms
+- Flooring Showrooms
+
+Features:
+
+- Product displays
+- Customer consultation
+- Quote builder
+- Deposit payments
+
+Warehouse Mode
+
+Optimised for:
+
+- Warehouses
+- Distribution Centres
+
+Features:
+
+- Goods In
+- Goods Out
+- Picking
+- Packing
+- Transfers
+- Barcode scanning
+
+==================================================
+FUTURE ROADMAP
+==================================================
+
+- Progressive Web App (PWA)
+- Android POS App
+- iOS POS App
+- Windows POS App
+- Self-Service Kiosk
+- Self-Checkout
+- RFID Stock Tracking
+- AI Shelf Monitoring
+- Voice-Assisted Picking
