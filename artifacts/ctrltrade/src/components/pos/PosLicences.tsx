@@ -6,13 +6,14 @@ import {
   useUpdatePosTerminal,
   useUpdatePosLicenceBranch,
   useListBranches,
+  useValidatePosLicence,
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { KeyRound, MonitorSmartphone, Plus, Monitor } from "lucide-react";
+import { KeyRound, MonitorSmartphone, Plus, Monitor, ShieldCheck, ShieldX, ShieldAlert } from "lucide-react";
 
 const STATUS_CLS: Record<string, string> = {
   active: "bg-green-500/10 text-green-600 border-green-500/20",
@@ -34,6 +35,13 @@ function fmtMoney(pence: number, currency: string) {
   return `${symbol}${(pence / 100).toFixed(2)}`;
 }
 
+type ValidationResult = {
+  valid: boolean;
+  mode: "full" | "read_only" | "locked";
+  status: string;
+  message: string | null;
+};
+
 export function PosLicences() {
   const { data, isLoading, refetch } = useListPosLicences();
   const { data: branches } = useListBranches();
@@ -41,10 +49,14 @@ export function PosLicences() {
   const registerTerminal = useRegisterPosTerminal();
   const updateTerminal = useUpdatePosTerminal();
   const assignBranch = useUpdatePosLicenceBranch();
+  const validateLicence = useValidatePosLicence();
   const { toast } = useToast();
 
   const [reqType, setReqType] = useState<"web" | "desktop" | "hybrid">("web");
   const [terminalName, setTerminalName] = useState<Record<string, string>>({});
+  const [validateKey, setValidateKey] = useState<Record<string, string>>({});
+  const [validateTerminal, setValidateTerminal] = useState<Record<string, string>>({});
+  const [validateResults, setValidateResults] = useState<Record<string, ValidationResult>>({});
 
   const handleRequest = () => {
     requestTill.mutate(
@@ -104,6 +116,24 @@ export function PosLicences() {
     updateTerminal.mutate(
       { terminalId, data: { status: current === "active" ? "inactive" : "active" } },
       { onSuccess: () => refetch(), onError: () => toast({ title: "Update failed", variant: "destructive" }) },
+    );
+  };
+
+  const handleValidate = (licenceId: string, licenceKey: string, surface: "web" | "desktop") => {
+    const key = (validateKey[licenceId] ?? licenceKey).trim();
+    const terminal = (validateTerminal[licenceId] ?? "").trim();
+    setValidateResults((s) => ({ ...s, [licenceId]: undefined as unknown as ValidationResult }));
+    validateLicence.mutate(
+      { data: { licenceKey: key, terminalCode: terminal || undefined, surface } },
+      {
+        onSuccess: (result) => {
+          setValidateResults((s) => ({
+            ...s,
+            [licenceId]: { valid: result.valid, mode: result.mode as "full" | "read_only" | "locked", status: result.status, message: result.message ?? null },
+          }));
+        },
+        onError: () => toast({ title: "Validation failed", variant: "destructive" }),
+      },
     );
   };
 
@@ -231,6 +261,49 @@ export function PosLicences() {
                   >
                     <Plus className="mr-1 h-3.5 w-3.5" /> Add
                   </Button>
+                </div>
+
+                {/* Validate till-open */}
+                <div className="mt-3 border-t border-border pt-3">
+                  <p className="text-[10px] font-semibold uppercase text-muted-foreground tracking-widest mb-2">Validate Till Open</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Input
+                      value={validateTerminal[lic.id] ?? ""}
+                      onChange={(e) => setValidateTerminal((s) => ({ ...s, [lic.id]: e.target.value }))}
+                      placeholder="Terminal code (e.g. POS-001)"
+                      data-testid={`input-validate-terminal-${lic.id}`}
+                      className="h-8 text-xs flex-1 min-w-[160px]"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleValidate(lic.id, lic.licenceKey, lic.type === "desktop" ? "desktop" : "web")}
+                      disabled={validateLicence.isPending}
+                      data-testid={`button-validate-${lic.id}`}
+                      className="h-8 text-xs shrink-0"
+                    >
+                      <ShieldCheck className="mr-1 h-3.5 w-3.5" /> Validate
+                    </Button>
+                  </div>
+                  {validateResults[lic.id] && (() => {
+                    const r = validateResults[lic.id];
+                    const Icon = r.mode === "full" ? ShieldCheck : r.mode === "read_only" ? ShieldAlert : ShieldX;
+                    const cls = r.mode === "full"
+                      ? "bg-green-500/10 border-green-500/20 text-green-700"
+                      : r.mode === "read_only"
+                        ? "bg-amber-500/10 border-amber-500/20 text-amber-700"
+                        : "bg-red-500/10 border-red-500/20 text-red-700";
+                    return (
+                      <div className={`mt-2 flex items-start gap-2 rounded border px-2.5 py-2 text-xs ${cls}`} data-testid={`validate-result-${lic.id}`}>
+                        <Icon className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-semibold uppercase tracking-wide">{r.mode.replace("_", " ")}</span>
+                          {r.message && <span className="ml-2 font-normal">{r.message}</span>}
+                          {!r.message && r.mode === "full" && <span className="ml-2 font-normal">Licence is valid — till may open.</span>}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             ))}

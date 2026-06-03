@@ -13,11 +13,13 @@ import {
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
 import { useModules } from "@/contexts/ModulesContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function TillScreen() {
   const colors = useColors();
   const router = useRouter();
   const { modules, isLoading: modulesLoading } = useModules();
+  const { mode } = useAuth();
   const qc = useQueryClient();
   const { data: session, isLoading } = useGetCurrentTillSession();
 
@@ -49,6 +51,8 @@ export default function TillScreen() {
 
   const isOpen = !!session;
   const activeLocId = locationId ?? locations?.find((l) => l.isDefault)?.id ?? locations?.[0]?.id;
+  const isLocked = mode === "locked";
+  const isReadOnly = mode === "read_only";
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
@@ -57,6 +61,16 @@ export default function TillScreen() {
           <Text style={[styles.kicker, { color: colors.mutedForeground }]}>TILL SESSION</Text>
           <Text style={[styles.title, { color: colors.foreground }]}>{isOpen ? "OPEN" : "CLOSED"}</Text>
         </View>
+
+        {(isLocked || isReadOnly) && (
+          <View style={[styles.modeBanner, { backgroundColor: isLocked ? colors.destructive + "18" : "#f59e0b18", borderColor: isLocked ? colors.destructive : "#f59e0b" }]}>
+            <Text style={[styles.modeBannerText, { color: isLocked ? colors.destructive : "#b45309" }]}>
+              {isLocked
+                ? "TILL LOCKED — This licence has been suspended or revoked. Contact your administrator."
+                : "READ-ONLY MODE — This licence has expired or is in read-only mode. New sales are blocked until renewed."}
+            </Text>
+          </View>
+        )}
 
         {isOpen ? (
           <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -95,9 +109,25 @@ export default function TillScreen() {
               <Text style={[styles.secondaryText, { color: colors.foreground }]}>BACK TO TILL</Text>
             </Pressable>
           </View>
+        ) : isLocked ? (
+          <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.destructive }]}>
+            <Text style={[styles.sectionLabel, { color: colors.destructive }]}>TILL LOCKED</Text>
+            <Text style={[styles.lockedBody, { color: colors.mutedForeground }]}>
+              This till cannot be opened because the licence is suspended or revoked.
+              Please contact your administrator to resolve the licence status.
+            </Text>
+            <Pressable onPress={() => router.replace("/(app)/index" as any)} style={[styles.secondary, { borderColor: colors.border, marginTop: 16 }]}>
+              <Text style={[styles.secondaryText, { color: colors.foreground }]}>GO BACK</Text>
+            </Pressable>
+          </View>
         ) : (
           <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>OPEN NEW SESSION</Text>
+            {isReadOnly && (
+              <Text style={[styles.lockedBody, { color: "#b45309", marginBottom: 12 }]}>
+                Opening a new till session is not available in read-only mode.
+              </Text>
+            )}
             <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>LOCATION</Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
               {locations?.map((l) => {
@@ -105,8 +135,8 @@ export default function TillScreen() {
                 return (
                   <Pressable
                     key={l.id}
-                    onPress={() => setLocationId(l.id)}
-                    style={[styles.chip, { borderColor: active ? colors.primary : colors.border, backgroundColor: active ? colors.primary : "transparent" }]}
+                    onPress={() => !isReadOnly && setLocationId(l.id)}
+                    style={[styles.chip, { borderColor: active ? colors.primary : colors.border, backgroundColor: active ? colors.primary : "transparent", opacity: isReadOnly ? 0.5 : 1 }]}
                   >
                     <Text style={[styles.chipText, { color: active ? colors.primaryForeground : colors.foreground }]}>{l.name}</Text>
                   </Pressable>
@@ -119,7 +149,8 @@ export default function TillScreen() {
               value={float}
               onChangeText={setFloat}
               keyboardType="decimal-pad"
-              style={[styles.input, { color: colors.foreground, borderColor: colors.input, backgroundColor: colors.background }]}
+              editable={!isReadOnly}
+              style={[styles.input, { color: colors.foreground, borderColor: colors.input, backgroundColor: colors.background, opacity: isReadOnly ? 0.5 : 1 }]}
             />
 
             {error && <Text style={[styles.error, { color: colors.destructive }]}>{error}</Text>}
@@ -130,7 +161,8 @@ export default function TillScreen() {
                 if (!activeLocId) { setError("Select a location"); return; }
                 open.mutate({ data: { locationId: activeLocId, openingFloatPence: Math.round((parseFloat(float || "0") || 0) * 100) } });
               }}
-              style={({ pressed }) => [styles.submit, { backgroundColor: colors.primary, opacity: open.isPending || pressed ? 0.85 : 1 }]}
+              disabled={isReadOnly}
+              style={({ pressed }) => [styles.submit, { backgroundColor: colors.primary, opacity: isReadOnly || open.isPending || pressed ? (isReadOnly ? 0.4 : 0.85) : 1 }]}
             >
               <Text style={[styles.submitText, { color: colors.primaryForeground }]}>{open.isPending ? "OPENING…" : "OPEN TILL"}</Text>
             </Pressable>
@@ -156,6 +188,9 @@ const styles = StyleSheet.create({
   titleBar: { paddingVertical: 6 },
   kicker: { fontFamily: MONO_FONT, fontSize: 10, letterSpacing: 3 },
   title: { fontFamily: MONO_FONT, fontSize: 24, fontWeight: "700", letterSpacing: 2, marginTop: 4 },
+  modeBanner: { borderWidth: 1, borderRadius: 8, padding: 12 },
+  modeBannerText: { fontFamily: MONO_FONT, fontSize: 12, letterSpacing: 1, lineHeight: 18 },
+  lockedBody: { fontFamily: MONO_FONT, fontSize: 13, lineHeight: 20 },
   section: { borderWidth: 1, borderRadius: 10, padding: 16 },
   sectionLabel: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 3, marginBottom: 12 },
   fieldLabel: { fontFamily: MONO_FONT, fontSize: 10, letterSpacing: 2, marginBottom: 6, marginTop: 6 },

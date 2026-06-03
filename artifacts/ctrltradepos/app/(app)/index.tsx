@@ -15,6 +15,7 @@ import { Header } from "@/components/Header";
 import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
 import { useModules } from "@/contexts/ModulesContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 function money(pence: number): string {
   return `£${(pence / 100).toFixed(2)}`;
@@ -71,6 +72,7 @@ export default function PosHomeScreen() {
   const colors = useColors();
   const router = useRouter();
   const { modules, isLoading: modulesLoading } = useModules();
+  const { mode } = useAuth();
   const posEnabled = modules?.posEnabled ?? false;
   const { data: session, isLoading: sessionLoading } = useGetCurrentTillSession();
 
@@ -102,39 +104,62 @@ export default function PosHomeScreen() {
     );
   }
 
+  const isLocked = mode === "locked";
+  const isReadOnly = mode === "read_only";
+  const canSell = isOpen && mode === "full";
+  const canOpenTill = mode === "full";
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top", "left", "right"]}>
       <Header title="POINT OF SALE" subtitle="Trade Counter & Warehouse" />
       <ScrollView contentContainerStyle={styles.scroll}>
+        {(isLocked || isReadOnly) && (
+          <View style={[styles.modeBanner, { backgroundColor: isLocked ? "#ef444418" : "#f59e0b18", borderColor: isLocked ? "#ef4444" : "#f59e0b" }]}>
+            <Text style={[styles.modeBannerText, { color: isLocked ? "#ef4444" : "#b45309" }]}>
+              {isLocked
+                ? "TILL LOCKED — Licence suspended or revoked. Contact your administrator."
+                : "READ-ONLY MODE — Licence expired or read-only. New sales are blocked until renewed."}
+            </Text>
+          </View>
+        )}
+
         <Pressable
-          onPress={() => router.push("/(app)/till")}
+          onPress={() => !isLocked && router.push("/(app)/till")}
           style={({ pressed }) => [
             styles.statusCard,
             {
               backgroundColor: colors.card,
-              borderColor: isOpen ? colors.primary : colors.border,
-              opacity: pressed ? 0.9 : 1,
+              borderColor: isLocked ? "#ef4444" : isOpen ? colors.primary : colors.border,
+              opacity: pressed && !isLocked ? 0.9 : 1,
             },
           ]}
         >
           <View style={styles.statusRow}>
             <Text style={[styles.statusKicker, { color: colors.mutedForeground }]}>TILL SESSION</Text>
-            <View style={[styles.dot, { backgroundColor: isOpen ? colors.primary : colors.mutedForeground }]} />
+            <View style={[styles.dot, { backgroundColor: isLocked ? "#ef4444" : isOpen ? colors.primary : colors.mutedForeground }]} />
           </View>
           {sessionLoading ? (
             <ActivityIndicator color={colors.primary} style={{ marginTop: 12 }} />
+          ) : isLocked ? (
+            <>
+              <Text style={[styles.statusValue, { color: "#ef4444" }]}>LOCKED</Text>
+              <Text style={[styles.statusMeta, { color: colors.mutedForeground }]}>
+                Licence suspended or revoked — trading not possible
+              </Text>
+            </>
           ) : isOpen ? (
             <>
               <Text style={[styles.statusValue, { color: colors.foreground }]}>OPEN</Text>
               <Text style={[styles.statusMeta, { color: colors.mutedForeground }]}>
                 {session?.locationName ?? "Till"} · Takings {money(takingsPence)}
+                {isReadOnly ? " · Read-only" : ""}
               </Text>
             </>
           ) : (
             <>
               <Text style={[styles.statusValue, { color: colors.foreground }]}>CLOSED</Text>
               <Text style={[styles.statusMeta, { color: colors.mutedForeground }]}>
-                Open a till session to start selling
+                {isReadOnly ? "Read-only mode — cannot open new session" : "Open a till session to start selling"}
               </Text>
             </>
           )}
@@ -145,12 +170,13 @@ export default function PosHomeScreen() {
             label="SELL"
             hint="Catalogue & checkout"
             primary
-            disabled={!isOpen}
+            disabled={!canSell}
             onPress={() => router.push("/(app)/products")}
           />
           <ActionTile
             label={isOpen ? "MANAGE TILL" : "OPEN TILL"}
             hint={isOpen ? "Session & cash" : "Set opening float"}
+            disabled={!canOpenTill && !isOpen}
             onPress={() => router.push("/(app)/till")}
           />
           <ActionTile
@@ -161,7 +187,7 @@ export default function PosHomeScreen() {
           <ActionTile
             label="REFUND"
             hint="Returns & credits"
-            disabled={!isOpen}
+            disabled={!canSell}
             onPress={() => router.push("/(app)/refund")}
           />
           <ActionTile
@@ -172,7 +198,7 @@ export default function PosHomeScreen() {
           />
         </View>
 
-        {!isOpen && (
+        {!isOpen && !isLocked && !isReadOnly && (
           <Text style={[styles.note, { color: colors.mutedForeground }]}>
             Open a till session to enable selling, refunds and end-of-day reconciliation.
           </Text>
@@ -185,6 +211,8 @@ export default function PosHomeScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { paddingHorizontal: 20, paddingBottom: 40, paddingTop: 20, gap: 20 },
+  modeBanner: { borderWidth: 1, borderRadius: 8, padding: 12 },
+  modeBannerText: { fontFamily: MONO_FONT, fontSize: 12, letterSpacing: 1, lineHeight: 18 },
   centered: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 40, gap: 12 },
   disabledTitle: { fontFamily: MONO_FONT, fontSize: 18, letterSpacing: 2, fontWeight: "700" },
   disabledBody: { fontFamily: MONO_FONT, fontSize: 13, textAlign: "center", lineHeight: 20 },
