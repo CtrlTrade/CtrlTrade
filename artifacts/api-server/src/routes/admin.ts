@@ -97,6 +97,48 @@ router.post("/v1/admin/impersonation/stop", async (req, res): Promise<void> => {
 
 router.use("/v1/admin", requireSuperAdmin);
 
+// Super-admin recovery: directly set a user's password by email or id.
+// Needed because the public reset flow only emails a link, which is a dead end
+// for accounts whose email domain cannot receive mail (e.g. demo .test accounts).
+router.post("/v1/admin/users/set-password", async (req, res): Promise<void> => {
+  const body = z
+    .object({
+      email: z.string().email().optional(),
+      userId: z.string().min(1).optional(),
+      password: z.string().min(8),
+    })
+    .refine((d) => Boolean(d.email) || Boolean(d.userId), {
+      message: "Provide either email or userId.",
+    })
+    .safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+
+  const whereClause = body.data.userId
+    ? eq(usersTable.id, body.data.userId)
+    : ilike(usersTable.email, body.data.email!);
+  const [user] = await db.select().from(usersTable).where(whereClause);
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    return;
+  }
+
+  const passwordHash = await hashPassword(body.data.password);
+  await db.update(usersTable).set({ passwordHash }).where(eq(usersTable.id, user.id));
+
+  await logAudit({
+    tenantId: null,
+    actorUserId: req.auth!.user.id,
+    actorLabel: `superadmin:${req.auth!.user.email}`,
+    kind: "user.password_set_by_admin",
+    message: `Super-admin set the password for ${user.email}.`,
+  });
+
+  res.json({ ok: true, userId: user.id, email: user.email });
+});
+
 router.get("/v1/admin/dashboard", async (_req, res): Promise<void> => {
   const allSubs = await db.select().from(subscriptionsTable);
   let mrr = 0;
