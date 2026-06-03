@@ -33,4 +33,8 @@ export interface SignupPayload {
   aiModulesEnabled?: string[];
   communicationChannels?: string[];
   posEnabled?: boolean;
+  tenantTypeSlug?: string;
+  hasTradeCounter?: boolean;
+  hasWarehouse?: boolean;
+  hasShowroom?: boolean;
 }

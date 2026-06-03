@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { useSignup, useGetPricing, useListTradeCategories, useCreateSetupIntent, useListIndustries } from "@workspace/api-client-react";
+import { useSignup, useGetPricing, useListTradeCategories, useCreateSetupIntent, useListIndustries, useListTenantTypes } from "@workspace/api-client-react";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
@@ -64,12 +64,18 @@ export function Signup() {
   const { data: categories, isLoading: categoriesLoading } = useListTradeCategories();
   const { data: pricing, isLoading: pricingLoading } = useGetPricing();
   const { data: industries, isLoading: industriesLoading } = useListIndustries();
+  const { data: tenantTypeGroups, isLoading: tenantTypesLoading } = useListTenantTypes();
   const createSetupIntent = useCreateSetupIntent();
   const signup = useSignup();
 
   const [company, setCompany] = useState({ name: "", country: "UK", phone: "", addressLine1: "", city: "", postcode: "", companyNumber: "" });
   const [contactDetails, setContactDetails] = useState({ contactName: "", website: "", vatNumber: "" });
   const [industrySlug, setIndustrySlug] = useState<string>("");
+  const [tenantTypeSlug, setTenantTypeSlug] = useState<string>("");
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState<string>("");
+  const [hasTradeCounter, setHasTradeCounter] = useState(false);
+  const [hasWarehouse, setHasWarehouse] = useState(false);
+  const [hasShowroom, setHasShowroom] = useState(false);
   const [businessType, setBusinessType] = useState<string>("");
   const [vatRegistered, setVatRegistered] = useState(false);
   const [accountingProvider, setAccountingProvider] = useState<string>("none");
@@ -99,6 +105,21 @@ export function Signup() {
     });
     return () => { cancelled = true; };
   }, []);
+
+  // Recompute module baseline whenever tenantTypeSlug or follow-up answers change.
+  // Always sets a full baseline (true AND false) so changing type never leaves stale flags.
+  useEffect(() => {
+    if (!tenantTypeGroups) return;
+    const allTypes = tenantTypeGroups.flatMap((g: any) => g.types);
+    const found = tenantTypeSlug ? allTypes.find((t: any) => t.slug === tenantTypeSlug) : null;
+    const mods = found?.defaultModules ?? {};
+
+    setPosEnabled(Boolean(mods.posEnabled) || Boolean(hasTradeCounter));
+    setHasTradeShop(Boolean(mods.hasTradeShop) || Boolean(hasTradeCounter) || Boolean(hasWarehouse));
+    setHasMobileWorkforce(Boolean(mods.hasMobileWorkforce));
+    setAppointmentBookingEnabled(Boolean(mods.appointmentBookingEnabled) || Boolean(hasShowroom));
+    setMultiBranchEnabled(Boolean(mods.multiBranchEnabled));
+  }, [tenantTypeSlug, hasTradeCounter, hasWarehouse, hasShowroom, tenantTypeGroups]);
 
   const nextStep = () => setStep((s) => Math.min(TOTAL_STEPS, s + 1));
   const prevStep = () => setStep((s) => Math.max(1, s - 1));
@@ -134,6 +155,10 @@ export function Signup() {
         ownerPassword: owner.password,
         paymentMethodId,
         industrySlug: industrySlug || undefined,
+        tenantTypeSlug: tenantTypeSlug || undefined,
+        hasTradeCounter,
+        hasWarehouse,
+        hasShowroom,
         businessType: businessType || undefined,
         website: contactDetails.website || undefined,
         contactName: contactDetails.contactName || undefined,
@@ -161,8 +186,8 @@ export function Signup() {
 
   const stepTitles = [
     "Company Details",
-    "Your Industry",
     "Business Type",
+    "Business Structure",
     "Platform Modules",
     "Communication & AI",
     "Trade Categories",
@@ -174,7 +199,7 @@ export function Signup() {
 
   const stepDescriptions = [
     "Tell us about your company.",
-    "Select the primary industry your business operates in.",
+    "Select your business type to pre-configure the right modules.",
     "What type of business are you?",
     "Choose which platform modules to activate.",
     "Set up communication channels and AI features.",
@@ -243,32 +268,92 @@ export function Signup() {
               </form>
             )}
 
-            {/* Step 2 — Industry Selection */}
+            {/* Step 2 — Tenant Type Picker */}
             {step === 2 && (
-              <div className="space-y-6">
-                {industriesLoading ? <Skeleton className="h-64" /> : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
-                    {(industries ?? []).map((ind: any) => (
-                      <button
-                        key={ind.slug}
-                        type="button"
-                        onClick={() => setIndustrySlug(ind.slug === industrySlug ? "" : ind.slug)}
-                        className={`flex items-center gap-3 border p-4 text-left transition-colors ${industrySlug === ind.slug ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
-                        data-testid={`btn-industry-${ind.slug}`}
-                      >
-                        {industrySlug === ind.slug && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
-                        <div>
-                          <div className="font-semibold text-sm">{ind.name}</div>
-                          {ind.description && <div className="text-xs text-muted-foreground mt-0.5">{ind.description}</div>}
+              <div className="space-y-4">
+                {tenantTypesLoading ? <Skeleton className="h-72" /> : (
+                  <>
+                    <div className="flex gap-0 border-b border-border overflow-x-auto">
+                      {(tenantTypeGroups ?? []).map((g: any) => (
+                        <button
+                          key={g.categorySlug}
+                          type="button"
+                          onClick={() => { setSelectedCategorySlug(g.categorySlug); setTenantTypeSlug(""); setHasTradeCounter(false); setHasWarehouse(false); setHasShowroom(false); }}
+                          className={`px-3 py-2 text-xs font-bold border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                            selectedCategorySlug === g.categorySlug
+                              ? "border-primary text-white"
+                              : "border-transparent text-muted-foreground hover:text-foreground/80"
+                          }`}
+                          data-testid={`btn-category-${g.categorySlug}`}
+                        >
+                          {g.category}
+                        </button>
+                      ))}
+                    </div>
+
+                    {selectedCategorySlug ? (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
+                          {(tenantTypeGroups ?? [])
+                            .find((g: any) => g.categorySlug === selectedCategorySlug)
+                            ?.types.map((t: any) => (
+                              <button
+                                key={t.slug}
+                                type="button"
+                                onClick={() => { setTenantTypeSlug(t.slug === tenantTypeSlug ? "" : t.slug); setHasTradeCounter(false); setHasWarehouse(false); setHasShowroom(false); }}
+                                className={`flex items-center gap-2 border p-3 text-left transition-colors ${
+                                  tenantTypeSlug === t.slug ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                                }`}
+                                data-testid={`btn-tenant-type-${t.slug}`}
+                              >
+                                {tenantTypeSlug === t.slug && <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0" />}
+                                <span className="font-semibold text-sm">{t.name}</span>
+                              </button>
+                            ))}
                         </div>
-                      </button>
-                    ))}
-                  </div>
+
+                        {tenantTypeSlug && (
+                          <div className="border border-border bg-card/50 p-4 space-y-3">
+                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">A few quick questions</p>
+                            {[
+                              { id: "hasTradeCounter", label: "Do you have a trade counter or serve trade customers directly?", value: hasTradeCounter, set: setHasTradeCounter },
+                              { id: "hasWarehouse", label: "Do you hold stock or operate a warehouse?", value: hasWarehouse, set: setHasWarehouse },
+                              { id: "hasShowroom", label: "Do you have a showroom or offer design consultations?", value: hasShowroom, set: setHasShowroom },
+                            ].map((q) => (
+                              <div key={q.id} className="flex items-start gap-3">
+                                <div className="flex gap-2 mt-0.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => q.set(true)}
+                                    className={`px-3 py-1 text-xs font-bold border transition-colors ${q.value === true ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}
+                                  >
+                                    Yes
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => q.set(false)}
+                                    className={`px-3 py-1 text-xs font-bold border transition-colors ${q.value === false ? "border-border bg-muted text-foreground" : "border-border text-muted-foreground hover:border-primary/50"}`}
+                                  >
+                                    No
+                                  </button>
+                                </div>
+                                <span className="text-sm text-foreground/80">{q.label}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="py-8 text-center text-sm text-muted-foreground">
+                        Select a category above to see business types
+                      </div>
+                    )}
+                  </>
                 )}
-                <div className="flex justify-between pt-4">
+                <div className="flex justify-between pt-2">
                   <Button variant="outline" onClick={prevStep} className="rounded-xl font-bold"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
                   <Button onClick={nextStep} className="rounded-xl font-bold" data-testid="button-signup-next-2">
-                    {industrySlug ? "Next" : "Skip for now"} <ArrowRight className="ml-2 h-4 w-4" />
+                    {tenantTypeSlug ? "Next" : "Skip for now"} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
               </div>

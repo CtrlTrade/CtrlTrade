@@ -174,6 +174,12 @@ export function AdminTenantDetail() {
                   { label: "Created",    value: <span className="font-mono text-foreground/80">{new Date(tenant.createdAt).toLocaleString()}</span> },
                   { label: "Owner",      value: <span className="font-bold text-foreground">{owner.name}</span> },
                   { label: "Email",      value: <span className="font-mono text-foreground/80">{owner.email}</span> },
+                  { label: "Business Type", value: (tenant as any).tenantType
+                    ? <span className="font-semibold text-foreground text-xs">{(tenant as any).tenantType}</span>
+                    : <span className="text-xs text-muted-foreground font-mono">—</span> },
+                  { label: "Category", value: (tenant as any).tenantCategory
+                    ? <span className="text-xs text-muted-foreground font-mono">{(tenant as any).tenantCategory}</span>
+                    : <span className="text-xs text-muted-foreground font-mono">—</span> },
                   { label: "2FA",        value: (tenant as any).require2fa
                     ? <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold bg-green-500/10 text-green-400 border border-green-500/20"><ShieldCheck className="h-3 w-3" /> Enforced</span>
                     : <span className="text-xs text-muted-foreground font-mono">Not enforced</span> },

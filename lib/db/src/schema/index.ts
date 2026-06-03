@@ -228,6 +228,8 @@ export const tenantsTable = pgTable(
     cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
     require2fa: boolean("require_2fa").notNull().default(false),
     industryTourDismissedAt: timestamp("industry_tour_dismissed_at", { withTimezone: true }),
+    tenantType: varchar("tenant_type", { length: 80 }),
+    tenantCategory: varchar("tenant_category", { length: 80 }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
@@ -2408,6 +2410,33 @@ export const platformSalesLeadMessagesTable = pgTable(
   }),
 );
 export type PlatformSalesLeadMessage = typeof platformSalesLeadMessagesTable.$inferSelect;
+
+// ---- Tenant types (global reference for signup picker) --------------------
+export const tenantTypesTable = pgTable(
+  "tenant_types",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: varchar("slug", { length: 80 }).notNull().unique(),
+    name: text("name").notNull(),
+    category: text("category").notNull(),
+    categorySlug: varchar("category_slug", { length: 80 }).notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    defaultModules: jsonb("default_modules").notNull().default(sql`'{}'::jsonb`).$type<{
+      posEnabled?: boolean;
+      hasTradeShop?: boolean;
+      hasMobileWorkforce?: boolean;
+      appointmentBookingEnabled?: boolean;
+      multiBranchEnabled?: boolean;
+    }>(),
+    industrySlug: varchar("industry_slug", { length: 80 }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    categorySlugIdx: index("tenant_types_category_slug_idx").on(t.categorySlug),
+    sortIdx: index("tenant_types_sort_idx").on(t.categorySlug, t.sortOrder),
+  }),
+);
+export type TenantType = typeof tenantTypesTable.$inferSelect;
 
 // ---- Staff in-app notifications -------------------------------------------
 export const staffNotificationsTable = pgTable(

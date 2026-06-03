@@ -914,6 +914,21 @@ paths:
       responses:
         "204": { description: No content }
 
+  /v1/tenant-types:
+    get:
+      operationId: listTenantTypes
+      tags: [onboarding]
+      summary: List all tenant types grouped by category for the signup picker
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TenantTypesGroup"
+
   /v1/trade-categories:
     get:
       operationId: listTradeCategories
@@ -6427,6 +6442,35 @@ components:
           type: array
           items: { type: string }
 
+    TenantType:
+      type: object
+      required: [slug, name, category, categorySlug, sortOrder, defaultModules]
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        category: { type: string }
+        categorySlug: { type: string }
+        sortOrder: { type: integer }
+        industrySlug: { type: string, nullable: true }
+        defaultModules:
+          type: object
+          properties:
+            posEnabled: { type: boolean }
+            hasTradeShop: { type: boolean }
+            hasMobileWorkforce: { type: boolean }
+            appointmentBookingEnabled: { type: boolean }
+            multiBranchEnabled: { type: boolean }
+
+    TenantTypesGroup:
+      type: object
+      required: [category, categorySlug, types]
+      properties:
+        category: { type: string }
+        categorySlug: { type: string }
+        types:
+          type: array
+          items: { $ref: "#/components/schemas/TenantType" }
+
     TradeCategory:
       type: object
       required: [id, slug, name, jobTypes]
@@ -6481,6 +6525,10 @@ components:
           type: array
           items: { type: string }
         posEnabled: { type: boolean }
+        tenantTypeSlug: { type: string }
+        hasTradeCounter: { type: boolean }
+        hasWarehouse: { type: boolean }
+        hasShowroom: { type: boolean }
 
     LoginCredentials:
       type: object
@@ -6762,6 +6810,8 @@ components:
           items: { type: string }
         parentTenantId: { type: ["string", "null"] }
         require2fa: { type: boolean }
+        tenantType: { type: ["string", "null"] }
+        tenantCategory: { type: ["string", "null"] }
         whiteLabelConfig:
           anyOf:
             - type: "null"

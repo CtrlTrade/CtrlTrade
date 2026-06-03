@@ -26,6 +26,63 @@ export interface ProvisioningOptions {
   communicationChannels?: string[];
 }
 
+export interface TenantModuleDefaults {
+  posEnabled?: boolean;
+  hasTradeShop?: boolean;
+  hasMobileWorkforce?: boolean;
+  appointmentBookingEnabled?: boolean;
+  multiBranchEnabled?: boolean;
+}
+
+/**
+ * Compute the authoritative module flag set for a new tenant.
+ *
+ * Merge order (lowest → highest precedence):
+ *   1. tenantTypeDefaults  — from the selected tenant type's defaultModules
+ *   2. followUpBoosts      — Trade Counter / Warehouse / Showroom answers (additive)
+ *   3. userOverrides       — explicit Step 4 payload values (can enable OR disable)
+ *
+ * Any layer can only be undefined/absent; when a field is absent from a layer
+ * the value from the lower-precedence layer is kept.
+ */
+export function computeTenantModuleFlags(opts: {
+  tenantTypeDefaults?: TenantModuleDefaults;
+  hasTradeCounter?: boolean;
+  hasWarehouse?: boolean;
+  hasShowroom?: boolean;
+  userOverrides?: TenantModuleDefaults;
+}): Required<TenantModuleDefaults> {
+  const d = opts.tenantTypeDefaults ?? {};
+  const u = opts.userOverrides ?? {};
+
+  // Layer 1: type defaults
+  let pos = Boolean(d.posEnabled);
+  let shop = Boolean(d.hasTradeShop);
+  let mobile = Boolean(d.hasMobileWorkforce);
+  let appt = Boolean(d.appointmentBookingEnabled);
+  let branch = Boolean(d.multiBranchEnabled);
+
+  // Layer 2: follow-up boosts (additive — never disable)
+  if (opts.hasTradeCounter) { pos = true; shop = true; }
+  if (opts.hasWarehouse)    { shop = true; }
+  if (opts.hasShowroom)     { appt = true; }
+
+  // Layer 3: explicit user Step 4 overrides (highest precedence)
+  if (u.posEnabled !== undefined)                pos    = Boolean(u.posEnabled);
+  if (u.hasTradeShop !== undefined)              shop   = Boolean(u.hasTradeShop);
+  if (u.hasMobileWorkforce !== undefined)        mobile = Boolean(u.hasMobileWorkforce);
+  if (u.appointmentBookingEnabled !== undefined) appt   = Boolean(u.appointmentBookingEnabled);
+  if (u.multiBranchEnabled !== undefined)        branch = Boolean(u.multiBranchEnabled);
+
+  return {
+    posEnabled: pos,
+    hasTradeShop: shop,
+    hasMobileWorkforce: mobile,
+    appointmentBookingEnabled: appt,
+    multiBranchEnabled: branch,
+  };
+}
+
 type Tx = Parameters<Parameters<typeof db["transaction"]>[0]>[0];
 
 export async function getIndustryBySlug(slug: string) {

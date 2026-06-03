@@ -7,6 +7,7 @@ import {
   industryJobTypesTable,
   industryChecklistsTable,
   industryDocumentTemplatesTable,
+  tenantTypesTable,
 } from "@workspace/db";
 import { requireSuperAdmin, requireTenant } from "../middlewares/auth";
 import {
@@ -22,6 +23,37 @@ import {
 } from "@workspace/api-zod";
 
 const router: IRouter = Router();
+
+router.get("/v1/tenant-types", async (_req, res): Promise<void> => {
+  const types = await db
+    .select()
+    .from(tenantTypesTable)
+    .orderBy(tenantTypesTable.categorySlug, tenantTypesTable.sortOrder);
+
+  const groupMap = new Map<string, { category: string; categorySlug: string; types: typeof types }>();
+  for (const t of types) {
+    if (!groupMap.has(t.categorySlug)) {
+      groupMap.set(t.categorySlug, { category: t.category, categorySlug: t.categorySlug, types: [] });
+    }
+    groupMap.get(t.categorySlug)!.types.push(t);
+  }
+
+  res.json(
+    Array.from(groupMap.values()).map((g) => ({
+      category: g.category,
+      categorySlug: g.categorySlug,
+      types: g.types.map((t) => ({
+        slug: t.slug,
+        name: t.name,
+        category: t.category,
+        categorySlug: t.categorySlug,
+        sortOrder: t.sortOrder,
+        industrySlug: (t as any).industrySlug ?? null,
+        defaultModules: t.defaultModules ?? {},
+      })),
+    })),
+  );
+});
 
 router.get("/v1/industries", async (_req, res): Promise<void> => {
   const industries = await db

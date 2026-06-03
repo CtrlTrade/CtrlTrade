@@ -75,6 +75,8 @@ export async function serializeTenant(t: Tenant) {
     tradeCategorySlugs: slugs,
     parentTenantId: t.parentTenantId ?? null,
     require2fa: t.require2fa,
+    tenantType: t.tenantType ?? null,
+    tenantCategory: t.tenantCategory ?? null,
     whiteLabelConfig: t.whiteLabelConfig ?? null,
   };
 }

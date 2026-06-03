@@ -9,6 +9,7 @@ import {
   tradeCategoriesTable,
   tenantTradeCategoriesTable,
   industriesTable,
+  tenantTypesTable,
 } from "@workspace/db";
 import { eq as drizzleEq } from "drizzle-orm";
 import {
@@ -24,7 +25,7 @@ import { ensurePriceIds, buildLineItems } from "../lib/stripeSubscription";
 import { PRICING } from "../lib/pricing";
 import { logAudit } from "../lib/audit";
 import { platformReferralLinksTable, platformReferralConversionsTable } from "@workspace/db";
-import { getIndustryBySlug, getIndustryDetailById, copyIndustryContentToTenant } from "../lib/industryProvisioning";
+import { getIndustryBySlug, getIndustryDetailById, copyIndustryContentToTenant, computeTenantModuleFlags } from "../lib/industryProvisioning";
 
 function readRefCookie(req: { headers: { cookie?: string } }): string | null {
   const header = req.headers.cookie;
@@ -57,6 +58,21 @@ router.post("/v1/auth/signup", async (req, res): Promise<void> => {
   if (existing.length > 0) {
     res.status(409).json({ error: "An account with that email already exists" });
     return;
+  }
+
+  // Validate tenantTypeSlug BEFORE any Stripe resources are created
+  const rawTenantTypeSlug = (body as any).tenantTypeSlug as string | null | undefined;
+  let preloadedTenantType: (typeof tenantTypesTable.$inferSelect) | null = null;
+  if (rawTenantTypeSlug) {
+    const [row] = await db
+      .select()
+      .from(tenantTypesTable)
+      .where(drizzleEq(tenantTypesTable.slug, rawTenantTypeSlug));
+    if (!row) {
+      res.status(400).json({ error: `Unknown tenantTypeSlug: ${rawTenantTypeSlug}` });
+      return;
+    }
+    preloadedTenantType = row;
   }
 
   const stripe = await getUncachableStripeClient();
@@ -175,9 +191,19 @@ router.post("/v1/auth/signup", async (req, res): Promise<void> => {
       }
     }
 
-    const industrySlugValue = (body as any).industrySlug as string | null | undefined;
-    if (industrySlugValue) {
-      const [ind] = await tx.select().from(industriesTable).where(drizzleEq(industriesTable.slug, industrySlugValue));
+    // Resolve industry: explicit override takes priority, else fall back to tenant type's mapped industry
+    let resolvedIndustrySlug = (body as any).industrySlug as string | null | undefined;
+
+    // Use pre-validated tenant type row (validated before Stripe creation)
+    const tenantTypeRow = preloadedTenantType;
+
+    // Use tenant type's mapped industry slug as fallback
+    if (!resolvedIndustrySlug && tenantTypeRow?.industrySlug) {
+      resolvedIndustrySlug = tenantTypeRow.industrySlug;
+    }
+
+    if (resolvedIndustrySlug) {
+      const [ind] = await tx.select().from(industriesTable).where(drizzleEq(industriesTable.slug, resolvedIndustrySlug));
       if (ind) {
         await tx.update(tenantsTable).set({ industryId: ind.id }).where(drizzleEq(tenantsTable.id, tenant.id));
         (tenant as any).industryId = ind.id;
@@ -187,6 +213,35 @@ router.post("/v1/auth/signup", async (req, res): Promise<void> => {
           await copyIndustryContentToTenant(tx, tenant.id, industryDetail);
         }
       }
+    }
+
+    // Compute authoritative module flags for this tenant:
+    //   Layer 1 — type defaultModules (server-side authority)
+    //   Layer 2 — follow-up answer boosts (additive)
+    //   Layer 3 — explicit Step 4 user overrides from payload (highest precedence)
+    if (tenantTypeRow) {
+      const flags = computeTenantModuleFlags({
+        tenantTypeDefaults: tenantTypeRow.defaultModules ?? {},
+        hasTradeCounter: Boolean((body as any).hasTradeCounter),
+        hasWarehouse:    Boolean((body as any).hasWarehouse),
+        hasShowroom:     Boolean((body as any).hasShowroom),
+        userOverrides: {
+          posEnabled:                (body as any).posEnabled,
+          hasTradeShop:              (body as any).hasTradeShop,
+          hasMobileWorkforce:        (body as any).hasMobileWorkforce,
+          appointmentBookingEnabled: (body as any).appointmentBookingEnabled,
+          multiBranchEnabled:        (body as any).multiBranchEnabled,
+        },
+      });
+
+      const moduleUpdates = {
+        tenantType:     tenantTypeRow.slug,
+        tenantCategory: tenantTypeRow.categorySlug,
+        ...flags,
+      };
+
+      await tx.update(tenantsTable).set(moduleUpdates).where(drizzleEq(tenantsTable.id, tenant.id));
+      Object.assign(tenant, moduleUpdates);
     }
 
     await tx.insert(subscriptionsTable).values({

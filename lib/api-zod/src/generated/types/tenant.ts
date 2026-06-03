@@ -71,5 +71,9 @@ export interface Tenant {
   /** @nullable */
   parentTenantId?: string | null;
   require2fa?: boolean;
+  /** @nullable */
+  tenantType?: string | null;
+  /** @nullable */
+  tenantCategory?: string | null;
   whiteLabelConfig?: null | WhiteLabelConfig;
 }

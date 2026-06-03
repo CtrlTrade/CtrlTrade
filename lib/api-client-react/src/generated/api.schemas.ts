@@ -237,6 +237,30 @@ export interface Pricing {
   trialDays: number;
 }
 
+export type TenantTypeDefaultModules = {
+  posEnabled?: boolean;
+  hasTradeShop?: boolean;
+  hasMobileWorkforce?: boolean;
+  appointmentBookingEnabled?: boolean;
+  multiBranchEnabled?: boolean;
+};
+
+export interface TenantType {
+  slug: string;
+  name: string;
+  category: string;
+  categorySlug: string;
+  sortOrder: number;
+  industrySlug?: string | null;
+  defaultModules: TenantTypeDefaultModules;
+}
+
+export interface TenantTypesGroup {
+  category: string;
+  categorySlug: string;
+  types: TenantType[];
+}
+
 export interface TradeCategory {
   id: string;
   slug: string;
@@ -292,6 +316,10 @@ export interface SignupPayload {
   aiModulesEnabled?: string[];
   communicationChannels?: string[];
   posEnabled?: boolean;
+  tenantTypeSlug?: string;
+  hasTradeCounter?: boolean;
+  hasWarehouse?: boolean;
+  hasShowroom?: boolean;
 }
 
 export interface LoginCredentials {
@@ -457,6 +485,10 @@ export interface Tenant {
   /** @nullable */
   parentTenantId?: string | null;
   require2fa?: boolean;
+  /** @nullable */
+  tenantType?: string | null;
+  /** @nullable */
+  tenantCategory?: string | null;
   whiteLabelConfig?: null | WhiteLabelConfig;
 }
 
