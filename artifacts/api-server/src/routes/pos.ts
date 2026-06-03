@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { and, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import {
   db,
   usersTable,
@@ -1328,7 +1328,7 @@ router.get("/v1/pos/downloads", async (_req, res): Promise<void> => {
   const rows = await db
     .select()
     .from(platformSettingsTable)
-    .where(sql`key IN ('windows_url', 'macos_url')`);
+    .where(inArray(platformSettingsTable.key, ["windows_url", "macos_url"]));
   const map = Object.fromEntries(rows.map((r) => [r.key, r.value ?? null]));
   res.json({
     windowsUrl: (map["windows_url"] as string | null | undefined) ?? null,

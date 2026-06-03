@@ -104,7 +104,10 @@ async function main() {
     console.log(`  email: ${ownerEmail}`);
     console.log(`  password: ${ownerPassword}`);
   } else {
-    console.log(`Tenant admin user already exists (${ownerEmail}).`);
+    // Always keep the password hash in sync with the seed definition
+    const hash = await bcrypt.hash(ownerPassword, 10);
+    await db.update(usersTable).set({ passwordHash: hash }).where(eq(usersTable.email, ownerEmail));
+    console.log(`Tenant admin user already exists (${ownerEmail}). Password hash refreshed.`);
   }
 
   const existingMembership = await db

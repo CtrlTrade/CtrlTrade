@@ -28,6 +28,20 @@ const UpdateEntryInput = UpdateTimesheetEntryBody;
 const RejectEntryInput = RejectTimesheetEntryBody;
 const TimesheetsQuery = ListTimesheetsQueryParams;
 
+const LocationBodySchema = z.object({
+  lat: z.number().nullable().optional(),
+  lng: z.number().nullable().optional(),
+  notes: z.string().nullable().optional(),
+});
+
+function parseLocationBody(raw: unknown) {
+  return LocationBodySchema.parse(raw);
+}
+
+function parseTimesheetsQuery(raw: unknown) {
+  return TimesheetsQuery.parse(raw);
+}
+
 function serializeCheckin(
   c: JobCheckin,
   jobNumber: string | null,

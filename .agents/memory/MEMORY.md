@@ -5,3 +5,5 @@
 - [DB schema drift fix pattern](db-schema-drift.md) — when Drizzle schema has a column the live DB lacks, apply via ALTER TABLE … ADD COLUMN IF NOT EXISTS directly via executeSql
 - [Tenant foreign-ID ownership](tenant-foreign-id-ownership.md) — tenant write routes must verify client-supplied branchId/licenceId belong to the tenant; global FKs allow cross-tenant injection
 - [POS session binding enforcement](pos-session-binding-enforcement.md) — POS write-mode resolver must require ALL THREE token bindings (licence+terminal+surface) & re-validate per write; partial token → locked
+- [Seed password hash staleness](seed-password-hash-staleness.md) — seed INSERT-only skips hash on re-run; always re-hash on update path or bcrypt compare silently fails
+- [bcryptjs compare debugging](bcryptjs-compare-debugging.md) — compare() returning false despite correct password means the stored hash was created from a different password; test with node -e to verify
