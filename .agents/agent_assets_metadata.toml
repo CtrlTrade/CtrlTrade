@@ -6,6 +6,12 @@ uri = "file://artifacts/ctrltradepos/assets/images/icon.png"
 type = "image"
 title = "ctrltradepos icon"
 
+[[generated]]
+id = "xtgyzIGY7aT_wVZomQcKo"
+uri = "file://desktop/ctrltradepos-electron/assets/icon.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "2e3A6QK_2M-GodpQlmYCn"
 uri = "file://leads_export.csv"

@@ -8,6 +8,7 @@ function createWindow(): BrowserWindow {
     minWidth: 1024,
     minHeight: 768,
     title: "CtrlTradePos",
+    icon: path.join(__dirname, "..", "assets", "icon.png"),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

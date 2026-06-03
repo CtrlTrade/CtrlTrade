@@ -19,12 +19,14 @@
   "build": {
     "appId": "com.ctrltrade.pos",
     "productName": "CtrlTradePos",
+    "icon": "assets/icon",
     "directories": {
       "output": "dist"
     },
     "files": [
       "src/main.js",
-      "www/**"
+      "www/**",
+      "assets/**"
     ],
     "win": {
       "target": "nsis"
