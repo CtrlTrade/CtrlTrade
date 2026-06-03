@@ -2265,6 +2265,11 @@ export const posTerminalsTable = pgTable(
   (t) => ({
     tenantIdx: index("pos_terminals_tenant_idx").on(t.tenantId),
     codeUniq: unique("pos_terminals_tenant_code_uniq").on(t.tenantId, t.terminalCode),
+    // One active terminal per licence — enforced at DB level so concurrent
+    // registrations cannot race past the application-layer guard.
+    activeLicenceUniq: uniqueIndex("pos_terminals_active_licence_uniq")
+      .on(t.licenceId)
+      .where(sql`licence_id IS NOT NULL AND status = 'active'`),
   }),
 );
 

@@ -179,6 +179,25 @@ router.post(
       return;
     }
 
+    // Enforce 1:1 licence↔terminal — a licence may only have one ACTIVE
+    // terminal at a time. This guards per-till billing (£59.99/till) and
+    // prevents licence sharing across multiple physical tills.
+    const [existingActive] = await db
+      .select({ id: posTerminalsTable.id, code: posTerminalsTable.terminalCode })
+      .from(posTerminalsTable)
+      .where(
+        and(
+          eq(posTerminalsTable.licenceId, licenceId),
+          eq(posTerminalsTable.status, "active"),
+        ),
+      );
+    if (existingActive) {
+      res.status(409).json({
+        error: `This licence already has an active terminal (${existingActive.code}). Deactivate it first, or use a different licence.`,
+      });
+      return;
+    }
+
     const code = await nextTerminalCode(tenantId);
     const now = new Date();
     const [row] = await db
@@ -235,6 +254,33 @@ router.patch(
       res.status(400).json({ error: "Licence not found for this business" });
       return;
     }
+
+    // When rebinding to a different licence, ensure the target licence does
+    // not already have another active terminal (1:1 per-till billing invariant).
+    const newLicenceId = parsed.data.licenceId;
+    const isRebinding = newLicenceId !== undefined && newLicenceId !== existing.licenceId;
+    const isActivating =
+      parsed.data.status === "active" && existing.status !== "active" && existing.licenceId;
+    const licenceToCheck = isRebinding ? newLicenceId : isActivating ? existing.licenceId : null;
+    if (licenceToCheck) {
+      const [conflict] = await db
+        .select({ id: posTerminalsTable.id, code: posTerminalsTable.terminalCode })
+        .from(posTerminalsTable)
+        .where(
+          and(
+            eq(posTerminalsTable.licenceId, licenceToCheck),
+            eq(posTerminalsTable.status, "active"),
+          ),
+        );
+      // Allow the terminal to keep its own active slot (not a conflict with itself)
+      if (conflict && conflict.id !== terminalId) {
+        res.status(409).json({
+          error: `Licence already has an active terminal (${conflict.code}). Deactivate it first.`,
+        });
+        return;
+      }
+    }
+
     const patch: Record<string, unknown> = {};
     if (parsed.data.name !== undefined) patch.name = parsed.data.name;
     if (parsed.data.branchId !== undefined) patch.branchId = parsed.data.branchId;
