@@ -47,7 +47,7 @@ const platforms = [
     title: "iOS",
     desc: "Sell from an iPhone or iPad. Portable till for trade counters, events, and pop-up locations.",
     cta: "App Store",
-    href: "#",
+    href: null,
     external: true,
   },
   {
@@ -55,7 +55,7 @@ const platforms = [
     title: "Android",
     desc: "Native Android app for phones and tablets. Works with Bluetooth scanners and portable printers.",
     cta: "Google Play",
-    href: "#",
+    href: null,
     external: true,
   },
 ];
@@ -125,11 +125,18 @@ export function CtrlTradePosPage() {
                 <h3 className="text-lg font-bold mb-2">{p.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">{p.desc}</p>
                 {p.external ? (
-                  <a href={p.href} target="_blank" rel="noopener noreferrer">
-                    <Button size="sm" variant="outline" className="w-full font-semibold">{p.cta}</Button>
-                  </a>
+                  p.href ? (
+                    <a href={p.href} target="_blank" rel="noopener noreferrer">
+                      <Button size="sm" variant="outline" className="w-full font-semibold">{p.cta}</Button>
+                    </a>
+                  ) : (
+                    <div className="space-y-2">
+                      <Button size="sm" variant="outline" className="w-full font-semibold opacity-50 cursor-not-allowed" disabled>{p.cta}</Button>
+                      <p className="text-xs text-center text-muted-foreground">Coming Soon</p>
+                    </div>
+                  )
                 ) : (
-                  <Link href={p.href}>
+                  <Link href={p.href!}>
                     <Button size="sm" className="w-full font-semibold">{p.cta}</Button>
                   </Link>
                 )}
