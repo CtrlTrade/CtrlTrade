@@ -2,6 +2,10 @@
   "name": "@workspace/ctrltradepos-electron",
   "version": "0.0.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CtrlTrade/CtrlTrade.git"
+  },
   "main": "src/main.js",
   "scripts": {
     "build:web": "node scripts/check-env.mjs && dotenv -e .env --override=false -- pnpm --filter @workspace/ctrltradepos exec expo export --platform web --output-dir ../../desktop/ctrltradepos-electron/www",
