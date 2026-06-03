@@ -23,6 +23,8 @@ import {
   useCreatePosSale,
   useValidatePosLicence,
   useListPosTradeAccounts,
+  posLogin,
+  setAuthTokenGetter,
 } from "@workspace/api-client-react";
 import {
   getPosHardware,
@@ -1291,6 +1293,148 @@ function LicenceGate({
 }
 
 // ---------------------------------------------------------------------------
+// Web POS activation gate — obtains a POS bearer token via /v1/pos/login.
+//
+// The /v1/pos/* write endpoints (open session, create sale, etc.) require
+// requirePosAuth middleware which validates a signed POS bearer token bound to
+// a specific user, tenant, licence, and terminal. Regular web session cookies
+// are NOT accepted for these endpoints. This gate acquires and stores that
+// token, then registers it via setAuthTokenGetter so every subsequent API
+// call from the till includes Authorization: Bearer <pos-token>.
+// ---------------------------------------------------------------------------
+
+const WEB_POS_TOKEN_KEY = "ctrltradepos-web-pos-token";
+const WEB_POS_TERMINAL_KEY = "ctrltradepos-web-terminal-code";
+
+function WebPosActivationGate({
+  children,
+  onActivated,
+}: {
+  children: React.ReactNode;
+  onActivated?: (type: LicenceType) => void;
+}) {
+  const licenceKey = localStorage.getItem("ctrltradepos-licence-key") ?? "";
+
+  const [activated, setActivated] = useState(() => {
+    return !!localStorage.getItem(WEB_POS_TOKEN_KEY);
+  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [terminalCode, setTerminalCode] = useState(
+    () => localStorage.getItem(WEB_POS_TERMINAL_KEY) ?? "",
+  );
+  const [error, setError] = useState<string | null>(null);
+  const [activating, setActivating] = useState(false);
+
+  // On mount: if a stored token exists, register it immediately so API calls work.
+  useEffect(() => {
+    const token = localStorage.getItem(WEB_POS_TOKEN_KEY);
+    if (token) {
+      setAuthTokenGetter(() => token);
+    }
+    // Cleanup: unregister POS auth when navigating away from the till.
+    return () => {
+      setAuthTokenGetter(null);
+    };
+  }, []);
+
+  const handleActivate = async () => {
+    if (!email.trim() || !password.trim() || !terminalCode.trim()) return;
+    setActivating(true);
+    setError(null);
+    try {
+      const session = await posLogin({
+        email: email.trim(),
+        password: password.trim(),
+        licenceKey: licenceKey || null,
+        terminalCode: terminalCode.trim().toUpperCase(),
+        surface: "web",
+      });
+      const token = session.token;
+      localStorage.setItem(WEB_POS_TOKEN_KEY, token);
+      localStorage.setItem(WEB_POS_TERMINAL_KEY, terminalCode.trim().toUpperCase());
+      setAuthTokenGetter(() => token);
+      const licType = ((session as { licence?: { type?: string } }).licence?.type as LicenceType | undefined) ?? "web";
+      onActivated?.(licType);
+      setActivated(true);
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Activation failed — check your credentials and terminal code";
+      setError(msg);
+    } finally {
+      setActivating(false);
+    }
+  };
+
+  if (!activated) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-8" data-testid="pos-activation-gate">
+        <div className="max-w-sm w-full space-y-5">
+          <div className="text-center">
+            <CreditCard className="h-12 w-12 text-primary mx-auto mb-3" />
+            <h2 className="text-xl font-bold">SIGN IN TO TILL</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Enter your staff credentials and terminal code to activate this till.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email address"
+              autoComplete="username"
+              className="w-full h-11 rounded-xl border border-border bg-card px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              data-testid="pos-email-input"
+              onKeyDown={(e) => e.key === "Enter" && handleActivate()}
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              autoComplete="current-password"
+              className="w-full h-11 rounded-xl border border-border bg-card px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              data-testid="pos-password-input"
+              onKeyDown={(e) => e.key === "Enter" && handleActivate()}
+            />
+            <input
+              type="text"
+              value={terminalCode}
+              onChange={(e) => setTerminalCode(e.target.value.toUpperCase())}
+              placeholder="Terminal code (e.g. TILL-001)"
+              autoComplete="off"
+              className="w-full h-11 rounded-xl border border-border bg-card px-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              data-testid="pos-terminal-input"
+              onKeyDown={(e) => e.key === "Enter" && handleActivate()}
+            />
+            {error && (
+              <div className="flex items-center gap-2 text-sm text-destructive">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                {error}
+              </div>
+            )}
+          </div>
+          <button
+            onPointerDown={handleActivate}
+            disabled={activating || !email.trim() || !password.trim() || !terminalCode.trim()}
+            className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold active:scale-[0.98] transition-all touch-manipulation disabled:opacity-50"
+            data-testid="pos-activate-button"
+          >
+            {activating ? "ACTIVATING…" : "ACTIVATE TILL"}
+          </button>
+          <p className="text-xs text-center text-muted-foreground">
+            Activation is stored for 14 days. Clear browser storage to sign out.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
+
+// ---------------------------------------------------------------------------
 // Main PosTill component
 // ---------------------------------------------------------------------------
 
@@ -1579,6 +1723,7 @@ export function PosTill() {
       data-testid="pos-till"
     >
       <LicenceGate onValidated={setHwLicenceType}>
+        <WebPosActivationGate onActivated={setHwLicenceType}>
         <SessionGate>
           {/* relative wrapper so HardwarePanel can be position:absolute over the till */}
           <div className="flex flex-col flex-1 overflow-hidden relative">
@@ -1703,6 +1848,7 @@ export function PosTill() {
           )}
           </div>{/* end relative wrapper */}
         </SessionGate>
+        </WebPosActivationGate>
       </LicenceGate>
     </div>
   );
