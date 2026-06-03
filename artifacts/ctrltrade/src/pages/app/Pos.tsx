@@ -18,6 +18,7 @@ import {
   useListSuppliers,
 } from "@workspace/api-client-react";
 import { PosLicences } from "@/components/pos/PosLicences";
+import { PosDownloads } from "@/components/pos/PosDownloads";
 
 export function AppPos() {
   const { data: products } = useListProducts();
@@ -69,6 +70,8 @@ export function AppPos() {
           </Link>
         ))}
       </div>
+
+      <PosDownloads />
 
       <PosLicences />
     </div>
