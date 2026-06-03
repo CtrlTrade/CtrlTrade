@@ -4,7 +4,7 @@
   "private": true,
   "main": "src/main.js",
   "scripts": {
-    "build:web": "dotenv -e .env --override=false -- pnpm --filter @workspace/ctrltradepos exec expo export --platform web --output-dir ../../desktop/ctrltradepos-electron/www",
+    "build:web": "node scripts/check-env.mjs && dotenv -e .env --override=false -- pnpm --filter @workspace/ctrltradepos exec expo export --platform web --output-dir ../../desktop/ctrltradepos-electron/www",
     "build:main": "tsc -p tsconfig.json",
     "start": "pnpm run build:main && electron .",
     "dist:win": "pnpm run build:main && electron-builder --win",
