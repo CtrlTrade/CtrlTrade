@@ -6,8 +6,7 @@
     "outDir": "src",
     "rootDir": "src",
     "target": "es2022",
-    "types": ["node"],
-    "customConditions": []
+    "types": ["node"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "www"]
