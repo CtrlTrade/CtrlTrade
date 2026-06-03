@@ -32,11 +32,28 @@ interface TokenPayload {
   u: string;
   t: string;
   e: number;
+  /** Licence binding captured at till open, re-validated on each mutating request. */
+  lk?: string;
+  tc?: string;
+  sf?: "web" | "desktop";
 }
 
-export function signPosToken(userId: string, tenantId: string): { token: string; expiresAt: Date } {
+export interface PosLicenceBinding {
+  licenceKey?: string | null;
+  terminalCode?: string | null;
+  surface?: "web" | "desktop";
+}
+
+export function signPosToken(
+  userId: string,
+  tenantId: string,
+  licence?: PosLicenceBinding,
+): { token: string; expiresAt: Date } {
   const expiresAt = new Date(Date.now() + TOKEN_TTL_MS);
   const payload: TokenPayload = { u: userId, t: tenantId, e: expiresAt.getTime() };
+  if (licence?.licenceKey) payload.lk = licence.licenceKey;
+  if (licence?.terminalCode) payload.tc = licence.terminalCode;
+  if (licence?.surface) payload.sf = licence.surface;
   const body = b64url(Buffer.from(JSON.stringify(payload), "utf8"));
   const sig = b64url(crypto.createHmac("sha256", getSecret()).update(body).digest());
   return { token: `${body}.${sig}`, expiresAt };
@@ -68,6 +85,9 @@ export interface PosAuthContext {
   user: User;
   tenant: Tenant;
   membership: Membership;
+  licenceKey?: string;
+  terminalCode?: string;
+  surface?: "web" | "desktop";
 }
 
 declare module "express-serve-static-core" {
@@ -106,6 +126,13 @@ export async function requirePosAuth(req: Request, res: Response, next: NextFunc
     res.status(403).json({ error: "No membership for tenant" });
     return;
   }
-  req.posAuth = { user, tenant, membership };
+  req.posAuth = {
+    user,
+    tenant,
+    membership,
+    licenceKey: payload.lk,
+    terminalCode: payload.tc,
+    surface: payload.sf,
+  };
   next();
 }

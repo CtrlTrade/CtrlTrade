@@ -954,6 +954,16 @@ router.post("/v1/admin/tenants/:tenantId/pos-licences", async (req, res): Promis
     res.status(404).json({ error: "Tenant not found" });
     return;
   }
+  if (parsed.data.branchId) {
+    const [branch] = await db
+      .select()
+      .from(branchesTable)
+      .where(and(eq(branchesTable.id, parsed.data.branchId), eq(branchesTable.tenantId, tenantId)));
+    if (!branch) {
+      res.status(400).json({ error: "Branch does not belong to this business." });
+      return;
+    }
+  }
   const status = parsed.data.status ?? "active";
   const trialEndsAt =
     status === "trial"
@@ -1009,7 +1019,19 @@ router.patch("/v1/admin/pos-licences/:licenceId", async (req, res): Promise<void
       patch.trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
     }
   }
-  if (parsed.data.branchId !== undefined) patch.branchId = parsed.data.branchId;
+  if (parsed.data.branchId !== undefined) {
+    if (parsed.data.branchId) {
+      const [branch] = await db
+        .select()
+        .from(branchesTable)
+        .where(and(eq(branchesTable.id, parsed.data.branchId), eq(branchesTable.tenantId, existing.tenantId)));
+      if (!branch) {
+        res.status(400).json({ error: "Branch does not belong to this business." });
+        return;
+      }
+    }
+    patch.branchId = parsed.data.branchId;
+  }
   if (parsed.data.notes !== undefined) patch.notes = parsed.data.notes;
 
   const [updated] = await db

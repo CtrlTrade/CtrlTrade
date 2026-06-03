@@ -268,6 +268,7 @@ import type {
   PosLicenceList,
   PosLicenceValidationRequest,
   PosLicenceValidationResult,
+  PosLoginCredentials,
   PosProduct,
   PosReceiptReceipt,
   PosReceiptRequest,
@@ -2041,7 +2042,7 @@ export const getPosLoginUrl = () => {
 /**
  * @summary Authenticate a field/control user for the CtrlTradePos till
  */
-export const posLogin = async (loginCredentials: LoginCredentials, options?: RequestInit): Promise<PosSession> => {
+export const posLogin = async (posLoginCredentials: PosLoginCredentials, options?: RequestInit): Promise<PosSession> => {
 
   return customFetch<PosSession>(getPosLoginUrl(),
   {
@@ -2049,7 +2050,7 @@ export const posLogin = async (loginCredentials: LoginCredentials, options?: Req
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
-      loginCredentials,)
+      posLoginCredentials,)
   }
 );}
 
@@ -2057,8 +2058,8 @@ export const posLogin = async (loginCredentials: LoginCredentials, options?: Req
 
 
 export const getPosLoginMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof posLogin>>, TError,{data: BodyType<LoginCredentials>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof posLogin>>, TError,{data: BodyType<LoginCredentials>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof posLogin>>, TError,{data: BodyType<PosLoginCredentials>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof posLogin>>, TError,{data: BodyType<PosLoginCredentials>}, TContext> => {
 
 const mutationKey = ['posLogin'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -2070,7 +2071,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof posLogin>>, {data: BodyType<LoginCredentials>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof posLogin>>, {data: BodyType<PosLoginCredentials>}> = (props) => {
           const {data} = props ?? {};
 
           return  posLogin(data,requestOptions)
@@ -2084,18 +2085,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type PosLoginMutationResult = NonNullable<Awaited<ReturnType<typeof posLogin>>>
-    export type PosLoginMutationBody = BodyType<LoginCredentials>
+    export type PosLoginMutationBody = BodyType<PosLoginCredentials>
     export type PosLoginMutationError = ErrorType<unknown>
 
     /**
  * @summary Authenticate a field/control user for the CtrlTradePos till
  */
 export const usePosLogin = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof posLogin>>, TError,{data: BodyType<LoginCredentials>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof posLogin>>, TError,{data: BodyType<PosLoginCredentials>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof posLogin>>,
         TError,
-        {data: BodyType<LoginCredentials>},
+        {data: BodyType<PosLoginCredentials>},
         TContext
       > => {
       return useMutation(getPosLoginMutationOptions(options));

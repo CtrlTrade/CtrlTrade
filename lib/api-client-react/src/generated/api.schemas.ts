@@ -300,6 +300,23 @@ export interface LoginCredentials {
   password: string;
 }
 
+export type PosLoginCredentialsSurface = typeof PosLoginCredentialsSurface[keyof typeof PosLoginCredentialsSurface];
+
+
+export const PosLoginCredentialsSurface = {
+  web: 'web',
+  desktop: 'desktop',
+} as const;
+
+export interface PosLoginCredentials {
+  email: string;
+  /** @minLength 1 */
+  password: string;
+  licenceKey?: string | null;
+  terminalCode?: string | null;
+  surface?: PosLoginCredentialsSurface;
+}
+
 export interface TotpSetup {
   otpAuthUri: string;
   secret: string;
@@ -1718,11 +1735,23 @@ export interface ExpiryAttention {
   items: ExpiryItem[];
 }
 
+export type PosSessionMode = typeof PosSessionMode[keyof typeof PosSessionMode];
+
+
+export const PosSessionMode = {
+  full: 'full',
+  read_only: 'read_only',
+  locked: 'locked',
+} as const;
+
 export interface PosSession {
   token: string;
   expiresAt: string;
   user: SessionUser;
   tenant: Tenant;
+  mode?: PosSessionMode;
+  licence?: PosLicence;
+  terminal?: PosTerminal;
 }
 
 export interface PosJob {

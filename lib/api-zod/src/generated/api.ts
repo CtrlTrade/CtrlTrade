@@ -414,7 +414,10 @@ export const UpdateAdminIntegrationCatalogueResponse = zod.object({
 
 export const PosLoginBody = zod.object({
   "email": zod.string().email(),
-  "password": zod.string().min(1)
+  "password": zod.string().min(1),
+  "licenceKey": zod.string().nullish(),
+  "terminalCode": zod.string().nullish(),
+  "surface": zod.enum(['web', 'desktop']).optional()
 })
 
 export const PosLoginResponse = zod.object({
@@ -499,7 +502,50 @@ export const PosLoginResponse = zod.object({
   "dkimVerified": zod.boolean().optional(),
   "legalEntity": zod.string().optional()
 })]).optional()
-})
+}),
+  "mode": zod.enum(['full', 'read_only', 'locked']).optional(),
+  "licence": zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceKey": zod.string(),
+  "type": zod.enum(['web', 'desktop', 'hybrid']),
+  "status": zod.enum(['active', 'trial', 'suspended', 'expired', 'revoked', 'read_only']),
+  "trialEndsAt": zod.string().nullish(),
+  "expiresAt": zod.string().nullish(),
+  "lastCheckAt": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "terminals": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "terminalCode": zod.string(),
+  "name": zod.string(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']),
+  "status": zod.enum(['active', 'inactive']),
+  "registeredAt": zod.string().nullish(),
+  "lastSeenAt": zod.string().nullish(),
+  "createdAt": zod.string()
+}))
+}).optional(),
+  "terminal": zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "terminalCode": zod.string(),
+  "name": zod.string(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']),
+  "status": zod.enum(['active', 'inactive']),
+  "registeredAt": zod.string().nullish(),
+  "lastSeenAt": zod.string().nullish(),
+  "createdAt": zod.string()
+}).optional()
 })
 
 
@@ -588,7 +634,50 @@ export const GetPosSessionResponse = zod.object({
   "dkimVerified": zod.boolean().optional(),
   "legalEntity": zod.string().optional()
 })]).optional()
-})
+}),
+  "mode": zod.enum(['full', 'read_only', 'locked']).optional(),
+  "licence": zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceKey": zod.string(),
+  "type": zod.enum(['web', 'desktop', 'hybrid']),
+  "status": zod.enum(['active', 'trial', 'suspended', 'expired', 'revoked', 'read_only']),
+  "trialEndsAt": zod.string().nullish(),
+  "expiresAt": zod.string().nullish(),
+  "lastCheckAt": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "terminals": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "terminalCode": zod.string(),
+  "name": zod.string(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']),
+  "status": zod.enum(['active', 'inactive']),
+  "registeredAt": zod.string().nullish(),
+  "lastSeenAt": zod.string().nullish(),
+  "createdAt": zod.string()
+}))
+}).optional(),
+  "terminal": zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "branchId": zod.string().nullish(),
+  "branchName": zod.string().nullish(),
+  "licenceId": zod.string().nullish(),
+  "terminalCode": zod.string(),
+  "name": zod.string(),
+  "mode": zod.enum(['trade_counter', 'showroom', 'warehouse']),
+  "status": zod.enum(['active', 'inactive']),
+  "registeredAt": zod.string().nullish(),
+  "lastSeenAt": zod.string().nullish(),
+  "createdAt": zod.string()
+}).optional()
 })
 
 

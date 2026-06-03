@@ -451,7 +451,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginCredentials"
+              $ref: "#/components/schemas/PosLoginCredentials"
       responses:
         "200":
           description: OK
@@ -6474,6 +6474,16 @@ components:
         email: { type: string, format: email }
         password: { type: string, minLength: 1 }
 
+    PosLoginCredentials:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 1 }
+        licenceKey: { type: string, nullable: true }
+        terminalCode: { type: string, nullable: true }
+        surface: { type: string, enum: [web, desktop] }
+
     TotpSetup:
       type: object
       required: [otpAuthUri, secret]
@@ -8008,6 +8018,9 @@ components:
         expiresAt: { type: string, format: date-time }
         user: { $ref: "#/components/schemas/SessionUser" }
         tenant: { $ref: "#/components/schemas/Tenant" }
+        mode: { type: string, enum: [full, read_only, locked] }
+        licence: { $ref: "#/components/schemas/PosLicence" }
+        terminal: { $ref: "#/components/schemas/PosTerminal" }
 
     PosJob:
       type: object

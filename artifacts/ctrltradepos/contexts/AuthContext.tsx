@@ -11,6 +11,10 @@ import { posLogin, getPosSession } from "@workspace/api-client-react";
 import type { PosSession } from "@workspace/api-client-react";
 
 const TOKEN_KEY = "ctrltradepos.token";
+const LICENCE_KEY = "ctrltradepos.licenceKey";
+const TERMINAL_KEY = "ctrltradepos.terminalCode";
+
+export type PosMode = "full" | "read_only" | "locked";
 
 type AuthState =
   | { status: "loading"; session: null }
@@ -19,7 +23,13 @@ type AuthState =
 
 interface AuthContextValue {
   state: AuthState;
-  signIn: (email: string, password: string) => Promise<void>;
+  mode: PosMode;
+  signIn: (
+    email: string,
+    password: string,
+    licenceKey?: string,
+    terminalCode?: string,
+  ) => Promise<void>;
   signOut: () => Promise<void>;
   getToken: () => string | null;
 }
@@ -38,6 +48,10 @@ async function persistToken(token: string | null) {
   else await AsyncStorage.removeItem(TOKEN_KEY);
 }
 
+function sessionMode(session: PosSession | null): PosMode {
+  return (session?.mode as PosMode | undefined) ?? "full";
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>({ status: "loading", session: null });
 
@@ -51,6 +65,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
         memToken = stored;
+        // The POS token carries the licence binding; /v1/pos/me re-validates it
+        // and returns the current mode (full / read_only / locked).
         const session = await getPosSession();
         memToken = session.token;
         await AsyncStorage.setItem(TOKEN_KEY, session.token);
@@ -66,11 +82,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    const session = await posLogin({ email, password });
-    await persistToken(session.token);
-    setState({ status: "signed-in", session });
-  }, []);
+  const signIn = useCallback(
+    async (email: string, password: string, licenceKey?: string, terminalCode?: string) => {
+      const key = licenceKey?.trim() || (await AsyncStorage.getItem(LICENCE_KEY)) || undefined;
+      const terminal = terminalCode?.trim() || (await AsyncStorage.getItem(TERMINAL_KEY)) || undefined;
+      const session = await posLogin({
+        email,
+        password,
+        licenceKey: key ?? null,
+        terminalCode: terminal ?? null,
+        // The Expo app is a native installed till, so it activates against the
+        // Desktop POS surface of the licence (web-only licences are rejected).
+        surface: "desktop",
+      });
+      await persistToken(session.token);
+      if (key) await AsyncStorage.setItem(LICENCE_KEY, key);
+      if (terminal) await AsyncStorage.setItem(TERMINAL_KEY, terminal);
+      setState({ status: "signed-in", session });
+    },
+    [],
+  );
 
   const signOut = useCallback(async () => {
     await persistToken(null);
@@ -78,7 +109,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ state, signIn, signOut, getToken: () => memToken }),
+    () => ({
+      state,
+      mode: state.status === "signed-in" ? sessionMode(state.session) : "full",
+      signIn,
+      signOut,
+      getToken: () => memToken,
+    }),
     [state, signIn, signOut],
   );
 

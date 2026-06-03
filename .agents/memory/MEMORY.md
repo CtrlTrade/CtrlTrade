@@ -4,3 +4,4 @@
 - [requireSuperAdmin router guard scoping](requireSuperAdmin-guard-scoping.md) — unscoped router.use(requireSuperAdmin) blocks ALL routes; always scope to "/v1/admin"
 - [DB schema drift fix pattern](db-schema-drift.md) — when Drizzle schema has a column the live DB lacks, apply via ALTER TABLE … ADD COLUMN IF NOT EXISTS directly via executeSql
 - [Tenant foreign-ID ownership](tenant-foreign-id-ownership.md) — tenant write routes must verify client-supplied branchId/licenceId belong to the tenant; global FKs allow cross-tenant injection
+- [POS session binding enforcement](pos-session-binding-enforcement.md) — POS write-mode resolver must require ALL THREE token bindings (licence+terminal+surface) & re-validate per write; partial token → locked

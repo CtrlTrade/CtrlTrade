@@ -20,7 +20,7 @@ import {
   type TillSession,
 } from "@workspace/db";
 import {
-  LoginBody,
+  PosLoginBody,
   CreatePosSaleBody,
   SendPosReceiptBody,
   OpenTillSessionInput,
@@ -31,8 +31,10 @@ import {
 } from "@workspace/api-zod";
 import { verifyPassword } from "../lib/auth";
 import { serializeTenant, serializeUser } from "../lib/serializers";
-import { signPosToken, requirePosAuth } from "../lib/posAuth";
+import { signPosToken, requirePosAuth, type PosAuthContext } from "../lib/posAuth";
+import type { Request, Response, NextFunction } from "express";
 import { logAudit } from "../lib/audit";
+import { validateLicenceForOpen } from "../lib/posLicence";
 import {
   applyStockDelta,
   getOrCreateDefaultLocation,
@@ -45,7 +47,7 @@ const router: IRouter = Router();
 // POST /v1/pos/login
 // ---------------------------------------------------------------------------
 router.post("/v1/pos/login", async (req, res): Promise<void> => {
-  const parsed = LoginBody.safeParse(req.body);
+  const parsed = PosLoginBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
@@ -78,7 +80,82 @@ router.post("/v1/pos/login", async (req, res): Promise<void> => {
     return;
   }
 
-  const { token, expiresAt } = signPosToken(user.id, tenant.id);
+  // ---------------------------------------------------------------------------
+  // Licence validation (step 79): a CtrlTradePos® till may ONLY open against a
+  // specific, usable licence. A licence key is mandatory — there is no
+  // unbound/legacy path that grants till access (that would let any user with
+  // valid credentials obtain a write-capable session without a licence). We
+  // validate the full tenant ↔ branch ↔ terminal binding: locked outcomes
+  // block the open, read-only outcomes still issue a token but downgrade the
+  // till to read-only. The issued token carries the binding so every mutating
+  // request can be re-validated (see requirePosFullMode).
+  // ---------------------------------------------------------------------------
+  const surface = parsed.data.surface ?? "web";
+
+  if (!parsed.data.licenceKey) {
+    await logAudit({
+      tenantId: tenant.id,
+      actorUserId: user.id,
+      actorLabel: user.email,
+      kind: "pos.login.blocked",
+      message: `POS login blocked for ${user.email}: no licence key supplied`,
+    });
+    res.status(400).json({
+      error: "A CtrlTradePos® licence key is required to open this till.",
+      mode: "locked",
+    });
+    return;
+  }
+
+  // Every till must bind to a registered terminal (step 84). This is enforced
+  // unconditionally — not gated on the client-asserted `surface` — so a caller
+  // cannot omit/forge `surface` to skip the terminal requirement and obtain a
+  // write-capable session without a bound terminal. The terminal is provisioned
+  // by the business owner/admin before the till can activate.
+  if (!parsed.data.terminalCode) {
+    res.status(400).json({
+      error: "A terminal code is required to activate this till.",
+      mode: "locked",
+    });
+    return;
+  }
+
+  const outcome = await validateLicenceForOpen({
+    tenantId: tenant.id,
+    licenceKey: parsed.data.licenceKey,
+    terminalCode: parsed.data.terminalCode,
+    surface,
+  });
+  const mode = outcome.mode;
+  const licencePayload = outcome.licence;
+  const terminalPayload = outcome.terminal;
+
+  if (outcome.mode === "locked") {
+    await logAudit({
+      tenantId: tenant.id,
+      actorUserId: user.id,
+      actorLabel: user.email,
+      kind: "pos.login.blocked",
+      message: `POS login blocked for ${user.email}: ${outcome.message ?? "licence locked"}`,
+    });
+    res.status(403).json({
+      error: outcome.message ?? "This till licence is not active.",
+      mode: outcome.mode,
+      status: outcome.status,
+      licence: outcome.licence,
+      terminal: outcome.terminal,
+    });
+    return;
+  }
+
+  // Persist the *normalized* binding (computed surface, validated terminal) in
+  // the token so every mutating request re-validates against the same surface +
+  // terminal that were checked at login — the client can no longer drop these.
+  const { token, expiresAt } = signPosToken(user.id, tenant.id, {
+    licenceKey: parsed.data.licenceKey,
+    terminalCode: parsed.data.terminalCode,
+    surface,
+  });
   const tenantPayload = await serializeTenant(tenant);
 
   await logAudit({
@@ -86,7 +163,7 @@ router.post("/v1/pos/login", async (req, res): Promise<void> => {
     actorUserId: user.id,
     actorLabel: user.email,
     kind: "pos.login",
-    message: `POS login from ${user.email}`,
+    message: `POS login from ${user.email} (mode: ${mode})`,
   });
 
   res.json({
@@ -94,20 +171,99 @@ router.post("/v1/pos/login", async (req, res): Promise<void> => {
     expiresAt: expiresAt.toISOString(),
     user: serializeUser(user, membership),
     tenant: tenantPayload,
+    mode,
+    licence: licencePayload,
+    terminal: terminalPayload,
   });
 });
+
+// ---------------------------------------------------------------------------
+// Licence mode resolution + write guard.
+//
+// Re-derives the till's current mode from the licence binding carried in the
+// POS token. Used by GET /v1/pos/me (to report mode to the client) and by the
+// requirePosFullMode middleware (to block mutating actions when a licence is
+// read-only or locked). Re-validating on every request means a revoked or
+// suspended licence takes effect immediately, not just at next login.
+// ---------------------------------------------------------------------------
+async function resolveLicenceMode(auth: PosAuthContext): Promise<{
+  mode: "full" | "read_only" | "locked";
+  message: string | null;
+  licence: Awaited<ReturnType<typeof validateLicenceForOpen>>["licence"];
+  terminal: Awaited<ReturnType<typeof validateLicenceForOpen>>["terminal"];
+}> {
+  // A token must carry the FULL binding — licence key, registered terminal, and
+  // surface — to be treated as anything other than locked. There is no unbound
+  // fallback: writes require a token issued against a specific licence, terminal
+  // and surface at login. Requiring all three (including surface) closes the
+  // residual path where a partial/legacy token without `surface` would skip the
+  // web/desktop licence-type gate during write re-validation.
+  if (!auth.licenceKey || !auth.terminalCode || !auth.surface) {
+    return {
+      mode: "locked",
+      message: "This till is not activated against a licence and terminal. Sign in again.",
+      licence: null,
+      terminal: null,
+    };
+  }
+  const outcome = await validateLicenceForOpen({
+    tenantId: auth.tenant.id,
+    licenceKey: auth.licenceKey,
+    terminalCode: auth.terminalCode,
+    surface: auth.surface,
+  });
+  return { mode: outcome.mode, message: outcome.message, licence: outcome.licence, terminal: outcome.terminal };
+}
+
+/** Block mutating POS actions unless the till's licence resolves to full mode. */
+async function requirePosFullMode(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  const { mode, message, licence, terminal } = await resolveLicenceMode(req.posAuth!);
+  if (mode !== "full") {
+    res.status(403).json({
+      error:
+        message ??
+        (mode === "read_only"
+          ? "This till is in read-only mode and cannot complete this action."
+          : "This till licence is not active."),
+      mode,
+      licence,
+      terminal,
+    });
+    return;
+  }
+  next();
+}
 
 // ---------------------------------------------------------------------------
 // GET /v1/pos/me
 // ---------------------------------------------------------------------------
 router.get("/v1/pos/me", requirePosAuth, async (req, res): Promise<void> => {
-  const { user, tenant, membership } = req.posAuth!;
-  const { token, expiresAt } = signPosToken(user.id, tenant.id);
+  const { user, tenant, membership, licenceKey, terminalCode, surface } = req.posAuth!;
+  // Refuse to refresh a partially-bound (legacy) token: forcing re-login here
+  // prevents an under-bound session from being perpetuated indefinitely via the
+  // re-sign below. A fully-bound token re-validates normally.
+  if (!licenceKey || !terminalCode || !surface) {
+    res.status(401).json({ error: "Session is not fully activated. Please sign in again." });
+    return;
+  }
+  const { token, expiresAt } = signPosToken(user.id, tenant.id, {
+    licenceKey,
+    terminalCode,
+    surface,
+  });
+  const { mode, licence, terminal } = await resolveLicenceMode(req.posAuth!);
   res.json({
     token,
     expiresAt: expiresAt.toISOString(),
     user: serializeUser(user, membership),
     tenant: await serializeTenant(tenant),
+    mode,
+    licence,
+    terminal,
   });
 });
 
@@ -220,7 +376,7 @@ router.get("/v1/pos/sales", requirePosAuth, async (req, res): Promise<void> => {
 // ---------------------------------------------------------------------------
 // POST /v1/pos/sales
 // ---------------------------------------------------------------------------
-router.post("/v1/pos/sales", requirePosAuth, async (req, res): Promise<void> => {
+router.post("/v1/pos/sales", requirePosAuth, requirePosFullMode, async (req, res): Promise<void> => {
   const parsed = CreatePosSaleBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -265,6 +421,8 @@ router.post("/v1/pos/sales", requirePosAuth, async (req, res): Promise<void> => 
 
 // ---------------------------------------------------------------------------
 // POST /v1/pos/sales/:saleId/receipt
+// Not gated by requirePosFullMode: re-issuing a receipt for an existing sale is
+// a read-only reprint of historical data, allowed even in read-only mode.
 // ---------------------------------------------------------------------------
 router.post("/v1/pos/sales/:saleId/receipt", requirePosAuth, async (req, res): Promise<void> => {
   const parsed = SendPosReceiptBody.safeParse(req.body);
@@ -503,7 +661,7 @@ router.get("/v1/pos/till-sessions/current", requirePosAuth, async (req, res) => 
   res.json(open ? await serializeTillSession(open) : null);
 });
 
-router.post("/v1/pos/till-sessions/open", requirePosAuth, async (req, res): Promise<void> => {
+router.post("/v1/pos/till-sessions/open", requirePosAuth, requirePosFullMode, async (req, res): Promise<void> => {
   const parsed = OpenTillSessionInput.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
   const { tenant, user } = req.posAuth!;
@@ -545,6 +703,9 @@ router.post("/v1/pos/till-sessions/open", requirePosAuth, async (req, res): Prom
   res.status(201).json(await serializeTillSession(row));
 });
 
+// Not gated by requirePosFullMode: closing/cashing-up an already-open shift must
+// remain possible even if the licence has lapsed to read-only since open, so the
+// operator is never trapped with an unclosable session.
 router.post("/v1/pos/till-sessions/:sessionId/close", requirePosAuth, async (req, res): Promise<void> => {
   const parsed = CloseTillSessionInput.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
@@ -710,7 +871,7 @@ router.get("/v1/pos/transactions", requirePosAuth, async (req, res) => {
   res.json(result);
 });
 
-router.post("/v1/pos/transactions", requirePosAuth, async (req, res): Promise<void> => {
+router.post("/v1/pos/transactions", requirePosAuth, requirePosFullMode, async (req, res): Promise<void> => {
   const parsed = PosTransactionInput.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
   const { tenant, user } = req.posAuth!;
@@ -910,7 +1071,7 @@ router.post("/v1/pos/transactions", requirePosAuth, async (req, res): Promise<vo
   res.status(201).json(await serializeTransaction(row, insertedItems, user.name, tradeAcct?.name ?? null));
 });
 
-router.post("/v1/pos/transactions/:transactionId/refund", requirePosAuth, async (req, res): Promise<void> => {
+router.post("/v1/pos/transactions/:transactionId/refund", requirePosAuth, requirePosFullMode, async (req, res): Promise<void> => {
   const parsed = PosRefundInput.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
   const { tenant, user } = req.posAuth!;

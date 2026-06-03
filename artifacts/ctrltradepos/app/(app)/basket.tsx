@@ -13,6 +13,7 @@ import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
 import { useBasket } from "@/lib/basket";
 import { useModules } from "@/contexts/ModulesContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Tender = "cash" | "card" | "split" | "trade_account";
 
@@ -20,6 +21,8 @@ export default function BasketScreen() {
   const colors = useColors();
   const router = useRouter();
   const { modules, isLoading: modulesLoading } = useModules();
+  const { mode } = useAuth();
+  const readOnly = mode !== "full";
   const qc = useQueryClient();
   const basket = useBasket();
   const { data: tradeAccounts } = useListPosTradeAccounts();
@@ -68,6 +71,14 @@ export default function BasketScreen() {
 
   function submit() {
     setError(null);
+    if (readOnly) {
+      setError(
+        mode === "locked"
+          ? "This till licence is not active. Selling is disabled."
+          : "This till is in read-only mode. Selling is disabled.",
+      );
+      return;
+    }
     if (basket.items.length === 0) { setError("Basket is empty"); return; }
     const cash = Math.round((parseFloat(cashStr || "0") || 0) * 100);
     const card = Math.round((parseFloat(cardStr || "0") || 0) * 100);
@@ -107,6 +118,15 @@ export default function BasketScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
+        {readOnly && (
+          <View style={[styles.banner, { borderColor: colors.destructive, backgroundColor: colors.card }]}>
+            <Text style={[styles.bannerText, { color: colors.destructive }]}>
+              {mode === "locked"
+                ? "TILL LOCKED — licence not active. Selling is disabled."
+                : "READ-ONLY MODE — licence not fully active. Selling is disabled."}
+            </Text>
+          </View>
+        )}
         <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>ITEMS</Text>
           {basket.items.map((it, idx) => (
@@ -222,14 +242,16 @@ export default function BasketScreen() {
 
         <Pressable
           onPress={submit}
-          disabled={create.isPending || basket.items.length === 0}
+          disabled={create.isPending || basket.items.length === 0 || readOnly}
           style={({ pressed }) => [
             styles.submit,
-            { backgroundColor: colors.primary, opacity: create.isPending || basket.items.length === 0 || pressed ? 0.85 : 1 },
+            { backgroundColor: colors.primary, opacity: create.isPending || basket.items.length === 0 || readOnly || pressed ? 0.5 : 1 },
           ]}
         >
           {create.isPending ? <ActivityIndicator color={colors.primaryForeground} /> : (
-            <Text style={[styles.submitText, { color: colors.primaryForeground }]}>CHARGE £{(totals.total / 100).toFixed(2)}</Text>
+            <Text style={[styles.submitText, { color: colors.primaryForeground }]}>
+              {readOnly ? "SELLING DISABLED" : `CHARGE £${(totals.total / 100).toFixed(2)}`}
+            </Text>
           )}
         </Pressable>
       </ScrollView>
@@ -253,6 +275,8 @@ const styles = StyleSheet.create({
   title: { fontFamily: MONO_FONT, fontSize: 18, fontWeight: "700", letterSpacing: 2, marginTop: 4 },
   close: { fontFamily: MONO_FONT, fontSize: 12, letterSpacing: 2 },
   scroll: { padding: 16, gap: 14, paddingBottom: 60 },
+  banner: { borderWidth: 1, borderRadius: 10, padding: 14 },
+  bannerText: { fontFamily: MONO_FONT, fontSize: 12, letterSpacing: 1, fontWeight: "700", textAlign: "center" },
   section: { borderWidth: 1, borderRadius: 10, padding: 14 },
   sectionLabel: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 3, marginBottom: 10 },
   lineRow: { flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 10, borderBottomWidth: 1 },

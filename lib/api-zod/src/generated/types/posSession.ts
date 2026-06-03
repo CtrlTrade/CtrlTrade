@@ -5,6 +5,9 @@
  * CtrlTrade SaaS Portal API
  * OpenAPI spec version: 0.1.0
  */
+import type { PosLicence } from './posLicence';
+import type { PosSessionMode } from './posSessionMode';
+import type { PosTerminal } from './posTerminal';
 import type { SessionUser } from './sessionUser';
 import type { Tenant } from './tenant';
 
@@ -13,4 +16,7 @@ export interface PosSession {
   expiresAt: Date;
   user: SessionUser;
   tenant: Tenant;
+  mode?: PosSessionMode;
+  licence?: PosLicence;
+  terminal?: PosTerminal;
 }

@@ -21,6 +21,8 @@ export default function LoginScreen() {
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [licenceKey, setLicenceKey] = useState("");
+  const [terminalCode, setTerminalCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -29,10 +31,23 @@ export default function LoginScreen() {
       setError("Email and password are required.");
       return;
     }
+    if (!licenceKey.trim()) {
+      setError("A licence key is required to activate this till.");
+      return;
+    }
+    if (!terminalCode.trim()) {
+      setError("A terminal code is required to activate this till.");
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
-      await signIn(email.trim(), password);
+      await signIn(
+        email.trim(),
+        password,
+        licenceKey.trim() || undefined,
+        terminalCode.trim() || undefined,
+      );
     } catch (err) {
       const message = err instanceof Error ? err.message : "Sign-in failed.";
       setError(message.replace(/^HTTP \d+[^:]*:\s*/, ""));
@@ -90,6 +105,38 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               secureTextEntry
               placeholder="••••••••"
+              placeholderTextColor={colors.mutedForeground}
+              style={[
+                styles.input,
+                { color: colors.foreground, borderColor: colors.input, backgroundColor: colors.background },
+              ]}
+            />
+
+            <Text style={[styles.label, { color: colors.mutedForeground, marginTop: 16 }]}>
+              LICENCE KEY
+            </Text>
+            <TextInput
+              value={licenceKey}
+              onChangeText={setLicenceKey}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              placeholder="CTP-XXXX-XXXX-XXXX"
+              placeholderTextColor={colors.mutedForeground}
+              style={[
+                styles.input,
+                { color: colors.foreground, borderColor: colors.input, backgroundColor: colors.background },
+              ]}
+            />
+
+            <Text style={[styles.label, { color: colors.mutedForeground, marginTop: 16 }]}>
+              TERMINAL
+            </Text>
+            <TextInput
+              value={terminalCode}
+              onChangeText={setTerminalCode}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              placeholder="POS-001"
               placeholderTextColor={colors.mutedForeground}
               style={[
                 styles.input,
