@@ -7095,6 +7095,7 @@ export const CreatePosTransactionBody = zod.object({
   "cardTakenPence": zod.number().min(createPosTransactionBodyCardTakenPenceMin).optional(),
   "tradeCreditPence": zod.number().min(createPosTransactionBodyTradeCreditPenceMin).optional(),
   "notes": zod.string().nullish(),
+  "idempotencyKey": zod.string().nullish().describe('Client-generated UUID for offline deduplication; re-submitting the same key returns the existing transaction.'),
   "items": zod.array(zod.object({
   "productId": zod.string().nullish(),
   "variantId": zod.string().nullish(),

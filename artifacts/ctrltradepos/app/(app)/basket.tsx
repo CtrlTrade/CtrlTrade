@@ -14,8 +14,22 @@ import { MONO_FONT } from "@/constants/colors";
 import { useBasket } from "@/lib/basket";
 import { useModules } from "@/contexts/ModulesContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useOfflineSync } from "@/contexts/OfflineSyncContext";
+import { enqueue } from "@/lib/offlineQueue";
 
 type Tender = "cash" | "card" | "split" | "trade_account";
+
+function isNetworkError(err: unknown): boolean {
+  if (!err) return false;
+  const msg = (err as Error).message ?? "";
+  return (
+    msg.includes("Network request failed") ||
+    msg.includes("Failed to fetch") ||
+    msg.toLowerCase().includes("network") ||
+    msg.includes("ECONNREFUSED") ||
+    msg.includes("ETIMEDOUT")
+  );
+}
 
 export default function BasketScreen() {
   const colors = useColors();
@@ -26,6 +40,7 @@ export default function BasketScreen() {
   const qc = useQueryClient();
   const basket = useBasket();
   const { data: tradeAccounts } = useListPosTradeAccounts();
+  const { triggerSync, pendingCount } = useOfflineSync();
 
   useEffect(() => {
     if (!modulesLoading && !modules?.hasTradeShop) {
@@ -39,6 +54,7 @@ export default function BasketScreen() {
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [queuedOffline, setQueuedOffline] = useState(false);
 
   const totals = useMemo(() => {
     const trade = tradeAccounts?.find((t) => t.id === basket.tradeAccountId);
@@ -65,12 +81,46 @@ export default function BasketScreen() {
         basket.clear();
         router.replace({ pathname: "/(app)/receipt/[id]", params: { id: tx.id } });
       },
-      onError: (e: Error) => setError(e.message.replace(/^HTTP \d+[^:]*:\s*/, "")),
+      onError: async (e: Error) => {
+        if (isNetworkError(e)) {
+          await queueCurrentBasket();
+        } else {
+          setError(e.message.replace(/^HTTP \d+[^:]*:\s*/, ""));
+        }
+      },
     },
   });
 
+  async function queueCurrentBasket() {
+    const cash = Math.round((parseFloat(cashStr || "0") || 0) * 100);
+    const card = Math.round((parseFloat(cardStr || "0") || 0) * 100);
+    const credit = Math.round((parseFloat(creditStr || "0") || 0) * 100);
+    await enqueue({
+      items: basket.items.map((i) => ({
+        productId: i.productId,
+        variantId: i.variantId,
+        sku: i.sku,
+        description: i.description,
+        quantity: i.quantity,
+        unitPricePence: i.unitPricePence,
+        vatRatePct: i.vatRatePct,
+      })),
+      tender,
+      tradeAccountId: basket.tradeAccountId,
+      customerName: customerName.trim() || null,
+      customerEmail: customerEmail.trim() || null,
+      cashTakenPence: tender === "split" || tender === "cash" ? cash : undefined,
+      cardTakenPence: tender === "split" || tender === "card" ? card : undefined,
+      tradeCreditPence: tender === "split" || tender === "trade_account" ? credit : undefined,
+    });
+    basket.clear();
+    setQueuedOffline(true);
+    triggerSync();
+  }
+
   function submit() {
     setError(null);
+    setQueuedOffline(false);
     if (readOnly) {
       setError(
         mode === "locked"
@@ -103,6 +153,39 @@ export default function BasketScreen() {
         tradeCreditPence: tender === "split" || tender === "trade_account" ? credit : undefined,
       },
     });
+  }
+
+  if (queuedOffline) {
+    return (
+      <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+        <View style={[styles.titleBar, { borderColor: colors.border }]}>
+          <View>
+            <Text style={[styles.kicker, { color: colors.mutedForeground }]}>BASKET</Text>
+            <Text style={[styles.title, { color: colors.foreground }]}>QUEUED OFFLINE</Text>
+          </View>
+          <Pressable onPress={() => router.back()}>
+            <Text style={[styles.close, { color: colors.foreground }]}>✕ BACK</Text>
+          </Pressable>
+        </View>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 32, gap: 16 }}>
+          <Text style={[styles.offlineTitle, { color: colors.foreground }]}>SALE QUEUED</Text>
+          <Text style={[styles.offlineBody, { color: colors.mutedForeground }]}>
+            No connection detected. This sale has been saved locally and will sync automatically when connectivity returns.
+          </Text>
+          {pendingCount > 0 && (
+            <Text style={[styles.offlineBadge, { color: colors.primary }]}>
+              {pendingCount} sale{pendingCount === 1 ? "" : "s"} pending sync
+            </Text>
+          )}
+          <Pressable
+            onPress={() => router.replace("/(app)/index" as any)}
+            style={[styles.submit, { backgroundColor: colors.primary, marginTop: 8 }]}
+          >
+            <Text style={[styles.submitText, { color: colors.primaryForeground }]}>BACK TO TILL</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
   }
 
   return (
@@ -297,4 +380,7 @@ const styles = StyleSheet.create({
   totalsValue: { fontFamily: MONO_FONT, fontSize: 16, fontWeight: "700" },
   submit: { borderRadius: 8, paddingVertical: 18, alignItems: "center" },
   submitText: { fontFamily: MONO_FONT, fontSize: 14, letterSpacing: 3, fontWeight: "700" },
+  offlineTitle: { fontFamily: MONO_FONT, fontSize: 22, fontWeight: "700", letterSpacing: 3, textAlign: "center" },
+  offlineBody: { fontFamily: MONO_FONT, fontSize: 13, lineHeight: 20, textAlign: "center" },
+  offlineBadge: { fontFamily: MONO_FONT, fontSize: 12, letterSpacing: 2, fontWeight: "700" },
 });

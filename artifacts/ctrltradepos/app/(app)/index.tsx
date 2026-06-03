@@ -16,6 +16,7 @@ import { useColors } from "@/hooks/useColors";
 import { MONO_FONT } from "@/constants/colors";
 import { useModules } from "@/contexts/ModulesContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useOfflineSync } from "@/contexts/OfflineSyncContext";
 
 function money(pence: number): string {
   return `£${(pence / 100).toFixed(2)}`;
@@ -75,6 +76,7 @@ export default function PosHomeScreen() {
   const { mode } = useAuth();
   const posEnabled = modules?.posEnabled ?? false;
   const { data: session, isLoading: sessionLoading } = useGetCurrentTillSession();
+  const { pendingCount, isSyncing, triggerSync } = useOfflineSync();
 
   const isOpen = !!session;
   const takingsPence = session
@@ -112,6 +114,26 @@ export default function PosHomeScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={["top", "left", "right"]}>
       <Header title="POINT OF SALE" subtitle="Trade Counter & Warehouse" />
+
+      {pendingCount > 0 && (
+        <Pressable
+          onPress={triggerSync}
+          style={[styles.syncBanner, { backgroundColor: colors.card, borderColor: colors.primary }]}
+        >
+          <View style={styles.syncRow}>
+            <Text style={[styles.syncDot, { color: colors.primary }]}>●</Text>
+            <Text style={[styles.syncText, { color: colors.foreground }]}>
+              {isSyncing
+                ? `SYNCING ${pendingCount} OFFLINE SALE${pendingCount === 1 ? "" : "S"}…`
+                : `${pendingCount} OFFLINE SALE${pendingCount === 1 ? "" : "S"} PENDING SYNC`}
+            </Text>
+            {!isSyncing && (
+              <Text style={[styles.syncAction, { color: colors.primary }]}>SYNC NOW</Text>
+            )}
+          </View>
+        </Pressable>
+      )}
+
       <ScrollView contentContainerStyle={styles.scroll}>
         {(isLocked || isReadOnly) && (
           <View style={[styles.modeBanner, { backgroundColor: isLocked ? "#ef444418" : "#f59e0b18", borderColor: isLocked ? "#ef4444" : "#f59e0b" }]}>
@@ -216,6 +238,11 @@ const styles = StyleSheet.create({
   centered: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 40, gap: 12 },
   disabledTitle: { fontFamily: MONO_FONT, fontSize: 18, letterSpacing: 2, fontWeight: "700" },
   disabledBody: { fontFamily: MONO_FONT, fontSize: 13, textAlign: "center", lineHeight: 20 },
+  syncBanner: { borderTopWidth: 1, borderBottomWidth: 1, paddingHorizontal: 20, paddingVertical: 10 },
+  syncRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  syncDot: { fontFamily: MONO_FONT, fontSize: 10 },
+  syncText: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 1, flex: 1 },
+  syncAction: { fontFamily: MONO_FONT, fontSize: 11, letterSpacing: 2, fontWeight: "700" },
   statusCard: { borderWidth: 1, borderRadius: 12, padding: 20 },
   statusRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   statusKicker: { fontFamily: MONO_FONT, fontSize: 10, letterSpacing: 3 },

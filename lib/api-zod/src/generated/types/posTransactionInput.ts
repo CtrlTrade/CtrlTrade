@@ -32,6 +32,11 @@ export interface PosTransactionInput {
   tradeCreditPence?: number;
   /** @nullable */
   notes?: string | null;
+  /**
+     * Client-generated UUID for offline deduplication; re-submitting the same key returns the existing transaction.
+     * @nullable
+     */
+  idempotencyKey?: string | null;
   /** @minItems 1 */
   items: PosTransactionItemInput[];
 }

@@ -877,6 +877,25 @@ router.post("/v1/pos/transactions", requirePosAuth, requirePosFullMode, async (r
   const { tenant, user } = req.posAuth!;
   const body = parsed.data;
 
+  // Idempotency: if a client-generated key is supplied and a transaction with that
+  // key already exists for this tenant, return the existing one rather than inserting
+  // a duplicate. This allows offline sales to be synced multiple times safely.
+  if (body.idempotencyKey) {
+    const [existing] = await db
+      .select()
+      .from(posTransactionsTable)
+      .where(and(eq(posTransactionsTable.tenantId, tenant.id), eq(posTransactionsTable.idempotencyKey, body.idempotencyKey)))
+      .limit(1);
+    if (existing) {
+      const items = await db
+        .select()
+        .from(posTransactionItemsTable)
+        .where(eq(posTransactionItemsTable.transactionId, existing.id));
+      res.json(await serializeTransaction(existing, items, user.name, null));
+      return;
+    }
+  }
+
   // Resolve location
   const locationId = body.locationId ?? (await getOrCreateDefaultLocation(tenant.id));
 
@@ -989,6 +1008,7 @@ router.post("/v1/pos/transactions", requirePosAuth, requirePosFullMode, async (r
           tradeCreditPence: credit,
           changeGivenPence: change,
           notes: body.notes ?? null,
+          idempotencyKey: body.idempotencyKey ?? null,
         })
         .returning();
       row = r;

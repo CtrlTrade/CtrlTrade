@@ -1832,12 +1832,14 @@ export const posTransactionsTable = pgTable(
     receiptDeliveredAt: timestamp("receipt_delivered_at", { withTimezone: true }),
     receiptMethod: varchar("receipt_method", { length: 16 }),
     receiptDestination: text("receipt_destination"),
+    idempotencyKey: varchar("idempotency_key", { length: 128 }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     tenantIdx: index("pos_transactions_tenant_idx").on(t.tenantId),
     sessionIdx: index("pos_transactions_session_idx").on(t.tillSessionId),
     uniqNumber: unique("pos_transactions_tenant_number_uniq").on(t.tenantId, t.number),
+    idempotencyKeyUniq: unique("pos_transactions_idempotency_key_uniq").on(t.tenantId, t.idempotencyKey),
   }),
 );
 
