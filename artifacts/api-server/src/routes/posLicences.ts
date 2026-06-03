@@ -73,6 +73,10 @@ router.post(
       return;
     }
     const tenantId = req.auth!.tenant!.id;
+    if (!(await ownsBranch(tenantId, parsed.data.branchId))) {
+      res.status(400).json({ error: "Branch not found for this business" });
+      return;
+    }
     const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
     const [row] = await db
       .insert(posLicencesTable)
@@ -164,6 +168,10 @@ router.post(
       licenceId = lic.id;
     } else if (licenceId && !(await ownsLicence(tenantId, licenceId))) {
       res.status(400).json({ error: "Licence not found for this business" });
+      return;
+    }
+    if (!licenceId) {
+      res.status(400).json({ error: "A licence key or licence is required to register a terminal" });
       return;
     }
     if (!(await ownsBranch(tenantId, parsed.data.branchId))) {

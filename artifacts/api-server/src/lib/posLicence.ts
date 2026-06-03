@@ -191,17 +191,35 @@ export async function validateLicenceForOpen(opts: {
   }
 
   const now = new Date();
+  // Always record that a check happened, even when the open is ultimately rejected.
   await db.update(posLicencesTable).set({ lastCheckAt: now }).where(eq(posLicencesTable.id, licence.id));
 
+  // When a terminal code is supplied, the terminal must exist, be active, be bound
+  // to *this* licence, and (if both are branch-scoped) share the licence's branch.
   let terminal: PosTerminal | undefined;
   if (opts.terminalCode) {
     [terminal] = await db
       .select()
       .from(posTerminalsTable)
       .where(and(eq(posTerminalsTable.tenantId, opts.tenantId), eq(posTerminalsTable.terminalCode, opts.terminalCode)));
-    if (terminal) {
-      await db.update(posTerminalsTable).set({ lastSeenAt: now }).where(eq(posTerminalsTable.id, terminal.id));
+    if (!terminal) {
+      return { valid: false, status, mode: "locked", message: "This terminal is not registered for this business.", licence: serializeLicence({ ...licence, lastCheckAt: now }, null, []), terminal: null };
     }
+    if (terminal.status !== "active") {
+      return { valid: false, status, mode: "locked", message: "This terminal has been deactivated. Contact your administrator.", licence: serializeLicence({ ...licence, lastCheckAt: now }, null, []), terminal: serializeTerminal(terminal) };
+    }
+    if (terminal.licenceId !== licence.id) {
+      return { valid: false, status, mode: "locked", message: "This terminal is not linked to that licence key.", licence: serializeLicence({ ...licence, lastCheckAt: now }, null, []), terminal: serializeTerminal(terminal) };
+    }
+    if (licence.branchId && terminal.branchId && licence.branchId !== terminal.branchId) {
+      return { valid: false, status, mode: "locked", message: "This terminal belongs to a different branch than the licence.", licence: serializeLicence({ ...licence, lastCheckAt: now }, null, []), terminal: serializeTerminal(terminal) };
+    }
+  }
+
+  // Only refresh last-seen once the licence/terminal binding is valid and usable.
+  if (terminal && mode !== "locked") {
+    await db.update(posTerminalsTable).set({ lastSeenAt: now }).where(eq(posTerminalsTable.id, terminal.id));
+    terminal = { ...terminal, lastSeenAt: now };
   }
 
   const valid = mode === "full";
