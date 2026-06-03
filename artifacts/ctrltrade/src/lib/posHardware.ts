@@ -174,7 +174,7 @@ class BarcodeScannerService {
       return;
     }
 
-    if (e.key.length === 1) {
+    if (e.key && e.key.length === 1) {
       if (this.wedgeTimer) clearTimeout(this.wedgeTimer);
       this.wedgeBuffer += e.key;
       // Reset buffer if no character arrives within 80 ms (human typing pace)
