@@ -104,7 +104,7 @@ router.post("/v1/admin/users/set-password", async (req, res): Promise<void> => {
   const body = z
     .object({
       email: z.string().email().optional(),
-      userId: z.string().min(1).optional(),
+      userId: z.string().uuid().optional(),
       password: z.string().min(8),
     })
     .refine((d) => Boolean(d.email) || Boolean(d.userId), {
@@ -116,9 +116,11 @@ router.post("/v1/admin/users/set-password", async (req, res): Promise<void> => {
     return;
   }
 
+  // Match login semantics: exact email lookup (deterministic, avoids the
+  // ambiguity of a case-insensitive match hitting multiple rows).
   const whereClause = body.data.userId
     ? eq(usersTable.id, body.data.userId)
-    : ilike(usersTable.email, body.data.email!);
+    : eq(usersTable.email, body.data.email!);
   const [user] = await db.select().from(usersTable).where(whereClause);
   if (!user) {
     res.status(404).json({ error: "User not found" });
