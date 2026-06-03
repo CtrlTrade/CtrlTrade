@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
+import { useGetPosDownloads } from "@workspace/api-client-react";
+import { DOWNLOAD_LINKS } from "@/lib/downloadLinks";
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -9,6 +11,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+  const { data: posDownloads } = useGetPosDownloads();
   const productsRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
 
@@ -247,15 +250,28 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <div>
               <h3 className="font-semibold mb-4 text-xs uppercase tracking-wider">Download</h3>
               <ul className="space-y-2.5 text-sm text-muted-foreground">
-                {[
-                  { label: "Windows" },
-                  { label: "macOS" },
-                  { label: "iOS" },
-                  { label: "Android" },
-                ].map(p => (
+                {([
+                  { label: "Windows", href: posDownloads?.windowsUrl ?? null },
+                  { label: "macOS", href: posDownloads?.macosUrl ?? null },
+                  { label: "iOS", href: DOWNLOAD_LINKS.ios },
+                  { label: "Android", href: DOWNLOAD_LINKS.android },
+                ] satisfies { label: string; href: string | null }[]).map(p => (
                   <li key={p.label} className="flex items-center gap-2">
-                    <span>{p.label}</span>
-                    <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-medium">Coming Soon</span>
+                    {p.href ? (
+                      <a
+                        href={p.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-foreground transition-colors"
+                      >
+                        {p.label}
+                      </a>
+                    ) : (
+                      <>
+                        <span>{p.label}</span>
+                        <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-medium">Coming Soon</span>
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>
