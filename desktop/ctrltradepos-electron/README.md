@@ -107,6 +107,32 @@ This compiles `src/main.ts` → `src/main.js` and launches Electron with a minim
 
 ---
 
+## Releasing via GitHub Actions
+
+Push a version tag and GitHub automatically builds the Windows `.exe` and attaches it to a GitHub Release — no local Windows machine needed.
+
+### One-time setup
+
+1. **Push the repo to GitHub** (if not already done).
+2. **Add the `EXPO_PUBLIC_DOMAIN` secret** in your GitHub repository:
+   - Go to **Settings → Secrets and variables → Actions → New repository secret**
+   - Name: `EXPO_PUBLIC_DOMAIN`
+   - Value: your production domain, e.g. `ctrltrade.co.uk` (no `https://`, no trailing slash)
+
+### Releasing a new version
+
+```bash
+# Tag the commit you want to release
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+That's it. GitHub Actions picks up the tag, builds the installer on a cloud Windows machine, and uploads `CtrlTradePos Setup 1.0.0.exe` to the GitHub Release automatically (usually takes ~10 minutes).
+
+You can then download the `.exe` from the **Releases** page of your GitHub repo and upload it via **Admin → POS Downloads** to update the footer download link on the site.
+
+---
+
 ## Code signing & notarisation
 
 Code signing is **not** configured here. To distribute the app:
